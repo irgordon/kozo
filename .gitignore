@@ -1,3 +1,69 @@
+# -------------------------
+# Zig build artifacts
+# -------------------------
 .zig-cache/
 zig-out/
 *.o
+
+# Zig temporary files
+*.zig.zon
+*.zig-cache/
+*.a
+*.so
+*.dylib
+
+# -------------------------
+# Rust build artifacts
+# -------------------------
+/target/
+/Cargo.lock
+**/*.rs.bk
+
+# Rust tooling
+/.cargo/
+/rustfmt.toml
+/clippy.toml
+
+# -------------------------
+# macOS system clutter
+# -------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# macOS metadata in folders
+.Spotlight-V100
+.Trashes
+
+# -------------------------
+# Editor / IDE files
+# -------------------------
+# VSCode
+.vscode/
+*.code-workspace
+
+# JetBrains
+.idea/
+
+# Vim / Neovim
+*.swp
+*.swo
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# -------------------------
+# Common development artifacts
+# -------------------------
+*.log
+*.tmp
+*.bak
+*.cache/
+dist/
+build/
+.env
+.env.*
