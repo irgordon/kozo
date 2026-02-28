@@ -4,7 +4,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Built_with-Zig-F7A41D?style=for-the-badge&logo=zig&logoColor=white" />
-  <img src="https://img.shields.io/badge/Built_with-Rust-000000?style=for-the-badge&logo=rust&logoColor=white" />
+  <img src="https://img.shields.io/badge/Built_with-Rust-000000?style=for-the-badge&logo=rust&logoColor=#B7410E" />
   <img src="https://img.shields.io/badge/Platform-KOZO_Native-000000?style=for-the-badge&logo=linux&logoColor=white" />
   <img src="https://img.shields.io/badge/License-FOSS-000000?style=for-the-badge&logo=opensourceinitiative&logoColor=white" />
   <img src="https://img.shields.io/badge/Architectures-x86__64%20%7C%20ARM64-000000?style=for-the-badge" />
