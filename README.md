@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="kozo-logo.png" width="240" alt="KOZO: Made Simple, Designed Secure.">
+  <img src="kozo-logo.svg" width="240" alt="KOZO: Made Simple, Designed Secure.">
 </p>
 
 <p align="center">
