@@ -1,59 +1,63 @@
 <p align="center">
-  <img src="kozo-logo.svg" width="240" alt="KOZO: Made Simple, Designed Secure.">
+  <a href="https://kozo.page"><img src="kozo-logo.svg" width="240" alt="KOZO: Made Simple, Designed Secure."></a>
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/Built_with-Zig-F7A41D?style=for-the-badge&logo=zig&logoColor=white" />
   <img src="https://img.shields.io/badge/Built_with-Rust-000000?style=for-the-badge&logo=rust&logoColor=white" />
-  <img src="https://img.shields.io/badge/Platform-Linux-000000?style=for-the-badge&logo=linux&logoColor=white" />
+  <img src="https://img.shields.io/badge/Platform-KOZO_Native-000000?style=for-the-badge&logo=linux&logoColor=white" />
   <img src="https://img.shields.io/badge/License-FOSS-000000?style=for-the-badge&logo=opensourceinitiative&logoColor=white" />
-  <img src="https://img.shields.io/badge/Architectures-x86__64%20%7C%20ARM64%20%7C%20RISC--V-000000?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Architectures-x86__64%20%7C%20ARM64-000000?style=for-the-badge" />
 </p>
 
 # **KOZO**
 
-KOZO is a modern, modular operating system written in Zig and Rust. It runs headless on servers and with a full GUI on desktops, across x86‑64, ARM64 (aarch64), and RISC‑V (riscv64). Every layer is designed privacy‑first, secure by default, and aligned with strict SOLID and Single Layer Abstraction principles.
+**KOZO** is a next-generation operating system built from the ground up for privacy, performance, and peace of mind. By combining the precision of **Zig** with the safety of **Rust**, KOZO creates a computing environment that is "Secure by Default" without sacrificing the apps you love.
 
-## **Why KOZO**
 
-- **Modular by design**  
-  Each subsystem is isolated, replaceable, and cleanly bounded. No cross‑layer bleed, no hidden coupling.
 
-- **Secure by default**  
-  Defense‑in‑depth across memory, processes, capabilities, and I/O. No optional security. No legacy assumptions.
+## **Why KOZO?**
 
-- **Predictable architecture**  
-  A strict Single Layer Abstraction model ensures clarity, testability, and long‑term maintainability.
+- **Built-In Privacy**
+  In KOZO, your data isn't just "protected"—it's unreachable. Using a **Zero Trust** model, apps only see exactly what you allow them to see. No more hidden tracking, no more "ambient" access to your files.
 
-- **Headless or full GUI**  
-  Runs lean on servers, fully featured on desktops. One OS, multiple execution modes.
+- **Unmatched Stability**
+  By isolating every part of the system (drivers, internet, files) into its own "sandbox," KOZO ensures that a crash in one app never takes down the whole computer. It’s an OS that stays out of your way and just works.
 
-- **Multi‑architecture**  
-  First‑class support for x86‑64, ARM64, and RISC‑V with consistent behavior across all platforms.
+- **Run Your Favorite Apps**
+  You don't have to switch your workflow. KOZO features a built-in compatibility layer that allows standard Linux applications to run safely and smoothly, but with enhanced security and privacy controls.
+
+- **Performance Without Compromise**
+  We use a "Microkernel" design—keeping the core of the OS tiny and lightning-fast. This means faster boot times, smoother multitasking, and better battery life on laptops.
+
+- **Clear-Name Security**
+  We've replaced confusing "permissions" with **Clear-Name** prompts. Instead of cryptic codes, KOZO asks you simple questions: *"Allow the Browser to access your Downloads folder?"* You are always in control.
+
+
 
 ## **Core Principles**
 
-- **Deterministic behavior**  
-  Clear boundaries, explicit capabilities, and reproducible execution paths.
+- **Simple & Modular**
+  Every piece of KOZO does one thing and does it well. This makes the system easier to update, harder to break, and simpler to trust.
 
-- **Minimal surface area**  
-  Only the essentials live in the core. Everything else is modular and optional.
+- **Defense-in-Depth**
+  We assume threats exist and build layers of protection around your digital life. If one layer is ever compromised, the others remain locked tight.
 
-- **Defense‑in‑depth**  
-  Memory safety, process isolation, capability‑scoped APIs, and hardened defaults.
-
-- **Clarity over complexity**  
-  Every component has a single responsibility and a single abstraction boundary.
+- **Modern Foundations**
+  Leveraging the latest in systems programming (Zig & Rust), KOZO avoids the "legacy baggage" of 40-year-old operating systems, focusing instead on the needs of today's users.
 
 ## **Project Structure**
 
-
+* `kernel/`: The "Heart" of the system (Zig). High-precision, minimal code.
+* `services/`: The "Brain" of the system (Rust). Safe, smart system logic.
+* `scripts/`: The "Builder." Ensures every version of KOZO is perfectly crafted.
 
 ## **Status**
 
-KOZO is under active development. Architecture, modules, and platform layers are being built in parallel with strict documentation and reproducibility standards.
+KOZO is currently in early, active development. We are laying the foundations for a stable, public release. Early adopters and developers are encouraged to follow our architectural specs for deep-dive technical details.
 
 ## **License**
 
-MIT + Apache 2.0 (dual‑licensed)
+MIT + Apache 2.0 (dual-licensed)
 
 ---
