@@ -52,7 +52,7 @@ TRAP_STUB trap_debug 1
 TRAP_STUB trap_nmi 2
 TRAP_STUB trap_breakpoint 3
 TRAP_STUB trap_overflow 4
-TRAP_STUB trap_bound_range 5
+// Vector 5: Formerly BOUND, now Reserved in 64-bit
 TRAP_STUB trap_invalid_opcode 6
 TRAP_STUB trap_device_not_avail 7
 TRAP_STUB trap_double_fault 8
@@ -239,7 +239,7 @@ idt_set_gate:
     ret
 
 // ============================================================================
-// Data Section - IDT
+// Data Section - IDT & Trap Table
 // ============================================================================
 
 .section .data
@@ -253,34 +253,34 @@ idt_descriptor:
     .word idt_end - idt - 1       // Limit
     .quad idt                     // Base
 
-// Handler table - filled by Zig on init
-.global trap_handlers
-trap_handlers:
-    .quad trap_divide_error
-    .quad trap_debug
-    .quad trap_nmi
-    .quad trap_breakpoint
-    .quad trap_overflow
-    .quad trap_bound_range
-    .quad trap_invalid_opcode
-    .quad trap_device_not_avail
-    .quad trap_double_fault
+.align 8
+.global trap_table
+trap_table:
+    .quad trap_divide_error      /* 0 */
+    .quad trap_debug             /* 1 */
+    .quad trap_nmi               /* 2 */
+    .quad trap_breakpoint        /* 3 */
+    .quad trap_overflow          /* 4 */
+    .quad trap_default           /* 5: Formerly BOUND, now Reserved in 64-bit */
+    .quad trap_invalid_opcode    /* 6 */
+    .quad trap_device_not_avail  /* 7 */
+    .quad trap_double_fault      /* 8 */
     .quad 0                       // 9: Reserved
-    .quad trap_invalid_tss
-    .quad trap_segment_not_present
-    .quad trap_stack_segment
-    .quad trap_general_protection
-    .quad trap_page_fault
+    .quad trap_invalid_tss       /* 10 */
+    .quad trap_segment_not_present /* 11 */
+    .quad trap_stack_segment     /* 12 */
+    .quad trap_general_protection /* 13 */
+    .quad trap_page_fault        /* 14 */
     .quad 0                       // 15: Reserved
-    .quad trap_x87_exception
-    .quad trap_alignment_check
-    .quad trap_machine_check
-    .quad trap_simd_exception
-    .quad trap_virtualization
+    .quad trap_x87_exception     /* 16 */
+    .quad trap_alignment_check   /* 17 */
+    .quad trap_machine_check     /* 18 */
+    .quad trap_simd_exception    /* 19 */
+    .quad trap_virtualization    /* 20 */
     .quad 0, 0, 0                 // 21-23: Reserved
     .quad 0, 0, 0                 // 24-26: Reserved
     .quad 0, 0, 0                 // 27-29: Reserved
-    .quad trap_security
+    .quad trap_security          /* 30 */
     .quad 0                       // 31: Reserved
     // 32-255: default handler
     .rept 224

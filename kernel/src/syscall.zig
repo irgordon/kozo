@@ -7,6 +7,8 @@ const cap = @import("capability.zig");
 const thread = @import("thread.zig");
 const sched = @import("scheduler.zig");
 
+pub const SYS_MAP_MEMORY = 12;
+
 /// System V ABI: args in rdi, rsi, rdx, r10, r8, r9
 /// Returns: error code (0 = success, negative = error)
 pub export fn kozo_syscall_handler(

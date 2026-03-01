@@ -11,17 +11,145 @@ and this project adheres to the following versioning scheme:
 
 ---
 
+## [0.0.3] - 2026-02-28
+
+### Status
+
+Development pre-alpha - UEFI & PMM Foundation
+
+### Overview
+
+Transitioned to a pure 64-bit UEFI boot architecture and implemented the foundational Physical Memory Manager (PMM). This version establishes spec-compliant memory map parsing and restores critical ABI synchronization between Zig and Rust layers.
+
+### Added
+
+#### Memory Management
+
+- **Physical Memory Manager (PMM)**: Implemented a bitmap-based frame allocator in `kernel/src/memory/pmm.zig`.
+- **UEFI Memory Map Parsing**: Added spec-compliant stride indexing using `descriptor_size` for robust memory map traversal.
+- **BootInfo Contract**: Restored `common/boot_info.zig` as the "Sacred Contract" between the UEFI loader and the kernel.
+
+#### ABI Synchronization
+
+- **ABI Generator**: Created `scripts/gen_abi.zig` to automatically sync syscall numbers and constants to Rust.
+- **Extended syscalls**: Added `SYS_MAP_MEMORY` syscall constant for future VMM integration.
+- **Build System**: Restored the `abi` step in `build.zig` to ensure kernel/service lockstep.
+
+#### Architecture Refinements
+
+- **Pure 64-bit Trap Table**: Updated `trap.S` to prune the legacy `BOUND` instruction and implement a reserved trap table.
+- **UEFI Loader Logic**: Integrated GOP, memory map, and ELF64 loading into the `boot/uefi` layer.
+
+### Removed
+
+- **Redundant Code**: Deleted misplaced `kernel/src/syscall.zig.rs`.
+- **Legacy Assembly**: Removed `trap_bound_range` (obsolete in long mode).
+
+### Next Steps (0.0.4 Target)
+
+1. Implement Virtual Memory Manager (VMM) with page table walking.
+2. Wire up the first userspace capability from the PMM untyped pool.
+3. Establish the higher-half kernel mapping using the new PMM frames.
+
+---
+
+## [0.0.2] - 2026-02-28
+
+### Status
+
+Development pre-alpha - Surgical Genesis Block
+
+### Overview
+
+Completed minimal x86_64 bring-up with higher-half kernel mapping. The kernel now successfully boots via PVH ELF Note, enters long mode, and executes Zig code in the higher-half virtual address space (0xffffffff80000000).
+
+### Added
+
+#### x86_64 Boot Architecture
+
+- **PVH ELF Note**: Official Xen-compliant PVH entry point (type 18) for QEMU direct boot
+- **Long Mode Entry**: Complete 32-bit to 64-bit transition with identity paging
+- **Higher-Half Mapping**: Kernel mapped to 0xffffffff80000000 with proper PHDRS
+- **Page Tables**: Identity map first 2MB using huge pages (2MB pages)
+- **GDT Setup**: 64-bit code and data segments for long mode
+- **Stack Pivot**: Transition from boot stack to higher-half kernel stack
+- **BSS Zeroing**: Assembly routine to zero BSS before entering Zig
+
+#### Assembly Implementation
+
+- `kernel/arch/x86_64/boot.S`: Complete boot sequence with VGA heartbeat debugging
+- `kernel/arch/x86_64/trap.S`: IDT setup, trap handlers, syscall entry point
+- `kernel/arch/x86_64/context.S`: Context save/restore for callee-saved registers
+- `kernel/arch/x86_64/linker.ld`: Surgical linker script with PT_NOTE/PT_LOAD PHDRS
+
+#### Kernel Core (Zig)
+
+- `kernel/src/abi.zig`: Zig-native ABI constants (syscall numbers, capability types)
+- `kernel/src/spinlock.zig`: Minimal spinlock implementation with IRQ save/restore
+- `kernel/src/thread.zig`: TCB structure with context, IPC state, capability roots
+- `kernel/src/scheduler.zig`: Run queue with enqueue/dequeue/yield primitives
+- `kernel/src/main.zig`: Hardened serial driver with LSR polling
+
+#### Build System Fixes
+
+- Zig 0.13.0 API compatibility updates
+- Fixed `CompileStep` → `Step.Compile` naming
+- Fixed `ChildProcess` → `process.Child` naming
+- Added proper path handling with `b.path()`
+- Simplified build.zig for kernel-only development
+
+### Changed
+
+#### Boot Process
+
+- **Before**: Empty assembly stubs, no boot capability
+- **After**: Full PVH boot chain from 32-bit entry to 64-bit Zig main
+
+#### Memory Layout
+
+- **Before**: Flat 1MB loading, no virtual memory
+- **After**: Higher-half kernel at 0xffffffff80000000, identity-mapped boot
+
+#### Linker Script
+
+- **Before**: Basic section placement, overlapping sections
+- **After**: Explicit PHDRS with PT_NOTE for PVH, PT_LOAD for segments
+
+### Known Limitations
+
+#### Remaining Blockers
+
+- **Scheduler**: Basic structure present but not integrated with context switch
+- **Threading**: TCB defined but thread creation not fully wired
+- **IPC**: Architecture defined but fast path not implemented
+- **Memory Mapping**: Page table walking not yet implemented
+- **Serial Output**: VGA heartbeat works but serial port output pending verification
+
+#### Next Steps (0.0.3 Target)
+
+1. Integrate scheduler with context switch
+2. Implement thread creation and management
+3. Wire up IPC fast path
+4. Implement page table walking for memory mapping
+5. Verify serial output in QEMU
+6. Begin Rust service integration
+
+---
+
 ## [0.0.1] - 2026-02-28
 
 ### Status
+
 Development pre-alpha - Genesis Block
 
 ### Overview
+
 Initial project scaffolding and foundational architecture for the KOZO capability-based microkernel operating system. This version establishes the build system, kernel architecture, and service framework, with significant implementation work remaining.
 
 ### Added
 
 #### Build System
+
 - Zig-based master build system (`build.zig`) with ABI lockstep generation
 - Automatic generation of synchronized ABI headers (`kozo_abi.h`) and Rust modules (`abi.rs`)
 - Toolchain validation for Zig 0.13.0 and Rust 1.77.0
@@ -33,6 +161,7 @@ Initial project scaffolding and foundational architecture for the KOZO capabilit
 - Reproducible build support via `SOURCE_DATE_EPOCH`
 
 #### Kernel (Layer 0 - Zig)
+
 - Kernel main entry point (`kernel/src/main.zig`) with BootInfo handling
 - Capability system foundation (`kernel/src/capability.zig`):
   - CNode (Capability Node) structure for capability tables
@@ -58,6 +187,7 @@ Initial project scaffolding and foundational architecture for the KOZO capabilit
   - `kernel/arch/x86_64/trap.S` (IDT/syscall entry placeholder)
 
 #### Services (Layer 1 - Rust)
+
 - kozo-sys system interface library:
   - Complete syscall wrappers in inline assembly
   - Type-safe capability handles (CapHandle, CNodeHandle, EndpointHandle)
@@ -77,6 +207,7 @@ Initial project scaffolding and foundational architecture for the KOZO capabilit
 - FSD (Filesystem Daemon) stub (`services/fsd/src/main.rs`)
 
 #### Documentation
+
 - Project manifesto (`docs/MANIFESTO.md`) - Core principles and philosophy
 - High-level architecture specification (`docs/spec/ARCHITECTURE.md`)
 - Application architecture specification (`docs/spec/APPLICATION_ARCHITECTURE.md`)
@@ -86,6 +217,7 @@ Initial project scaffolding and foundational architecture for the KOZO capabilit
 - Project README with structure overview
 
 #### ABI Definition
+
 - 20 syscall numbers defined (capability, IPC, threading, endpoints, memory, debug)
 - Capability types: Null, Untyped, CNode, Endpoint, Thread, AddressSpace, Frame, PageTable, IrqHandler
 - Rights bitmask: READ, WRITE, GRANT, MAP
@@ -95,6 +227,7 @@ Initial project scaffolding and foundational architecture for the KOZO capabilit
 ### Known Limitations
 
 #### Critical Blockers
+
 - **Assembly stubs are empty**: boot.S, context.S, ipc.S, trap.S contain only file headers
 - **Scheduler not implemented**: `kernel/src/scheduler.zig` is empty (3 lines)
 - **Thread Control Blocks incomplete**: `kernel/src/thread.zig` has empty TCB struct
@@ -102,12 +235,14 @@ Initial project scaffolding and foundational architecture for the KOZO capabilit
 - **Cannot boot to user mode**: No path from kernel entry to Init service execution
 
 #### Service Gaps
+
 - Policy Service does not compile (references non-existent types: IPCBuffer, Endpoint)
 - FSD missing Cargo.toml and implementation
 - No actual binary loading from initrd
 - No service manager functionality in Init
 
 #### Hardware Support
+
 - x86_64 assembly layer incomplete
 - No interrupt controller (x2APIC) support
 - No timer implementation
@@ -115,12 +250,14 @@ Initial project scaffolding and foundational architecture for the KOZO capabilit
 - aarch64 architecture defined but no implementation
 
 ### Security Notes
+
 - Capability model properly designed with rights attenuation
 - Badge generation uses simple mixing (not cryptographically secure for production)
 - Memory zeroing on retype prevents information leakage
 - Zero-heap kernel design eliminates resource exhaustion attacks
 
 ### Dependencies
+
 - Zig 0.13.0 (strictly enforced)
 - Rust 1.77.0 (strictly enforced)
 - QEMU (for testing)
@@ -129,6 +266,7 @@ Initial project scaffolding and foundational architecture for the KOZO capabilit
 - objcopy (for debug symbols)
 
 ### Next Steps (0.0.2 Target)
+
 1. Implement x86_64 assembly stubs (boot, context switch, IPC, traps)
 2. Complete scheduler with round-robin queue
 3. Implement Thread Control Block structure
@@ -139,85 +277,14 @@ Initial project scaffolding and foundational architecture for the KOZO capabilit
 
 ---
 
-## [0.0.2] - 2026-02-28
-
-### Status
-Development pre-alpha - Surgical Genesis Block
-
-### Overview
-Completed minimal x86_64 bring-up with higher-half kernel mapping. The kernel now successfully boots via PVH ELF Note, enters long mode, and executes Zig code in the higher-half virtual address space (0xffffffff80000000).
-
-### Added
-
-#### x86_64 Boot Architecture
-- **PVH ELF Note**: Official Xen-compliant PVH entry point (type 18) for QEMU direct boot
-- **Long Mode Entry**: Complete 32-bit to 64-bit transition with identity paging
-- **Higher-Half Mapping**: Kernel mapped to 0xffffffff80000000 with proper PHDRS
-- **Page Tables**: Identity map first 2MB using huge pages (2MB pages)
-- **GDT Setup**: 64-bit code and data segments for long mode
-- **Stack Pivot**: Transition from boot stack to higher-half kernel stack
-- **BSS Zeroing**: Assembly routine to zero BSS before entering Zig
-
-#### Assembly Implementation
-- `kernel/arch/x86_64/boot.S`: Complete boot sequence with VGA heartbeat debugging
-- `kernel/arch/x86_64/trap.S`: IDT setup, trap handlers, syscall entry point
-- `kernel/arch/x86_64/context.S`: Context save/restore for callee-saved registers
-- `kernel/arch/x86_64/linker.ld`: Surgical linker script with PT_NOTE/PT_LOAD PHDRS
-
-#### Kernel Core (Zig)
-- `kernel/src/abi.zig`: Zig-native ABI constants (syscall numbers, capability types)
-- `kernel/src/spinlock.zig`: Minimal spinlock implementation with IRQ save/restore
-- `kernel/src/thread.zig`: TCB structure with context, IPC state, capability roots
-- `kernel/src/scheduler.zig`: Run queue with enqueue/dequeue/yield primitives
-- `kernel/src/main.zig`: Hardened serial driver with LSR polling
-
-#### Build System Fixes
-- Zig 0.13.0 API compatibility updates
-- Fixed `CompileStep` → `Step.Compile` naming
-- Fixed `ChildProcess` → `process.Child` naming
-- Added proper path handling with `b.path()`
-- Simplified build.zig for kernel-only development
-
-### Changed
-
-#### Boot Process
-- **Before**: Empty assembly stubs, no boot capability
-- **After**: Full PVH boot chain from 32-bit entry to 64-bit Zig main
-
-#### Memory Layout
-- **Before**: Flat 1MB loading, no virtual memory
-- **After**: Higher-half kernel at 0xffffffff80000000, identity-mapped boot
-
-#### Linker Script
-- **Before**: Basic section placement, overlapping sections
-- **After**: Explicit PHDRS with PT_NOTE for PVH, PT_LOAD for segments
-
-### Known Limitations
-
-#### Remaining Blockers
-- **Scheduler**: Basic structure present but not integrated with context switch
-- **Threading**: TCB defined but thread creation not fully wired
-- **IPC**: Architecture defined but fast path not implemented
-- **Memory Mapping**: Page table walking not yet implemented
-- **Serial Output**: VGA heartbeat works but serial port output pending verification
-
-#### Next Steps (0.0.3 Target)
-1. Integrate scheduler with context switch
-2. Implement thread creation and management
-3. Wire up IPC fast path
-4. Implement page table walking for memory mapping
-5. Verify serial output in QEMU
-6. Begin Rust service integration
-
----
-
 ## Version History
 
-| Version | Date | Status | Codename |
-|---------|------|--------|----------|
-| 0.0.2 | 2026-02-28 | Development pre-alpha | Surgical Genesis |
-| 0.0.1 | 2026-02-28 | Development pre-alpha | Genesis Block |
+| Version | Date       | Status                | Codename              |
+| ------- | ---------- | --------------------- | --------------------- |
+| 0.0.3   | 2026-02-28 | Development pre-alpha | UEFI & PMM Foundation |
+| 0.0.2   | 2026-02-28 | Development pre-alpha | Surgical Genesis      |
+| 0.0.1   | 2026-02-28 | Development pre-alpha | Genesis Block         |
 
 ---
 
-*This changelog is immutable. All entries are permanent records of the project's evolution.*
+_This changelog is immutable. All entries are permanent records of the project's evolution._
