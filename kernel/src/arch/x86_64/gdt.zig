@@ -16,17 +16,70 @@ pub const GdtEntry = packed struct(u64) {
     pub fn userData() GdtEntry   { return .{ .access = 0xF2, .flags = 0xA }; }
 };
 
-const Gdt = struct {
+pub const TssDescriptor = packed struct(u128) {
+    limit_low: u16,
+    base_low: u24,
+    access: u8 = 0x89, // Present, Type 9 (64-bit TSS Available)
+    limit_high: u4,
+    flags: u4 = 0,
+    base_mid: u8,
+    base_high: u32,
+    reserved: u32 = 0,
+
+    pub fn init(base: u64, limit: u32) TssDescriptor {
+        return .{
+            .limit_low = @as(u16, @intCast(limit & 0xFFFF)),
+            .base_low = @as(u24, @intCast(base & 0xFFFFFF)),
+            .limit_high = @as(u4, @intCast((limit >> 16) & 0xF)),
+            .base_mid = @as(u8, @intCast((base >> 24) & 0xFF)),
+            .base_high = @as(u32, @intCast(base >> 32)),
+        };
+    }
+};
+
+pub const Tss = extern struct {
+    reserved0: u32 = 0,
+    rsp0: u64 = 0,
+    rsp1: u64 = 0,
+    rsp2: u64 = 0,
+    reserved1: u64 = 0,
+    ist1: u64 = 0,
+    ist2: u64 = 0,
+    ist3: u64 = 0,
+    ist4: u64 = 0,
+    ist5: u64 = 0,
+    ist6: u64 = 0,
+    ist7: u64 = 0,
+    reserved2: u64 = 0,
+    reserved3: u16 = 0,
+    iopb_offset: u16 = @sizeOf(Tss),
+};
+
+const Gdt = extern struct {
     null_ptr: u64 = 0,
-    k_code: GdtEntry = GdtEntry.kernelCode(),
-    k_data: GdtEntry = GdtEntry.kernelData(),
-    u_code: GdtEntry = GdtEntry.userCode(),
-    u_data: GdtEntry = GdtEntry.userData(),
+    k_code: GdtEntry = GdtEntry.kernelCode(), // 0x08
+    k_data: GdtEntry = GdtEntry.kernelData(), // 0x10
+    u_data: GdtEntry = GdtEntry.userData(),   // 0x18
+    u_code: GdtEntry = GdtEntry.userCode(),   // 0x20
+    tss: TssDescriptor = undefined,           // 0x28
 };
 
 var gdt: Gdt = .{};
+var tss: Tss = .{};
+
+pub fn setKernelStack(stack: u64) void {
+    tss.rsp0 = stack;
+}
+
+pub fn setInterruptStack(stack: u64, index: u8) void {
+    if (index == 0 or index > 7) return;
+    const ist_ptr: [*]u64 = @ptrCast(&tss.ist1);
+    ist_ptr[index - 1] = stack;
+}
 
 pub fn init() void {
+    gdt.tss = TssDescriptor.init(@intFromPtr(&tss), @sizeOf(Tss) - 1);
+
     const ptr = packed struct { limit: u16, base: u64 }{
         .limit = @sizeOf(Gdt) - 1,
         .base = @intFromPtr(&gdt),
@@ -42,7 +95,11 @@ pub fn init() void {
         \\movw $0x10, %%ax
         \\movw %%ax, %%ds
         \\movw %%ax, %%es
+        \\movw %%ax, %%fs
+        \\movw %%ax, %%gs
         \\movw %%ax, %%ss
+        \\movw $0x28, %%ax
+        \\ltr %%ax
         : : [ptr] "r" (&ptr) : "rax", "memory"
     );
 }

@@ -21,4 +21,8 @@ pub const BootInfo = struct {
     // --- System Tables ---
     rsdp_phys: u64, // ACPI Root Pointer
     pml4_phys: u64, // CR3: Page Table Root
+
+    // --- Initrd ---
+    initrd_addr: u64,
+    initrd_size: u64,
 };

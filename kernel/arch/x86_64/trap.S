@@ -13,11 +13,10 @@
 // IDT entry structure (16 bytes) - we'll fill this at runtime
 // For now, just declare the handlers
 
-// Simple interrupt handler macro
+// Simple interrupt handler macro (No Error Code)
 .macro TRAP_STUB name num
     .global \name
     \name:
-        // Save all registers (System V AMD64 ABI)
         pushq %rax
         pushq %rcx
         pushq %rdx
@@ -28,11 +27,18 @@
         pushq %r10
         pushq %r11
         
-        // Call C handler with trap number
+        // Smart swapgs: CS is at 80(%rsp)
+        testb $3, 80(%rsp)
+        jz 1f
+        swapgs
+    1:
         movq $\num, %rdi
         call trap_dispatch
         
-        // Restore registers
+        testb $3, 80(%rsp)
+        jz 2f
+        swapgs
+    2:
         popq %r11
         popq %r10
         popq %r9
@@ -42,31 +48,73 @@
         popq %rdx
         popq %rcx
         popq %rax
-        
         iretq
 .endm
 
-// Generate stub handlers for all 32 exceptions
+// Interrupt handler macro (With Error Code)
+.macro TRAP_STUB_ERR name num
+    .global \name
+    \name:
+        // Error code is already on stack. We swap it with rax to preserve registers.
+        xchgq %rax, (%rsp) 
+        pushq %rcx
+        pushq %rdx
+        pushq %rsi
+        pushq %rdi
+        pushq %r8
+        pushq %r9
+        pushq %r10
+        pushq %r11
+        
+        // Smart swapgs: CS is at 80(%rsp)
+        // RAX push (via swap) + 8 more pushes = 9 pushes.
+        // Stack: SS, RSP, RFLAGS, CS, RIP, ERR, R11...
+        // CS is at 80(%rsp)
+        testb $3, 80(%rsp)
+        jz 1f
+        swapgs
+    1:
+        movq $\num, %rdi
+        // RSI gets the error code from rax
+        movq %rax, %rsi 
+        call trap_dispatch
+        
+        testb $3, 80(%rsp)
+        jz 2f
+        swapgs
+    2:
+        popq %r11
+        popq %r10
+        popq %r9
+        popq %r8
+        popq %rdi
+        popq %rsi
+        popq %rdx
+        popq %rcx
+        popq %rax // Error code was here, now rax is restored
+        iretq
+.endm
+
+// Generate stub handlers
 TRAP_STUB trap_divide_error 0
 TRAP_STUB trap_debug 1
 TRAP_STUB trap_nmi 2
 TRAP_STUB trap_breakpoint 3
 TRAP_STUB trap_overflow 4
-// Vector 5: Formerly BOUND, now Reserved in 64-bit
 TRAP_STUB trap_invalid_opcode 6
 TRAP_STUB trap_device_not_avail 7
-TRAP_STUB trap_double_fault 8
-TRAP_STUB trap_invalid_tss 10
-TRAP_STUB trap_segment_not_present 11
-TRAP_STUB trap_stack_segment 12
-TRAP_STUB trap_general_protection 13
-TRAP_STUB trap_page_fault 14
+TRAP_STUB_ERR trap_double_fault 8
+TRAP_STUB_ERR trap_invalid_tss 10
+TRAP_STUB_ERR trap_segment_not_present 11
+TRAP_STUB_ERR trap_stack_segment 12
+TRAP_STUB_ERR trap_general_protection 13
+TRAP_STUB_ERR trap_page_fault 14
 TRAP_STUB trap_x87_exception 16
-TRAP_STUB trap_alignment_check 17
+TRAP_STUB_ERR trap_alignment_check 17
 TRAP_STUB trap_machine_check 18
 TRAP_STUB trap_simd_exception 19
 TRAP_STUB trap_virtualization 20
-TRAP_STUB trap_security 30
+TRAP_STUB_ERR trap_security 30
 TRAP_STUB trap_timer 32
 
 // Default handler for unimplemented interrupts
@@ -82,9 +130,17 @@ trap_default:
     pushq %r10
     pushq %r11
     
+    testb $3, 80(%rsp)
+    jz 1f
+    swapgs
+1:
     movq $0xFF, %rdi
     call trap_dispatch
     
+    testb $3, 80(%rsp)
+    jz 2f
+    swapgs
+2:
     popq %r11
     popq %r10
     popq %r9
@@ -102,61 +158,66 @@ trap_default:
 
 .global syscall_entry
 syscall_entry:
-    // On syscall entry:
-    // RAX = syscall number
-    // RDI, RSI, RDX, R10, R8, R9 = args (System V AMD64 ABI)
-    // RCX = user RIP (CPU sets this)
-    // R11 = user RFLAGS (CPU sets this)
+    // 1. Swap from User GS to Kernel GS
+    swapgs
+
+    // Save User RSP and load Kernel RSP
+    movq %rsp, user_rsp_scratch(%rip)
+    movq kernel_rsp_scratch(%rip), %rsp
     
-    // Save user state
-    pushq %r11                    // User RFLAGS
-    pushq %rcx                    // User RIP
-    
-    // Save argument registers
-    pushq %rdi
-    pushq %rsi
+    // 2. Save User State (Match iretq frame for consistency)
+    pushq $0x1B                      // SS (User Data)
+    pushq user_rsp_scratch(%rip)     // RSP
+    pushq %r11                       // RFLAGS (saved in R11 by syscall)
+    pushq $0x23                      // CS (User Code)
+    pushq %rcx                       // RIP (saved in RCX by syscall)
+
+    // 3. Push Genearl Purpose Registers (Matches SyscallFrame order)
+    pushq %rax
+    pushq %rbx
+    pushq %rcx
     pushq %rdx
-    pushq %r10
+    pushq %rsi
+    pushq %rdi
+    pushq %rbp
     pushq %r8
     pushq %r9
-    
-    // Save callee-saved registers
-    pushq %rbx
-    pushq %rbp
+    pushq %r10
+    pushq %r11
     pushq %r12
     pushq %r13
     pushq %r14
     pushq %r15
-    
-    // Arguments are in place, but R10 needs to move to RCX for C
-    movq %r10, %rcx
-    
-    // Call the Zig syscall handler
-    call kozo_syscall_handler
-    
-    // RAX now contains return value
-    
-    // Restore callee-saved registers
+
+    // 4. Call Zig dispatcher
+    // RDI = SyscallFrame*
+    movq %rsp, %rdi
+    call syscall_dispatch
+
+    // 5. Restore registers
     popq %r15
     popq %r14
     popq %r13
     popq %r12
-    popq %rbp
-    popq %rbx
-    
-    // Restore argument registers
+    popq %r11
+    popq %r10
     popq %r9
     popq %r8
-    popq %r10
-    popq %rdx
-    popq %rsi
+    popq %rbp
     popq %rdi
-    
-    // Restore user RIP, RFLAGS
+    popq %rsi
+    popq %rdx
     popq %rcx
-    popq %r11
+    popq %rbx
+    popq %rax
+
+    // 6. Setup for sysretq
+    // RCX = RIP, R11 = RFLAGS (Retrieved from frame)
+    movq 120(%rsp), %rcx    // RIP
+    movq 136(%rsp), %r11    // RFLAGS
     
-    // Return to user mode
+    // Restore User RSP
+    movq 144(%rsp), %rsp    // RSP
     sysretq
 
 // ============================================================================
@@ -206,6 +267,7 @@ syscall_init:
 // ============================================================================
 
 // void idt_set_gate(uint8_t vector, uint64_t handler, uint16_t selector, uint8_t type)
+// void idt_set_gate(uint8_t vector, uint64_t handler, uint16_t selector, uint8_t type)
 .global idt_set_gate
 idt_set_gate:
     // RDI = vector, RSI = handler, RDX = selector, RCX = type
@@ -237,6 +299,18 @@ idt_set_gate:
     // Zero reserved
     movl $0, 12(%rax)
     
+    ret
+
+// void idt_set_ist(uint8_t vector, uint8_t ist_index)
+.global idt_set_ist
+idt_set_ist:
+    // RDI = vector, RSI = ist_index
+    movq %rdi, %rax
+    shlq $4, %rax                 // vector * 16 (sizeof IDT entry)
+    leaq idt(%rip), %r8
+    addq %r8, %rax                // &idt[vector]
+    
+    movb %sil, 4(%rax)            // Set IST field (byte 4 of the entry)
     ret
 
 // ============================================================================
@@ -287,3 +361,8 @@ trap_table:
     .rept 223
     .quad trap_default
     .endr
+
+.global user_rsp_scratch
+.global kernel_rsp_scratch
+user_rsp_scratch:   .quad 0
+kernel_rsp_scratch: .quad 0

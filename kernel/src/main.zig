@@ -12,7 +12,10 @@ const idt = @import("arch/x86_64/idt.zig");
 const vga = @import("arch/x86_64/vga.zig");
 const pmm = @import("memory/pmm.zig");
 const vmm = @import("memory/vmm.zig");
+const elf = @import("memory/elf.zig");
+const cpio = @import("memory/cpio.zig");
 const lapic = @import("arch/x86_64/lapic.zig");
+const syscall = @import("arch/x86_64/syscall.zig");
 const scheduler = @import("scheduler.zig");
 const thread = @import("thread.zig");
 
@@ -40,7 +43,7 @@ export fn _kernel_start(info: *const BootInfo) noreturn {
     // Initialize the IDT. 
     // Currently, this just loads the LIDT instruction. 
     // Handlers in trap.S will be wired up in Phase 3.
-    idt.init();
+    // idt.init(); - Moved below pmm.init to allow IST allocation
 
     // --- Phase 2: Hardware Visualization ---
     // Initialize the Framebuffer writer using info provided by UEFI.
@@ -59,13 +62,18 @@ export fn _kernel_start(info: *const BootInfo) noreturn {
     // 2. Initialize the Virtual Memory Manager (VMM) using recursive paging
     vmm.init(info.pml4_phys);
 
-    // 3. Map and initialize the Local APIC
-    const lapic_virt: u64 = 0xFFFFFFFF40000000; // Example HAL window
-    vmm.mapPage(lapic_virt, lapic.DEFAULT_LAPIC_BASE, vmm.PageFlags.Present | vmm.PageFlags.Write | vmm.PageFlags.CacheDisable) catch @panic("LAPIC Mapping Failed");
-    lapic.init(lapic_virt);
+    // 2.5 Initialize Emergency Stacks (IST)
+    // Double Fault (IST1)
+    const df_stack = pmm.allocFrame() catch @panic("Failed to allocate DF stack");
+    gdt.setInterruptStack(df_stack + 4096, 1);
+    // Machine Check (IST2)
+    const mc_stack = pmm.allocFrame() catch @panic("Failed to allocate MC stack");
+    gdt.setInterruptStack(mc_stack + 4096, 2);
 
     // 4. Initialize the IDT and specific handlers
     idt.init();
+
+    // 3. Map and initialize the Local APIC
 
     // 5. Initialize Scheduler and System Threads
     scheduler.init();
@@ -76,10 +84,49 @@ export fn _kernel_start(info: *const BootInfo) noreturn {
     // 6. Enable the APIC Timer (Vector 32, every 10ms-ish for Genesis)
     lapic.enableTimer(32, 0x1000000);
 
+    // 7. Initialize Syscall Architecture
+    syscall.init();
+
     // --- Phase 4: The Multitasking Era ---
-    // Start the first thread by yielding.
-    // In Genesis, the scheduler will pick the first thread we enqueued.
-    // For now, we'll just idle until an interrupt or thread is ready.
+    
+    // 1. Launch the Init Service
+    // We search for the "init" file in the CPIO archive passed by the loader
+    const initrd_ptr: [*]u8 = @ptrFromInt(info.initrd_addr);
+    const init_data = cpio.findFile(initrd_ptr[0..info.initrd_size], "init") 
+        orelse @panic("Init service not found in initrd");
+    
+    // 2. Create a new Address Space (Isolates Init from Kernel)
+    const init_cr3 = vmm.createAddressSpace() catch @panic("Failed to create Init address space");
+    
+    // Switch to target address space so ELF memcpy works as intended
+    asm volatile ("mov %[cr3], %%cr3" : : [cr3] "r" (init_cr3) : "memory");
+
+    // 3. Load ELF and get entry point
+    const entry = elf.loadElf(init_data) catch @panic("Failed to load Init ELF");
+    
+    // 4. Create Init Thread (TID 1)
+    const init_tcb = thread.allocTCB() orelse @panic("Failed to allocate Init TCB");
+    init_tcb.tid = 1;
+    init_tcb.priority = 10; // High priority for init
+    init_tcb.cr3 = init_cr3;
+    
+    // 5. Allocate and Map User Stack
+    // We use a fixed virtual address for the user stack in Genesis
+    const USER_STACK_VADDR: u64 = 0x0000700000000000;
+    const u_stack_phys = pmm.allocFrame() catch @panic("Failed to allocate user stack");
+    vmm.mapPage(USER_STACK_VADDR - 4096, u_stack_phys, vmm.PageFlags.User | vmm.PageFlags.Write | vmm.PageFlags.NoExecute) catch @panic("Failed to map user stack");
+
+    const k_stack_phys = pmm.allocFrame() catch @panic("Failed to allocate kernel stack");
+    // Kernel stack doesn't need to be mapped in user space, TCB uses physical/higher-half pointer
+    const k_stack_top = 0xFFFFFFFF90000000; // Example fixed window or dynamic
+    vmm.mapPage(k_stack_top - 4096, k_stack_phys, vmm.PageFlags.Write | vmm.PageFlags.NoExecute) catch @panic("Failed to map kernel stack");
+    
+    // 6. Set up TCB (Ring 3)
+    init_tcb.root_cnode = null; // Explicitly null for now
+    init_tcb.setupThread(entry, USER_STACK_VADDR, k_stack_top, true);
+    
+    // 7. Enqueue and Start
+    scheduler.enqueue(init_tcb);
     scheduler.yield();
 
     while (true) {

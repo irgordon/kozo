@@ -45,6 +45,20 @@ pub const CNode = struct {
     }
 };
 
+pub const Endpoint = struct {
+    /// Threads waiting to send a message to this endpoint
+    send_queue: thread.ThreadQueue,
+    /// Threads waiting to receive a message from this endpoint
+    recv_queue: thread.ThreadQueue,
+
+    pub fn init() Endpoint {
+        return .{
+            .send_queue = thread.ThreadQueue.init(),
+            .recv_queue = thread.ThreadQueue.init(),
+        };
+    }
+};
+
 pub const CapSlot = struct {
     cap_type: abi.kozo_cap_type_t,
     rights: abi.kozo_rights_t,
@@ -65,8 +79,7 @@ pub const CapSlot = struct {
             ptr: *CNode,
         },
         endpoint: struct {
-            badge: u64,    // Receiver identifies sender by this
-            queue: thread.ThreadQueue, // Blocked senders
+            ptr: *Endpoint,
         },
         thread: struct {
             tcb: *thread.TCB,
@@ -76,6 +89,11 @@ pub const CapSlot = struct {
             mapped: bool,  // Is currently mapped?
         },
     },
+
+    pub fn getEndpoint(self: *CapSlot) ?*Endpoint {
+        if (self.cap_type != .CAP_ENDPOINT) return null;
+        return self.data.endpoint.ptr;
+    }
 };
 
 const NULL_SLOT = CapSlot{
@@ -139,10 +157,9 @@ pub fn sys_retype(untyped_idx: usize, new_type: abi.kozo_cap_type_t,
             new_slot.data = .{ .cnode = .{ .ptr = cnode_ptr } };
         },
         .CAP_ENDPOINT => {
-            new_slot.data = .{ .endpoint = .{
-                .badge = new_badge,
-                .queue = thread.ThreadQueue.init(),
-            }};
+            const ep_ptr = @as(*Endpoint, @ptrFromInt(phys_addr));
+            ep_ptr.* = Endpoint.init();
+            new_slot.data = .{ .endpoint = .{ .ptr = ep_ptr } };
         },
         .CAP_THREAD => {
             // Thread control block allocated but not yet initialized

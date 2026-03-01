@@ -12,7 +12,10 @@ export fn trap_dispatch(num: u64) void {
     switch (num) {
         // --- Hardware IRQs ---
         32 => { // APIC Timer
-            lapic.eoi();
+            // 1. Acknowledge the hardware immediately
+            lapic.sendEOI();
+            
+            // 2. Trigger the scheduler
             scheduler.yield();
         },
 

@@ -87,14 +87,64 @@ fn getTableAddress(l4: u64, l3: u64, l2: u64) u64 {
     return VMM_BASE | (l4 << 30) | (l3 << 21) | (l2 << 12);
 }
 
+/// Check if a virtual address is already mapped.
+pub fn isMapped(virt: u64) bool {
+    const l4_idx = (virt >> 39) & 0x1FF;
+    const l3_idx = (virt >> 30) & 0x1FF;
+    const l2_idx = (virt >> 21) & 0x1FF;
+    const l1_idx = (virt >> 12) & 0x1FF;
+
+    const pml4: [*]u64 = @ptrFromInt(VMM_BASE + (RECURSIVE_SLOT << 30) + (RECURSIVE_SLOT << 21) + (RECURSIVE_SLOT << 12));
+    if (pml4[l4_idx] & PageFlags.Present == 0) return false;
+
+    const pdpt: [*]u64 = @ptrFromInt(getTableAddress(RECURSIVE_SLOT, RECURSIVE_SLOT, l4_idx));
+    if (pdpt[l3_idx] & PageFlags.Present == 0) return false;
+
+    const pd: [*]u64 = @ptrFromInt(getTableAddress(RECURSIVE_SLOT, l4_idx, l3_idx));
+    if (pd[l2_idx] & PageFlags.Present == 0) return false;
+
+    const pt: [*]u64 = @ptrFromInt(getTableAddress(l4_idx, l3_idx, l2_idx));
+    return (pt[l1_idx] & PageFlags.Present != 0);
+}
+
+/// Create a new address space (PML4).
+/// Returns the physical address of the new PML4.
+pub fn createAddressSpace() !u64 {
+    const pml4_phys = try pmm.allocFrame();
+    
+    // We need to map this frame temporarily to zero it and install recursive slot.
+    // For Genesis, we leverage the fact that kernel code/data is already mapped 
+    // in the higher half across all address spaces.
+    
+    // 1. Temporarily map the new PML4 to a scratch address
+    const scratch_vaddr: u64 = 0xFFFFFFFF80000000; // Above kernel
+    try mapPage(scratch_vaddr, pml4_phys, PageFlags.Write | PageFlags.Present);
+    
+    const new_pml4: [*]u64 = @ptrFromInt(scratch_vaddr);
+    @memset(@as([*]u8, @ptrCast(new_pml4))[0..4096], 0);
+    
+    // 2. Install Recursive Mapping
+    new_pml4[RECURSIVE_SLOT] = pml4_phys | PageFlags.Present | PageFlags.Write;
+    
+    // 3. Inherit Kernel Mapping (Higher 2GB)
+    // In x86_64, indices 256-511 are for Higher Half. 
+    // For Genesis, we inherit the kernel's PML4 entries for simplicity.
+    const current_pml4: [*]u64 = @ptrFromInt(VMM_BASE + (RECURSIVE_SLOT << 30) + (RECURSIVE_SLOT << 21) + (RECURSIVE_SLOT << 12));
+    var i: usize = 256;
+    while (i < 512) : (i += 1) {
+        if (i == RECURSIVE_SLOT) continue;
+        new_pml4[i] = current_pml4[i];
+    }
+    
+    // TODO: Unmap scratch_vaddr properly (invlpg)
+    
+    return pml4_phys;
+}
+
 /// Initialize the VMM. 
 /// In Genesis, this involves taking over the PML4 set up by the loader
 /// and installing the recursive slot.
 pub fn init(pml4_phys: u64) void {
-    // The loader should have already mapped the kernel and set up a basic PML4.
-    // We access the current PML4 (physically) and write the recursive entry.
-    // NOTE: This assumes we are still identity mapped or have a way to 
-    // access physical memory directly temporarily.
     const pml4: [*]u64 = @ptrFromInt(pml4_phys);
     pml4[RECURSIVE_SLOT] = pml4_phys | PageFlags.Present | PageFlags.Write;
 }

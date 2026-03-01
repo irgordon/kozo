@@ -32,7 +32,7 @@ pub fn init(base_virt: u64) void {
 }
 
 /// Send End of Interrupt
-pub fn eoi() void {
+pub fn sendEOI() void {
     write(REG_EOI, 0);
 }
 

@@ -24,6 +24,7 @@ pub const IdtEntry = packed struct(u128) {
 extern var trap_table: [256]?*const anyopaque;
 extern fn idt_install() void;
 extern fn idt_set_gate(vector: u8, handler: u64, selector: u16, type_attr: u8) void;
+extern fn idt_set_ist(vector: u8, ist_index: u8) void;
 
 pub fn init() void {
     // 1. Initialize all gates to the default handler first
@@ -42,7 +43,13 @@ pub fn init() void {
         }
     }
 
-    // 3. Install Timer IRQ (Vector 32)
+    // 3. Configure IST for critical exceptions
+    // Double Fault (Vector 8) uses IST1
+    idt_set_ist(8, 1);
+    // Machine Check (Vector 18) uses IST2
+    idt_set_ist(18, 2);
+
+    // 4. Install Timer IRQ (Vector 32)
     if (trap_table[32]) |handler| {
         idt_set_gate(32, @intFromPtr(handler), 0x08, 0x8E);
     }
