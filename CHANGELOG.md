@@ -26,7 +26,8 @@ Finalized the core architectural heartbeat of the KOZO microkernel. This version
 #### Inter-Process Communication (IPC)
 
 - **Synchronous IPC Fast-Path**: Implemented `sys_call` (Send-then-Wait) and `sys_reply_wait` (Atomic Reply-and-Receive) in `kernel/src/syscall/ipc.zig`.
-- **Registers-Only Transfer**: Optimised message passing using `RSI`, `RDX`, and `R10` for zero-copy 3-word transfers.
+- **Registers-Only Transfer**: Optimized message passing using symmetric mapping (Client: RSI/RDX/R10; Server Reply: RDX/R10) for zero-copy 3-word transfers.
+- **Direct Handover Optimization**: Enhanced `sys_reply_wait` to perform an atomic context return to Ring 3 if a message is waiting, bypassing scheduler queues.
 - **Secure Badge Identification**: Implemented kernel-enforced badge derivation to provide unforgeable caller identity in the `RDI` register.
 - **Endpoint Wait Queues**: Developed `send_queue` and `recv_queue` management for capability-guarded endpoints.
 
