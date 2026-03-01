@@ -54,8 +54,8 @@ pub export fn syscall_dispatch(frame: *SyscallFrame) void {
     const num = frame.rax;
     
     frame.rax = switch (num) {
-        abi.SYS_IPC_CALL => @intCast(ipc.sys_call(frame.rdi, frame.rsi, frame.rdx, frame.r10)),
-        abi.SYS_IPC_REPLY => @intCast(ipc.sys_reply_wait(@as(u32, @intCast(frame.rdi)), frame.rsi, frame.rdx, frame.r10)),
+        abi.SYS_IPC_CALL => @intCast(ipc.sys_call(frame)),
+        abi.SYS_IPC_REPLY => @intCast(ipc.sys_reply_wait(frame)),
         abi.SYS_DEBUG_PUTCHAR => {
             // Simple debug out for now
             std.debug.print("{c}", .{@as(u8, @intCast(frame.rdi))});

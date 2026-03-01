@@ -7,36 +7,38 @@ const abi = @import("../abi.zig");
 const arch_syscall = @import("../arch/x86_64/syscall.zig");
 
 /// sys_call: Send a message and block until a reply is received.
-/// RDI = endpoint_cap_idx, RSI = msg0, RDX = msg1, R10 = msg2
-pub fn sys_call(ep_idx: usize, msg0: u64, msg1: u64, msg2: u64) isize {
+/// The kernel moves data directly between the caller's frame and the receiver's frame.
+pub fn sys_call(frame: *arch_syscall.SyscallFrame) isize {
     const caller = thread.getCurrent() orelse return -1;
+    const ep_idx = frame.rdi; // First arg: Endpoint Capability Index
     
     // 1. Lookup the Endpoint capability
     const ep_cap = caller.getCapability(ep_idx) orelse return abi.KOZO_ERR_NO_CAP;
     const ep = ep_cap.getEndpoint() orelse return abi.KOZO_ERR_INVALID;
 
-    // 2. Fast Path: Is there a receiver waiting?
+    // 2. Direct Transfer Path (Server is already waiting)
     if (ep.recv_queue.dequeue()) |server| {
-        // DIRECT TRANSFER: 
+        // Find the server's saved SyscallFrame on its own stack
         const server_frame = @as(*arch_syscall.SyscallFrame, @ptrFromInt(@intFromPtr(server.getSyscallFrame())));
         
-        // Transfer 3 Message Words (RSI, RDX, R10 as per specification)
-        server_frame.rax = 0; // KOZO_OK
-        server_frame.rsi = msg0; 
-        server_frame.rdx = msg1;
-        server_frame.r10 = msg2;
+        // DATA TRANSFER: Move 3 words directly register-to-register
+        server_frame.rax = 0;           // KOZO_OK
+        server_frame.rsi = frame.rsi;   // Message Word 0
+        server_frame.rdx = frame.rdx;   // Message Word 1
+        server_frame.r10 = frame.r10;   // Message Word 2
         
-        // Secure Badge Transfer (Caller ID) - Goes to RDI
+        // IDENTITY: Inject the caller's secure badge into server's RDI
         server_frame.rdi = ep_cap.badge; 
         
-        // Block caller for reply
-        caller.state = .BLOCKED_REPLY;
-        
-        // Wake up server
+        // SUCCESS: Receiver is now runnable
         server.state = .RUNNABLE;
         scheduler.enqueue(server);
 
-        // Switch to reduce latency (Direct switch)
+        // BLOCK: Caller waits for the reply
+        caller.state = .BLOCKED_REPLY;
+        frame.rax = 0; // Success for the sys_call invocation itself
+        
+        // SWITCH: Direct handover to server to minimize latency
         scheduler.switchTo(server);
         return 0; 
     } else {
@@ -44,12 +46,9 @@ pub fn sys_call(ep_idx: usize, msg0: u64, msg1: u64, msg2: u64) isize {
         caller.state = .BLOCKED_SEND;
         ep.send_queue.enqueue(caller);
         
-        // Store the message and badge for later transfer
-        const caller_frame = @as(*arch_syscall.SyscallFrame, @ptrFromInt(@intFromPtr(caller.getSyscallFrame())));
-        caller_frame.rsi = msg0; 
-        caller_frame.rdx = msg1;
-        caller_frame.r10 = msg2;
-        caller_frame.rbx = ep_cap.badge; 
+        // The message and badge stay in the caller's SyscallFrame on their kernel stack.
+        // We temporarily store the badge in RBX (scrubbed on return anyway)
+        frame.rbx = ep_cap.badge; 
 
         scheduler.yield();
         return 0;
@@ -57,22 +56,21 @@ pub fn sys_call(ep_idx: usize, msg0: u64, msg1: u64, msg2: u64) isize {
 }
 
 /// sys_reply_wait: Atomic Reply-then-Receive
-/// client_tid: Who we are replying to
-/// reply0, reply1, reply2: The 3-word message to the client
-/// ep_idx: The endpoint to wait on for the next request
-pub fn sys_reply_wait(client_tid: u32, reply0: u64, reply1: u64, reply2: u64, ep_idx: usize) isize {
+pub fn sys_reply_wait(frame: *arch_syscall.SyscallFrame) isize {
     const server = thread.getCurrent() orelse return -1;
+    const client_tid: u32 = @intCast(frame.rdi);
+    const ep_idx = frame.r10; // In reply_wait, R10 is the endpoint to wait on
     
     // 1. Reply to Client
     if (thread.getTCBByTid(client_tid)) |client| {
         if (client.state == .BLOCKED_REPLY) {
             const client_frame = @as(*arch_syscall.SyscallFrame, @ptrFromInt(@intFromPtr(client.getSyscallFrame())));
             
-            // Transfer 3 words back to client
+            // Transfer 3 words back to client (RSI, RDX, R10 from server's frame)
             client_frame.rax = 0; // KOZO_OK
-            client_frame.rsi = reply0;
-            client_frame.rdx = reply1;
-            client_frame.r10 = reply2;
+            client_frame.rsi = frame.rsi;
+            client_frame.rdx = frame.rdx;
+            client_frame.r10 = frame.r8; // Note: using R8 for reply2 to avoid collision with ep_idx
             
             client.state = .RUNNABLE;
             scheduler.enqueue(client);
@@ -88,12 +86,11 @@ pub fn sys_reply_wait(client_tid: u32, reply0: u64, reply1: u64, reply2: u64, ep
         const client_frame = @as(*arch_syscall.SyscallFrame, @ptrFromInt(@intFromPtr(next_client.getSyscallFrame())));
         
         // Transfer into server's frame
-        const server_frame = @as(*arch_syscall.SyscallFrame, @ptrFromInt(@intFromPtr(server.getSyscallFrame())));
-        server_frame.rax = 0; // KOZO_OK
-        server_frame.rsi = client_frame.rsi; // msg0
-        server_frame.rdx = client_frame.rdx; // msg1
-        server_frame.r10 = client_frame.r10; // msg2
-        server_frame.rdi = client_frame.rbx; // Secure Badge
+        frame.rax = 0; // KOZO_OK
+        frame.rsi = client_frame.rsi; // msg0
+        frame.rdx = client_frame.rdx; // msg1
+        frame.r10 = client_frame.r10; // msg2
+        frame.rdi = client_frame.rbx; // Secure Badge
         
         next_client.state = .BLOCKED_REPLY;
         return 0; // Server continues directly in user-space
@@ -102,11 +99,10 @@ pub fn sys_reply_wait(client_tid: u32, reply0: u64, reply1: u64, reply2: u64, ep
         server.state = .BLOCKED_RECV;
         ep.recv_queue.enqueue(server);
 
-        // Optional: Zero out server's message registers while waiting
-        const server_frame = @as(*arch_syscall.SyscallFrame, @ptrFromInt(@intFromPtr(server.getSyscallFrame())));
-        server_frame.rsi = 0;
-        server_frame.rdx = 0;
-        server_frame.r10 = 0;
+        // Scrub server's message registers while waiting
+        frame.rsi = 0;
+        frame.rdx = 0;
+        frame.r10 = 0;
 
         scheduler.yield();
         return 0;
