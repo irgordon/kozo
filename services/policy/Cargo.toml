@@ -1,0 +1,19 @@
+[package]
+name = "kozo-policy"
+version = "0.0.1-dev"
+edition = "2021"
+authors = ["KOZO OS Team"]
+license = "MIT OR Apache-2.0"
+
+[features]
+default = []
+tier1_privileged = []  # Enables cap.policy.grant functionality
+
+[dependencies]
+# no_std compatible collections
+heapless = "0.8"  # Fixed-size containers for genesis
+
+[profile.release]
+panic = "abort"
+lto = true
+codegen-units = 1

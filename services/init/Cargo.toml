@@ -1,0 +1,19 @@
+# KOZO Init Service - Bootstrap Process
+# File Path: services/init/Cargo.toml
+# Generates: services/target/x86_64-kozo-none/release/init
+
+[package]
+name = "kozo-init"
+version = "0.0.1-dev"
+edition = "2021"
+authors = ["KOZO OS Team"]
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+kozo-sys = { path = "../kozo-sys" } # Depends on: services/kozo-sys/
+
+[profile.release]
+panic = "abort"
+opt-level = 2
+lto = true
+codegen-units = 1

@@ -1,0 +1,4 @@
+# KOZO Services Workspace
+# File Path: services/Cargo.toml
+[workspace]
+members = ["kozo-sys", "init", "policy", "fsd"]

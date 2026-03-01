@@ -1,0 +1,22 @@
+# KOZO System Interface Library
+# File Path: services/kozo-sys/Cargo.toml
+# Consumes: services/kozo-sys/src/abi.rs (Generated)
+
+[package]
+name = "kozo-sys"
+version = "0.0.1-dev"
+edition = "2021"
+authors = ["KOZO OS Team"]
+license = "MIT OR Apache-2.0"
+description = "Low-level KOZO kernel syscall interface"
+
+[lib]
+name = "kozo_sys"
+path = "src/lib.rs"
+
+[dependencies]
+# no_std by default, no dependencies needed for genesis
+
+[features]
+default = []
+std = []  # Future: std support for hosted testing
