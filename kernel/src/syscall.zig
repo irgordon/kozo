@@ -2,23 +2,25 @@
 //! Responsibility: Validate and dispatch syscalls with capability checks
 
 const std = @import("std");
-const abi = @import("kozo_abi.h");
+const abi = @import("abi.zig");
 const cap = @import("capability.zig");
 const thread = @import("thread.zig");
 const sched = @import("scheduler.zig");
 
 /// System V ABI: args in rdi, rsi, rdx, r10, r8, r9
 /// Returns: error code (0 = success, negative = error)
-export fn kozo_syscall_handler(
+pub export fn kozo_syscall_handler(
     n: usize,
     arg0: usize, // rdi
     arg1: usize, // rsi  
     arg2: usize, // rdx
     arg3: usize, // r10
     arg4: usize, // r8
-    arg5: usize, // r9 (reserved for future use)
+    _arg5: usize, // r9 (reserved for future use)
 ) isize {
-    _ = arg5;
+    // Silence unused warnings - all args used depending on syscall
+    _ = arg4;
+    _ = _arg5;
 
     // Validate syscall number range for security
     if (n > 99) {
@@ -32,7 +34,7 @@ export fn kozo_syscall_handler(
         abi.SYS_CAP_MINT => cap.sys_mint(arg0, arg1),
         abi.SYS_CAP_REVOKE => cap.sys_revoke(arg0, arg1),
         abi.SYS_CAP_VERIFY => cap.sys_verify(arg0, arg1),
-        abi.SYS_CAP_CREATE => cap.sys_create(arg0, arg1, arg2), // Create from untyped
+        abi.SYS_CAP_CREATE => cap.sys_create(arg0, @enumFromInt(arg1), arg2), // Create from untyped
         abi.SYS_CAP_DELETE => cap.sys_delete(arg0), // Remove from cnode but don't free
 
         // === IPC - DIRECT SWITCH (Performance Critical) ===
@@ -86,7 +88,7 @@ export fn kozo_syscall_handler(
 fn ipc_call(endpoint_idx: usize, msg_ptr: usize, msg_len: usize, timeout: usize) isize {
     if (msg_len > abi.IPC_BUFFER_SIZE) return -6; // InvalidParam
     
-    const current = thread.getCurrent();
+    const current = thread.getCurrent() orelse return -2;
     
     // Verify endpoint capability
     const ep_slot = current.root_cnode.get(endpoint_idx) catch return -2;
@@ -142,7 +144,7 @@ fn ipc_call(endpoint_idx: usize, msg_ptr: usize, msg_len: usize, timeout: usize)
 fn ipc_reply(reply_ptr: usize, reply_len: usize) isize {
     if (reply_len > abi.IPC_BUFFER_SIZE) return -6;
     
-    const current = thread.getCurrent();
+    const current = thread.getCurrent() orelse return -2;
     
     // Verify we are in a call (have a caller waiting)
     if (current.ipc_state != .RECEIVED_CALL or current.ipc_caller == null) {
@@ -181,7 +183,7 @@ fn ipc_send(endpoint_idx: usize, msg_ptr: usize, msg_len: usize, timeout: usize)
     _ = timeout; // For async, timeout only matters if queue full
     if (msg_len > abi.IPC_BUFFER_SIZE) return -6;
     
-    const current = thread.getCurrent();
+    const current = thread.getCurrent() orelse return -2;
     const ep_slot = current.root_cnode.get(endpoint_idx) catch return -2;
     if (ep_slot.cap_type != .CAP_ENDPOINT) return -1;
     
@@ -208,7 +210,7 @@ fn ipc_send(endpoint_idx: usize, msg_ptr: usize, msg_len: usize, timeout: usize)
 fn ipc_recv(endpoint_idx: usize, buf_ptr: usize, buf_len: usize) isize {
     if (buf_len < abi.IPC_BUFFER_SIZE) return -6;
     
-    const current = thread.getCurrent();
+    const current = thread.getCurrent() orelse return -2;
     const ep_slot = current.root_cnode.get(endpoint_idx) catch return -2;
     if (ep_slot.cap_type != .CAP_ENDPOINT) return -1;
     
@@ -251,7 +253,7 @@ fn ipc_recv(endpoint_idx: usize, buf_ptr: usize, buf_len: usize) isize {
 /// arg3: cnode capability index for root (initial capabilities)
 /// Returns: thread capability index on success, error on failure
 fn thread_create(vspace_idx: usize, entry: usize, stack: usize, cnode_idx: usize) isize {
-    const current = thread.getCurrent();
+    const current = thread.getCurrent() orelse return -2;
     
     // Verify VSpace capability
     const vspace_slot = current.root_cnode.get(vspace_idx) catch return -2;
@@ -290,7 +292,7 @@ fn thread_create(vspace_idx: usize, entry: usize, stack: usize, cnode_idx: usize
 
 /// SYS_THREAD_RESUME: Start a suspended thread
 fn thread_resume(thread_idx: usize) isize {
-    const current = thread.getCurrent();
+    const current = thread.getCurrent() orelse return -2;
     const thread_slot = current.root_cnode.get(thread_idx) catch return -2;
     if (thread_slot.cap_type != .CAP_THREAD) return -1;
     
@@ -309,7 +311,7 @@ fn thread_resume(thread_idx: usize) isize {
 }
 
 fn thread_suspend(thread_idx: usize) isize {
-    const current = thread.getCurrent();
+    const current = thread.getCurrent() orelse return -2;
     const thread_slot = current.root_cnode.get(thread_idx) catch return -2;
     if (thread_slot.cap_type != .CAP_THREAD) return -1;
     
@@ -327,7 +329,7 @@ fn thread_suspend(thread_idx: usize) isize {
 fn thread_set_priority(thread_idx: usize, priority: usize) isize {
     if (priority > 255) return -6;
     
-    const current = thread.getCurrent();
+    const current = thread.getCurrent() orelse return -2;
     const thread_slot = current.root_cnode.get(thread_idx) catch return -2;
     if (thread_slot.cap_type != .CAP_THREAD) return -1;
     
@@ -350,7 +352,7 @@ fn thread_set_priority(thread_idx: usize, priority: usize) isize {
 
 /// SYS_ENDPOINT_CREATE: Create new IPC endpoint
 fn endpoint_create(slot_idx: usize) isize {
-    const current = thread.getCurrent();
+    const current = thread.getCurrent() orelse return -2;
     
     // Ensure slot is free
     const slot = current.root_cnode.get(slot_idx) catch return -2;
@@ -362,7 +364,7 @@ fn endpoint_create(slot_idx: usize) isize {
 }
 
 fn endpoint_delete(endpoint_idx: usize) isize {
-    const current = thread.getCurrent();
+    const current = thread.getCurrent() orelse return -2;
     const ep_slot = current.root_cnode.get(endpoint_idx) catch return -2;
     if (ep_slot.cap_type != .CAP_ENDPOINT) return -1;
     
@@ -384,7 +386,7 @@ fn endpoint_delete(endpoint_idx: usize) isize {
 /// arg2: name length
 fn namespace_register(endpoint_idx: usize, name_ptr: usize, name_len: usize) isize {
     _ = name_len;
-    const current = thread.getCurrent();
+    const current = thread.getCurrent() orelse return -2;
     const ep_slot = current.root_cnode.get(endpoint_idx) catch return -2;
     if (ep_slot.cap_type != .CAP_ENDPOINT) return -1;
     
@@ -403,7 +405,7 @@ fn namespace_register(endpoint_idx: usize, name_ptr: usize, name_len: usize) isi
 
 fn map_frame(frame_idx: usize, vaddr: usize, rights: usize, attr: usize) isize {
     _ = attr;
-    const current = thread.getCurrent();
+    const current = thread.getCurrent() orelse return -2;
     const frame_slot = current.root_cnode.get(frame_idx) catch return -2;
     if (frame_slot.cap_type != .CAP_FRAME) return -1;
     if (frame_slot.rights & rights != rights) return -4; // Insufficient rights
@@ -425,8 +427,7 @@ fn map_frame(frame_idx: usize, vaddr: usize, rights: usize, attr: usize) isize {
 }
 
 fn unmap_frame(frame_idx: usize, vaddr: usize) isize {
-    _ = vaddr;
-    const current = thread.getCurrent();
+    const current = thread.getCurrent() orelse return -2;
     const frame_slot = current.root_cnode.get(frame_idx) catch return -2;
     if (frame_slot.cap_type != .CAP_FRAME) return -1;
     
@@ -443,7 +444,7 @@ fn unmap_frame(frame_idx: usize, vaddr: usize) isize {
 // === DEBUGGING ===
 
 fn debug_dump_caps() isize {
-    const current = thread.getCurrent();
+    const current = thread.getCurrent() orelse return -2;
     std.log.info("=== Capabilities for Thread {d} ===", .{current.tid});
     
     for (current.root_cnode.slots, 0..) |slot, i| {

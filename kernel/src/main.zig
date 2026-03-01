@@ -1,52 +1,64 @@
-//! KOZO Kernel - Genesis Main
-//! File Path: kernel/src/main.zig
+// kernel/src/main.zig
+// Last Modified: 2026-02-28, 21:03:12.112
 
-const std = @import("std");
-const config = @import("config");
-const arch = @import("arch/x86_64/boot.zig");
-const cap = @import("capability.zig");
-
-pub const BootInfo = struct {
-    untyped_base: usize,
-    untyped_size: usize,
-    root_cnode_ptr: usize,
+const VgaColor = enum(u8) {
+    Black = 0,
+    Blue = 1,
+    Green = 2,
+    Cyan = 3,
+    Red = 4,
+    Magenta = 5,
+    Brown = 6,
+    LightGray = 7,
+    DarkGray = 8,
+    LightBlue = 9,
+    LightGreen = 10,
+    LightCyan = 11,
+    LightRed = 12,
+    Pink = 13,
+    Yellow = 14,
+    White = 15,
 };
 
-export fn kozo_kernel_main(boot_ptr: *BootInfo) noreturn {
-    // 1. Initial Serial/Logging bring-up
-    std.log.info("KOZO Genesis Block Initializing...", .{});
+const VgaWriter = struct {
+    buffer: [*]volatile u16,
+    cursor: usize,
 
-    // 2. Arch-specific CPU setup (Paging, IDT, Syscall MSRs)
-    arch.init_cpu();
+    pub fn init(phys_addr: usize) VgaWriter {
+        return .{
+            .buffer = @ptrFromInt(phys_addr),
+            .cursor = 0,
+        };
+    }
 
-    // 3. Initialize Root CNode from bootloader memory
-    const root_slots = @as([*]cap.CapSlot, @ptrFromInt(boot_ptr.root_cnode_ptr));
-    var root_cnode = cap.CNode{
-        .slots = root_slots[0..(1 << config.root_cnode_bits)],
-        .parent = null,
-        .next_sibling = null,
-        .prev_sibling = null,
-    };
+    pub fn putChar(self: *VgaWriter, char: u8, fg: VgaColor, bg: VgaColor) void {
+        const color = (@as(u16, @intFromEnum(bg)) << 12) | (@as(u16, @intFromEnum(fg)) << 8);
+        self.buffer[self.cursor] = color | char;
+        self.cursor += 1;
+    }
 
-    // 4. Register the initial Untyped Capability at Slot 0
-    // This is the "Seed" from which all other memory will be retyped.
-    root_cnode.insert(0, .{
-        .cap_type = .CAP_UNTYPED,
-        .rights = 0xFFFFFFFFFFFFFFFF, // Full Grant rights for Init
-        .badge = 0x7FFFFFFFFFFFFFFF, // Genesis Badge
-        .data = .{
-            .untyped = .{
-                .base = boot_ptr.untyped_base,
-                .size = boot_ptr.untyped_size,
-                .offset = 0,
-                .parent = null,
-            },
-        },
-    }) catch @panic("Failed to seed initial Untyped capability");
+    pub fn write(self: *VgaWriter, text: []const u8, fg: VgaColor, bg: VgaColor) void {
+        for (text) |c| {
+            self.putChar(c, fg, bg);
+        }
+    }
+};
 
-    std.log.info("Memory Seeded. Untyped Base: 0x{x}", .{boot_ptr.untyped_base});
+// Required for linking, even if unused in Genesis
+export fn trap_dispatch(_: u64) void {}
+export fn kozo_syscall_handler(_: usize, _: usize, _: usize, _: usize, _: usize, _: usize, _: usize) isize { return -1; }
 
-    // 5. Jump to Layer 1 (Rust Init)
-    // We pass the address of the boot_ptr so Init knows where its memory is.
-    arch.jump_to_init(boot_ptr);
+export fn kozo_kernel_main() noreturn {
+    // Initialize writer at the physical VGA address (mapped via Identity PD[0])
+    var vga = VgaWriter.init(0xb8000);
+    
+    // Skip past the bootloader's pulses (Red '1', Yellow '2', White '+')
+    vga.cursor = 6; 
+
+    // Pulse 4: The Higher-Half "Genesis" Message
+    vga.write(" KOZO GENESIS ", VgaColor.White, VgaColor.Green);
+
+    while (true) {
+        asm volatile ("hlt");
+    }
 }

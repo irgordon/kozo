@@ -139,10 +139,83 @@ Initial project scaffolding and foundational architecture for the KOZO capabilit
 
 ---
 
+## [0.0.2] - 2026-02-28
+
+### Status
+Development pre-alpha - Surgical Genesis Block
+
+### Overview
+Completed minimal x86_64 bring-up with higher-half kernel mapping. The kernel now successfully boots via PVH ELF Note, enters long mode, and executes Zig code in the higher-half virtual address space (0xffffffff80000000).
+
+### Added
+
+#### x86_64 Boot Architecture
+- **PVH ELF Note**: Official Xen-compliant PVH entry point (type 18) for QEMU direct boot
+- **Long Mode Entry**: Complete 32-bit to 64-bit transition with identity paging
+- **Higher-Half Mapping**: Kernel mapped to 0xffffffff80000000 with proper PHDRS
+- **Page Tables**: Identity map first 2MB using huge pages (2MB pages)
+- **GDT Setup**: 64-bit code and data segments for long mode
+- **Stack Pivot**: Transition from boot stack to higher-half kernel stack
+- **BSS Zeroing**: Assembly routine to zero BSS before entering Zig
+
+#### Assembly Implementation
+- `kernel/arch/x86_64/boot.S`: Complete boot sequence with VGA heartbeat debugging
+- `kernel/arch/x86_64/trap.S`: IDT setup, trap handlers, syscall entry point
+- `kernel/arch/x86_64/context.S`: Context save/restore for callee-saved registers
+- `kernel/arch/x86_64/linker.ld`: Surgical linker script with PT_NOTE/PT_LOAD PHDRS
+
+#### Kernel Core (Zig)
+- `kernel/src/abi.zig`: Zig-native ABI constants (syscall numbers, capability types)
+- `kernel/src/spinlock.zig`: Minimal spinlock implementation with IRQ save/restore
+- `kernel/src/thread.zig`: TCB structure with context, IPC state, capability roots
+- `kernel/src/scheduler.zig`: Run queue with enqueue/dequeue/yield primitives
+- `kernel/src/main.zig`: Hardened serial driver with LSR polling
+
+#### Build System Fixes
+- Zig 0.13.0 API compatibility updates
+- Fixed `CompileStep` → `Step.Compile` naming
+- Fixed `ChildProcess` → `process.Child` naming
+- Added proper path handling with `b.path()`
+- Simplified build.zig for kernel-only development
+
+### Changed
+
+#### Boot Process
+- **Before**: Empty assembly stubs, no boot capability
+- **After**: Full PVH boot chain from 32-bit entry to 64-bit Zig main
+
+#### Memory Layout
+- **Before**: Flat 1MB loading, no virtual memory
+- **After**: Higher-half kernel at 0xffffffff80000000, identity-mapped boot
+
+#### Linker Script
+- **Before**: Basic section placement, overlapping sections
+- **After**: Explicit PHDRS with PT_NOTE for PVH, PT_LOAD for segments
+
+### Known Limitations
+
+#### Remaining Blockers
+- **Scheduler**: Basic structure present but not integrated with context switch
+- **Threading**: TCB defined but thread creation not fully wired
+- **IPC**: Architecture defined but fast path not implemented
+- **Memory Mapping**: Page table walking not yet implemented
+- **Serial Output**: VGA heartbeat works but serial port output pending verification
+
+#### Next Steps (0.0.3 Target)
+1. Integrate scheduler with context switch
+2. Implement thread creation and management
+3. Wire up IPC fast path
+4. Implement page table walking for memory mapping
+5. Verify serial output in QEMU
+6. Begin Rust service integration
+
+---
+
 ## Version History
 
 | Version | Date | Status | Codename |
 |---------|------|--------|----------|
+| 0.0.2 | 2026-02-28 | Development pre-alpha | Surgical Genesis |
 | 0.0.1 | 2026-02-28 | Development pre-alpha | Genesis Block |
 
 ---
