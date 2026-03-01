@@ -67,6 +67,7 @@ TRAP_STUB trap_machine_check 18
 TRAP_STUB trap_simd_exception 19
 TRAP_STUB trap_virtualization 20
 TRAP_STUB trap_security 30
+TRAP_STUB trap_timer 32
 
 // Default handler for unimplemented interrupts
 .global trap_default
@@ -281,8 +282,8 @@ trap_table:
     .quad 0, 0, 0                 // 24-26: Reserved
     .quad 0, 0, 0                 // 27-29: Reserved
     .quad trap_security          /* 30 */
-    .quad 0                       // 31: Reserved
-    // 32-255: default handler
-    .rept 224
+    .quad trap_timer             /* 32 */
+    // 33-255: default handler
+    .rept 223
     .quad trap_default
     .endr

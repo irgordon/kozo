@@ -108,48 +108,43 @@ context_setup:
 // Switch Context (save current, restore new)
 // ============================================================================
 
-// void context_switch(Context* current, Context* next)
-// Saves current context, restores next context
-// DOES NOT RETURN to caller - returns to next's saved RIP instead
-.global context_switch
-context_switch:
-    // Arguments:
-    // RDI = pointer to current context (save here)
-    // RSI = pointer to next context (restore from here)
-    
-    // Save current callee-saved registers
-    movq %r15, 0(%rdi)
-    movq %r14, 8(%rdi)
-    movq %r13, 16(%rdi)
-    movq %r12, 24(%rdi)
-    movq %rbp, 32(%rdi)
-    movq %rbx, 40(%rdi)
-    
-    // Save stack pointer (return address pushed by call)
-    // RSP points to return address on entry
-    movq %rsp, 48(%rdi)
-    
-    // Save return address as RIP
-    movq (%rsp), %rax
-    movq %rax, 56(%rdi)
-    
-    // Now restore next context
-    movq %rsi, %rdi       // Move next to RDI for restore
-    
-    // Restore callee-saved registers
-    movq 0(%rdi), %r15
-    movq 8(%rdi), %r14
-    movq 16(%rdi), %r13
-    movq 24(%rdi), %r12
-    movq 32(%rdi), %rbp
-    movq 40(%rdi), %rbx
-    
-    // Restore stack pointer
-    movq 48(%rdi), %rsp
-    
-    // Jump to saved RIP (this returns to next's execution)
-    movq 56(%rdi), %rax
-    jmp *%rax
-    
-    // context_switch does not return to its caller
-    // It returns to wherever 'next' was saved
+// ============================================================================
+// Switch Context (stack-based, Pure 64)
+// ============================================================================
+
+// void switch_context(uint64_t* old_stack, uint64_t new_stack, uint64_t new_cr3)
+// RDI = *u64 (pointer to old TCB's stack_ptr)
+// RSI = u64  (new TCB's stack_ptr)
+// RDX = u64  (new TCB's CR3)
+.global switch_context
+switch_context:
+    /* 1. Save Callee-saved registers of the OLD thread onto its stack */
+    pushq %rbp
+    pushq %rbx
+    pushq %r12
+    pushq %r13
+    pushq %r14
+    pushq %r15
+
+    /* 2. Save the current stack pointer into the OLD TCB */
+    movq %rsp, (%rdi)
+
+    /* 3. Switch Address Space if necessary (CR3) */
+    movq %cr3, %rax
+    cmpq %rax, %rdx
+    je 1f
+    movq %rdx, %cr3
+1:
+
+    /* 4. Load the NEW thread's stack pointer */
+    movq %rsi, %rsp
+
+    /* 5. Restore Callee-saved registers from the NEW thread's stack */
+    popq %r15
+    popq %r14
+    popq %r13
+    popq %r12
+    popq %rbx
+    popq %rbp
+
+    retq

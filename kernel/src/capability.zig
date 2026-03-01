@@ -48,9 +48,12 @@ pub const CNode = struct {
 pub const CapSlot = struct {
     cap_type: abi.kozo_cap_type_t,
     rights: abi.kozo_rights_t,
-    // Badge: unforgeable kernel-generated ID for this specific capability instance
-    // Used by Policy Service to verify capability authenticity
     badge: u64,
+    
+    // Derivation tracking
+    parent: ?*CapSlot,  // The capability this was derived from
+    depth: u32,        // Distance from the original Untyped cap
+    
     data: union {
         untyped: struct {
             base: usize,   // Physical base address
@@ -79,6 +82,8 @@ const NULL_SLOT = CapSlot{
     .cap_type = .CAP_NULL,
     .rights = 0,
     .badge = 0,
+    .parent = null,
+    .depth = 0,
     .data = undefined,
 };
 
@@ -116,6 +121,8 @@ pub fn sys_retype(untyped_idx: usize, new_type: abi.kozo_cap_type_t,
         .cap_type = new_type,
         .rights = abi.RIGHT_READ | abi.RIGHT_WRITE | abi.RIGHT_GRANT,
         .badge = new_badge,
+        .parent = untyped_slot,
+        .depth = untyped_slot.depth + 1,
         .data = undefined,
     };
 
@@ -237,7 +244,12 @@ pub fn sys_revoke(cnode_idx: usize, slot_idx: usize) isize {
         revokeCNodeRecursive(target.data.cnode.ptr);
     }
     
-    // TODO: For untyped, return memory to pool? (Genesis: just nullify)
+    // Memory Reclamation: If this is a FRAME, return it to the PMM
+    if (target.cap_type == .CAP_FRAME) {
+        pmm.freeFrame(target.data.frame.phys);
+    }
+
+    // Reset to NULL
     target.* = NULL_SLOT;
     
     return 0;

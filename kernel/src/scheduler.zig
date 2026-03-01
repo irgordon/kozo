@@ -1,16 +1,15 @@
-//! KOZO Kernel - Minimal Scheduler
-//! File Path: kernel/src/scheduler.zig
-//! Responsibility: One run queue, one current thread, deterministic switch
-//! Scope: NO preemption, NO fairness, NO IPC fast path - just switch on syscall return
+// File Path: kernel/src/scheduler.zig
+// Last Modified: 2026-03-01, 10:20:15.110
+// Note: Refined Scheduler - Implements stack-based context switching and CR3 handling.
 
 const std = @import("std");
 const thread = @import("thread.zig");
 
 // External assembly function
-extern fn context_switch(current: *thread.Context, next: *thread.Context) void;
+// void switch_context(uint64_t* old_stack, uint64_t new_stack, uint64_t new_cr3)
+extern fn switch_context(current_stack: *u64, next_stack: u64, next_cr3: u64) void;
 
-/// Run queue - simple singly-linked list
-/// Head is next to run, tail is where we append
+/// Run queue - simple singly-linked list via TCB.next
 var runqueue_head: ?*thread.TCB = null;
 var runqueue_tail: ?*thread.TCB = null;
 
@@ -27,14 +26,11 @@ pub fn enqueue(tcb: *thread.TCB) void {
     tcb.next = null;
     
     if (runqueue_tail) |tail| {
-        // Append to existing queue
         tail.next = tcb;
-        runqueue_tail = tcb;
     } else {
-        // First thread in queue
         runqueue_head = tcb;
-        runqueue_tail = tcb;
     }
+    runqueue_tail = tcb;
 }
 
 /// Remove and return next runnable thread
@@ -42,8 +38,7 @@ pub fn dequeue() ?*thread.TCB {
     const tcb = runqueue_head orelse return null;
     
     runqueue_head = tcb.next;
-    if (runqueue_tail == tcb) {
-        // Was the only thread
+    if (runqueue_head == null) {
         runqueue_tail = null;
     }
     
@@ -51,158 +46,79 @@ pub fn dequeue() ?*thread.TCB {
     return tcb;
 }
 
-/// Get next thread to run (don't remove from queue)
-pub fn peek() ?*thread.TCB {
-    return runqueue_head;
+/// Helper to create and enqueue a new thread
+pub fn spawnThread(entry: u64, stack_top: u64, cr3: u64, priority: u8) !*thread.TCB {
+    const tcb = thread.allocTCB() orelse return error.NoTCB;
+    tcb.cr3 = cr3;
+    tcb.priority = priority;
+    tcb.setupThread(entry, stack_top);
+    enqueue(tcb);
+    return tcb;
 }
 
 /// Yield CPU to next runnable thread
-/// Called on syscall return or explicit yield
 pub fn yield() void {
-    const current = thread.getCurrent();
-    
-    // Get next thread to run
-    const next = dequeue();
-    if (next == null) {
-        // No other thread to run - continue with current
-        return;
-    }
-    
-    // If current exists and is runnable, put it back in queue
-    if (current) |curr| {
-        if (curr.state == .RUNNING or curr.state == .RUNNABLE) {
-            curr.state = .RUNNABLE;
-            enqueue(curr);
-        }
-    }
-    
-    // Switch to next thread
-    switchTo(next.?);
+    const current = thread.getCurrent() orelse return;
+    const next = dequeue() orelse return; // Stay on current if nothing else is ready
+
+    current.state = .RUNNABLE;
+    enqueue(current);
+
+    next.state = .RUNNING;
+    thread.setCurrent(next);
+
+    // Perform the stack-based swap and CR3 update
+    switch_context(&current.stack_ptr, next.stack_ptr, next.cr3);
 }
 
-/// Switch to specific thread (used by thread resume, IPC return)
+/// Switch to specific thread (e.g., for IPC return or first bootstrap)
 pub fn switchTo(next: *thread.TCB) void {
     const current = thread.getCurrent();
     
-    // Mark next as running
     next.state = .RUNNING;
-    
-    // Update current thread pointer
-    const prev = current;
     thread.setCurrent(next);
-    
-    // If there's a previous thread, context switch
-    // If not (first switch), we need different handling
-    if (prev) |p| {
-        // Save current state to prev's context, restore from next's context
-        context_switch(&p.context, &next.context);
-        // When we return here, it's because someone switched back to us
+
+    if (current) |p| {
+        switch_context(&p.stack_ptr, next.stack_ptr, next.cr3);
     } else {
-        // First thread - just restore its context
-        // This shouldn't happen in normal operation
+        // Bootstrap: First thread execution
+        // We manually switch address space and stack
+        if (next.cr3 != 0) {
+            asm volatile ("mov %[cr3], %%cr3" : : [cr3] "r" (next.cr3) : "memory");
+        }
+        
         asm volatile (
-            \\movq %[rsp], %rsp
-            \\jmp *%[rip]
+            \\movq %[rsp], %%rsp
+            \\popq %%r15
+            \\popq %%r14
+            \\popq %%r13
+            \\popq %%r12
+            \\popq %%rbx
+            \\popq %%rbp
+            \\retq
             :
-            : [rsp] "r" (next.context.rsp),
-              [rip] "r" (next.context.rip)
+            : [rsp] "r" (next.stack_ptr)
             : "memory"
         );
         unreachable;
     }
 }
 
-/// Block current thread (remove from run queue, mark BLOCKED)
-pub fn block(tcb: *thread.TCB) void {
-    // Remove from run queue if present
-    // For now, just mark as blocked
-    tcb.state = .BLOCKED;
+/// Block current thread (mark BLOCKED and switch away)
+pub fn block() void {
+    const current = thread.getCurrent() orelse return;
+    current.state = .BLOCKED;
     
-    // If this is current thread, we MUST switch away
-    if (thread.getCurrent() == tcb) {
-        const next = dequeue();
-        if (next) |n| {
-            thread.setCurrent(n);
-            n.state = .RUNNING;
-            // Context switch to next
-            context_switch(&tcb.context, &n.context);
-        } else {
-            // No other thread - this is a problem
-            // For now, panic
-            @panic("Blocked last thread");
-        }
-    }
+    const next = dequeue() orelse @panic("Blocked last thread");
+    next.state = .RUNNING;
+    thread.setCurrent(next);
+    
+    switch_context(&current.stack_ptr, next.stack_ptr, next.cr3);
 }
 
-/// Unblock thread (make runnable again)
+/// Unblock thread
 pub fn unblock(tcb: *thread.TCB) void {
     if (tcb.state == .BLOCKED) {
         enqueue(tcb);
     }
-}
-
-/// Force suspend a running thread
-pub fn forceSuspend(tcb: *thread.TCB) void {
-    if (tcb.state == .RUNNING) {
-        tcb.state = .SUSPENDED;
-        // If it's current, we need to switch away
-        if (thread.getCurrent() == tcb) {
-            yield();
-        }
-    }
-}
-
-/// Remove from run queue (for priority changes)
-pub fn removeFromQueue(tcb: *thread.TCB) void {
-    // Simple removal - scan and unlink
-    // Not efficient, but minimal
-    
-    if (runqueue_head == tcb) {
-        runqueue_head = tcb.next;
-        if (runqueue_tail == tcb) {
-            runqueue_tail = null;
-        }
-        tcb.next = null;
-        return;
-    }
-    
-    // Scan for it
-    var curr = runqueue_head;
-    while (curr) |c| {
-        if (c.next == tcb) {
-            c.next = tcb.next;
-            if (runqueue_tail == tcb) {
-                runqueue_tail = c;
-            }
-            tcb.next = null;
-            return;
-        }
-        curr = c.next;
-    }
-}
-
-/// Reprioritize thread (after priority change)
-pub fn reprioritize(tcb: *thread.TCB) void {
-    // For now, just remove and re-add
-    // In a real scheduler we'd use a proper priority queue
-    if (tcb.state == .RUNNABLE) {
-        removeFromQueue(tcb);
-        enqueue(tcb);
-    }
-}
-
-/// Check if scheduler has work to do
-pub fn hasWork() bool {
-    return runqueue_head != null;
-}
-
-/// Get count of runnable threads
-pub fn runnableCount() usize {
-    var count: usize = 0;
-    var curr = runqueue_head;
-    while (curr) |c| {
-        count += 1;
-        curr = c.next;
-    }
-    return count;
 }

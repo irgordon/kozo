@@ -61,7 +61,13 @@ pub fn main() void {
         hang();
     }
 
-    // 5. Build Handover Info
+    // 5. Setup Kernel Page Tables (Identity + Higher-Half)
+    const cr3_val = setupKernelPaging(bs) catch {
+        _ = con_out.outputString(L("Error: Paging Setup Failed\r\n"));
+        hang();
+    };
+
+    // 6. Build Handover Info
     const info = BootInfo{
         .fb_base = gop.mode.frame_buffer_base,
         .fb_size = gop.mode.frame_buffer_size,
@@ -72,12 +78,7 @@ pub fn main() void {
         .memory_map_size = mmap_size,
         .descriptor_size = desc_size,
         .rsdp_phys = rsdp.findRsdp(st) orelse 0,
-    };
-
-    // 6. Setup Kernel Page Tables (Identity + Higher-Half)
-    const cr3_val = setupKernelPaging(bs) catch {
-        _ = con_out.outputString(L("Error: Paging Setup Failed\r\n"));
-        hang();
+        .pml4_phys = cr3_val,
     };
 
     // 7. EXIT BOOT SERVICES

@@ -1,27 +1,9 @@
-//! KOZO Kernel - Thread Control Blocks
-//! File Path: kernel/src/thread.zig
-//! Responsibility: Thread state management, minimal viable TCB
-//! Scope: One run queue, one current thread, deterministic switch
+// File Path: kernel/src/thread.zig
+// Last Modified: 2026-03-01, 10:15:22.402
+// Note: Refined TCB - Implements O(1) Free List and Stack-based Context.
 
 const std = @import("std");
 const cap = @import("capability.zig");
-
-/// Callee-saved register context (System V AMD64 ABI)
-/// Layout must match context.S
-pub const Context = extern struct {
-    r15: u64,
-    r14: u64,
-    r13: u64,
-    r12: u64,
-    rbp: u64,
-    rbx: u64,
-    rsp: u64,  // Stack pointer
-    rip: u64,  // Instruction pointer
-    
-    pub fn init() Context {
-        return std.mem.zeroes(Context);
-    }
-};
 
 /// Thread states
 pub const ThreadState = enum {
@@ -32,153 +14,109 @@ pub const ThreadState = enum {
     BLOCKED,    // Waiting for event
 };
 
-/// Thread queue (for IPC endpoints, scheduler, etc.)
-pub const ThreadQueue = struct {
-    head: ?*TCB,
-    tail: ?*TCB,
-    
-    pub fn init() ThreadQueue {
-        return .{ .head = null, .tail = null };
-    }
-    
-    pub fn enqueue(self: *ThreadQueue, tcb: *TCB) void {
-        tcb.next = null;
-        if (self.tail) |tail| {
-            tail.next = tcb;
-        } else {
-            self.head = tcb;
-        }
-        self.tail = tcb;
-    }
-    
-    pub fn dequeue(self: *ThreadQueue) ?*TCB {
-        const tcb = self.head orelse return null;
-        self.head = tcb.next;
-        if (self.head == null) {
-            self.tail = null;
-        }
-        return tcb;
-    }
-};
-
-/// IPC state
-pub const IpcState = enum {
-    IDLE,
-    WAITING_CALL,
-    WAITING_REPLY,
-    RECEIVED_CALL,
-    RECEIVED_ASYNC,
-    ERROR,
-};
-
-/// Thread Control Block - minimal viable
+/// Thread Control Block - minimal viable for 64-bit preemption
 pub const TCB = struct {
-    // Execution context (callee-saved registers)
-    context: Context,
+    // Current stack pointer of the thread (pointing to its Context on the stack)
+    stack_ptr: u64,
     
-    // State
+    // Virtual Memory Space (CR3)
+    cr3: u64,
+    
+    // Capability Root (CNode)
+    cspace: u64,
+
+    // State management
     state: ThreadState,
-    ipc_state: IpcState,
-    
-    // Scheduling
     tid: u32,
     priority: u8,
     
-    // Links for run queue
+    // Links for run queue and free list
     next: ?*TCB,
-    prev: ?*TCB,
-    
-    // Capability context
-    root_cnode: cap.CNode,
-    vspace: cap.CapSlot,
-    
-    // IPC
-    ipc_buffer: [512]u8,
-    ipc_msg_len: usize,
-    ipc_endpoint: usize,
-    ipc_caller: ?*TCB,
-    ipc_badge: u64,
     
     /// Initialize a TCB to FREE state
     pub fn init(self: *TCB) void {
         self.* = .{
-            .context = Context.init(),
+            .stack_ptr = 0,
+            .cr3 = 0,
+            .cspace = 0,
             .state = .FREE,
-            .ipc_state = .IDLE,
             .tid = 0,
             .priority = 128,
             .next = null,
-            .prev = null,
-            .root_cnode = undefined,
-            .vspace = undefined,
-            .ipc_buffer = undefined,
-            .ipc_msg_len = 0,
-            .ipc_endpoint = 0,
-            .ipc_caller = null,
-            .ipc_badge = 0,
         };
+    }
+
+    /// Prepare a thread's stack for initial execution.
+    /// This simulates a context switch save by pushing the entry point and registers.
+    pub fn setupThread(self: *TCB, entry: u64, stack_top: u64) void {
+        // ABI Alignment: Ensure stack_top is 16-byte aligned
+        const aligned_stack = (stack_top & ~@as(u64, 15));
+        
+        // Return address (RIP)
+        var sp = aligned_stack - 8;
+        @as(*u64, @ptrFromInt(sp)).* = entry;
+
+        // Pushed by switch_context: rbp, rbx, r12, r13, r14, r15
+        // Total 6 registers (48 bytes)
+        sp -= 8 * 6;
+        const regs: [*]u64 = @ptrFromInt(sp);
+        @memset(regs[0..6], 0); // Clear R15 through RBP
+        
+        self.stack_ptr = sp;
+        self.state = .RUNNABLE;
     }
 };
 
-// Static pool of TCBs (no heap allocation in kernel)
+// --- TCB Pool and O(1) Allocation ---
 const MAX_THREADS = 256;
 var tcb_pool: [MAX_THREADS]TCB = undefined;
+var free_list_head: ?*TCB = null;
 var tcb_initialized = false;
 
-/// Initialize TCB pool
+/// Initialize TCB pool and build the Free List.
 pub fn init() void {
     if (tcb_initialized) return;
     
-    for (&tcb_pool) |*tcb| {
+    // Build the initial free list O(1) chained
+    for (0..MAX_THREADS) |i| {
+        const tcb = &tcb_pool[i];
         tcb.init();
+        tcb.tid = @intCast(i);
+        
+        if (i < MAX_THREADS - 1) {
+            tcb.next = &tcb_pool[i + 1];
+        } else {
+            tcb.next = null;
+        }
     }
+    free_list_head = &tcb_pool[0];
     tcb_initialized = true;
 }
 
-/// Allocate a free TCB
+/// Allocate a free TCB in O(1) time.
 pub fn allocTCB() ?*TCB {
-    for (&tcb_pool, 0..) |*tcb, i| {
-        if (tcb.state == .FREE) {
-            tcb.init();
-            tcb.tid = @intCast(i);
-            return tcb;
-        }
-    }
-    return null;
-}
-
-/// Free a TCB back to pool
-pub fn freeTCB(tcb: *TCB) void {
-    tcb.state = .FREE;
+    const tcb = free_list_head orelse return null;
+    free_list_head = tcb.next;
+    
+    tcb.state = .SUSPENDED;
     tcb.next = null;
-    tcb.prev = null;
-}
-
-/// Get TCB by TID
-pub fn getTCB(tid: u32) ?*TCB {
-    if (tid >= MAX_THREADS) return null;
-    const tcb = &tcb_pool[tid];
-    if (tcb.state == .FREE) return null;
     return tcb;
 }
 
-/// Current thread (set by scheduler)
+/// Free a TCB back to the list in O(1) time.
+pub fn freeTCB(tcb: *TCB) void {
+    tcb.state = .FREE;
+    tcb.next = free_list_head;
+    free_list_head = tcb;
+}
+
+// --- Current Thread Tracking ---
 var current_thread: ?*TCB = null;
 
-/// Get currently executing thread
 pub fn getCurrent() ?*TCB {
     return current_thread;
 }
 
-/// Set current thread (called by scheduler during switch)
 pub fn setCurrent(tcb: ?*TCB) void {
     current_thread = tcb;
-}
-
-/// Idle thread context (for when no other thread runs)
-var idle_context: Context = undefined;
-
-/// Get idle context for initial setup
-pub fn getIdleContext() *Context {
-    return &idle_context;
 }
