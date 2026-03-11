@@ -9,6 +9,7 @@ LOG_DIR="$ARTIFACTS_DIR/logs"
 TODO_JSON="$TASKS_DIR/todo.json"
 RUNTIME_JSON="$TASKS_DIR/runtime.json"
 VERIFY_JSON="$ARTIFACTS_DIR/latest_verify.json"
+LESSONS_JSON="$TASKS_DIR/lessons.json"
 
 mkdir -p "$LOG_DIR"
 
@@ -29,58 +30,52 @@ need_cmd python3
 need_cmd git
 need_file "$TODO_JSON"
 need_file "$RUNTIME_JSON"
+need_file "$LESSONS_JSON"
 
 RUN_ID="verify-$(date -u +"%Y%m%dT%H%M%SZ")"
 GENERATED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
-CHANGED_FILES=()
-while IFS= read -r f; do
-  [[ -n "$f" ]] && CHANGED_FILES+=("$f")
-done < <(
+CHANGED_FILES_TEXT="$(
   {
     git -C "$ROOT" diff --name-only HEAD -- . || true
     git -C "$ROOT" diff --name-only --cached -- . || true
     git -C "$ROOT" ls-files --others --exclude-standard || true
-  } | sort -u
-)
+  } | sed '/^$/d' | grep -vE '(^|/)__pycache__/|\.pyc$' | sort -u
+)"
 
-EVIDENCE_FILES=()
-if [[ -d "$LOG_DIR" ]]; then
-  while IFS= read -r f; do
-    rel="${f#"$ROOT"/}"
-    EVIDENCE_FILES+=("$rel")
-  done < <(find "$LOG_DIR" -type f | sort)
-fi
+EVIDENCE_FILES_TEXT="$(
+  if [[ -d "$LOG_DIR" ]]; then
+    find "$LOG_DIR" -type f | sort | sed "s#^$ROOT/##"
+  fi
+)"
 
 VERIFY_OUTPUT="$(
-ROOT="$ROOT" python3 - "${CHANGED_FILES[@]}" -- "${EVIDENCE_FILES[@]}" -- "$RUN_ID" "$GENERATED_AT" <<'PY'
+ROOT="$ROOT" \
+CHANGED_FILES_TEXT="$CHANGED_FILES_TEXT" \
+EVIDENCE_FILES_TEXT="$EVIDENCE_FILES_TEXT" \
+RUN_ID="$RUN_ID" \
+GENERATED_AT="$GENERATED_AT" \
+python3 - <<'PY'
 import json
 import os
-import sys
 from pathlib import Path
 
 from harness.aggregator import run_aggregator
 
 root = Path(os.environ["ROOT"])
-args = sys.argv[1:]
-
-try:
-    sep1 = args.index("--")
-    sep2 = args.index("--", sep1 + 1)
-except ValueError as exc:
-    raise SystemExit(f"invalid argument framing: {exc}")
-
-changed_files = args[:sep1]
-evidence_files = args[sep1 + 1:sep2]
-run_id = args[sep2 + 1]
-generated_at = args[sep2 + 2]
+changed_files = [line for line in os.environ.get("CHANGED_FILES_TEXT", "").splitlines() if line]
+evidence_files = [line for line in os.environ.get("EVIDENCE_FILES_TEXT", "").splitlines() if line]
+run_id = os.environ["RUN_ID"]
+generated_at = os.environ["GENERATED_AT"]
 
 todo = json.loads((root / "tasks" / "todo.json").read_text())
 runtime = json.loads((root / "tasks" / "runtime.json").read_text())
+json.loads((root / "tasks" / "lessons.json").read_text())
 
 bundle = {
     "todo": todo,
     "runtime": runtime,
+    "root_dir": str(root),
 }
 
 artifact = run_aggregator(

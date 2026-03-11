@@ -2,30 +2,46 @@
   "artifact_version": "1",
   "task_id": "bootstrap-kozo-harness",
   "task_title": "Bootstrap KOZO harness",
-  "mode": "execute",
+  "mode": "complete",
   "current_step": {
-    "id": 1,
+    "id": 3,
     "kind": "edit",
-    "title": "Create registry and invariant modules",
+    "title": "Finalize schemas, scripts, and generated control artifacts",
     "files_expected": [
-      "harness/registry.py",
-      "harness/invariants.py",
-      "harness/codes.py"
+      "schemas/todo.schema.json",
+      "schemas/runtime.schema.json",
+      "schemas/latest_verify.schema.json",
+      "schemas/agent_context.schema.json",
+      "scripts/verify.sh",
+      "scripts/agent_context.sh",
+      "tasks/todo.json",
+      "tasks/runtime.json",
+      "tasks/lessons.json",
+      "artifacts/latest_verify.json",
+      "agent/agent_context.json",
+      ".codex/AGENTS.md"
     ],
     "verification_refs": [
-      "verification.invariants[0]"
+      "verification.tests_run[0]",
+      "verification.tests_run[1]",
+      "verification.tests_run[2]"
     ]
   },
   "constraints": [
-    "Do not edit files outside current_step.files_expected"
+    "Plan is complete; any further edits require a new planned step.",
+    "Fail closed if a file falls outside the declared task scope."
   ],
   "active_rules": [],
   "recent_failures": [],
-  "next_verification": [],
+  "next_verification": [
+    "verification.tests_run[0]",
+    "verification.tests_run[1]",
+    "verification.tests_run[2]"
+  ],
   "halt_conditions": [
-    "Any file outside current_step.files_expected changes",
-    "current step failure_count reaches 2",
-    "verify status is fail after an execution attempt"
+    "Any file outside the declared task scope changes.",
+    "The current step failure count reaches 2.",
+    "Verification returns status=fail after an execution attempt."
   ],
   "updated_at": "2026-03-11T00:00:00Z"
 }

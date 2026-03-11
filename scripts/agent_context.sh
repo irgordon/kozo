@@ -9,6 +9,24 @@ OUTPUT_JSON="$ROOT/agent/agent_context.json"
 
 mkdir -p "$ROOT/agent"
 
+fail() {
+  printf "FAIL: %s\n" "$*" >&2
+  exit 1
+}
+
+need_cmd() {
+  command -v "$1" >/dev/null 2>&1 || fail "Missing command: $1"
+}
+
+need_file() {
+  [[ -f "$1" ]] || fail "Required file missing: $1"
+}
+
+need_cmd python3
+need_file "$TODO_JSON"
+need_file "$RUNTIME_JSON"
+need_file "$VERIFY_JSON"
+
 python3 - "$TODO_JSON" "$RUNTIME_JSON" "$VERIFY_JSON" "$OUTPUT_JSON" <<'PY'
 import json
 import sys

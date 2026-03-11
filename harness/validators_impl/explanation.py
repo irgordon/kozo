@@ -25,4 +25,4 @@ class ExplanationValidator(BaseValidator):
                 detail="Explanation summary required but missing or invalid",
                 action="Add a non-empty explanation_summary list describing completed edits",
             )
-        return ValidationResult.pass_(code=OK, detail="Explanation summary present and valid")
+        return ValidationResult.pass_(code=OK, detail="Explanation summary is present when the plan requires it")

@@ -1,37 +1,61 @@
 from types import MappingProxyType
 
 ARTIFACT_VERSION = "1"
+PASS = "pass"
+FAIL = "fail"
+SUMMARY_SUBSYSTEM_GENERIC = "generic"
 
-SUBSYSTEMS = MappingProxyType({
-    "generic": (),
-    "schema": (),
-    "lifecycle": (),
-    "step_scope": (),
-    "verification_refs": (),
-    "explanation": (),
-    "preconditions": (),
-    "subagent": (),
-    "rust": (),
-    "odin": (),
-    "abi": (),
-    "evidence": (),
-})
+PLAN_STATUSES = ("approved", "complete")
+STEP_STATUSES = ("pending", "done")
+STEP_KINDS = ("edit", "docs")
+TASK_KINDS = ("non_trivial",)
+APPROVAL_STATUSES = ("approved",)
+CONTEXT_MODES = ("execute", "replan", "halted", "complete")
+VERIFICATION_SECTIONS = (
+    "tests_run",
+    "logs",
+    "diffs",
+    "invariants",
+    "expected_behavior",
+    "actual_behavior",
+)
 
-STATUSES = MappingProxyType({
-    "pass": "validator succeeded",
-    "fail": "validator failed",
-})
+SUBSYSTEMS = MappingProxyType(
+    {
+        SUMMARY_SUBSYSTEM_GENERIC: (),
+        "schema": (),
+        "lifecycle": (),
+        "step_scope": (),
+        "verification_refs": (),
+        "explanation": (),
+        "preconditions": (),
+        "subagent": (),
+        "rust": (),
+        "odin": (),
+        "abi": (),
+        "evidence": (),
+    }
+)
 
-CHECKS = MappingProxyType({
-    "schema": "schema",
-    "plan_lifecycle": "lifecycle",
-    "step_scope": "step_scope",
-    "verification_refs": "verification_refs",
-    "explanation": "explanation",
-    "preconditions": "preconditions",
-    "subagent": "subagent",
-    "rust": "rust",
-    "odin": "odin",
-    "abi": "abi",
-    "evidence": "evidence",
-})
+STATUSES = MappingProxyType(
+    {
+        PASS: "validator succeeded",
+        FAIL: "validator failed",
+    }
+)
+
+CHECKS = MappingProxyType(
+    {
+        "schema": "schema",
+        "plan_lifecycle": "lifecycle",
+        "step_scope": "step_scope",
+        "verification_refs": "verification_refs",
+        "explanation": "explanation",
+        "preconditions": "preconditions",
+        "subagent": "subagent",
+        "rust": "rust",
+        "odin": "odin",
+        "abi": "abi",
+        "evidence": "evidence",
+    }
+)

@@ -1,15 +1,122 @@
 {
   "artifact_version": "1",
+  "run_id": "verify-20260311T134107Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 0,
+    "total_checks": 11,
     "failed_check_count": 0
   },
-  "checks": [],
+  "checks": [
+    {
+      "name": "schema",
+      "subsystem": "schema",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Task artifacts satisfy the declared schemas"
+    },
+    {
+      "name": "plan_lifecycle",
+      "subsystem": "lifecycle",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Plan lifecycle is internally consistent"
+    },
+    {
+      "name": "step_scope",
+      "subsystem": "step_scope",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Changed files stay within the declared step scope"
+    },
+    {
+      "name": "verification_refs",
+      "subsystem": "verification_refs",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Verification refs resolve into canonical verification entries"
+    },
+    {
+      "name": "explanation",
+      "subsystem": "explanation",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Explanation summary is present when the plan requires it"
+    },
+    {
+      "name": "preconditions",
+      "subsystem": "preconditions",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Preconditions are backed by declared verification signals"
+    },
+    {
+      "name": "subagent",
+      "subsystem": "subagent",
+      "status": "pass",
+      "code": "OK",
+      "detail": "No subagent scope needs validation in this bootstrap plan"
+    },
+    {
+      "name": "rust",
+      "subsystem": "rust",
+      "status": "pass",
+      "code": "OK",
+      "detail": "No Rust changes require validation in this bootstrap loop"
+    },
+    {
+      "name": "odin",
+      "subsystem": "odin",
+      "status": "pass",
+      "code": "OK",
+      "detail": "No Odin kernel changes require validation in this bootstrap loop"
+    },
+    {
+      "name": "abi",
+      "subsystem": "abi",
+      "status": "pass",
+      "code": "OK",
+      "detail": "No ABI-surface files changed during bootstrap"
+    },
+    {
+      "name": "evidence",
+      "subsystem": "evidence",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Evidence file references resolve on disk"
+    }
+  ],
   "failed_checks": [],
-  "changed_files": [],
+  "changed_files": [
+    ".codex/AGENTS.md",
+    "agent/agent_context.json",
+    "artifacts/latest_verify.json",
+    "harness/aggregator.py",
+    "harness/codes.py",
+    "harness/invariants.py",
+    "harness/registry.py",
+    "harness/summarize.py",
+    "harness/validators_impl/abi.py",
+    "harness/validators_impl/evidence.py",
+    "harness/validators_impl/explanation.py",
+    "harness/validators_impl/odin.py",
+    "harness/validators_impl/plan_lifecycle.py",
+    "harness/validators_impl/preconditions.py",
+    "harness/validators_impl/rust.py",
+    "harness/validators_impl/schema.py",
+    "harness/validators_impl/step_scope.py",
+    "harness/validators_impl/subagent.py",
+    "harness/validators_impl/verification_refs.py",
+    "schemas/agent_context.schema.json",
+    "schemas/latest_verify.schema.json",
+    "schemas/runtime.schema.json",
+    "schemas/todo.schema.json",
+    "scripts/agent_context.sh",
+    "scripts/verify.sh",
+    "tasks/runtime.json",
+    "tasks/todo.json"
+  ],
   "evidence_files": [],
-  "generated_at": "2026-03-11T00:00:00Z"
+  "generated_at": "2026-03-11T13:41:07Z"
 }
