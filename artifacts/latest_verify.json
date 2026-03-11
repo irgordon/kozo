@@ -1,0 +1,15 @@
+{
+  "artifact_version": "1",
+  "status": "pass",
+  "summary_code": "OK",
+  "summary_subsystem": "generic",
+  "summary": {
+    "total_checks": 0,
+    "failed_check_count": 0
+  },
+  "checks": [],
+  "failed_checks": [],
+  "changed_files": [],
+  "evidence_files": [],
+  "generated_at": "2026-03-11T00:00:00Z"
+}

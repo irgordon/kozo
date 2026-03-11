@@ -1,0 +1,19 @@
+{
+  "artifact_version": "1",
+  "task_id": "bootstrap-kozo-harness",
+  "task_title": "Bootstrap KOZO harness",
+  "plan_status": "approved",
+  "current_step_id": 1,
+  "replan_required": false,
+  "halted": false,
+  "failure_state": {
+    "last_failed_step": 1,
+    "failure_count": 0
+  },
+  "execution": {
+    "step_attempt": 1,
+    "last_step_started_at": null,
+    "last_step_completed_at": null
+  },
+  "updated_at": "2026-03-11T00:00:00Z"
+}

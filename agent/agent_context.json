@@ -1,0 +1,31 @@
+{
+  "artifact_version": "1",
+  "task_id": "bootstrap-kozo-harness",
+  "task_title": "Bootstrap KOZO harness",
+  "mode": "execute",
+  "current_step": {
+    "id": 1,
+    "kind": "edit",
+    "title": "Create registry and invariant modules",
+    "files_expected": [
+      "harness/registry.py",
+      "harness/invariants.py",
+      "harness/codes.py"
+    ],
+    "verification_refs": [
+      "verification.invariants[0]"
+    ]
+  },
+  "constraints": [
+    "Do not edit files outside current_step.files_expected"
+  ],
+  "active_rules": [],
+  "recent_failures": [],
+  "next_verification": [],
+  "halt_conditions": [
+    "Any file outside current_step.files_expected changes",
+    "current step failure_count reaches 2",
+    "verify status is fail after an execution attempt"
+  ],
+  "updated_at": "2026-03-11T00:00:00Z"
+}

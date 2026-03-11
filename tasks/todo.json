@@ -1,0 +1,101 @@
+{
+  "task_title": "Bootstrap KOZO harness",
+  "task_kind": "non_trivial",
+  "created_at": "2026-03-11T00:00:00Z",
+  "plan_status": "approved",
+  "replan_number": 0,
+  "approval": {
+    "status": "approved"
+  },
+  "preconditions": [
+    "Repository initialized",
+    "Python 3 available"
+  ],
+  "assumptions": [
+    "Harness files will be created in this repository"
+  ],
+  "file_scope": [
+    "harness/",
+    "schemas/",
+    "scripts/",
+    "tasks/",
+    "agent/"
+  ],
+  "steps": [
+    {
+      "id": 1,
+      "title": "Create registry and invariant modules",
+      "status": "pending",
+      "kind": "edit",
+      "files_expected": [
+        "harness/registry.py",
+        "harness/invariants.py",
+        "harness/codes.py"
+      ],
+      "verification_refs": [
+        "verification.invariants[0]"
+      ],
+      "failure_count": 0
+    },
+    {
+      "id": 2,
+      "title": "Create summarizer and aggregator",
+      "status": "pending",
+      "kind": "edit",
+      "files_expected": [
+        "harness/summarize.py",
+        "harness/aggregator.py"
+      ],
+      "verification_refs": [
+        "verification.invariants[1]"
+      ],
+      "failure_count": 0
+    },
+    {
+      "id": 3,
+      "title": "Create schemas and entrypoint scripts",
+      "status": "pending",
+      "kind": "edit",
+      "files_expected": [
+        "schemas/latest_verify.schema.json",
+        "schemas/agent_context.schema.json",
+        "scripts/verify.sh",
+        "scripts/agent_context.sh"
+      ],
+      "verification_refs": [
+        "verification.tests_run[0]"
+      ],
+      "failure_count": 0
+    }
+  ],
+  "expected_outputs": [
+    "Harness directory exists",
+    "Schemas generated",
+    "Agent control plane operational"
+  ],
+  "verification": {
+    "tests_run": [
+      {
+        "tool": "shell",
+        "command": "python3 -m py_compile harness/*.py",
+        "status": "planned"
+      }
+    ],
+    "logs": [],
+    "diffs": [],
+    "invariants": [
+      "All identifiers originate from registry.py",
+      "Structural rules originate from invariants.py"
+    ],
+    "expected_behavior": [
+      "Harness compiles",
+      "Summarizer produces agent_context.json"
+    ],
+    "actual_behavior": [],
+    "baseline_reference": "blank-repo"
+  },
+  "elegance_review": {
+    "required": false
+  },
+  "lessons_referenced": []
+}
