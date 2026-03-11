@@ -30,8 +30,29 @@
       ]
     },
     "summary_code": {
-      "type": "string",
-      "pattern": ".*\\S.*"
+      "enum": [
+        "OK",
+        "SCHEMA_INVALID",
+        "PLAN_STATUS_INVALID",
+        "STEP_ORDER_INVALID",
+        "STEP_FAILURE_THRESHOLD",
+        "REPLAN_REQUIRED",
+        "STEP_SCOPE_UNPLANNED_FILE",
+        "STEP_SCOPE_EMPTY_DONE_STEP",
+        "STEP_SCOPE_OUTSIDE_TASK_SCOPE",
+        "VERIFICATION_REFS_INVALID",
+        "MISSING_REF",
+        "EXPLANATION_SUMMARY_REQUIRED",
+        "PRECONDITION_UNCHECKED",
+        "SUBAGENT_SCOPE_VIOLATION",
+        "RUST_FMT_FAILED",
+        "RUST_CLIPPY_FAILED",
+        "RUST_TEST_FAILED",
+        "ODIN_CHECK_FAILED",
+        "ABI_WIDTH_MISMATCH",
+        "ABI_LAYOUT_MISMATCH",
+        "EVIDENCE_FILE_MISSING"
+      ]
     },
     "summary_subsystem": {
       "enum": [
@@ -116,8 +137,29 @@
             ]
           },
           "code": {
-            "type": "string",
-            "pattern": ".*\\S.*"
+            "enum": [
+              "OK",
+              "SCHEMA_INVALID",
+              "PLAN_STATUS_INVALID",
+              "STEP_ORDER_INVALID",
+              "STEP_FAILURE_THRESHOLD",
+              "REPLAN_REQUIRED",
+              "STEP_SCOPE_UNPLANNED_FILE",
+              "STEP_SCOPE_EMPTY_DONE_STEP",
+              "STEP_SCOPE_OUTSIDE_TASK_SCOPE",
+              "VERIFICATION_REFS_INVALID",
+              "MISSING_REF",
+              "EXPLANATION_SUMMARY_REQUIRED",
+              "PRECONDITION_UNCHECKED",
+              "SUBAGENT_SCOPE_VIOLATION",
+              "RUST_FMT_FAILED",
+              "RUST_CLIPPY_FAILED",
+              "RUST_TEST_FAILED",
+              "ODIN_CHECK_FAILED",
+              "ABI_WIDTH_MISMATCH",
+              "ABI_LAYOUT_MISMATCH",
+              "EVIDENCE_FILE_MISSING"
+            ]
           },
           "detail": {
             "type": "string",
@@ -169,8 +211,28 @@
             ]
           },
           "code": {
-            "type": "string",
-            "pattern": ".*\\S.*"
+            "enum": [
+              "SCHEMA_INVALID",
+              "PLAN_STATUS_INVALID",
+              "STEP_ORDER_INVALID",
+              "STEP_FAILURE_THRESHOLD",
+              "REPLAN_REQUIRED",
+              "STEP_SCOPE_UNPLANNED_FILE",
+              "STEP_SCOPE_EMPTY_DONE_STEP",
+              "STEP_SCOPE_OUTSIDE_TASK_SCOPE",
+              "VERIFICATION_REFS_INVALID",
+              "MISSING_REF",
+              "EXPLANATION_SUMMARY_REQUIRED",
+              "PRECONDITION_UNCHECKED",
+              "SUBAGENT_SCOPE_VIOLATION",
+              "RUST_FMT_FAILED",
+              "RUST_CLIPPY_FAILED",
+              "RUST_TEST_FAILED",
+              "ODIN_CHECK_FAILED",
+              "ABI_WIDTH_MISMATCH",
+              "ABI_LAYOUT_MISMATCH",
+              "EVIDENCE_FILE_MISSING"
+            ]
           },
           "detail": {
             "type": "string",

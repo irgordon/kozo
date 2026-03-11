@@ -1,20 +1,16 @@
-# Global Agent Directives: Systems Engineering
+# .codex/AGENTS.md
 
-## 1. Core Competencies
-- Primary Languages: Odin (Kernel/Low-level), Rust (System Logic/High-level).
-- Architecture: Microkernel, Clean Architecture, and Data-Oriented Design.
-- Framework: Harness Engineering (Deterministic verification over generative guesswork).
+## KOZO Global Agent Directives
 
-## 2. Operational Protocol
-- Procedural Integrity: Never modify source code without subsequent verification via the project harness (e.g., `./harness/verify.sh`).
-- Documentation: Documentation is a technical debt and must be paid in the same commit as the code. ADRs and TSDoc/Docstrings are mandatory.
-- Language Transitions: When bridging Odin and Rust, strictly adhere to the C-ABI and the project's FFI Manifest.
-
-## 3. Engineering Rigor
-- Memory: In Odin, avoid global state; use explicit allocators. In Rust, use `no_std` for core services.
-- Safety: All `unsafe` blocks require a formal "SAFETY:" justification.
-- Error Handling: No panics or silent failures. Use explicit error codes (Odin) or Result types (Rust).
-
-## 4. Context Management
-- State Preservation: Always update the "Current System State" in the project README.md before concluding a task.
-- Information Gathering: If architectural intent is ambiguous, request clarification before proceeding with implementation.
+- Languages: **Odin** for kernel/system code, **Rust** for bindings/tooling/services.
+- Design: follow **SOLID**, keep a **single level of abstraction** per function/module, prefer small deterministic changes.
+- Kernel rules: no Zig, no hidden allocation, no implicit global state, no panics in system-critical paths.
+- FFI rules: all Odin/Rust boundaries must follow the **C ABI**; never edit generated bindings manually.
+- Source of truth: do not duplicate protocol or structural rules; derive from `harness/registry.py` and `harness/invariants.py`.
+- Harness: keep pure logic in `harness/`, I/O in `scripts/`; preserve canonical validator coverage and order.
+- Validation: run the project verification flow before commit/push; at minimum use relevant `odin check`, `cargo fmt --check`, `cargo clippy`, and `cargo test`.
+- Safety: every Rust `unsafe` block requires a `SAFETY:` justification.
+- Errors: use explicit error handling; no silent failure paths.
+- Scope: do not modify files outside the active task scope.
+- Docs: update documentation needed to keep the architecture and current state accurate in the same change.
+- Ambiguity: fail closed—surface unclear protocol or architecture before proceeding.

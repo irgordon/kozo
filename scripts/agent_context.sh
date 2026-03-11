@@ -32,6 +32,7 @@ import json
 import sys
 from pathlib import Path
 from harness.summarize import summarize
+from harness.validators_impl.schema import validate_named_document
 
 todo = json.loads(Path(sys.argv[1]).read_text())
 runtime = json.loads(Path(sys.argv[2]).read_text())
@@ -39,6 +40,7 @@ verify = json.loads(Path(sys.argv[3]).read_text())
 output = Path(sys.argv[4])
 
 context = summarize(todo, runtime, verify)
+validate_named_document("agent_context", context)
 output.write_text(json.dumps(context, indent=2) + "\n")
 PY
 

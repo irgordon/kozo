@@ -34,20 +34,35 @@ need_file "$LESSONS_JSON"
 
 RUN_ID="verify-$(date -u +"%Y%m%dT%H%M%SZ")"
 GENERATED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+EMPTY_TREE="4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 
-CHANGED_FILES_TEXT="$(
+git_head_ref() {
+  if git -C "$ROOT" rev-parse --verify HEAD >/dev/null 2>&1; then
+    printf "HEAD"
+    return
+  fi
+  printf "%s" "$EMPTY_TREE"
+}
+
+collect_changed_files() {
+  local head_ref
+  head_ref="$(git_head_ref)"
   {
-    git -C "$ROOT" diff --name-only HEAD -- . || true
-    git -C "$ROOT" diff --name-only --cached -- . || true
+    git -C "$ROOT" diff --name-only -- . || true
+    git -C "$ROOT" diff --name-only --cached "$head_ref" -- . || true
     git -C "$ROOT" ls-files --others --exclude-standard || true
   } | sed '/^$/d' | grep -vE '(^|/)__pycache__/|\.pyc$' | sort -u
-)"
+}
 
-EVIDENCE_FILES_TEXT="$(
+collect_evidence_files() {
   if [[ -d "$LOG_DIR" ]]; then
     find "$LOG_DIR" -type f | sort | sed "s#^$ROOT/##"
   fi
-)"
+}
+
+CHANGED_FILES_TEXT="$(collect_changed_files)"
+
+EVIDENCE_FILES_TEXT="$(collect_evidence_files)"
 
 VERIFY_OUTPUT="$(
 ROOT="$ROOT" \
@@ -93,9 +108,18 @@ PY
 printf "%s\n" "$VERIFY_OUTPUT" > "$VERIFY_JSON"
 
 STATUS="$(
-python3 - "$VERIFY_JSON" <<'PY'
-import json, sys
-print(json.loads(open(sys.argv[1]).read())["status"])
+ROOT="$ROOT" python3 - "$VERIFY_JSON" <<'PY'
+import json
+import os
+import sys
+from pathlib import Path
+
+from harness.validators_impl.schema import validate_named_document
+
+verify_path = Path(sys.argv[1])
+verify = json.loads(verify_path.read_text())
+validate_named_document("latest_verify", verify)
+print(verify["status"])
 PY
 )"
 
