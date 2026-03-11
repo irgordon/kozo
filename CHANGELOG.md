@@ -5,3 +5,4 @@
 - Bootstrap the minimum KOZO harness and control-plane loop.
 - Add canonical registry-ordered validators and schema-backed artifacts.
 - Add `verify.sh` and `agent_context.sh` to generate the first working verification outputs.
+- Harden `aggregator.py` and `summarize.py` so verification runs in canonical order and agent context resolves the next required commands.

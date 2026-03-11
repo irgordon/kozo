@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260311T134107Z",
+  "run_id": "verify-20260311T141415Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -90,33 +90,9 @@
   "failed_checks": [],
   "changed_files": [
     ".codex/AGENTS.md",
-    "agent/agent_context.json",
-    "artifacts/latest_verify.json",
     "harness/aggregator.py",
-    "harness/codes.py",
-    "harness/invariants.py",
-    "harness/registry.py",
-    "harness/summarize.py",
-    "harness/validators_impl/abi.py",
-    "harness/validators_impl/evidence.py",
-    "harness/validators_impl/explanation.py",
-    "harness/validators_impl/odin.py",
-    "harness/validators_impl/plan_lifecycle.py",
-    "harness/validators_impl/preconditions.py",
-    "harness/validators_impl/rust.py",
-    "harness/validators_impl/schema.py",
-    "harness/validators_impl/step_scope.py",
-    "harness/validators_impl/subagent.py",
-    "harness/validators_impl/verification_refs.py",
-    "schemas/agent_context.schema.json",
-    "schemas/latest_verify.schema.json",
-    "schemas/runtime.schema.json",
-    "schemas/todo.schema.json",
-    "scripts/agent_context.sh",
-    "scripts/verify.sh",
-    "tasks/runtime.json",
-    "tasks/todo.json"
+    "harness/summarize.py"
   ],
   "evidence_files": [],
-  "generated_at": "2026-03-11T13:41:07Z"
+  "generated_at": "2026-03-11T14:14:15Z"
 }

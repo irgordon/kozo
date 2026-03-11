@@ -31,7 +31,11 @@
     "Plan is complete; any further edits require a new planned step.",
     "Fail closed if a file falls outside the declared task scope."
   ],
-  "active_rules": [],
+  "active_rules": [
+    "Run: python3 -m py_compile harness/*.py harness/validators_impl/*.py",
+    "Run: ./scripts/verify.sh",
+    "Run: ./scripts/agent_context.sh"
+  ],
   "recent_failures": [],
   "next_verification": [
     "verification.tests_run[0]",

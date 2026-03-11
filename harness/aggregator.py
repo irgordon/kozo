@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Any, Dict, List, Sequence, Tuple, Type
 
 from harness.codes import CODES, FAIL, OK, PASS
 from harness.registry import (
@@ -9,7 +9,7 @@ from harness.registry import (
     SUBSYSTEMS,
     SUMMARY_SUBSYSTEM_GENERIC,
 )
-from harness.validator import ValidationResult
+from harness.validator import BaseValidator, ValidationResult
 from harness.validators import VALIDATORS
 from harness.validators_impl.schema import validate_named_document
 
@@ -38,6 +38,26 @@ def _validate_validator_coverage_and_order(seen_names: Sequence[str]) -> None:
             "VALIDATORS must appear in canonical order: "
             f"{list(_EXPECTED_VALIDATOR_ORDER)}"
         )
+
+
+def _build_validator_map() -> Dict[str, Type[BaseValidator]]:
+    validator_map: Dict[str, Type[BaseValidator]] = {}
+    for validator_class in VALIDATORS:
+        validator_name = _validate_nonempty_string(
+            getattr(validator_class, "name", ""),
+            f"{validator_class.__name__}.name",
+        )
+        if validator_name in validator_map:
+            raise ValueError(f"Duplicate validator registration for {validator_name!r}")
+        validator_map[validator_name] = validator_class
+
+    missing = [name for name in _EXPECTED_VALIDATOR_ORDER if name not in validator_map]
+    extra = sorted(set(validator_map) - set(_EXPECTED_VALIDATOR_ORDER))
+    if missing:
+        raise ValueError(f"VALIDATORS missing canonical checks: {missing}")
+    if extra:
+        raise ValueError(f"VALIDATORS contains non-canonical checks: {extra}")
+    return validator_map
 
 
 def _normalize_result(name: str, subsystem: str, result: ValidationResult) -> Dict[str, Any]:
@@ -97,6 +117,22 @@ def _build_validation_bundle(
     return bundle
 
 
+def _collect_results(validation_bundle: Dict[str, Any]) -> List[Tuple[str, str, ValidationResult]]:
+    validator_map = _build_validator_map()
+    seen_names: List[str] = []
+    collected: List[Tuple[str, str, ValidationResult]] = []
+
+    for name in _EXPECTED_VALIDATOR_ORDER:
+        validator = validator_map[name]()
+        validator_name = _validate_nonempty_string(validator.name, "validator.name")
+        subsystem = _validate_nonempty_string(validator.subsystem, "validator.subsystem")
+        seen_names.append(validator_name)
+        collected.append((validator_name, subsystem, validator.validate(validation_bundle)))
+
+    _validate_validator_coverage_and_order(seen_names)
+    return collected
+
+
 def _build_artifact(
     run_id: str,
     checks: List[Dict[str, Any]],
@@ -153,16 +189,7 @@ def run_aggregator(
         normalized_generated_at,
     )
 
-    raw_results: List[Tuple[str, str, ValidationResult]] = []
-    seen_names: List[str] = []
-    for validator_class in VALIDATORS:
-        validator = validator_class()
-        name = _validate_nonempty_string(validator.name, "validator.name")
-        subsystem = _validate_nonempty_string(validator.subsystem, "validator.subsystem")
-        seen_names.append(name)
-        raw_results.append((name, subsystem, validator.validate(validation_bundle)))
-
-    _validate_validator_coverage_and_order(seen_names)
+    raw_results = _collect_results(validation_bundle)
     normalized = [_normalize_result(name, subsystem, result) for name, subsystem, result in raw_results]
     checks = [entry["check"] for entry in normalized]
     failed_checks = [
