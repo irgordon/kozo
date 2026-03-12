@@ -14,6 +14,7 @@ from harness.validators_impl.subagent import SubagentValidator
 from harness.validators_impl.rust import RustValidator
 from harness.validators_impl.odin import OdinValidator
 from harness.validators_impl.abi import AbiValidator
+from harness.validators_impl.protocol_validator import ProtocolValidator
 from harness.validators_impl.evidence import EvidenceValidator
 
 _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
@@ -27,6 +28,7 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "rust": RustValidator,
     "odin": OdinValidator,
     "abi": AbiValidator,
+    "protocol_alignment": ProtocolValidator,
     "evidence": EvidenceValidator,
 }
 

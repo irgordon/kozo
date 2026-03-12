@@ -22,6 +22,7 @@ RUST_TEST_FAILED = "RUST_TEST_FAILED"
 ODIN_CHECK_FAILED = "ODIN_CHECK_FAILED"
 ABI_WIDTH_MISMATCH = "ABI_WIDTH_MISMATCH"
 ABI_LAYOUT_MISMATCH = "ABI_LAYOUT_MISMATCH"
+PROTOCOL_MISMATCH = "PROTOCOL_MISMATCH"
 EVIDENCE_FILE_MISSING = "EVIDENCE_FILE_MISSING"
 
 CODES = MappingProxyType(
@@ -46,6 +47,7 @@ CODES = MappingProxyType(
         ODIN_CHECK_FAILED: "odin check failed",
         ABI_WIDTH_MISMATCH: "ABI width mismatch",
         ABI_LAYOUT_MISMATCH: "ABI layout mismatch",
+        PROTOCOL_MISMATCH: "Kernel and service protocol usage drifted from the ABI",
         EVIDENCE_FILE_MISSING: "Required evidence file missing",
     }
 )

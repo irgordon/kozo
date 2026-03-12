@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260311T141415Z",
+  "run_id": "verify-20260312T234138Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 11,
+    "total_checks": 12,
     "failed_check_count": 0
   },
   "checks": [
@@ -63,21 +63,28 @@
       "subsystem": "rust",
       "status": "pass",
       "code": "OK",
-      "detail": "No Rust changes require validation in this bootstrap loop"
+      "detail": "Rust changes are backed by declared cargo check evidence"
     },
     {
       "name": "odin",
       "subsystem": "odin",
       "status": "pass",
       "code": "OK",
-      "detail": "No Odin kernel changes require validation in this bootstrap loop"
+      "detail": "Odin changes are backed by declared odin check evidence"
     },
     {
       "name": "abi",
       "subsystem": "abi",
       "status": "pass",
       "code": "OK",
-      "detail": "No ABI-surface files changed during bootstrap"
+      "detail": "Checked-in ABI bindings match the normative header"
+    },
+    {
+      "name": "protocol_alignment",
+      "subsystem": "protocol_alignment",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Kernel and Rust protocol usage align with the ABI contract"
     },
     {
       "name": "evidence",
@@ -89,10 +96,34 @@
   ],
   "failed_checks": [],
   "changed_files": [
-    ".codex/AGENTS.md",
-    "harness/aggregator.py",
-    "harness/summarize.py"
+    "CHANGELOG.md",
+    "agent/agent_context.json",
+    "artifacts/latest_verify.json",
+    "bindings/odin/kozo_abi.odin",
+    "bindings/rust/kozo_abi.rs",
+    "contracts/kozo_abi.h",
+    "harness/codes.py",
+    "harness/registry.py",
+    "harness/validators.py",
+    "harness/validators_impl/abi.py",
+    "harness/validators_impl/abi_sync_validator.py",
+    "harness/validators_impl/odin.py",
+    "harness/validators_impl/protocol_validator.py",
+    "harness/validators_impl/rust.py",
+    "kernel/arch/x86_64/arch.odin",
+    "kernel/arch/x86_64/serial.odin",
+    "kernel/main.odin",
+    "schemas/agent_context.schema.json",
+    "schemas/latest_verify.schema.json",
+    "scripts/gen_abi.py",
+    "tasks/runtime.json",
+    "tasks/todo.json",
+    "userspace/core_service/Cargo.toml",
+    "userspace/core_service/src/main.rs"
   ],
-  "evidence_files": [],
-  "generated_at": "2026-03-11T14:14:15Z"
+  "evidence_files": [
+    "artifacts/logs/cargo-check.log",
+    "artifacts/logs/odin-check.log"
+  ],
+  "generated_at": "2026-03-12T23:41:38Z"
 }

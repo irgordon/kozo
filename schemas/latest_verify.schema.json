@@ -67,6 +67,7 @@
         "rust",
         "odin",
         "abi",
+        "protocol_alignment",
         "evidence"
       ]
     },
@@ -112,6 +113,7 @@
               "rust",
               "odin",
               "abi",
+              "protocol_alignment",
               "evidence"
             ]
           },
@@ -127,6 +129,7 @@
               "rust",
               "odin",
               "abi",
+              "protocol_alignment",
               "evidence"
             ]
           },
@@ -158,6 +161,7 @@
               "ODIN_CHECK_FAILED",
               "ABI_WIDTH_MISMATCH",
               "ABI_LAYOUT_MISMATCH",
+              "PROTOCOL_MISMATCH",
               "EVIDENCE_FILE_MISSING"
             ]
           },
@@ -192,6 +196,7 @@
               "rust",
               "odin",
               "abi",
+              "protocol_alignment",
               "evidence"
             ]
           },
@@ -207,6 +212,7 @@
               "rust",
               "odin",
               "abi",
+              "protocol_alignment",
               "evidence"
             ]
           },
@@ -231,6 +237,7 @@
               "ODIN_CHECK_FAILED",
               "ABI_WIDTH_MISMATCH",
               "ABI_LAYOUT_MISMATCH",
+              "PROTOCOL_MISMATCH",
               "EVIDENCE_FILE_MISSING"
             ]
           },

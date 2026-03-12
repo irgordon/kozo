@@ -1,9 +1,9 @@
 {
   "artifact_version": "1",
-  "task_id": "bootstrap-kozo-harness",
-  "task_title": "Bootstrap KOZO harness",
+  "task_id": "kozo-protocol-alignment",
+  "task_title": "KOZO Protocol Alignment",
   "plan_status": "complete",
-  "current_step_id": 3,
+  "current_step_id": 1,
   "replan_required": false,
   "halted": false,
   "failure_state": {
@@ -12,8 +12,8 @@
   },
   "execution": {
     "step_attempt": 1,
-    "last_step_started_at": "2026-03-11T00:00:00Z",
-    "last_step_completed_at": "2026-03-11T00:00:00Z"
+    "last_step_started_at": "2026-03-12T14:30:00Z",
+    "last_step_completed_at": "2026-03-12T23:15:00Z"
   },
-  "updated_at": "2026-03-11T00:00:00Z"
+  "updated_at": "2026-03-12T23:15:00Z"
 }

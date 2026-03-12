@@ -1,30 +1,44 @@
 {
   "artifact_version": "1",
-  "task_id": "bootstrap-kozo-harness",
-  "task_title": "Bootstrap KOZO harness",
+  "task_id": "kozo-protocol-alignment",
+  "task_title": "KOZO Protocol Alignment",
   "mode": "complete",
   "current_step": {
-    "id": 3,
+    "id": 1,
     "kind": "edit",
-    "title": "Finalize schemas, scripts, and generated control artifacts",
+    "title": "Align the ABI, kernel dispatcher, Rust consumer, and harness protocol validator",
     "files_expected": [
-      "schemas/todo.schema.json",
-      "schemas/runtime.schema.json",
-      "schemas/latest_verify.schema.json",
-      "schemas/agent_context.schema.json",
-      "scripts/verify.sh",
-      "scripts/agent_context.sh",
+      ".codex/AGENTS.md",
+      "CHANGELOG.md",
       "tasks/todo.json",
       "tasks/runtime.json",
-      "tasks/lessons.json",
+      "contracts/kozo_abi.h",
+      "scripts/gen_abi.py",
+      "bindings/odin/kozo_abi.odin",
+      "bindings/rust/kozo_abi.rs",
+      "kernel/main.odin",
+      "kernel/arch/x86_64/arch.odin",
+      "kernel/arch/x86_64/serial.odin",
+      "userspace/core_service/Cargo.toml",
+      "userspace/core_service/src/main.rs",
+      "harness/registry.py",
+      "harness/codes.py",
+      "harness/validators.py",
+      "harness/validators_impl/abi.py",
+      "harness/validators_impl/abi_sync_validator.py",
+      "harness/validators_impl/odin.py",
+      "harness/validators_impl/rust.py",
+      "harness/validators_impl/protocol_validator.py",
+      "schemas/latest_verify.schema.json",
+      "schemas/agent_context.schema.json",
       "artifacts/latest_verify.json",
-      "agent/agent_context.json",
-      ".codex/AGENTS.md"
+      "agent/agent_context.json"
     ],
     "verification_refs": [
       "verification.tests_run[0]",
       "verification.tests_run[1]",
-      "verification.tests_run[2]"
+      "verification.tests_run[2]",
+      "verification.tests_run[3]"
     ]
   },
   "constraints": [
@@ -32,20 +46,22 @@
     "Fail closed if a file falls outside the declared task scope."
   ],
   "active_rules": [
-    "Run: python3 -m py_compile harness/*.py harness/validators_impl/*.py",
-    "Run: ./scripts/verify.sh",
-    "Run: ./scripts/agent_context.sh"
+    "Run: python3 scripts/gen_abi.py",
+    "Run: odin check kernel/",
+    "Run: cargo check --manifest-path userspace/core_service/Cargo.toml --target x86_64-unknown-none",
+    "Run: ./scripts/verify.sh"
   ],
   "recent_failures": [],
   "next_verification": [
     "verification.tests_run[0]",
     "verification.tests_run[1]",
-    "verification.tests_run[2]"
+    "verification.tests_run[2]",
+    "verification.tests_run[3]"
   ],
   "halt_conditions": [
     "Any file outside the declared task scope changes.",
     "The current step failure count reaches 2.",
     "Verification returns status=fail after an execution attempt."
   ],
-  "updated_at": "2026-03-11T00:00:00Z"
+  "updated_at": "2026-03-12T23:15:00Z"
 }
