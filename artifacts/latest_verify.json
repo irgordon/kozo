@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260312T234138Z",
+  "run_id": "verify-20260313T155149Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 12,
+    "total_checks": 13,
     "failed_check_count": 0
   },
   "checks": [
@@ -87,6 +87,13 @@
       "detail": "Kernel and Rust protocol usage align with the ABI contract"
     },
     {
+      "name": "layout_parity",
+      "subsystem": "structural_integrity",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Heartbeat payload layout matches across the C contract, Odin bindings, and Rust bindings"
+    },
+    {
       "name": "evidence",
       "subsystem": "evidence",
       "status": "pass",
@@ -105,11 +112,7 @@
     "harness/codes.py",
     "harness/registry.py",
     "harness/validators.py",
-    "harness/validators_impl/abi.py",
-    "harness/validators_impl/abi_sync_validator.py",
-    "harness/validators_impl/odin.py",
-    "harness/validators_impl/protocol_validator.py",
-    "harness/validators_impl/rust.py",
+    "harness/validators_impl/layout_parity.py",
     "kernel/arch/x86_64/arch.odin",
     "kernel/arch/x86_64/serial.odin",
     "kernel/main.odin",
@@ -118,12 +121,11 @@
     "scripts/gen_abi.py",
     "tasks/runtime.json",
     "tasks/todo.json",
-    "userspace/core_service/Cargo.toml",
     "userspace/core_service/src/main.rs"
   ],
   "evidence_files": [
     "artifacts/logs/cargo-check.log",
     "artifacts/logs/odin-check.log"
   ],
-  "generated_at": "2026-03-12T23:41:38Z"
+  "generated_at": "2026-03-13T15:51:49Z"
 }

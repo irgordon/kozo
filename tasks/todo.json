@@ -1,18 +1,19 @@
 {
-  "task_title": "KOZO Protocol Alignment",
+  "task_title": "KOZO Layout Parity",
   "task_kind": "non_trivial",
-  "created_at": "2026-03-12T14:30:00Z",
+  "created_at": "2026-03-12T23:30:00Z",
   "plan_status": "complete",
   "replan_number": 0,
   "approval": {
     "status": "approved"
   },
   "preconditions": [
-    "KOZO ABI V1 normative layer is in place",
+    "KOZO protocol alignment is complete",
     "Odin and Rust toolchains are installed"
   ],
   "assumptions": [
-    "Protocol validation is semantic and repository-grounded rather than runtime-executed"
+    "The x86_64 data model is LP64",
+    "The heartbeat payload uses natural C layout without packed annotations"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -31,7 +32,7 @@
   "steps": [
     {
       "id": 1,
-      "title": "Align the ABI, kernel dispatcher, Rust consumer, and harness protocol validator",
+      "title": "Add the normative heartbeat payload struct and project it into Odin and Rust bindings",
       "status": "done",
       "kind": "edit",
       "files_expected": [
@@ -42,20 +43,41 @@
         "contracts/kozo_abi.h",
         "scripts/gen_abi.py",
         "bindings/odin/kozo_abi.odin",
-        "bindings/rust/kozo_abi.rs",
+        "bindings/rust/kozo_abi.rs"
+      ],
+      "verification_refs": [
+        "verification.tests_run[0]"
+      ],
+      "failure_count": 0
+    },
+    {
+      "id": 2,
+      "title": "Wire the typed heartbeat payload through the Odin kernel and Rust service scaffold",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
         "kernel/main.odin",
         "kernel/arch/x86_64/arch.odin",
         "kernel/arch/x86_64/serial.odin",
         "userspace/core_service/Cargo.toml",
-        "userspace/core_service/src/main.rs",
+        "userspace/core_service/src/main.rs"
+      ],
+      "verification_refs": [
+        "verification.tests_run[1]",
+        "verification.tests_run[2]"
+      ],
+      "failure_count": 0
+    },
+    {
+      "id": 3,
+      "title": "Add full layout parity validation and regenerate control artifacts",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
         "harness/registry.py",
         "harness/codes.py",
         "harness/validators.py",
-        "harness/validators_impl/abi.py",
-        "harness/validators_impl/abi_sync_validator.py",
-        "harness/validators_impl/odin.py",
-        "harness/validators_impl/rust.py",
-        "harness/validators_impl/protocol_validator.py",
+        "harness/validators_impl/layout_parity.py",
         "schemas/latest_verify.schema.json",
         "schemas/agent_context.schema.json",
         "artifacts/latest_verify.json",
@@ -71,9 +93,10 @@
     }
   ],
   "expected_outputs": [
-    "The kernel dispatches ABI syscalls through generated constants",
-    "The Rust service uses ABI syscall identifiers in a typed request path",
-    "The harness verifies semantic protocol alignment across header, kernel, and service layers"
+    "The ABI defines a normative heartbeat payload with a 24-byte C layout",
+    "Generated Odin and Rust bindings expose layout-compatible heartbeat payload structs",
+    "The kernel and service both use the typed payload path",
+    "The harness verifies total layout parity across the projections"
   ],
   "verification": {
     "tests_run": [
@@ -104,28 +127,29 @@
     ],
     "diffs": [],
     "invariants": [
-      "All dispatch and request logic uses generated ABI identifiers",
-      "Protocol drift is detected semantically across contract, kernel, and service layers"
+      "The heartbeat payload layout is derived from the normative C contract",
+      "The Odin and Rust projections preserve identical size, alignment, and field offsets"
     ],
-  "expected_behavior": [
-      "verify.sh reports a protocol_alignment check",
-      "verify.sh fails when the heartbeat syscall is absent from the kernel dispatcher",
-      "verify.sh passes when header, kernel, and service remain aligned"
+    "expected_behavior": [
+      "The generator emits a layout-compatible heartbeat payload struct into both bindings",
+      "odin check and cargo check pass with the typed payload path in use",
+      "verify.sh reports a layout_parity check with a passing structural_integrity subsystem"
     ],
     "actual_behavior": [
-      "verify.sh reports protocol_alignment in the final artifact.",
-      "The protocol validator fails with PROTOCOL_MISMATCH when the heartbeat syscall case is removed from the kernel dispatcher.",
-      "verify.sh passes once the kernel dispatcher, Rust consumer, and normative ABI are aligned."
+      "The generator emits a 24-byte heartbeat payload struct into both Odin and Rust bindings.",
+      "The Odin kernel populates timestamp and status_bits through the typed payload path and logs the payload values over serial.",
+      "The Rust service initializes and mutates the typed HeartbeatPayload before issuing the ABI-backed heartbeat request.",
+      "verify.sh reports a passing layout_parity check with the structural_integrity subsystem."
     ],
-    "baseline_reference": "kozo-abi-v1-normative"
+    "baseline_reference": "kozo-protocol-alignment"
   },
   "elegance_review": {
     "required": false
   },
   "lessons_referenced": [],
   "explanation_summary": [
-    "Added an ABI-backed syscall dispatch path in the Odin kernel using generated ABI identifiers only.",
-    "Updated the Rust core service to use ABI syscall identifiers through a typed heartbeat_request path.",
-    "Added semantic protocol validation so the harness detects missing kernel dispatch cases and missing Rust syscall usage."
+    "Added the normative heartbeat payload struct to the ABI and projected it into Odin and Rust with natural C layout.",
+    "Updated the kernel and service layers to use the typed heartbeat payload path with ABI-backed handles and syscalls.",
+    "Added a layout parity validator that proves size, alignment, and field offsets match across the C contract and both projections."
   ]
 }

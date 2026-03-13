@@ -18,4 +18,10 @@ typedef enum k_syscall_id_t {
 	K_SYSCALL_DEBUG_HEARTBEAT = 1,
 } k_syscall_id_t;
 
+typedef struct k_heartbeat_payload_t {
+	uint64_t sequence;
+	uint64_t timestamp;
+	uint32_t status_bits;
+} k_heartbeat_payload_t;
+
 #endif

@@ -51,6 +51,8 @@
         "ODIN_CHECK_FAILED",
         "ABI_WIDTH_MISMATCH",
         "ABI_LAYOUT_MISMATCH",
+        "PROTOCOL_MISMATCH",
+        "LAYOUT_PARITY_MISMATCH",
         "EVIDENCE_FILE_MISSING"
       ]
     },
@@ -68,6 +70,7 @@
         "odin",
         "abi",
         "protocol_alignment",
+        "structural_integrity",
         "evidence"
       ]
     },
@@ -114,6 +117,7 @@
               "odin",
               "abi",
               "protocol_alignment",
+              "layout_parity",
               "evidence"
             ]
           },
@@ -130,6 +134,7 @@
               "odin",
               "abi",
               "protocol_alignment",
+              "structural_integrity",
               "evidence"
             ]
           },
@@ -162,6 +167,7 @@
               "ABI_WIDTH_MISMATCH",
               "ABI_LAYOUT_MISMATCH",
               "PROTOCOL_MISMATCH",
+              "LAYOUT_PARITY_MISMATCH",
               "EVIDENCE_FILE_MISSING"
             ]
           },
@@ -197,6 +203,7 @@
               "odin",
               "abi",
               "protocol_alignment",
+              "layout_parity",
               "evidence"
             ]
           },
@@ -213,6 +220,7 @@
               "odin",
               "abi",
               "protocol_alignment",
+              "structural_integrity",
               "evidence"
             ]
           },
@@ -238,6 +246,7 @@
               "ABI_WIDTH_MISMATCH",
               "ABI_LAYOUT_MISMATCH",
               "PROTOCOL_MISMATCH",
+              "LAYOUT_PARITY_MISMATCH",
               "EVIDENCE_FILE_MISSING"
             ]
           },

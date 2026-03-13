@@ -1,5 +1,4 @@
-#![no_std]
-
+#[allow(non_camel_case_types, dead_code)]
 pub const KOZO_ABI_VERSION: u32 = 1;
 
 pub type K_HANDLE = u64;
@@ -11,3 +10,10 @@ pub const K_DENIED: K_STATUS = 2;
 pub type K_SYSCALL_ID = u32;
 pub const K_SYSCALL_NOP: K_SYSCALL_ID = 0;
 pub const K_SYSCALL_DEBUG_HEARTBEAT: K_SYSCALL_ID = 1;
+
+#[repr(C)]
+pub struct HeartbeatPayload {
+    pub sequence: u64,
+    pub timestamp: u64,
+    pub status_bits: u32,
+}

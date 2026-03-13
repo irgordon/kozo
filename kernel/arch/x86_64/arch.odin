@@ -1,9 +1,16 @@
 package x86_64
 
-import kozo_abi "../../../bindings/odin"
+import abi "../../../bindings/odin"
 
-bootstrap :: proc() -> kozo_abi.K_STATUS {
+bootstrap :: proc() -> abi.K_STATUS {
 	return serial_init()
+}
+
+read_timestamp :: proc "contextless"() -> u64 {
+	return asm() -> u64 #side_effects #intel {
+		"rdtsc; shl rdx, 32; or rax, rdx",
+		"={ax}"
+	}()
 }
 
 halt :: proc "contextless" () {

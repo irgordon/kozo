@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.0.3 - 2026-03-13
+
+- Added ABI-backed protocol alignment between the Odin kernel dispatcher and the Rust core service heartbeat request path.
+- Added semantic harness validation for protocol alignment so missing syscall cases or missing Rust syscall usage fail closed.
+- Extended the ABI with `k_heartbeat_payload_t` and projected the struct deterministically into Odin and Rust bindings.
+- Added full layout parity validation for the heartbeat payload, covering size, alignment, and field offsets across the generated projections.
+- Updated the kernel heartbeat path to populate and log the structured payload, and updated the Rust service to initialize and pass the same typed payload.
+- Verified the current state with `python3 scripts/gen_abi.py`, `odin check kernel/`, `cargo check --manifest-path userspace/core_service/Cargo.toml --target x86_64-unknown-none`, `./scripts/verify.sh`, and `./scripts/agent_context.sh`.
+
 ## v0.0.2 - 2026-03-12
 
 - Completed the harness bootstrap and aligned the verify/control-plane loop with active task packets.

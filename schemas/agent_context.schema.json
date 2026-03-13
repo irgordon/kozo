@@ -117,6 +117,7 @@
               "odin",
               "abi",
               "protocol_alignment",
+              "layout_parity",
               "evidence"
             ]
           },
@@ -133,6 +134,7 @@
               "odin",
               "abi",
               "protocol_alignment",
+              "structural_integrity",
               "evidence"
             ]
           },

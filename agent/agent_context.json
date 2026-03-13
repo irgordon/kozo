@@ -1,34 +1,17 @@
 {
   "artifact_version": "1",
-  "task_id": "kozo-protocol-alignment",
-  "task_title": "KOZO Protocol Alignment",
+  "task_id": "kozo-layout-parity",
+  "task_title": "KOZO Layout Parity",
   "mode": "complete",
   "current_step": {
-    "id": 1,
+    "id": 3,
     "kind": "edit",
-    "title": "Align the ABI, kernel dispatcher, Rust consumer, and harness protocol validator",
+    "title": "Add full layout parity validation and regenerate control artifacts",
     "files_expected": [
-      ".codex/AGENTS.md",
-      "CHANGELOG.md",
-      "tasks/todo.json",
-      "tasks/runtime.json",
-      "contracts/kozo_abi.h",
-      "scripts/gen_abi.py",
-      "bindings/odin/kozo_abi.odin",
-      "bindings/rust/kozo_abi.rs",
-      "kernel/main.odin",
-      "kernel/arch/x86_64/arch.odin",
-      "kernel/arch/x86_64/serial.odin",
-      "userspace/core_service/Cargo.toml",
-      "userspace/core_service/src/main.rs",
       "harness/registry.py",
       "harness/codes.py",
       "harness/validators.py",
-      "harness/validators_impl/abi.py",
-      "harness/validators_impl/abi_sync_validator.py",
-      "harness/validators_impl/odin.py",
-      "harness/validators_impl/rust.py",
-      "harness/validators_impl/protocol_validator.py",
+      "harness/validators_impl/layout_parity.py",
       "schemas/latest_verify.schema.json",
       "schemas/agent_context.schema.json",
       "artifacts/latest_verify.json",
@@ -63,5 +46,5 @@
     "The current step failure count reaches 2.",
     "Verification returns status=fail after an execution attempt."
   ],
-  "updated_at": "2026-03-12T23:15:00Z"
+  "updated_at": "2026-03-12T23:45:00Z"
 }

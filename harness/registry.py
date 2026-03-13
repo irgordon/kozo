@@ -34,6 +34,7 @@ SUBSYSTEMS = MappingProxyType(
         "odin": (),
         "abi": (),
         "protocol_alignment": (),
+        "structural_integrity": (),
         "evidence": (),
     }
 )
@@ -58,6 +59,7 @@ CHECKS = MappingProxyType(
         "odin": "odin",
         "abi": "abi",
         "protocol_alignment": "protocol_alignment",
+        "layout_parity": "structural_integrity",
         "evidence": "evidence",
     }
 )

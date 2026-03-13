@@ -1,6 +1,6 @@
 package x86_64
 
-import kozo_abi "../../../bindings/odin"
+import abi "../../../bindings/odin"
 
 COM1 :: u16(0x03f8)
 
@@ -48,11 +48,11 @@ configure_serial_frame :: proc() {
 	outb(COM1 + modem_control_offset, modem_ready)
 }
 
-serial_init :: proc() -> kozo_abi.K_STATUS {
+serial_init :: proc() -> abi.K_STATUS {
 	disable_serial_interrupts()
 	configure_serial_baud_rate()
 	configure_serial_frame()
-	return kozo_abi.K_OK
+	return abi.K_OK
 }
 
 serial_transmitter_ready :: proc() -> bool {
@@ -69,9 +69,46 @@ write_serial_byte :: proc(value: u8) {
 	outb(COM1, value)
 }
 
-serial_write :: proc(s: string) -> kozo_abi.K_STATUS {
+serial_write :: proc(s: string) -> abi.K_STATUS {
 	for i in 0..<len(s) {
 		write_serial_byte(s[i])
 	}
-	return kozo_abi.K_OK
+	return abi.K_OK
+}
+
+write_serial_newline :: proc() {
+	write_serial_byte('\r')
+	write_serial_byte('\n')
+}
+
+write_serial_hex_digit :: proc(value: u8) {
+	hex_digits := "0123456789ABCDEF"
+	write_serial_byte(hex_digits[value])
+}
+
+write_serial_hex_u64 :: proc(value: u64) {
+	for shift in 0..<16 {
+		bit_shift := u64(60 - shift*4)
+		nibble := u8((value >> bit_shift) & 0xF)
+		write_serial_hex_digit(nibble)
+	}
+}
+
+write_serial_hex_u32 :: proc(value: u32) {
+	for shift in 0..<8 {
+		bit_shift := u32(28 - shift*4)
+		nibble := u8((value >> bit_shift) & 0xF)
+		write_serial_hex_digit(nibble)
+	}
+}
+
+log_heartbeat_payload :: proc(payload: abi.Heartbeat_Payload) -> abi.K_STATUS {
+	serial_write("HB seq=")
+	write_serial_hex_u64(payload.sequence)
+	serial_write(" ts=")
+	write_serial_hex_u64(payload.timestamp)
+	serial_write(" status=")
+	write_serial_hex_u32(payload.status_bits)
+	write_serial_newline()
+	return abi.K_OK
 }

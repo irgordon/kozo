@@ -23,6 +23,7 @@ ODIN_CHECK_FAILED = "ODIN_CHECK_FAILED"
 ABI_WIDTH_MISMATCH = "ABI_WIDTH_MISMATCH"
 ABI_LAYOUT_MISMATCH = "ABI_LAYOUT_MISMATCH"
 PROTOCOL_MISMATCH = "PROTOCOL_MISMATCH"
+LAYOUT_PARITY_MISMATCH = "LAYOUT_PARITY_MISMATCH"
 EVIDENCE_FILE_MISSING = "EVIDENCE_FILE_MISSING"
 
 CODES = MappingProxyType(
@@ -48,6 +49,7 @@ CODES = MappingProxyType(
         ABI_WIDTH_MISMATCH: "ABI width mismatch",
         ABI_LAYOUT_MISMATCH: "ABI layout mismatch",
         PROTOCOL_MISMATCH: "Kernel and service protocol usage drifted from the ABI",
+        LAYOUT_PARITY_MISMATCH: "Generated bindings do not preserve the heartbeat payload layout",
         EVIDENCE_FILE_MISSING: "Required evidence file missing",
     }
 )
