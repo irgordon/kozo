@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.0.4 - 2026-03-14
+
+- Added the x86_64 boot foundation bridge with `_start`, a 16KB aligned bootstrap stack, and exported Odin `kernel_entry` / `syscall_dispatch` entry symbols.
+- Added ADR-0016 to document the assembly-to-Odin entry flow, trap ingress registers, preservation rules, and stack alignment expectations.
+- Added execution foundation validation so the harness proves the presence of the required boot and syscall bridge symbols even when full object-symbol inspection is environment-dependent.
+- Added semantic trap-path validation so the harness proves the normative `rax -> rdi` and `rbx -> rsi` register bridge into the exported Odin dispatcher signature.
+- Verified the negative proof for trap drift by swapping the ingress register moves and confirming `bridge_alignment` fails before restoring the correct mapping.
+- Regenerated `latest_verify.json` and `agent_context.json` from the passing boot/trap verification flow.
+
 ## v0.0.3 - 2026-03-13
 
 - Added ABI-backed protocol alignment between the Odin kernel dispatcher and the Rust core service heartbeat request path.

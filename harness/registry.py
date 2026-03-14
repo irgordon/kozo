@@ -35,6 +35,8 @@ SUBSYSTEMS = MappingProxyType(
         "abi": (),
         "protocol_alignment": (),
         "structural_integrity": (),
+        "execution_foundation": (),
+        "bridge_alignment": (),
         "evidence": (),
     }
 )
@@ -60,6 +62,8 @@ CHECKS = MappingProxyType(
         "abi": "abi",
         "protocol_alignment": "protocol_alignment",
         "layout_parity": "structural_integrity",
+        "execution_foundation": "execution_foundation",
+        "bridge_alignment": "bridge_alignment",
         "evidence": "evidence",
     }
 )

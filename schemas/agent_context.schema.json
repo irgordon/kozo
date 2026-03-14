@@ -118,6 +118,8 @@
               "abi",
               "protocol_alignment",
               "layout_parity",
+              "execution_foundation",
+              "bridge_alignment",
               "evidence"
             ]
           },
@@ -135,6 +137,8 @@
               "abi",
               "protocol_alignment",
               "structural_integrity",
+              "execution_foundation",
+              "bridge_alignment",
               "evidence"
             ]
           },

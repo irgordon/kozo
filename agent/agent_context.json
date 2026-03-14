@@ -1,27 +1,26 @@
 {
   "artifact_version": "1",
-  "task_id": "kozo-layout-parity",
-  "task_title": "KOZO Layout Parity",
-  "mode": "complete",
+  "task_id": "kozo-trap-path-v1",
+  "task_title": "KOZO Trap Path V1",
+  "mode": "halted",
   "current_step": {
-    "id": 3,
+    "id": 2,
     "kind": "edit",
-    "title": "Add full layout parity validation and regenerate control artifacts",
+    "title": "Add semantic bridge validation and regenerate control artifacts",
     "files_expected": [
       "harness/registry.py",
       "harness/codes.py",
       "harness/validators.py",
-      "harness/validators_impl/layout_parity.py",
+      "harness/validators_impl/entrypoint_validator.py",
+      "harness/validators_impl/bridge_validator.py",
       "schemas/latest_verify.schema.json",
       "schemas/agent_context.schema.json",
+      "CHANGELOG.md",
       "artifacts/latest_verify.json",
       "agent/agent_context.json"
     ],
     "verification_refs": [
-      "verification.tests_run[0]",
-      "verification.tests_run[1]",
-      "verification.tests_run[2]",
-      "verification.tests_run[3]"
+      "verification.tests_run[2]"
     ]
   },
   "constraints": [
@@ -29,22 +28,25 @@
     "Fail closed if a file falls outside the declared task scope."
   ],
   "active_rules": [
-    "Run: python3 scripts/gen_abi.py",
-    "Run: odin check kernel/",
-    "Run: cargo check --manifest-path userspace/core_service/Cargo.toml --target x86_64-unknown-none",
-    "Run: ./scripts/verify.sh"
+    "Run: ./scripts/verify.sh",
+    "Recovery required: fix the failed checks before execution resumes."
   ],
-  "recent_failures": [],
+  "recent_failures": [
+    {
+      "name": "step_scope",
+      "subsystem": "step_scope",
+      "code": "STEP_SCOPE_OUTSIDE_TASK_SCOPE",
+      "detail": "Changed file CHANGELOG.md falls outside todo.file_scope",
+      "action": "Restrict edits to files declared in tasks/todo.json"
+    }
+  ],
   "next_verification": [
-    "verification.tests_run[0]",
-    "verification.tests_run[1]",
-    "verification.tests_run[2]",
-    "verification.tests_run[3]"
+    "verification.tests_run[2]"
   ],
   "halt_conditions": [
     "Any file outside the declared task scope changes.",
     "The current step failure count reaches 2.",
     "Verification returns status=fail after an execution attempt."
   ],
-  "updated_at": "2026-03-12T23:45:00Z"
+  "updated_at": "2026-03-13T18:10:00Z"
 }

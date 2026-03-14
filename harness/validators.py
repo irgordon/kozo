@@ -16,6 +16,8 @@ from harness.validators_impl.odin import OdinValidator
 from harness.validators_impl.abi import AbiValidator
 from harness.validators_impl.protocol_validator import ProtocolValidator
 from harness.validators_impl.layout_parity import LayoutParityValidator
+from harness.validators_impl.entrypoint_validator import ExecutionFoundationValidator
+from harness.validators_impl.bridge_validator import BridgeAlignmentValidator
 from harness.validators_impl.evidence import EvidenceValidator
 
 _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
@@ -31,6 +33,8 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "abi": AbiValidator,
     "protocol_alignment": ProtocolValidator,
     "layout_parity": LayoutParityValidator,
+    "execution_foundation": ExecutionFoundationValidator,
+    "bridge_alignment": BridgeAlignmentValidator,
     "evidence": EvidenceValidator,
 }
 

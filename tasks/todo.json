@@ -1,19 +1,19 @@
 {
-  "task_title": "KOZO Layout Parity",
+  "task_title": "KOZO Trap Path V1",
   "task_kind": "non_trivial",
-  "created_at": "2026-03-12T23:30:00Z",
+  "created_at": "2026-03-13T18:00:00Z",
   "plan_status": "complete",
   "replan_number": 0,
   "approval": {
     "status": "approved"
   },
   "preconditions": [
-    "KOZO protocol alignment is complete",
-    "Odin and Rust toolchains are installed"
+    "KOZO boot foundation is complete",
+    "Odin toolchain is installed"
   ],
   "assumptions": [
-    "The x86_64 data model is LP64",
-    "The heartbeat payload uses natural C layout without packed annotations"
+    "The trap bridge is validated semantically from checked-in source on this environment",
+    "The normative ingress register mapping is rax -> rdi and rbx -> rsi"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -21,90 +21,62 @@
     "tasks/",
     "artifacts/",
     "agent/",
-    "contracts/",
-    "scripts/",
-    "bindings/",
     "kernel/",
-    "userspace/",
     "harness/",
-    "schemas/"
+    "schemas/",
+    "docs/"
   ],
   "steps": [
     {
       "id": 1,
-      "title": "Add the normative heartbeat payload struct and project it into Odin and Rust bindings",
+      "title": "Align the syscall assembly stub and exported Odin dispatcher signature",
       "status": "done",
       "kind": "edit",
       "files_expected": [
         ".codex/AGENTS.md",
-        "CHANGELOG.md",
         "tasks/todo.json",
         "tasks/runtime.json",
-        "contracts/kozo_abi.h",
-        "scripts/gen_abi.py",
-        "bindings/odin/kozo_abi.odin",
-        "bindings/rust/kozo_abi.rs"
+        "kernel/arch/x86_64/boot.asm",
+        "kernel/arch/x86_64/syscall.asm",
+        "kernel/main.odin",
+        "docs/adr/0016-kernel-entry-and-syscall-bridge.md"
       ],
       "verification_refs": [
-        "verification.tests_run[0]"
+        "verification.tests_run[0]",
+        "verification.tests_run[1]"
       ],
       "failure_count": 0
     },
     {
       "id": 2,
-      "title": "Wire the typed heartbeat payload through the Odin kernel and Rust service scaffold",
-      "status": "done",
-      "kind": "edit",
-      "files_expected": [
-        "kernel/main.odin",
-        "kernel/arch/x86_64/arch.odin",
-        "kernel/arch/x86_64/serial.odin",
-        "userspace/core_service/Cargo.toml",
-        "userspace/core_service/src/main.rs"
-      ],
-      "verification_refs": [
-        "verification.tests_run[1]",
-        "verification.tests_run[2]"
-      ],
-      "failure_count": 0
-    },
-    {
-      "id": 3,
-      "title": "Add full layout parity validation and regenerate control artifacts",
+      "title": "Add semantic bridge validation and regenerate control artifacts",
       "status": "done",
       "kind": "edit",
       "files_expected": [
         "harness/registry.py",
         "harness/codes.py",
         "harness/validators.py",
-        "harness/validators_impl/layout_parity.py",
+        "harness/validators_impl/entrypoint_validator.py",
+        "harness/validators_impl/bridge_validator.py",
         "schemas/latest_verify.schema.json",
         "schemas/agent_context.schema.json",
+        "CHANGELOG.md",
         "artifacts/latest_verify.json",
         "agent/agent_context.json"
       ],
       "verification_refs": [
-        "verification.tests_run[0]",
-        "verification.tests_run[1]",
-        "verification.tests_run[2]",
-        "verification.tests_run[3]"
+        "verification.tests_run[2]"
       ],
       "failure_count": 0
     }
   ],
   "expected_outputs": [
-    "The ABI defines a normative heartbeat payload with a 24-byte C layout",
-    "Generated Odin and Rust bindings expose layout-compatible heartbeat payload structs",
-    "The kernel and service both use the typed payload path",
-    "The harness verifies total layout parity across the projections"
+    "syscall.asm explicitly bridges rax -> rdi and rbx -> rsi",
+    "main.odin exports syscall_dispatch with the exact normative signature",
+    "The harness proves bridge_alignment across the assembly stub and Odin dispatcher"
   ],
   "verification": {
     "tests_run": [
-      {
-        "tool": "shell",
-        "command": "python3 scripts/gen_abi.py",
-        "status": "passed"
-      },
       {
         "tool": "shell",
         "command": "odin check kernel/",
@@ -112,8 +84,8 @@
       },
       {
         "tool": "shell",
-        "command": "cargo check --manifest-path userspace/core_service/Cargo.toml --target x86_64-unknown-none",
-        "status": "passed"
+        "command": "odin build kernel -build-mode:obj -out:artifacts/kernel.o",
+        "status": "skipped"
       },
       {
         "tool": "shell",
@@ -123,33 +95,32 @@
     ],
     "logs": [
       "artifacts/logs/odin-check.log",
-      "artifacts/logs/cargo-check.log"
+      "artifacts/logs/odin-build.log",
+      "artifacts/logs/nm-kernel.log"
     ],
     "diffs": [],
     "invariants": [
-      "The heartbeat payload layout is derived from the normative C contract",
-      "The Odin and Rust projections preserve identical size, alignment, and field offsets"
+      "The trap contract maps rax to the Odin id parameter and rbx to the payload pointer parameter",
+      "The syscall stub preserves the registers explicitly documented in ADR-0016 and aligns rsp before the call"
     ],
     "expected_behavior": [
-      "The generator emits a layout-compatible heartbeat payload struct into both bindings",
-      "odin check and cargo check pass with the typed payload path in use",
-      "verify.sh reports a layout_parity check with a passing structural_integrity subsystem"
+      "verify.sh reports a bridge_alignment check with a passing status",
+      "Swapping the ingress register moves in syscall.asm causes bridge_alignment to fail"
     ],
     "actual_behavior": [
-      "The generator emits a 24-byte heartbeat payload struct into both Odin and Rust bindings.",
-      "The Odin kernel populates timestamp and status_bits through the typed payload path and logs the payload values over serial.",
-      "The Rust service initializes and mutates the typed HeartbeatPayload before issuing the ABI-backed heartbeat request.",
-      "verify.sh reports a passing layout_parity check with the structural_integrity subsystem."
+      "verify.sh reports a bridge_alignment check in the final artifact.",
+      "Swapping the ingress register moves in syscall.asm causes bridge_alignment to fail with BRIDGE_ALIGNMENT_INVALID.",
+      "verify.sh passes once the assembly trap mapping, ADR, and exported Odin dispatcher signature are aligned."
     ],
-    "baseline_reference": "kozo-protocol-alignment"
+    "baseline_reference": "kozo-boot-foundation"
   },
   "elegance_review": {
     "required": false
   },
   "lessons_referenced": [],
   "explanation_summary": [
-    "Added the normative heartbeat payload struct to the ABI and projected it into Odin and Rust with natural C layout.",
-    "Updated the kernel and service layers to use the typed heartbeat payload path with ABI-backed handles and syscalls.",
-    "Added a layout parity validator that proves size, alignment, and field offsets match across the C contract and both projections."
+    "Aligned the syscall assembly bridge to the normative rax -> rdi and rbx -> rsi trap contract.",
+    "Updated ADR-0016 and the exported Odin dispatcher signature to make the trap-path contract explicit and auditable.",
+    "Added a semantic bridge validator so the harness proves the assembly-to-Odin register bridge and fails closed when the mapping drifts."
   ]
 }

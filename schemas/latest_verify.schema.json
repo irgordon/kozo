@@ -53,6 +53,8 @@
         "ABI_LAYOUT_MISMATCH",
         "PROTOCOL_MISMATCH",
         "LAYOUT_PARITY_MISMATCH",
+        "EXECUTION_FOUNDATION_INVALID",
+        "BRIDGE_ALIGNMENT_INVALID",
         "EVIDENCE_FILE_MISSING"
       ]
     },
@@ -71,6 +73,8 @@
         "abi",
         "protocol_alignment",
         "structural_integrity",
+        "execution_foundation",
+        "bridge_alignment",
         "evidence"
       ]
     },
@@ -118,6 +122,8 @@
               "abi",
               "protocol_alignment",
               "layout_parity",
+              "execution_foundation",
+              "bridge_alignment",
               "evidence"
             ]
           },
@@ -135,6 +141,8 @@
               "abi",
               "protocol_alignment",
               "structural_integrity",
+              "execution_foundation",
+              "bridge_alignment",
               "evidence"
             ]
           },
@@ -168,6 +176,8 @@
               "ABI_LAYOUT_MISMATCH",
               "PROTOCOL_MISMATCH",
               "LAYOUT_PARITY_MISMATCH",
+              "EXECUTION_FOUNDATION_INVALID",
+              "BRIDGE_ALIGNMENT_INVALID",
               "EVIDENCE_FILE_MISSING"
             ]
           },
@@ -204,6 +214,8 @@
               "abi",
               "protocol_alignment",
               "layout_parity",
+              "execution_foundation",
+              "bridge_alignment",
               "evidence"
             ]
           },
@@ -221,6 +233,8 @@
               "abi",
               "protocol_alignment",
               "structural_integrity",
+              "execution_foundation",
+              "bridge_alignment",
               "evidence"
             ]
           },
@@ -247,6 +261,8 @@
               "ABI_LAYOUT_MISMATCH",
               "PROTOCOL_MISMATCH",
               "LAYOUT_PARITY_MISMATCH",
+              "EXECUTION_FOUNDATION_INVALID",
+              "BRIDGE_ALIGNMENT_INVALID",
               "EVIDENCE_FILE_MISSING"
             ]
           },
