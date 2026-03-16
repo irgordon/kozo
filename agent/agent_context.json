@@ -1,18 +1,18 @@
 {
   "artifact_version": "1",
-  "task_id": "kozo-trap-path-v1",
-  "task_title": "KOZO Trap Path V1",
+  "task_id": "kozo-syscall-execution-proof-v1",
+  "task_title": "KOZO Syscall Execution Proof V1",
   "mode": "halted",
   "current_step": {
     "id": 2,
     "kind": "edit",
-    "title": "Add semantic bridge validation and regenerate control artifacts",
+    "title": "Add execution proof validation and detailed verify artifact reporting",
     "files_expected": [
       "harness/registry.py",
       "harness/codes.py",
       "harness/validators.py",
-      "harness/validators_impl/entrypoint_validator.py",
-      "harness/validators_impl/bridge_validator.py",
+      "harness/aggregator.py",
+      "harness/validators_impl/execution_proof.py",
       "schemas/latest_verify.schema.json",
       "schemas/agent_context.schema.json",
       "CHANGELOG.md",
@@ -48,5 +48,5 @@
     "The current step failure count reaches 2.",
     "Verification returns status=fail after an execution attempt."
   ],
-  "updated_at": "2026-03-13T18:10:00Z"
+  "updated_at": "2026-03-15T10:00:00Z"
 }

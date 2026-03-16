@@ -120,6 +120,7 @@
               "layout_parity",
               "execution_foundation",
               "bridge_alignment",
+              "execution_proof",
               "evidence"
             ]
           },
@@ -139,12 +140,41 @@
               "structural_integrity",
               "execution_foundation",
               "bridge_alignment",
+              "execution_proof",
               "evidence"
             ]
           },
           "code": {
             "type": "string",
             "pattern": ".*\\S.*"
+          },
+          "sub_results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "status",
+                "detail"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "pattern": ".*\\S.*"
+                },
+                "status": {
+                  "enum": [
+                    "pass",
+                    "fail"
+                  ]
+                },
+                "detail": {
+                  "type": "string",
+                  "pattern": ".*\\S.*"
+                }
+              }
+            }
           },
           "detail": {
             "type": "string",

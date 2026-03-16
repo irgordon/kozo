@@ -18,6 +18,7 @@ from harness.validators_impl.protocol_validator import ProtocolValidator
 from harness.validators_impl.layout_parity import LayoutParityValidator
 from harness.validators_impl.entrypoint_validator import ExecutionFoundationValidator
 from harness.validators_impl.bridge_validator import BridgeAlignmentValidator
+from harness.validators_impl.execution_proof import ExecutionProofValidator
 from harness.validators_impl.evidence import EvidenceValidator
 
 _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
@@ -35,6 +36,7 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "layout_parity": LayoutParityValidator,
     "execution_foundation": ExecutionFoundationValidator,
     "bridge_alignment": BridgeAlignmentValidator,
+    "execution_proof": ExecutionProofValidator,
     "evidence": EvidenceValidator,
 }
 

@@ -1,7 +1,7 @@
 {
   "artifact_version": "1",
-  "task_id": "kozo-trap-path-v1",
-  "task_title": "KOZO Trap Path V1",
+  "task_id": "kozo-syscall-execution-proof-v1",
+  "task_title": "KOZO Syscall Execution Proof V1",
   "plan_status": "complete",
   "current_step_id": 2,
   "replan_required": false,
@@ -12,8 +12,8 @@
   },
   "execution": {
     "step_attempt": 1,
-    "last_step_started_at": "2026-03-13T18:00:00Z",
-    "last_step_completed_at": "2026-03-13T18:10:00Z"
+    "last_step_started_at": "2026-03-15T09:00:00Z",
+    "last_step_completed_at": "2026-03-15T10:00:00Z"
   },
-  "updated_at": "2026-03-13T18:10:00Z"
+  "updated_at": "2026-03-15T10:00:00Z"
 }

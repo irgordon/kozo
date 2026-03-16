@@ -85,6 +85,9 @@ def _normalize_result(name: str, subsystem: str, result: ValidationResult) -> Di
         "code": result.code,
         "detail": _validate_nonempty_string(result.detail, f"{name}.detail"),
     }
+    sub_results = result.meta.get("sub_results")
+    if isinstance(sub_results, list):
+        check["sub_results"] = sub_results
     if result.status == PASS:
         return {"check": check, "failed_projection": None}
 
@@ -99,6 +102,8 @@ def _normalize_result(name: str, subsystem: str, result: ValidationResult) -> Di
     action_code = result.meta.get("action_code")
     if isinstance(action_code, str) and action_code:
         failed_projection["action_code"] = action_code
+    if "sub_results" in check:
+        failed_projection["sub_results"] = check["sub_results"]
     return {"check": check, "failed_projection": failed_projection}
 
 

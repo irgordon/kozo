@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260314T162122Z",
+  "run_id": "verify-20260316T022921Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 15,
+    "total_checks": 16,
     "failed_check_count": 0
   },
   "checks": [
@@ -63,7 +63,7 @@
       "subsystem": "rust",
       "status": "pass",
       "code": "OK",
-      "detail": "No Rust changes require validation in this bootstrap loop"
+      "detail": "Rust changes are backed by declared cargo check evidence"
     },
     {
       "name": "odin",
@@ -108,6 +108,45 @@
       "detail": "Assembly ingress registers and the exported Odin dispatcher signature align with the trap-path contract"
     },
     {
+      "name": "execution_proof",
+      "subsystem": "execution_proof",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Kernel and Rust sources prove the ordered heartbeat syscall behavior contract",
+      "sub_results": [
+        {
+          "name": "nil_guard",
+          "status": "pass",
+          "detail": "kernel/main.odin guards nil payloads and returns the ABI error-equivalent constant first"
+        },
+        {
+          "name": "magic_guard",
+          "status": "pass",
+          "detail": "kernel/main.odin validates the heartbeat magic before mutation"
+        },
+        {
+          "name": "mutation_order",
+          "status": "pass",
+          "detail": "kernel/main.odin performs guards, ingress trace, ordered mutations, egress trace, and success return in sequence"
+        },
+        {
+          "name": "rust_failure_path",
+          "status": "pass",
+          "detail": "userspace/core_service initializes the expected values, matches on K_OK, and has a heavy failure branch"
+        },
+        {
+          "name": "postcondition_asserts",
+          "status": "pass",
+          "detail": "userspace/core_service documents the postconditions it expects after a successful heartbeat call"
+        },
+        {
+          "name": "serial_log_stability",
+          "status": "pass",
+          "detail": "kernel/arch/x86_64/serial.odin provides the stable trace strings for future parsing"
+        }
+      ]
+    },
+    {
       "name": "evidence",
       "subsystem": "evidence",
       "status": "pass",
@@ -120,19 +159,18 @@
     "CHANGELOG.md",
     "agent/agent_context.json",
     "artifacts/latest_verify.json",
-    "docs/adr/0016-kernel-entry-and-syscall-bridge.md",
+    "harness/aggregator.py",
     "harness/codes.py",
     "harness/registry.py",
     "harness/validators.py",
-    "harness/validators_impl/bridge_validator.py",
-    "harness/validators_impl/entrypoint_validator.py",
-    "kernel/arch/x86_64/boot.asm",
-    "kernel/arch/x86_64/syscall.asm",
+    "harness/validators_impl/execution_proof.py",
+    "kernel/arch/x86_64/serial.odin",
     "kernel/main.odin",
     "schemas/agent_context.schema.json",
     "schemas/latest_verify.schema.json",
     "tasks/runtime.json",
-    "tasks/todo.json"
+    "tasks/todo.json",
+    "userspace/core_service/src/main.rs"
   ],
   "evidence_files": [
     "artifacts/logs/cargo-check.log",
@@ -140,5 +178,5 @@
     "artifacts/logs/odin-build.log",
     "artifacts/logs/odin-check.log"
   ],
-  "generated_at": "2026-03-14T16:21:22Z"
+  "generated_at": "2026-03-16T02:29:21Z"
 }

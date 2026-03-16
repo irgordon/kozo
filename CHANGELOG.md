@@ -1,10 +1,12 @@
 # Changelog
 
-## Current Status - 2026-03-15
+## v0.0.5 - 2026-03-15
 
-- `v0.0.4` remains the latest released milestone.
-- The kernel boot bridge, trap-path register contract, and harness bridge-alignment proof are in place and verified.
-- No new source changes were added after `v0.0.4`; only generated Python cache files are currently dirty in the local worktree.
+- Added source-level execution proof validation for the heartbeat syscall path across Odin, Rust, and the verification harness.
+- Implemented the ordered Odin arbiter sequence with nil guard, magic-value guard, stable ingress/egress trace strings, ordered pointer mutation, and ABI-backed return values.
+- Updated the Rust core service to initialize the normative magic payload, branch explicitly on `abi::K_OK`, assert postconditions, and enter a heavy failure path on error.
+- Extended the verify artifact format to carry granular `sub_results` for `execution_proof`, making field-level proof status visible in `latest_verify.json`.
+- Verified the negative proof by changing the Rust-side magic value and confirming `execution_proof` fails before restoring the correct contract.
 
 ## v0.0.4 - 2026-03-14
 

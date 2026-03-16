@@ -18,7 +18,7 @@ signal_kernel_heartbeat :: proc() -> abi.K_STATUS {
 		return status
 	}
 	payload := abi.Heartbeat_Payload{
-		sequence = 1,
+		sequence = 0xCAFEFEED,
 		timestamp = 0,
 		status_bits = u32(abi.K_INVALID),
 	}
@@ -36,9 +36,18 @@ syscall_dispatch :: proc "c" (
 	case abi.K_SYSCALL_NOP:
 		return abi.K_OK
 	case abi.K_SYSCALL_DEBUG_HEARTBEAT:
-		payload.timestamp = x86_64.read_timestamp()
+		if payload == nil {
+			return abi.K_INVALID
+		}
+		if payload.sequence != 0xCAFEFEED {
+			return abi.K_INVALID
+		}
+		x86_64.serial_log_debug_heartbeat_recv(payload.sequence)
+		payload.sequence += 1
+		payload.timestamp = 0xDEADBEEF
 		payload.status_bits = u32(abi.K_OK)
-		return x86_64.log_heartbeat_payload(payload^)
+		x86_64.serial_log_debug_heartbeat_time(payload.timestamp)
+		return abi.K_OK
 	}
 	return abi.K_INVALID
 }

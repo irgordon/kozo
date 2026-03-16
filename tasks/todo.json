@@ -1,19 +1,19 @@
 {
-  "task_title": "KOZO Trap Path V1",
+  "task_title": "KOZO Syscall Execution Proof V1",
   "task_kind": "non_trivial",
-  "created_at": "2026-03-13T18:00:00Z",
+  "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
   "replan_number": 0,
   "approval": {
     "status": "approved"
   },
   "preconditions": [
-    "KOZO boot foundation is complete",
-    "Odin toolchain is installed"
+    "KOZO trap path V1 is complete",
+    "Odin and Rust toolchains are installed"
   ],
   "assumptions": [
-    "The trap bridge is validated semantically from checked-in source on this environment",
-    "The normative ingress register mapping is rax -> rdi and rbx -> rsi"
+    "Execution proof is validated through context-aware static analysis at this phase",
+    "K_INVALID is the current generated error-equivalent status constant"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -22,24 +22,23 @@
     "artifacts/",
     "agent/",
     "kernel/",
+    "userspace/",
     "harness/",
-    "schemas/",
-    "docs/"
+    "schemas/"
   ],
   "steps": [
     {
       "id": 1,
-      "title": "Align the syscall assembly stub and exported Odin dispatcher signature",
+      "title": "Implement the ordered Odin syscall arbiter path and the Rust consumer contract",
       "status": "done",
       "kind": "edit",
       "files_expected": [
         ".codex/AGENTS.md",
         "tasks/todo.json",
         "tasks/runtime.json",
-        "kernel/arch/x86_64/boot.asm",
-        "kernel/arch/x86_64/syscall.asm",
         "kernel/main.odin",
-        "docs/adr/0016-kernel-entry-and-syscall-bridge.md"
+        "kernel/arch/x86_64/serial.odin",
+        "userspace/core_service/src/main.rs"
       ],
       "verification_refs": [
         "verification.tests_run[0]",
@@ -49,15 +48,15 @@
     },
     {
       "id": 2,
-      "title": "Add semantic bridge validation and regenerate control artifacts",
+      "title": "Add execution proof validation and detailed verify artifact reporting",
       "status": "done",
       "kind": "edit",
       "files_expected": [
         "harness/registry.py",
         "harness/codes.py",
         "harness/validators.py",
-        "harness/validators_impl/entrypoint_validator.py",
-        "harness/validators_impl/bridge_validator.py",
+        "harness/aggregator.py",
+        "harness/validators_impl/execution_proof.py",
         "schemas/latest_verify.schema.json",
         "schemas/agent_context.schema.json",
         "CHANGELOG.md",
@@ -71,9 +70,9 @@
     }
   ],
   "expected_outputs": [
-    "syscall.asm explicitly bridges rax -> rdi and rbx -> rsi",
-    "main.odin exports syscall_dispatch with the exact normative signature",
-    "The harness proves bridge_alignment across the assembly stub and Odin dispatcher"
+    "The Odin dispatcher proves the nil guard, magic guard, ordered mutation, and ABI-backed return flow",
+    "The Rust service proves the initialization, status handling, and postcondition expectations of the syscall contract",
+    "The harness records a granular execution_proof result in latest_verify.json"
   ],
   "verification": {
     "tests_run": [
@@ -84,8 +83,8 @@
       },
       {
         "tool": "shell",
-        "command": "odin build kernel -build-mode:obj -out:artifacts/kernel.o",
-        "status": "skipped"
+        "command": "cargo check --manifest-path userspace/core_service/Cargo.toml --target x86_64-unknown-none",
+        "status": "passed"
       },
       {
         "tool": "shell",
@@ -95,32 +94,33 @@
     ],
     "logs": [
       "artifacts/logs/odin-check.log",
-      "artifacts/logs/odin-build.log",
-      "artifacts/logs/nm-kernel.log"
+      "artifacts/logs/cargo-check.log"
     ],
     "diffs": [],
     "invariants": [
-      "The trap contract maps rax to the Odin id parameter and rbx to the payload pointer parameter",
-      "The syscall stub preserves the registers explicitly documented in ADR-0016 and aligns rsp before the call"
+      "All syscall success and failure paths use generated ABI constants",
+      "The Odin source orders guards before payload mutation",
+      "The Rust source proves success and failure handling explicitly"
     ],
     "expected_behavior": [
-      "verify.sh reports a bridge_alignment check with a passing status",
-      "Swapping the ingress register moves in syscall.asm causes bridge_alignment to fail"
+      "verify.sh emits execution_proof: pass",
+      "Changing the Rust magic value to 0xBADFEED causes execution_proof to fail",
+      "Removing or reordering the Odin mutation path causes execution_proof to fail"
     ],
     "actual_behavior": [
-      "verify.sh reports a bridge_alignment check in the final artifact.",
-      "Swapping the ingress register moves in syscall.asm causes bridge_alignment to fail with BRIDGE_ALIGNMENT_INVALID.",
-      "verify.sh passes once the assembly trap mapping, ADR, and exported Odin dispatcher signature are aligned."
+      "verify.sh emits execution_proof with a granular sub-result breakdown.",
+      "Changing the Rust magic value to 0xBADFEED causes execution_proof to fail.",
+      "The Odin arbiter enforces nil and magic guards before mutation and returns the ABI success constant after ordered field updates."
     ],
-    "baseline_reference": "kozo-boot-foundation"
+    "baseline_reference": "kozo-trap-path-v1"
   },
   "elegance_review": {
     "required": false
   },
   "lessons_referenced": [],
   "explanation_summary": [
-    "Aligned the syscall assembly bridge to the normative rax -> rdi and rbx -> rsi trap contract.",
-    "Updated ADR-0016 and the exported Odin dispatcher signature to make the trap-path contract explicit and auditable.",
-    "Added a semantic bridge validator so the harness proves the assembly-to-Odin register bridge and fails closed when the mapping drifts."
+    "Implemented the ordered Odin arbiter path with nil guard, magic guard, stable ingress/egress tracing, pointer-based mutation, and ABI-backed return values.",
+    "Updated the Rust consumer to initialize the normative magic payload, branch on abi::K_OK, assert the postconditions, and enter a heavy failure path on error.",
+    "Added a granular execution proof validator so verify artifacts record field-level proof results instead of a single opaque status."
   ]
 }

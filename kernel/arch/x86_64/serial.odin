@@ -112,3 +112,17 @@ log_heartbeat_payload :: proc(payload: abi.Heartbeat_Payload) -> abi.K_STATUS {
 	write_serial_newline()
 	return abi.K_OK
 }
+
+serial_log_debug_heartbeat_recv :: proc(sequence: u64) -> abi.K_STATUS {
+	serial_write("SYSCALL[DEBUG_HEARTBEAT] Recv Seq: 0x")
+	write_serial_hex_u64(sequence)
+	write_serial_newline()
+	return abi.K_OK
+}
+
+serial_log_debug_heartbeat_time :: proc(timestamp: u64) -> abi.K_STATUS {
+	serial_write("SYSCALL[DEBUG_HEARTBEAT] New Time: 0x")
+	write_serial_hex_u64(timestamp)
+	write_serial_newline()
+	return abi.K_OK
+}

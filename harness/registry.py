@@ -37,6 +37,7 @@ SUBSYSTEMS = MappingProxyType(
         "structural_integrity": (),
         "execution_foundation": (),
         "bridge_alignment": (),
+        "execution_proof": (),
         "evidence": (),
     }
 )
@@ -64,6 +65,7 @@ CHECKS = MappingProxyType(
         "layout_parity": "structural_integrity",
         "execution_foundation": "execution_foundation",
         "bridge_alignment": "bridge_alignment",
+        "execution_proof": "execution_proof",
         "evidence": "evidence",
     }
 )
