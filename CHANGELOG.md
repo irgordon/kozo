@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.0.6 - 2026-03-19
+
+- Fixed `scripts/verify.sh` so an empty changed-file set no longer aborts the run under `set -euo pipefail`, and updated the script to emit the generated verification artifact JSON directly.
+- Added fresh verification evidence generation for `odin check`, `odin build`, `cargo check`, and host object inspection so `artifacts/latest_verify.json` is reproducible from the current tree.
+- Replaced the broken default serial port inline assembly path with a build-safe stub and gated architecture-specific kernel behavior so `odin build kernel` and `odin build kernel -build-mode:obj -out:artifacts/kernel.o` succeed on the host.
+- Marked the Rust heartbeat path as explicit `STUB MODE`, documented that the syscall boundary is still simulated, and renamed `protocol_alignment` to `protocol_contract_alignment` so the harness reports the current system truthfully.
+- Hardened protocol validation to reject unlabeled local syscall stubs and strengthened execution-foundation proof by checking freestanding amd64 bridge symbols and NASM-assembled trap objects.
+
 ## v0.0.5 - 2026-03-15
 
 - Added source-level execution proof validation for the heartbeat syscall path across Odin, Rust, and the verification harness.

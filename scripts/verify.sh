@@ -28,6 +28,9 @@ need_file() {
 
 need_cmd python3
 need_cmd git
+need_cmd odin
+need_cmd cargo
+need_cmd nm
 need_file "$TODO_JSON"
 need_file "$RUNTIME_JSON"
 need_file "$LESSONS_JSON"
@@ -44,6 +47,15 @@ git_head_ref() {
   printf "%s" "$EMPTY_TREE"
 }
 
+filter_generated_changes() {
+  local status=0
+  grep -vE '(^|/)__pycache__/|\.pyc$' || status=$?
+  if [[ "$status" -eq 1 ]]; then
+    return 0
+  fi
+  return "$status"
+}
+
 collect_changed_files() {
   local head_ref
   head_ref="$(git_head_ref)"
@@ -51,7 +63,7 @@ collect_changed_files() {
     git -C "$ROOT" diff --name-only -- . || true
     git -C "$ROOT" diff --name-only --cached "$head_ref" -- . || true
     git -C "$ROOT" ls-files --others --exclude-standard || true
-  } | sed '/^$/d' | grep -vE '(^|/)__pycache__/|\.pyc$' | sort -u
+  } | sed '/^$/d' | filter_generated_changes | sort -u
 }
 
 collect_evidence_files() {
@@ -60,7 +72,46 @@ collect_evidence_files() {
   fi
 }
 
+run_logged_command() {
+  local log_file=$1
+  shift
+
+  if ! "$@" >"$log_file" 2>&1; then
+    cat "$log_file" >&2
+    fail "Command failed: $*"
+  fi
+}
+
+build_kernel_object_artifact() {
+  local log_file="$LOG_DIR/nm-kernel.log"
+  local object_files=()
+
+  if ! odin build "$ROOT/kernel" -build-mode:obj "-out:$ARTIFACTS_DIR/kernel.o" >"$log_file" 2>&1; then
+    cat "$log_file" >&2
+    fail "Command failed: odin build $ROOT/kernel -build-mode:obj -out:$ARTIFACTS_DIR/kernel.o"
+  fi
+
+  shopt -s nullglob
+  object_files=("$ARTIFACTS_DIR"/kernel*.o)
+  shopt -u nullglob
+
+  if [[ "${#object_files[@]}" -eq 0 ]]; then
+    cat "$log_file" >&2
+    fail "Object build did not emit any kernel*.o files under $ARTIFACTS_DIR"
+  fi
+
+  if ! nm -g "${object_files[@]}" >>"$log_file" 2>&1; then
+    cat "$log_file" >&2
+    fail "Command failed: nm -g ${object_files[*]}"
+  fi
+}
+
 CHANGED_FILES_TEXT="$(collect_changed_files)"
+
+run_logged_command "$LOG_DIR/odin-check.log" odin check "$ROOT/kernel"
+run_logged_command "$LOG_DIR/odin-build.log" odin build "$ROOT/kernel"
+run_logged_command "$LOG_DIR/cargo-check.log" cargo check --manifest-path "$ROOT/userspace/core_service/Cargo.toml" --target x86_64-unknown-none
+build_kernel_object_artifact
 
 EVIDENCE_FILES_TEXT="$(collect_evidence_files)"
 
@@ -106,6 +157,7 @@ PY
 )"
 
 printf "%s\n" "$VERIFY_OUTPUT" > "$VERIFY_JSON"
+printf "%s\n" "$VERIFY_OUTPUT"
 
 STATUS="$(
 ROOT="$ROOT" python3 - "$VERIFY_JSON" <<'PY'

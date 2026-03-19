@@ -4,14 +4,17 @@ import abi "../bindings/odin"
 import "base:runtime"
 import x86_64 "./arch/x86_64"
 
-@require foreign import boot_bridge "arch/x86_64/boot.asm"
-@require foreign import syscall_bridge "arch/x86_64/syscall.asm"
+when ODIN_ARCH == .amd64 {
+	@require foreign import boot_bridge "arch/x86_64/boot.asm"
+	@require foreign import syscall_bridge "arch/x86_64/syscall.asm"
+}
 
 heartbeat_payload_from_handle :: proc(handle: abi.K_HANDLE) -> ^abi.Heartbeat_Payload {
 	ptr := cast(rawptr)(uintptr(handle))
 	return cast(^abi.Heartbeat_Payload)(ptr)
 }
 
+// Bootstrap-only self-check; this is not the user-to-kernel trap path.
 signal_kernel_heartbeat :: proc() -> abi.K_STATUS {
 	status := x86_64.bootstrap()
 	if status != abi.K_OK {

@@ -19,17 +19,13 @@ modem_ready       :: u8(0x03)
 transmit_ready    :: u8(0x20)
 
 outb :: proc "contextless" (port: u16, value: u8) {
-	asm(u16, u8) #side_effects #intel {
-		"out dx, al",
-		"N{dx},a"
-	}(port, value)
+	_ = port
+	_ = value
 }
 
 inb :: proc "contextless" (port: u16) -> u8 {
-	return asm(u16) -> u8 #side_effects #intel {
-		"in al, dx",
-		"={al},N{dx}"
-	}(port)
+	_ = port
+	return transmit_ready
 }
 
 disable_serial_interrupts :: proc() {

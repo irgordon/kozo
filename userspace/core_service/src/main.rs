@@ -11,6 +11,7 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
     loop {}
 }
 
+// KOZO: STUB MODE — no real syscall boundary
 fn invoke_heartbeat_stub(syscall: abi::K_SYSCALL_ID, payload: &mut abi::HeartbeatPayload) -> abi::K_STATUS {
     if syscall != abi::K_SYSCALL_DEBUG_HEARTBEAT {
         return abi::K_INVALID;

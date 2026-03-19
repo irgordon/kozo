@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260316T022921Z",
+  "run_id": "verify-20260319T193143Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -80,11 +80,11 @@
       "detail": "Checked-in ABI bindings match the normative header"
     },
     {
-      "name": "protocol_alignment",
-      "subsystem": "protocol_alignment",
+      "name": "protocol_contract_alignment",
+      "subsystem": "protocol_contract_alignment",
       "status": "pass",
       "code": "OK",
-      "detail": "Kernel and Rust protocol usage align with the ABI contract"
+      "detail": "Kernel and Rust protocol contracts align in explicit STUB MODE"
     },
     {
       "name": "layout_parity",
@@ -98,7 +98,7 @@
       "subsystem": "execution_foundation",
       "status": "pass",
       "code": "OK",
-      "detail": "Source bridge declarations are present; symbol check skipped because nasm or nm is unavailable"
+      "detail": "Source bridge declarations and freestanding amd64 bridge symbols are present"
     },
     {
       "name": "bridge_alignment",
@@ -112,7 +112,7 @@
       "subsystem": "execution_proof",
       "status": "pass",
       "code": "OK",
-      "detail": "Kernel and Rust sources prove the ordered heartbeat syscall behavior contract",
+      "detail": "Kernel and Rust sources prove the ordered heartbeat contract for the current stub-mode implementation",
       "sub_results": [
         {
           "name": "nil_guard",
@@ -157,17 +157,19 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
-    "agent/agent_context.json",
+    "README.md",
     "artifacts/latest_verify.json",
-    "harness/aggregator.py",
-    "harness/codes.py",
     "harness/registry.py",
     "harness/validators.py",
+    "harness/validators_impl/entrypoint_validator.py",
     "harness/validators_impl/execution_proof.py",
+    "harness/validators_impl/protocol_validator.py",
+    "kernel/arch/x86_64/arch.odin",
     "kernel/arch/x86_64/serial.odin",
     "kernel/main.odin",
     "schemas/agent_context.schema.json",
     "schemas/latest_verify.schema.json",
+    "scripts/verify.sh",
     "tasks/runtime.json",
     "tasks/todo.json",
     "userspace/core_service/src/main.rs"
@@ -178,5 +180,5 @@
     "artifacts/logs/odin-build.log",
     "artifacts/logs/odin-check.log"
   ],
-  "generated_at": "2026-03-16T02:29:21Z"
+  "generated_at": "2026-03-19T19:31:43Z"
 }

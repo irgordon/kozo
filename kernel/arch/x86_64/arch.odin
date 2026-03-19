@@ -7,15 +7,21 @@ bootstrap :: proc() -> abi.K_STATUS {
 }
 
 read_timestamp :: proc "contextless"() -> u64 {
-	return asm() -> u64 #side_effects #intel {
-		"rdtsc; shl rdx, 32; or rax, rdx",
-		"={ax}"
-	}()
+	when ODIN_ARCH == .amd64 {
+		return asm() -> u64 #side_effects #intel {
+			"rdtsc; shl rdx, 32; or rax, rdx",
+			"={ax}"
+		}()
+	}
+	return 0
 }
 
 halt :: proc "contextless" () {
-	_ = asm #side_effects #intel {
-		"hlt",
-		""
+	when ODIN_ARCH == .amd64 {
+		_ = asm #side_effects #intel {
+			"hlt",
+			""
+		}
+		return
 	}
 }

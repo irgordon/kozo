@@ -17,3 +17,17 @@
 Instead of patching over decades of legacy design, KOZO starts fresh. Its microkernel foundation is clean, modern, and engineered for today’s hardware and expectations, giving you a system that feels lighter, safer, and more dependable from the inside out.
 
 ---
+
+Current Status: Syscall path is simulated (Rust stub → Odin direct call). No assembly trap execution yet.
+The current tree uses a Rust-side heartbeat stub and a separate kernel bootstrap self-dispatch; there is no end-to-end Rust → ASM → Odin syscall boundary yet.
+
+### Verification Artifacts
+
+Artifacts in `/artifacts` are:
+- Reproducible outputs of `scripts/verify.sh`
+- NOT authoritative unless `verify.sh` passes on the current tree
+
+Current Status:
+- Harness: Active
+- Kernel Build: PASS
+- Syscall Path: STUB
