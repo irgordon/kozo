@@ -60,6 +60,7 @@ Icon?
 # -------------------------
 # Common development artifacts
 # -------------------------
+__pycache__/
 *.log
 *.tmp
 *.bak
