@@ -18,8 +18,8 @@ Instead of patching over decades of legacy design, KOZO starts fresh. Its microk
 
 ---
 
-Current Status: Syscall path is simulated (Rust stub → Odin direct call). No assembly trap execution yet.
-The current tree uses a Rust-side heartbeat stub and a separate kernel bootstrap self-dispatch; there is no end-to-end Rust → ASM → Odin syscall boundary yet.
+Current Status: “KOZO executes a function-call trap path: Rust extern call → asm bridge → Odin dispatcher. This is not a hardware `syscall`/interrupt path and does not perform a privilege transition.”
+The current tree exercises the assembly bridge boundary in source and verification, while the kernel bootstrap self-check remains a direct internal dispatcher call.
 
 ### Verification Artifacts
 
@@ -30,4 +30,4 @@ Artifacts in `/artifacts` are:
 Current Status:
 - Harness: Active
 - Kernel Build: PASS
-- Syscall Path: STUB
+- Syscall Path: ASM BRIDGE

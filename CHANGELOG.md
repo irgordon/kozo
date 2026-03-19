@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.0.7 - 2026-03-19
+
+- Replaced the Rust heartbeat local stub with an extern `syscall_entry` bridge call so the implemented request path becomes `Rust -> syscall_entry (asm) -> syscall_dispatch (Odin)`.
+- Updated `kernel/arch/x86_64/syscall.asm` to accept the normal function-call ABI, map ingress values into the bridge registers, preserve `rbx`, and then forward the request into the unchanged Odin dispatcher contract.
+- Added `runtime_trap_path` validation so the harness fails closed if a local stub reappears, the extern bridge call is missing, or the syscall bridge symbol/mapping drifts.
+- Updated repository status, task metadata, and verification artifacts to describe the boundary as an exercised assembly bridge rather than a simulated stub path.
+
 ## v0.0.6 - 2026-03-19
 
 - Fixed `scripts/verify.sh` so an empty changed-file set no longer aborts the run under `set -euo pipefail`, and updated the script to emit the generated verification artifact JSON directly.

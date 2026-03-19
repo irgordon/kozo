@@ -135,6 +135,6 @@ class ExecutionProofValidator(BaseValidator):
         return ValidationResult(
             status="pass",
             code=OK,
-            detail="Kernel and Rust sources prove the ordered heartbeat contract for the current stub-mode implementation",
+            detail="Kernel and Rust sources prove the ordered heartbeat contract for the current runtime-trap implementation",
             meta={"sub_results": sub_results},
         )

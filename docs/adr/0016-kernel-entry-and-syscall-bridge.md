@@ -12,6 +12,7 @@ and must also define the first syscall trap handoff contract.
 
 ## Decision
 
+- Canonical status statement: “KOZO executes a function-call trap path: Rust extern call → asm bridge → Odin dispatcher. This is not a hardware `syscall`/interrupt path and does not perform a privilege transition.”
 - Entry point flow: `_start` (ASM) -> `kernel_entry` (Odin)
 - Stack size: 16KB bootstrap stack
 - Stack alignment: 16-byte aligned before calling `kernel_entry`
@@ -35,3 +36,4 @@ targets.
 - The assembly bridge can validate symbol presence independently of runtime boot.
 - The kernel has a deterministic top-level entry path with an explicit calling convention.
 - Future syscall expansion can build on the `rax`/`rbx` ingress rule without changing the bridge shape.
+- Any future hardware trap work must be introduced as a new phase with separate verification before this canonical wording is changed.

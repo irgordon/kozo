@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260319T193143Z",
+  "run_id": "verify-20260319T200243Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 16,
+    "total_checks": 17,
     "failed_check_count": 0
   },
   "checks": [
@@ -84,7 +84,7 @@
       "subsystem": "protocol_contract_alignment",
       "status": "pass",
       "code": "OK",
-      "detail": "Kernel and Rust protocol contracts align in explicit STUB MODE"
+      "detail": "Kernel and Rust protocol contracts align across the assembly bridge boundary"
     },
     {
       "name": "layout_parity",
@@ -108,11 +108,18 @@
       "detail": "Assembly ingress registers and the exported Odin dispatcher signature align with the trap-path contract"
     },
     {
+      "name": "runtime_trap_path",
+      "subsystem": "runtime_trap_path",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Rust calls extern syscall_entry and the assembly bridge routes the request into syscall_dispatch"
+    },
+    {
       "name": "execution_proof",
       "subsystem": "execution_proof",
       "status": "pass",
       "code": "OK",
-      "detail": "Kernel and Rust sources prove the ordered heartbeat contract for the current stub-mode implementation",
+      "detail": "Kernel and Rust sources prove the ordered heartbeat contract for the current runtime-trap implementation",
       "sub_results": [
         {
           "name": "nil_guard",
@@ -156,20 +163,20 @@
   ],
   "failed_checks": [],
   "changed_files": [
+    ".gitignore",
     "CHANGELOG.md",
     "README.md",
     "artifacts/latest_verify.json",
+    "docs/adr/0016-kernel-entry-and-syscall-bridge.md",
+    "harness/codes.py",
     "harness/registry.py",
     "harness/validators.py",
-    "harness/validators_impl/entrypoint_validator.py",
     "harness/validators_impl/execution_proof.py",
     "harness/validators_impl/protocol_validator.py",
-    "kernel/arch/x86_64/arch.odin",
-    "kernel/arch/x86_64/serial.odin",
-    "kernel/main.odin",
+    "harness/validators_impl/runtime_trap_path.py",
+    "kernel/arch/x86_64/syscall.asm",
     "schemas/agent_context.schema.json",
     "schemas/latest_verify.schema.json",
-    "scripts/verify.sh",
     "tasks/runtime.json",
     "tasks/todo.json",
     "userspace/core_service/src/main.rs"
@@ -180,5 +187,5 @@
     "artifacts/logs/odin-build.log",
     "artifacts/logs/odin-check.log"
   ],
-  "generated_at": "2026-03-19T19:31:43Z"
+  "generated_at": "2026-03-19T20:02:43Z"
 }

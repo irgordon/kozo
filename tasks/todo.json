@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO Syscall Execution Proof V1",
+  "task_title": "KOZO Runtime Trap Execution V1",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -12,16 +12,18 @@
     "Odin and Rust toolchains are installed"
   ],
   "assumptions": [
-    "The current syscall boundary remains in explicit STUB MODE until a real trap call is wired end to end",
+    "This phase exercises the Rust-to-assembly-to-Odin function-call boundary without introducing privilege transitions or a syscall instruction",
     "K_INVALID is the current generated error-equivalent status constant"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
+    ".gitignore",
     "CHANGELOG.md",
     "README.md",
     "tasks/",
     "artifacts/",
     "agent/",
+    "docs/",
     "kernel/",
     "userspace/",
     "harness/",
@@ -99,13 +101,100 @@
         "verification.tests_run[4]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 4,
+      "title": "Replace the Rust stub with the assembly bridge runtime trap path",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "README.md",
+        "tasks/todo.json",
+        "tasks/runtime.json",
+        "artifacts/latest_verify.json",
+        "kernel/arch/x86_64/syscall.asm",
+        "userspace/core_service/src/main.rs",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/protocol_validator.py",
+        "harness/validators_impl/runtime_trap_path.py",
+        "harness/validators_impl/execution_proof.py",
+        "schemas/latest_verify.schema.json",
+        "schemas/agent_context.schema.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[1]",
+        "verification.tests_run[2]",
+        "verification.tests_run[3]",
+        "verification.tests_run[4]"
+      ],
+      "failure_count": 0
+    },
+    {
+      "id": 5,
+      "title": "Lock the canonical runtime trap wording and ignore generated Python caches",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        ".gitignore",
+        "README.md",
+        "docs/adr/0016-kernel-entry-and-syscall-bridge.md",
+        "tasks/todo.json",
+        "tasks/runtime.json",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[4]"
+      ],
+      "failure_count": 0
+    },
+    {
+      "id": 6,
+      "title": "Remove tracked Python cache artifacts from version control",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "tasks/todo.json",
+        "tasks/runtime.json",
+        "artifacts/latest_verify.json",
+        "harness/__pycache__/__init__.cpython-314.pyc",
+        "harness/__pycache__/aggregator.cpython-314.pyc",
+        "harness/__pycache__/codes.cpython-314.pyc",
+        "harness/__pycache__/invariants.cpython-314.pyc",
+        "harness/__pycache__/registry.cpython-314.pyc",
+        "harness/__pycache__/schema_gen.cpython-314.pyc",
+        "harness/__pycache__/schema_gen_agent_context.cpython-314.pyc",
+        "harness/__pycache__/summarize.cpython-314.pyc",
+        "harness/__pycache__/validator.cpython-314.pyc",
+        "harness/__pycache__/validators.cpython-314.pyc",
+        "harness/validators_impl/__pycache__/__init__.cpython-314.pyc",
+        "harness/validators_impl/__pycache__/abi.cpython-314.pyc",
+        "harness/validators_impl/__pycache__/evidence.cpython-314.pyc",
+        "harness/validators_impl/__pycache__/explanation.cpython-314.pyc",
+        "harness/validators_impl/__pycache__/odin.cpython-314.pyc",
+        "harness/validators_impl/__pycache__/plan_lifecycle.cpython-314.pyc",
+        "harness/validators_impl/__pycache__/preconditions.cpython-314.pyc",
+        "harness/validators_impl/__pycache__/rust.cpython-314.pyc",
+        "harness/validators_impl/__pycache__/schema.cpython-314.pyc",
+        "harness/validators_impl/__pycache__/step_scope.cpython-314.pyc",
+        "harness/validators_impl/__pycache__/subagent.cpython-314.pyc",
+        "harness/validators_impl/__pycache__/verification_refs.cpython-314.pyc"
+      ],
+      "verification_refs": [
+        "verification.tests_run[4]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
     "The verification script is reproducible on a clean tree and emits the current verify artifact",
     "The kernel builds as a binary and as an object artifact without relying on broken default serial inline assembly",
-    "The Rust service is explicitly classified as STUB MODE until a real trap boundary exists",
-    "The harness records protocol_contract_alignment and execution_proof results that match the current stub-mode implementation"
+    "The Rust service crosses the assembly bridge through extern syscall_entry instead of a local stub",
+    "The harness records protocol_contract_alignment, runtime_trap_path, and execution_proof results that match the current runtime-trap implementation",
+    "README.md and ADR-0016 share the canonical wording for the function-call trap path and the workspace ignores generated __pycache__ content",
+    "Tracked Python cache artifacts are removed from version control so ignored cache files no longer dirty the workspace"
   ],
   "verification": {
     "tests_run": [
@@ -144,20 +233,23 @@
     "diffs": [],
     "invariants": [
       "The default kernel build path must succeed without broken serial inline assembly",
-      "Stub mode must be labeled explicitly anywhere a local Rust syscall stub is used",
+      "The Rust heartbeat request must cross the assembly bridge through extern syscall_entry rather than a local stub",
       "The verify artifact is only authoritative when the current tree reproduces it via scripts/verify.sh"
     ],
     "expected_behavior": [
       "verify.sh succeeds on a clean tree and prints the generated artifact JSON before VERIFY: PASS",
       "odin build kernel succeeds with the default source tree",
       "odin build kernel -build-mode:obj -out:artifacts/kernel.o succeeds and produces a host-build object artifact",
-      "A local Rust stub without the explicit STUB MODE marker causes protocol_contract_alignment to fail"
+      "verify.sh emits runtime_trap_path: pass when Rust declares and calls extern syscall_entry",
+      "Reintroducing the local Rust stub or removing the extern bridge call causes runtime_trap_path to fail"
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
       "The kernel builds successfully as both the default binary target and the object artifact target.",
-      "core_service declares STUB MODE explicitly and the protocol validator rejects unlabeled local stubs.",
-      "The verify artifact reports protocol_contract_alignment for the current stub-mode implementation."
+      "core_service declares and calls extern syscall_entry instead of a local heartbeat stub.",
+      "The verify artifact reports protocol_contract_alignment and runtime_trap_path for the current runtime-trap implementation.",
+      "README.md and ADR-0016 use the same canonical statement for the function-call trap path, and __pycache__/ is ignored.",
+      "Tracked Python cache artifacts are removed from version control so the remaining __pycache__ files are ignored."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -168,6 +260,8 @@
   "explanation_summary": [
     "Made scripts/verify.sh reproducible on clean trees, added fresh build/check evidence generation, and emitted the generated artifact JSON directly.",
     "Replaced the broken default serial inline assembly path with a build-safe stub so kernel builds and object generation succeed consistently.",
-    "Marked the Rust heartbeat path as explicit STUB MODE, renamed protocol_alignment to protocol_contract_alignment, and tightened the validator so unlabeled local stubs fail closed."
+    "Replaced the Rust heartbeat stub with an extern syscall_entry bridge call, added runtime_trap_path validation, and aligned the repository status with the exercised assembly bridge boundary.",
+    "Locked the canonical runtime-trap wording into README.md and ADR-0016 and ignored generated __pycache__/ directories to keep the workspace clean.",
+    "Removed the tracked Python cache artifacts from version control so ignored cache files no longer pollute repository state."
   ]
 }

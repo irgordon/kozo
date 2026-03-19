@@ -55,6 +55,7 @@
         "LAYOUT_PARITY_MISMATCH",
         "EXECUTION_FOUNDATION_INVALID",
         "BRIDGE_ALIGNMENT_INVALID",
+        "RUNTIME_TRAP_PATH_INVALID",
         "EXECUTION_PROOF_INVALID",
         "EVIDENCE_FILE_MISSING"
       ]
@@ -76,6 +77,7 @@
         "structural_integrity",
         "execution_foundation",
         "bridge_alignment",
+        "runtime_trap_path",
         "execution_proof",
         "evidence"
       ]
@@ -126,6 +128,7 @@
               "layout_parity",
               "execution_foundation",
               "bridge_alignment",
+              "runtime_trap_path",
               "execution_proof",
               "evidence"
             ]
@@ -146,6 +149,7 @@
               "structural_integrity",
               "execution_foundation",
               "bridge_alignment",
+              "runtime_trap_path",
               "execution_proof",
               "evidence"
             ]
@@ -182,6 +186,7 @@
               "LAYOUT_PARITY_MISMATCH",
               "EXECUTION_FOUNDATION_INVALID",
               "BRIDGE_ALIGNMENT_INVALID",
+              "RUNTIME_TRAP_PATH_INVALID",
               "EXECUTION_PROOF_INVALID",
               "EVIDENCE_FILE_MISSING"
             ]
@@ -249,6 +254,7 @@
               "layout_parity",
               "execution_foundation",
               "bridge_alignment",
+              "runtime_trap_path",
               "execution_proof",
               "evidence"
             ]
@@ -269,6 +275,7 @@
               "structural_integrity",
               "execution_foundation",
               "bridge_alignment",
+              "runtime_trap_path",
               "execution_proof",
               "evidence"
             ]
@@ -298,6 +305,7 @@
               "LAYOUT_PARITY_MISMATCH",
               "EXECUTION_FOUNDATION_INVALID",
               "BRIDGE_ALIGNMENT_INVALID",
+              "RUNTIME_TRAP_PATH_INVALID",
               "EXECUTION_PROOF_INVALID",
               "EVIDENCE_FILE_MISSING"
             ]

@@ -26,6 +26,7 @@ PROTOCOL_MISMATCH = "PROTOCOL_MISMATCH"
 LAYOUT_PARITY_MISMATCH = "LAYOUT_PARITY_MISMATCH"
 EXECUTION_FOUNDATION_INVALID = "EXECUTION_FOUNDATION_INVALID"
 BRIDGE_ALIGNMENT_INVALID = "BRIDGE_ALIGNMENT_INVALID"
+RUNTIME_TRAP_PATH_INVALID = "RUNTIME_TRAP_PATH_INVALID"
 EXECUTION_PROOF_INVALID = "EXECUTION_PROOF_INVALID"
 EVIDENCE_FILE_MISSING = "EVIDENCE_FILE_MISSING"
 
@@ -55,6 +56,7 @@ CODES = MappingProxyType(
         LAYOUT_PARITY_MISMATCH: "Generated bindings do not preserve the heartbeat payload layout",
         EXECUTION_FOUNDATION_INVALID: "Kernel boot and trap entry symbols are misaligned with the execution foundation contract",
         BRIDGE_ALIGNMENT_INVALID: "Assembly ingress registers do not align with the exported Odin trap dispatcher signature",
+        RUNTIME_TRAP_PATH_INVALID: "Rust does not cross the assembly syscall bridge as required by the runtime trap contract",
         EXECUTION_PROOF_INVALID: "Syscall execution behavior proof is missing or misordered in source",
         EVIDENCE_FILE_MISSING: "Required evidence file missing",
     }

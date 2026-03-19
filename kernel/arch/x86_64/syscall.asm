@@ -7,10 +7,13 @@ section .note.GNU-stack
 section .text
 
 syscall_entry:
+    push rbx
     push r11
     push rcx
     sub rsp, 8
 
+    mov rax, rdi
+    mov rbx, rsi
     mov rdi, rax
     mov rsi, rbx
     call syscall_dispatch
@@ -18,4 +21,5 @@ syscall_entry:
     add rsp, 8
     pop rcx
     pop r11
+    pop rbx
     ret
