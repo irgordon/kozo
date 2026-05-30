@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.0.8 - 2026-03-19
+## v0.0.8 - 2026-05-30
 
 - Replaced Rust-side debug assertions with explicit post-call return-path validation so the caller checks `abi::K_OK`, `payload.sequence == 0xCAFEFEEE`, `payload.timestamp == 0xDEADBEEF`, and `payload.status_bits == abi::K_OK` after `syscall_entry` returns.
 - Added a heavy failure helper on the Rust side so return-path contract violations fail closed instead of relying on debug-only assertions.
