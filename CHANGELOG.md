@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.0.9 - 2026-05-30
+
+- Hardened `bridge_alignment` so the harness validates the ordered live `syscall_entry` block instead of accepting bridge snippets that merely appear somewhere in `syscall.asm`.
+- Added named immutable bridge contracts for the assembly symbols, Odin dispatcher signature, ordered register moves, stack alignment, dispatcher handoff, restore path, and return instruction.
+- Added focused negative tests for dead snippets outside `syscall_entry`, out-of-order anchors, missing dispatcher handoff, missing Odin dispatcher signature, and missing entry block diagnostics.
+
 ## v0.0.8 - 2026-03-19
 
 - Replaced Rust-side debug assertions with explicit post-call return-path validation so the caller checks `abi::K_OK`, `payload.sequence == 0xCAFEFEEE`, `payload.timestamp == 0xDEADBEEF`, and `payload.status_bits == abi::K_OK` after `syscall_entry` returns.

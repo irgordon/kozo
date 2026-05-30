@@ -214,6 +214,25 @@
         "verification.tests_run[5]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 8,
+      "title": "Harden bridge alignment against dead or unordered assembly snippets",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "tasks/runtime.json",
+        "harness/validators_impl/bridge_validator.py",
+        "tests/test_bridge_alignment.py"
+      ],
+      "verification_refs": [
+        "verification.tests_run[0]",
+        "verification.tests_run[5]",
+        "verification.tests_run[6]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -224,7 +243,8 @@
     "README.md and ADR-0016 share the canonical wording for the function-call trap path and the workspace ignores generated __pycache__ content",
     "Tracked Python cache artifacts are removed from version control so ignored cache files no longer dirty the workspace",
     "Rust explicitly validates returned payload mutations after syscall_entry and the verify artifact records return_path_proof",
-    "Focused return_path_proof tests cover status_bits negative paths and unrelated status_bits text"
+    "Focused return_path_proof tests cover status_bits negative paths and unrelated status_bits text",
+    "bridge_alignment validates the ordered live syscall_entry block and rejects dead or unordered bridge snippets"
   ],
   "verification": {
     "tests_run": [
@@ -257,6 +277,11 @@
         "tool": "shell",
         "command": "python3 -m unittest discover -s tests",
         "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "python3 -m unittest tests/test_bridge_alignment.py",
+        "status": "passed"
       }
     ],
     "logs": [
@@ -280,7 +305,9 @@
       "Changing the expected Rust sequence to the wrong value causes return_path_proof to fail",
       "Removing the Rust timestamp check causes return_path_proof to fail",
       "Removing the Rust status_bits check causes return_path_proof to fail",
-      "Removing the Odin status_bits success write causes return_path_proof to fail"
+      "Removing the Odin status_bits success write causes return_path_proof to fail",
+      "Moving required bridge snippets outside the live syscall_entry block causes bridge_alignment to fail",
+      "Reordering required live syscall_entry anchors causes bridge_alignment to fail"
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -294,7 +321,10 @@
       "Removing the Rust timestamp check causes return_path_proof to fail.",
       "Removing the Rust status_bits check causes return_path_proof to fail with a named missing-anchor diagnostic.",
       "Removing the Odin status_bits success write causes return_path_proof to fail with a named missing-anchor diagnostic.",
-      "A stray status_bits mention does not satisfy the required Rust return-path status_bits check."
+      "A stray status_bits mention does not satisfy the required Rust return-path status_bits check.",
+      "bridge_alignment rejects dead snippets outside syscall_entry with a named diagnostic.",
+      "bridge_alignment rejects out-of-order live syscall_entry anchors with a named diagnostic.",
+      "bridge_alignment rejects missing dispatcher handoff and missing Odin dispatcher signatures."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -309,6 +339,7 @@
     "Locked the canonical runtime-trap wording into README.md and ADR-0016 and ignored generated __pycache__/ directories to keep the workspace clean.",
     "Removed the tracked Python cache artifacts from version control so ignored cache files no longer pollute repository state.",
     "Added return_path_proof so the Rust caller must explicitly validate the returned payload mutations after the bridge call, with negative proofs for wrong sequence and missing timestamp checks.",
-    "Hardened return_path_proof so status_bits checks and writes are required anchors with focused negative unit coverage."
+    "Hardened return_path_proof so status_bits checks and writes are required anchors with focused negative unit coverage.",
+    "Hardened bridge_alignment so ordered live syscall_entry anchors are required and covered by focused negative tests."
   ]
 }
