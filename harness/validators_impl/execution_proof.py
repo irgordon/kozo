@@ -65,8 +65,9 @@ class ExecutionProofValidator(BaseValidator):
         magic_guard_index = _line_index(heartbeat_branch, "if payload.sequence != 0xCAFEFEED")
         magic_return_index = _line_index_after(heartbeat_branch, "return abi.K_INVALID", magic_guard_index)
         recv_log_index = _line_index(heartbeat_branch, "x86_64.serial_log_debug_heartbeat_recv")
-        sequence_mutation_index = _line_index(heartbeat_branch, "payload.sequence += 1")
+        sequence_mutation_index = _line_index(heartbeat_branch, "payload.sequence = 0xCAFEFEEE")
         timestamp_mutation_index = _line_index(heartbeat_branch, "payload.timestamp = 0xDEADBEEF")
+        status_bits_mutation_index = _line_index(heartbeat_branch, "payload.status_bits = u32(abi.K_OK)")
         egress_log_index = _line_index(heartbeat_branch, "x86_64.serial_log_debug_heartbeat_time")
         success_return_index = _line_index(heartbeat_branch, "return abi.K_OK")
 
@@ -89,6 +90,7 @@ class ExecutionProofValidator(BaseValidator):
                     recv_log_index,
                     sequence_mutation_index,
                     timestamp_mutation_index,
+                    status_bits_mutation_index,
                     egress_log_index,
                     success_return_index,
                 ))
@@ -96,24 +98,27 @@ class ExecutionProofValidator(BaseValidator):
                 and magic_guard_index < sequence_mutation_index
                 and recv_log_index < sequence_mutation_index
                 and sequence_mutation_index < timestamp_mutation_index
-                and timestamp_mutation_index < egress_log_index
+                and timestamp_mutation_index < status_bits_mutation_index
+                and status_bits_mutation_index < egress_log_index
                 and egress_log_index < success_return_index,
-                "kernel/main.odin performs guards, ingress trace, ordered mutations, egress trace, and success return in sequence",
+                "kernel/main.odin performs guards, ingress trace, ordered payload mutations, egress trace, and success return in sequence",
             ),
             _sub_result(
                 "rust_failure_path",
                 "sequence: 0xCAFEFEED" in rust_source
                 and "timestamp: 0" in rust_source
-                and "match status" in rust_source
-                and "abi::K_OK" in rust_source
-                and "panic!(" in rust_source,
-                "userspace/core_service initializes the expected values, matches on K_OK, and has a heavy failure branch",
+                and "if status != abi::K_OK" in rust_source
+                and "fn fail_heartbeat_contract() -> !" in rust_source
+                and 'panic!("heartbeat return path contract violated")' in rust_source,
+                "userspace/core_service initializes the expected values, checks abi::K_OK explicitly, and has a heavy failure branch",
             ),
             _sub_result(
-                "postcondition_asserts",
-                "payload.sequence == 0xCAFEFEEE" in rust_source
-                and "payload.timestamp == 0xDEADBEEF" in rust_source,
-                "userspace/core_service documents the postconditions it expects after a successful heartbeat call",
+                "postcondition_checks",
+                "payload.sequence != 0xCAFEFEEE" in rust_source
+                and "payload.timestamp != 0xDEADBEEF" in rust_source
+                and "payload.status_bits != abi::K_OK" in rust_source
+                and "return validate_heartbeat_return_path(status, &payload);" in rust_source,
+                "userspace/core_service validates the returned payload fields and status bits after the bridge call",
             ),
             _sub_result(
                 "serial_log_stability",

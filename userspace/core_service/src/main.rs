@@ -22,10 +22,27 @@ fn invoke_heartbeat_bridge(
     unsafe { syscall_entry(u64::from(syscall), payload as *mut abi::HeartbeatPayload) as abi::K_STATUS }
 }
 
-fn assert_heartbeat_postconditions(payload: &abi::HeartbeatPayload) {
-    debug_assert!(payload.sequence == 0xCAFEFEEE);
-    debug_assert!(payload.timestamp == 0xDEADBEEF);
-    debug_assert!(payload.status_bits == abi::K_OK);
+fn fail_heartbeat_contract() -> ! {
+    panic!("heartbeat return path contract violated")
+}
+
+fn validate_heartbeat_return_path(
+    status: abi::K_STATUS,
+    payload: &abi::HeartbeatPayload,
+) -> abi::K_STATUS {
+    if status != abi::K_OK {
+        fail_heartbeat_contract();
+    }
+    if payload.sequence != 0xCAFEFEEE {
+        fail_heartbeat_contract();
+    }
+    if payload.timestamp != 0xDEADBEEF {
+        fail_heartbeat_contract();
+    }
+    if payload.status_bits != abi::K_OK {
+        fail_heartbeat_contract();
+    }
+    abi::K_OK
 }
 
 pub fn heartbeat_request() -> abi::K_STATUS {
@@ -37,13 +54,7 @@ pub fn heartbeat_request() -> abi::K_STATUS {
     let syscall: abi::K_SYSCALL_ID = abi::K_SYSCALL_DEBUG_HEARTBEAT;
 
     let status = invoke_heartbeat_bridge(syscall, &mut payload);
-    match status {
-        abi::K_OK => {
-            assert_heartbeat_postconditions(&payload);
-            abi::K_OK
-        }
-        _ => panic!("heartbeat syscall returned non-K_OK"),
-    }
+    return validate_heartbeat_return_path(status, &payload);
 }
 
 #[no_mangle]

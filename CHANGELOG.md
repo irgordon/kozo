@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.0.8 - 2026-03-19
+
+- Replaced Rust-side debug assertions with explicit post-call return-path validation so the caller checks `abi::K_OK`, `payload.sequence == 0xCAFEFEEE`, `payload.timestamp == 0xDEADBEEF`, and `payload.status_bits == abi::K_OK` after `syscall_entry` returns.
+- Added a heavy failure helper on the Rust side so return-path contract violations fail closed instead of relying on debug-only assertions.
+- Added `return_path_proof` validation so the harness fails if Rust stops inspecting the returned payload, checks the wrong constants, removes sequence/timestamp/status-bits checks, reintroduces a local stub, or if Odin stops writing the full response through the payload pointer.
+- Added focused negative tests so the proof fails when the Rust status-bits check or Odin status-bits success write is removed, including cases where `status_bits` appears only in unrelated text.
+- Regenerated the verification artifact so `latest_verify.json` records `return_path_proof: pass` as part of the current proof surface.
+
 ## v0.0.7 - 2026-03-19
 
 - Replaced the Rust heartbeat local stub with an extern `syscall_entry` bridge call so the implemented request path becomes `Rust -> syscall_entry (asm) -> syscall_dispatch (Odin)`.

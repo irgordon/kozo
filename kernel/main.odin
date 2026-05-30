@@ -46,7 +46,7 @@ syscall_dispatch :: proc "c" (
 			return abi.K_INVALID
 		}
 		x86_64.serial_log_debug_heartbeat_recv(payload.sequence)
-		payload.sequence += 1
+		payload.sequence = 0xCAFEFEEE
 		payload.timestamp = 0xDEADBEEF
 		payload.status_bits = u32(abi.K_OK)
 		x86_64.serial_log_debug_heartbeat_time(payload.timestamp)
