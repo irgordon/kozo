@@ -121,6 +121,7 @@
               "execution_foundation",
               "bridge_alignment",
               "runtime_trap_path",
+              "return_path_proof",
               "execution_proof",
               "evidence"
             ]
@@ -142,6 +143,7 @@
               "execution_foundation",
               "bridge_alignment",
               "runtime_trap_path",
+              "return_path_proof",
               "execution_proof",
               "evidence"
             ]

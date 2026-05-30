@@ -56,6 +56,7 @@
         "EXECUTION_FOUNDATION_INVALID",
         "BRIDGE_ALIGNMENT_INVALID",
         "RUNTIME_TRAP_PATH_INVALID",
+        "RETURN_PATH_PROOF_INVALID",
         "EXECUTION_PROOF_INVALID",
         "EVIDENCE_FILE_MISSING"
       ]
@@ -78,6 +79,7 @@
         "execution_foundation",
         "bridge_alignment",
         "runtime_trap_path",
+        "return_path_proof",
         "execution_proof",
         "evidence"
       ]
@@ -129,6 +131,7 @@
               "execution_foundation",
               "bridge_alignment",
               "runtime_trap_path",
+              "return_path_proof",
               "execution_proof",
               "evidence"
             ]
@@ -150,6 +153,7 @@
               "execution_foundation",
               "bridge_alignment",
               "runtime_trap_path",
+              "return_path_proof",
               "execution_proof",
               "evidence"
             ]
@@ -187,6 +191,7 @@
               "EXECUTION_FOUNDATION_INVALID",
               "BRIDGE_ALIGNMENT_INVALID",
               "RUNTIME_TRAP_PATH_INVALID",
+              "RETURN_PATH_PROOF_INVALID",
               "EXECUTION_PROOF_INVALID",
               "EVIDENCE_FILE_MISSING"
             ]
@@ -255,6 +260,7 @@
               "execution_foundation",
               "bridge_alignment",
               "runtime_trap_path",
+              "return_path_proof",
               "execution_proof",
               "evidence"
             ]
@@ -276,6 +282,7 @@
               "execution_foundation",
               "bridge_alignment",
               "runtime_trap_path",
+              "return_path_proof",
               "execution_proof",
               "evidence"
             ]
@@ -306,6 +313,7 @@
               "EXECUTION_FOUNDATION_INVALID",
               "BRIDGE_ALIGNMENT_INVALID",
               "RUNTIME_TRAP_PATH_INVALID",
+              "RETURN_PATH_PROOF_INVALID",
               "EXECUTION_PROOF_INVALID",
               "EVIDENCE_FILE_MISSING"
             ]
