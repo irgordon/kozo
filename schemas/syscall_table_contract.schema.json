@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "dispatcher",
+    "valid_syscalls",
+    "unknown_syscall_behavior",
+    "relationships"
+  ],
+  "properties": {
+    "version": {
+      "const": 0
+    },
+    "architecture": {
+      "type": "string",
+      "pattern": ".*\\S.*"
+    },
+    "dispatcher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "symbol",
+        "source_path",
+        "syscall_id_type",
+        "return_type"
+      ],
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "source_path": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "syscall_id_type": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "return_type": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        }
+      }
+    },
+    "valid_syscalls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "debug_heartbeat"
+      ],
+      "properties": {
+        "debug_heartbeat": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "constant",
+            "payload_layout",
+            "branch_selector",
+            "boundary_contract"
+          ],
+          "properties": {
+            "constant": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "payload_layout": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "branch_selector": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "boundary_contract": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            }
+          }
+        }
+      }
+    },
+    "unknown_syscall_behavior": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "return_status",
+        "must_not_mutate_payload"
+      ],
+      "properties": {
+        "return_status": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "must_not_mutate_payload": {
+          "type": "boolean"
+        }
+      }
+    },
+    "relationships": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "abi_manifest",
+        "syscall_boundary_contract"
+      ],
+      "properties": {
+        "abi_manifest": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "syscall_boundary_contract": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        }
+      }
+    }
+  }
+}

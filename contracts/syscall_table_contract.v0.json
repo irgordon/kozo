@@ -1,0 +1,26 @@
+{
+  "version": 0,
+  "architecture": "x86_64",
+  "dispatcher": {
+    "symbol": "syscall_dispatch",
+    "source_path": "kernel/main.odin",
+    "syscall_id_type": "K_SYSCALL_ID",
+    "return_type": "K_STATUS"
+  },
+  "valid_syscalls": {
+    "debug_heartbeat": {
+      "constant": "K_SYSCALL_DEBUG_HEARTBEAT",
+      "payload_layout": "heartbeat_payload",
+      "branch_selector": "abi.K_SYSCALL_DEBUG_HEARTBEAT",
+      "boundary_contract": "debug_heartbeat"
+    }
+  },
+  "unknown_syscall_behavior": {
+    "return_status": "K_INVALID",
+    "must_not_mutate_payload": true
+  },
+  "relationships": {
+    "abi_manifest": "contracts/kozo_abi_manifest.json",
+    "syscall_boundary_contract": "contracts/syscall_boundary_contract.v0.json"
+  }
+}

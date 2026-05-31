@@ -25,6 +25,7 @@ ABI_LAYOUT_MISMATCH = "ABI_LAYOUT_MISMATCH"
 ABI_MANIFEST_INVALID = "ABI_MANIFEST_INVALID"
 SYSCALL_BOUNDARY_CONTRACT_INVALID = "SYSCALL_BOUNDARY_CONTRACT_INVALID"
 SYSCALL_BOUNDARY_CONFORMANCE_INVALID = "SYSCALL_BOUNDARY_CONFORMANCE_INVALID"
+SYSCALL_TABLE_CONTRACT_INVALID = "SYSCALL_TABLE_CONTRACT_INVALID"
 PROTOCOL_MISMATCH = "PROTOCOL_MISMATCH"
 LAYOUT_PARITY_MISMATCH = "LAYOUT_PARITY_MISMATCH"
 EXECUTION_FOUNDATION_INVALID = "EXECUTION_FOUNDATION_INVALID"
@@ -60,6 +61,7 @@ CODES = MappingProxyType(
         ABI_MANIFEST_INVALID: "ABI manifest is missing, invalid, or inconsistent with the canonical ABI",
         SYSCALL_BOUNDARY_CONTRACT_INVALID: "Syscall boundary contract is missing, invalid, or inconsistent with the proven trap path",
         SYSCALL_BOUNDARY_CONFORMANCE_INVALID: "Live sources do not conform to the syscall boundary contract",
+        SYSCALL_TABLE_CONTRACT_INVALID: "Syscall table contract is missing, invalid, or inconsistent with the live dispatcher",
         PROTOCOL_MISMATCH: "Kernel and service protocol usage drifted from the ABI",
         LAYOUT_PARITY_MISMATCH: "Generated bindings do not preserve the heartbeat payload layout",
         EXECUTION_FOUNDATION_INVALID: "Kernel boot and trap entry symbols are misaligned with the execution foundation contract",
