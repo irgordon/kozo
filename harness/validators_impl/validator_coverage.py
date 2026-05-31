@@ -63,7 +63,15 @@ _VALIDATOR_TEST_CONTRACTS = {
         "protocol_contract_alignment",
         _TESTS_DIR / "test_protocol_contract_alignment.py",
         "ProtocolContractValidator",
-        ("missing_rust_heartbeat_syscall_reference",),
+        (
+            "missing_rust_syscall_constant",
+            "missing_odin_syscall_constant",
+            "rust_hardcoded_syscall_id",
+            "odin_hardcoded_syscall_id",
+            "constant_mismatch",
+            "dead_or_stale_constant",
+            "diagnostic_names_protocol_field",
+        ),
     ),
     "layout_parity": ValidatorTestContract("layout_parity", _TESTS_DIR / "test_layout_parity.py", "LayoutParityValidator", ("wrong_normative_layout",)),
     "execution_foundation": ValidatorTestContract(
