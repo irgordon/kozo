@@ -15,6 +15,9 @@
       "boundary_contract": "debug_heartbeat"
     }
   },
+  "allowed_nonpayload_branches": [
+    "abi.K_SYSCALL_NOP"
+  ],
   "unknown_syscall_behavior": {
     "return_status": "K_INVALID",
     "must_not_mutate_payload": true

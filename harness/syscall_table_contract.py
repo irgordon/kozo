@@ -46,6 +46,7 @@ class SyscallTableContract:
     architecture: str
     dispatcher: TableDispatcher
     valid_syscalls: tuple[TableSyscall, ...]
+    allowed_nonpayload_branches: tuple[str, ...]
     unknown_syscall_behavior: UnknownSyscallBehavior
     relationships: TableRelationships
 
@@ -70,6 +71,7 @@ def parse_syscall_table_contract(data: dict[str, Any]) -> SyscallTableContract:
         architecture=data["architecture"],
         dispatcher=_dispatcher(data),
         valid_syscalls=_valid_syscalls(data),
+        allowed_nonpayload_branches=_allowed_nonpayload_branches(data),
         unknown_syscall_behavior=_unknown_syscall_behavior(data),
         relationships=_relationships(data),
     )
@@ -104,6 +106,14 @@ def _valid_syscalls(data: dict[str, Any]) -> tuple[TableSyscall, ...]:
         )
         for name, syscall in syscalls.items()
         if isinstance(name, str) and isinstance(syscall, dict)
+    )
+
+
+def _allowed_nonpayload_branches(data: dict[str, Any]) -> tuple[str, ...]:
+    return tuple(
+        selector
+        for selector in data.get("allowed_nonpayload_branches", ())
+        if isinstance(selector, str)
     )
 
 

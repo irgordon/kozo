@@ -83,6 +83,13 @@
         }
       }
     },
+    "allowed_nonpayload_branches": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    },
     "unknown_syscall_behavior": {
       "type": "object",
       "additionalProperties": false,

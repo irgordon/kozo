@@ -441,6 +441,32 @@
         "verification.tests_run[10]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 17,
+      "title": "Validate live dispatcher conformance to syscall table contract v0",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "tasks/todo.json",
+        "contracts/syscall_table_contract.v0.json",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/syscall_table_contract.py",
+        "harness/validators.py",
+        "harness/validators_impl/syscall_table_conformance.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/agent_context.schema.json",
+        "schemas/latest_verify.schema.json",
+        "schemas/syscall_table_contract.schema.json",
+        "tests/test_syscall_table_conformance.py"
+      ],
+      "verification_refs": [
+        "verification.tests_run[5]",
+        "verification.tests_run[9]",
+        "verification.tests_run[10]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -461,7 +487,8 @@
     "ABI manifest v0 provides the Python-side source of truth for proven syscall constants, status constants, heartbeat payload layout, and heartbeat sentinels",
     "Syscall boundary contract v0 describes and validates only the currently proven x86_64 heartbeat trap boundary",
     "syscall_boundary_conformance proves live assembly, Rust, and Odin sources conform to syscall boundary contract v0",
-    "Syscall table contract v0 describes and validates the currently proven heartbeat/debug dispatcher branch and unknown-syscall default behavior"
+    "Syscall table contract v0 describes and validates the currently proven heartbeat/debug dispatcher branch and unknown-syscall default behavior",
+    "syscall_table_conformance proves the live Odin dispatcher implements syscall table contract v0 without uncontracted payload-mutating branches"
   ],
   "verification": {
     "tests_run": [

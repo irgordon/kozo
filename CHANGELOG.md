@@ -1,35 +1,87 @@
 # Changelog
 
-## v0.0.9 - 2026-05-31
+## v0.0.21 - 2026-05-31
 
-- Hardened `bridge_alignment` so the harness validates the ordered live `syscall_entry` block instead of accepting bridge snippets that merely appear somewhere in `syscall.asm`.
-- Added named immutable bridge contracts for the assembly symbols, Odin dispatcher signature, ordered register moves, stack alignment, dispatcher handoff, restore path, and return instruction.
-- Added focused negative tests for dead snippets outside `syscall_entry`, out-of-order anchors, missing dispatcher handoff, missing Odin dispatcher signature, and missing entry block diagnostics.
-- Hardened `runtime_trap_path` so the harness validates the live Rust `heartbeat_request` path and bridge helper instead of accepting unrelated extern bridge snippets.
-- Added focused `runtime_trap_path` tests for missing live anchors, wrong request sentinels, out-of-order request construction, dead extern calls, and missing heartbeat request diagnostics.
-- Hardened `execution_proof` as the high-level observable heartbeat execution proof by validating the live Odin `DEBUG_HEARTBEAT` branch and stable serial observation strings.
-- Added focused `execution_proof` tests for missing nil guards, missing heartbeat branch, dead mutation snippets, out-of-order mutations, missing `status_bits` mutation, and missing serial observations.
-- Regenerated the verification artifact so `latest_verify.json` records `bridge_alignment`, `runtime_trap_path`, `return_path_proof`, and `execution_proof` passing with the hardened proof details.
-- Added `validator_coverage` governance so every registered validator must declare a focused test file with behavioral negative-path coverage.
-- Added AST-based coverage checks that reject placeholder negative tests unless they invoke the validator or approved harness/helper path, assert failure behavior, and tie the negative test body to the configured validator token.
-- Added focused negative tests for previously uncovered validators and regression coverage for missing files, missing mappings, missing validator invocation, missing failure assertions, and token-only false passes.
-- Extended `validator_coverage` with marker-depth governance so each validator declares required negative coverage markers that must map to behavioral negative tests.
-- Added `KOZO_NEGATIVE_COVERAGE` metadata to focused validator tests and regression coverage for missing metadata, missing required markers, unknown markers, missing mapped functions, and mapped tests without behavior.
-- Added ABI manifest v0 as the machine-readable contract for currently proven syscall constants, status constants, heartbeat payload layout, generated binding paths, and heartbeat request/response sentinels.
-- Added an `abi_manifest` validator with schema-backed manifest loading and focused negative coverage for missing files, invalid JSON, schema violations, missing binding paths, constant drift, layout drift, and diagnostic quality.
-- Rewired `protocol_contract_alignment` and `layout_parity` to read proven ABI values from the manifest instead of duplicating local validator constants.
-- Documented ABI manifest v0 as a current proof artifact only; it does not declare a stable public ABI, Linux compatibility, additional syscalls, or runtime behavior changes.
-- Added syscall boundary contract v0 for the currently proven x86_64 heartbeat/debug syscall path.
-- Added a schema-backed syscall boundary loader and `syscall_boundary_contract` validator.
-- Added focused negative coverage for boundary contract failures, including register drift, missing ABI manifest references, sentinel mismatches, invalid payload retention, unknown mutable fields, and unknown proof validator references.
-- Documented syscall boundary contract v0 as a current heartbeat/debug proof artifact only; it does not add new syscalls, Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, or runtime behavior changes.
-- Added `syscall_boundary_conformance` as a contract-driven validator for the currently proven x86_64 heartbeat/debug syscall implementation.
-- Added focused negative coverage for assembly entry drift, dispatcher/register drift, Rust extern/request/return-validation drift, Odin dispatcher/branch/invalid-return/mutation drift, proof ownership drift, and diagnostic quality.
-- Documented syscall boundary conformance as a source proof against syscall boundary contract v0 only; it does not add new syscalls, Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, or runtime behavior changes.
+- Added `syscall_table_conformance` as a source-level validator for the live Odin dispatcher implementation.
+- Extended syscall table contract v0 with explicit `allowed_nonpayload_branches` so the existing `abi.K_SYSCALL_NOP` branch is allowed without broadening the payload syscall table.
+- Added focused negative coverage for dispatcher source drift, signature drift, hardcoded selectors, wrong branch bodies, uncontracted branches, payload layout drift, unknown/default behavior drift, and diagnostic quality.
+- Documented syscall table conformance as a source proof against syscall table contract v0 only; it does not add new syscalls, Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, or runtime behavior changes.
+
+## v0.0.20 - 2026-05-31
+
 - Added syscall table contract v0 for the currently proven heartbeat/debug dispatcher behavior.
 - Added a schema-backed syscall table loader and `syscall_table_contract` validator.
 - Added focused negative coverage for dispatcher metadata, ABI references, branch selector mapping, unknown/default syscall behavior, no-mutation guarantees, and diagnostic quality.
 - Documented syscall table contract v0 as a current heartbeat/debug dispatcher proof only; it does not add new syscalls, Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, or runtime behavior changes.
+
+## v0.0.19 - 2026-05-31
+
+- Added `syscall_boundary_conformance` as a contract-driven validator for the currently proven x86_64 heartbeat/debug syscall implementation.
+- Added focused negative coverage for assembly entry drift, dispatcher/register drift, Rust extern/request/return-validation drift, Odin dispatcher/branch/invalid-return/mutation drift, proof ownership drift, and diagnostic quality.
+- Documented syscall boundary conformance as a source proof against syscall boundary contract v0 only; it does not add new syscalls, Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, or runtime behavior changes.
+
+## v0.0.18 - 2026-05-31
+
+- Added syscall boundary contract v0 for the currently proven x86_64 heartbeat/debug syscall path.
+- Added a schema-backed syscall boundary loader and `syscall_boundary_contract` validator.
+- Added focused negative coverage for boundary contract failures, including register drift, missing ABI manifest references, sentinel mismatches, invalid payload retention, unknown mutable fields, and unknown proof validator references.
+- Documented syscall boundary contract v0 as a current heartbeat/debug proof artifact only; it does not add new syscalls, Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, or runtime behavior changes.
+
+## v0.0.17 - 2026-05-31
+
+- Added ABI manifest v0 as the machine-readable contract for currently proven syscall constants, status constants, heartbeat payload layout, generated binding paths, and heartbeat request/response sentinels.
+- Added an `abi_manifest` validator with schema-backed manifest loading and focused negative coverage for missing files, invalid JSON, schema violations, missing binding paths, constant drift, layout drift, and diagnostic quality.
+- Rewired `protocol_contract_alignment` and `layout_parity` to read proven ABI values from the manifest instead of duplicating local validator constants.
+- Documented ABI manifest v0 as a current proof artifact only; it does not declare a stable public ABI, Linux compatibility, additional syscalls, or runtime behavior changes.
+
+## v0.0.16 - 2026-05-31
+
+- Hardened `layout_parity` so it mechanically proves ABI data layout agreement across the canonical C header, generated Rust bindings, and generated Odin bindings.
+- Added explicit immutable layout contracts and parsed language layouts for heartbeat payload field order, widths, offsets, struct size, alignment, and single-definition expectations.
+- Added focused negative coverage for missing fields, manifest drift, wrong field order, width drift, offset drift, struct size drift, stale duplicate structs, and diagnostic quality.
+
+## v0.0.15 - 2026-05-31
+
+- Hardened `protocol_contract_alignment` so it proves canonical syscall protocol agreement across the ABI header, generated Rust bindings, generated Odin bindings, and live Rust/Odin heartbeat paths.
+- Added checks for ABI-manifest-backed syscall constants, generated binding agreement, live ABI-prefixed constant usage, and rejection of local hardcoded syscall IDs.
+- Added focused negative coverage for missing constants, mismatches, hardcoded IDs, stale/dead constants, and diagnostic quality.
+
+## v0.0.14 - 2026-05-31
+
+- Hardened verification artifact handling so generated verification state is refreshed without leaving transient kernel build artifacts or unsafe partial writes.
+- Cleaned `scripts/verify.sh` transient outputs and refreshed proof state after script hardening.
+- Preserved generated proof-state updates as separate verification commits from source changes.
+
+## v0.0.13 - 2026-05-31
+
+- Extended `validator_coverage` with marker-depth governance so each validator declares required negative coverage markers that must map to behavioral negative tests.
+- Added `KOZO_NEGATIVE_COVERAGE` metadata to focused validator tests.
+- Added regression coverage for missing metadata, missing required markers, unknown markers, missing mapped functions, and mapped tests without validator behavior.
+
+## v0.0.12 - 2026-05-31
+
+- Added `validator_coverage` governance so every registered validator must declare a focused test file with behavioral negative-path coverage.
+- Added AST-based coverage checks that reject placeholder negative tests unless they invoke the validator or approved harness/helper path, assert failure behavior, and tie the negative test body to the configured validator token.
+- Added focused negative tests for previously uncovered validators and regression coverage for missing files, missing mappings, missing validator invocation, missing failure assertions, and token-only false passes.
+
+## v0.0.11 - 2026-05-31
+
+- Hardened `execution_proof` as the high-level observable heartbeat execution proof by validating the live Odin `DEBUG_HEARTBEAT` branch and stable serial observation strings.
+- Added focused `execution_proof` tests for missing nil guards, missing heartbeat branch, dead mutation snippets, out-of-order mutations, missing `status_bits` mutation, and missing serial observations.
+- Regenerated proof state so `latest_verify.json` records the hardened execution proof details.
+
+## v0.0.10 - 2026-05-31
+
+- Hardened `runtime_trap_path` so the harness validates the live Rust `heartbeat_request` path and bridge helper instead of accepting unrelated extern bridge snippets.
+- Added focused `runtime_trap_path` tests for missing live anchors, wrong request sentinels, out-of-order request construction, dead extern calls, and missing heartbeat request diagnostics.
+- Regenerated proof state so `latest_verify.json` records the hardened runtime trap path details.
+
+## v0.0.9 - 2026-05-30
+
+- Hardened `bridge_alignment` so the harness validates the ordered live `syscall_entry` block instead of accepting bridge snippets that merely appear somewhere in `syscall.asm`.
+- Added named immutable bridge contracts for the assembly symbols, Odin dispatcher signature, ordered register moves, stack alignment, dispatcher handoff, restore path, and return instruction.
+- Added focused negative tests for dead snippets outside `syscall_entry`, out-of-order anchors, missing dispatcher handoff, missing Odin dispatcher signature, and missing entry block diagnostics.
+- Regenerated proof state so `latest_verify.json` records the hardened bridge alignment details.
 
 ## v0.0.8 - 2026-05-30
 
