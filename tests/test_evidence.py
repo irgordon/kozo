@@ -6,6 +6,12 @@ import unittest
 from harness.codes import EVIDENCE_FILE_MISSING
 from harness.validators_impl.evidence import EvidenceValidator
 
+KOZO_NEGATIVE_COVERAGE = {
+    "evidence": {
+        "missing_evidence_file": "test_fails_when_evidence_file_is_missing",
+    }
+}
+
 
 class EvidenceValidatorTests(unittest.TestCase):
     def test_fails_when_evidence_file_is_missing(self):

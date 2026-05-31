@@ -8,6 +8,12 @@ from harness.codes import EXECUTION_FOUNDATION_INVALID
 from harness.validators_impl import entrypoint_validator
 from harness.validators_impl.entrypoint_validator import ExecutionFoundationValidator
 
+KOZO_NEGATIVE_COVERAGE = {
+    "execution_foundation": {
+        "missing_boot_start_symbol": "test_fails_when_boot_start_symbol_is_missing",
+    }
+}
+
 
 class ExecutionFoundationValidatorTests(unittest.TestCase):
     def test_fails_when_boot_start_symbol_is_missing(self):

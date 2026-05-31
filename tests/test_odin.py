@@ -5,6 +5,12 @@ import unittest
 from harness.codes import ODIN_CHECK_FAILED
 from harness.validators_impl.odin import OdinValidator
 
+KOZO_NEGATIVE_COVERAGE = {
+    "odin": {
+        "missing_odin_check_evidence": "test_fails_when_odin_change_has_missing_check_evidence",
+    }
+}
+
 
 class OdinValidatorTests(unittest.TestCase):
     def test_fails_when_odin_change_has_missing_check_evidence(self):

@@ -5,6 +5,12 @@ import unittest
 from harness.codes import STEP_SCOPE_OUTSIDE_TASK_SCOPE
 from harness.validators_impl.step_scope import StepScopeValidator
 
+KOZO_NEGATIVE_COVERAGE = {
+    "step_scope": {
+        "outside_task_scope": "test_fails_when_changed_file_is_outside_task_scope",
+    }
+}
+
 
 class StepScopeValidatorTests(unittest.TestCase):
     def test_fails_when_changed_file_is_outside_task_scope(self):

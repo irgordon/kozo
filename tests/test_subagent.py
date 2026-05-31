@@ -5,6 +5,12 @@ import unittest
 from harness.codes import SUBAGENT_SCOPE_VIOLATION
 from harness.validators_impl.subagent import SubagentValidator
 
+KOZO_NEGATIVE_COVERAGE = {
+    "subagent": {
+        "subagent_scope_declared": "test_fails_when_subagent_scope_is_declared",
+    }
+}
+
 
 class SubagentValidatorTests(unittest.TestCase):
     def test_fails_when_subagent_scope_is_declared(self):

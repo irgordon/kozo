@@ -5,6 +5,12 @@ import unittest
 from harness.codes import SCHEMA_INVALID
 from harness.validators_impl.schema import SchemaValidator
 
+KOZO_NEGATIVE_COVERAGE = {
+    "schema": {
+        "missing_required_schema_fields": "test_fails_when_required_schema_fields_are_missing",
+    }
+}
+
 
 class SchemaValidatorTests(unittest.TestCase):
     def test_fails_when_required_schema_fields_are_missing(self):

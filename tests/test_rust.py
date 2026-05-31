@@ -5,6 +5,12 @@ import unittest
 from harness.codes import RUST_TEST_FAILED
 from harness.validators_impl.rust import RustValidator
 
+KOZO_NEGATIVE_COVERAGE = {
+    "rust": {
+        "missing_cargo_evidence": "test_fails_when_rust_change_has_missing_cargo_evidence",
+    }
+}
+
 
 class RustValidatorTests(unittest.TestCase):
     def test_fails_when_rust_change_has_missing_cargo_evidence(self):

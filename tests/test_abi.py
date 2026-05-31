@@ -6,6 +6,12 @@ from harness.codes import ABI_LAYOUT_MISMATCH
 from harness.validators_impl import abi_sync_validator
 from harness.validators_impl.abi import AbiValidator
 
+KOZO_NEGATIVE_COVERAGE = {
+    "abi": {
+        "missing_generated_binding": "test_fails_when_generated_binding_is_missing",
+    }
+}
+
 
 class AbiValidatorTests(unittest.TestCase):
     def test_fails_when_generated_binding_is_missing(self):

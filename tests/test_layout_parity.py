@@ -6,6 +6,12 @@ from harness.codes import LAYOUT_PARITY_MISMATCH
 from harness.validators_impl import layout_parity
 from harness.validators_impl.layout_parity import LayoutParityValidator
 
+KOZO_NEGATIVE_COVERAGE = {
+    "layout_parity": {
+        "wrong_normative_layout": "test_fails_when_normative_layout_is_wrong",
+    }
+}
+
 
 class LayoutParityValidatorTests(unittest.TestCase):
     def test_fails_when_normative_layout_is_wrong(self):

@@ -8,6 +8,12 @@ from harness.codes import PROTOCOL_MISMATCH
 from harness.validators_impl import protocol_validator
 from harness.validators_impl.protocol_validator import ProtocolContractValidator
 
+KOZO_NEGATIVE_COVERAGE = {
+    "protocol_contract_alignment": {
+        "missing_rust_heartbeat_syscall_reference": "test_fails_when_rust_heartbeat_syscall_reference_is_missing",
+    }
+}
+
 
 class ProtocolContractValidatorTests(unittest.TestCase):
     def test_fails_when_rust_heartbeat_syscall_reference_is_missing(self):

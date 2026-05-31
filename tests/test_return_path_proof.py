@@ -8,6 +8,15 @@ from harness.codes import OK, RETURN_PATH_PROOF_INVALID
 from harness.validators_impl import return_path_proof
 from harness.validators_impl.return_path_proof import ReturnPathProofValidator
 
+KOZO_NEGATIVE_COVERAGE = {
+    "return_path_proof": {
+        "missing_rust_status_bits_check": "test_fails_when_rust_status_bits_check_is_missing",
+        "missing_odin_status_bits_write": "test_fails_when_odin_status_bits_write_is_missing",
+        "status_bits_diagnostic": "test_status_bits_failure_diagnostic_names_missing_anchor",
+        "unrelated_status_bits_text": "test_unrelated_status_bits_text_does_not_satisfy_rust_check",
+    }
+}
+
 
 class ReturnPathProofValidatorTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -71,6 +80,7 @@ class ReturnPathProofValidatorTests(unittest.TestCase):
 
         result = self.validate_sources(self.rust_source, kernel_source)
 
+        self.assertEqual(result.status, "fail")
         self.assertIn("odin_returned_status_bits_write", result.detail)
         self.assertIn("status_bits", result.detail)
 

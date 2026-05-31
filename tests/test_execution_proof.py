@@ -8,6 +8,18 @@ from harness.codes import EXECUTION_PROOF_INVALID, OK
 from harness.validators_impl import execution_proof
 from harness.validators_impl.execution_proof import ExecutionProofValidator
 
+KOZO_NEGATIVE_COVERAGE = {
+    "execution_proof": {
+        "missing_nil_guard": "test_fails_when_nil_payload_guard_is_missing",
+        "missing_heartbeat_branch": "test_fails_when_heartbeat_branch_is_missing",
+        "dead_mutations_outside_branch": "test_fails_when_mutations_exist_only_outside_live_heartbeat_branch",
+        "out_of_order_mutations": "test_fails_when_payload_mutations_are_out_of_order",
+        "missing_status_bits_mutation": "test_fails_when_returned_status_bits_mutation_is_missing",
+        "missing_serial_observation": "test_fails_when_serial_observation_string_is_missing",
+        "status_bits_diagnostic": "test_failure_detail_names_missing_execution_contract_field",
+    }
+}
+
 
 class ExecutionProofValidatorTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -129,6 +141,7 @@ class ExecutionProofValidatorTests(unittest.TestCase):
 
         result = self.validate_sources(kernel_source, self.serial_source)
 
+        self.assertEqual(result.status, "fail")
         self.assertIn("returned_status_bits_write", result.detail)
         self.assertIn("missing_mutation", result.detail)
 

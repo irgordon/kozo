@@ -8,6 +8,18 @@ from harness.codes import OK, RUNTIME_TRAP_PATH_INVALID
 from harness.validators_impl import runtime_trap_path
 from harness.validators_impl.runtime_trap_path import RuntimeTrapPathValidator
 
+KOZO_NEGATIVE_COVERAGE = {
+    "runtime_trap_path": {
+        "dead_extern_call_outside_helper": "test_fails_when_extern_call_exists_only_outside_live_bridge_helper",
+        "missing_payload_construction": "test_fails_when_payload_construction_is_missing_from_live_path",
+        "wrong_sequence_sentinel": "test_fails_when_request_sequence_sentinel_is_wrong",
+        "wrong_timestamp_sentinel": "test_fails_when_request_timestamp_sentinel_is_wrong",
+        "wrong_status_bits_initialization": "test_fails_when_request_status_bits_initialization_is_wrong",
+        "out_of_order_live_path": "test_fails_when_live_path_operations_are_out_of_order",
+        "missing_heartbeat_block": "test_missing_live_heartbeat_block_diagnostic_names_contract",
+    }
+}
+
 
 class RuntimeTrapPathValidatorTests(unittest.TestCase):
     def setUp(self) -> None:

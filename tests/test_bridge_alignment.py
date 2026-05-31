@@ -8,6 +8,16 @@ from harness.codes import BRIDGE_ALIGNMENT_INVALID, OK
 from harness.validators_impl import bridge_validator
 from harness.validators_impl.bridge_validator import BridgeAlignmentValidator
 
+KOZO_NEGATIVE_COVERAGE = {
+    "bridge_alignment": {
+        "dead_snippets_outside_entry": "test_fails_when_anchors_exist_only_outside_syscall_entry",
+        "out_of_order_anchors": "test_fails_when_required_anchors_are_out_of_order",
+        "missing_dispatcher_handoff": "test_fails_when_dispatcher_handoff_is_missing_from_live_block",
+        "missing_odin_dispatcher_signature": "test_fails_when_odin_dispatcher_signature_is_missing",
+        "missing_entry_block": "test_missing_entry_block_diagnostic_names_entry_contract",
+    }
+}
+
 
 class BridgeAlignmentValidatorTests(unittest.TestCase):
     def setUp(self) -> None:

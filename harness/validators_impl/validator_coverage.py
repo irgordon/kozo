@@ -28,6 +28,7 @@ class ValidatorTestContract:
     validator_name: str
     test_path: Path
     coverage_token: str
+    required_negative_markers: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -35,6 +36,7 @@ class CoverageIssue:
     reason: str
     validator_name: str
     detail: str
+    marker_name: str = ""
 
 
 @dataclass(frozen=True)
@@ -43,36 +45,107 @@ class TestFileAnalysis:
     tree: ast.Module | None
     test_functions: tuple[ast.FunctionDef, ...]
     helper_functions: tuple[ast.FunctionDef, ...]
+    negative_coverage: dict[str, dict[str, str]]
 
 
 _VALIDATOR_TEST_CONTRACTS = {
-    "schema": ValidatorTestContract("schema", _TESTS_DIR / "test_schema.py", "SchemaValidator"),
-    "plan_lifecycle": ValidatorTestContract("plan_lifecycle", _TESTS_DIR / "test_plan_lifecycle.py", "PlanLifecycleValidator"),
-    "step_scope": ValidatorTestContract("step_scope", _TESTS_DIR / "test_step_scope.py", "StepScopeValidator"),
-    "verification_refs": ValidatorTestContract("verification_refs", _TESTS_DIR / "test_verification_refs.py", "VerificationRefsValidator"),
-    "explanation": ValidatorTestContract("explanation", _TESTS_DIR / "test_explanation.py", "ExplanationValidator"),
-    "preconditions": ValidatorTestContract("preconditions", _TESTS_DIR / "test_preconditions.py", "PreconditionsValidator"),
-    "subagent": ValidatorTestContract("subagent", _TESTS_DIR / "test_subagent.py", "SubagentValidator"),
-    "rust": ValidatorTestContract("rust", _TESTS_DIR / "test_rust.py", "RustValidator"),
-    "odin": ValidatorTestContract("odin", _TESTS_DIR / "test_odin.py", "OdinValidator"),
-    "abi": ValidatorTestContract("abi", _TESTS_DIR / "test_abi.py", "AbiValidator"),
+    "schema": ValidatorTestContract("schema", _TESTS_DIR / "test_schema.py", "SchemaValidator", ("missing_required_schema_fields",)),
+    "plan_lifecycle": ValidatorTestContract("plan_lifecycle", _TESTS_DIR / "test_plan_lifecycle.py", "PlanLifecycleValidator", ("out_of_order_step_ids",)),
+    "step_scope": ValidatorTestContract("step_scope", _TESTS_DIR / "test_step_scope.py", "StepScopeValidator", ("outside_task_scope",)),
+    "verification_refs": ValidatorTestContract("verification_refs", _TESTS_DIR / "test_verification_refs.py", "VerificationRefsValidator", ("invalid_verification_ref",)),
+    "explanation": ValidatorTestContract("explanation", _TESTS_DIR / "test_explanation.py", "ExplanationValidator", ("missing_explanation_summary",)),
+    "preconditions": ValidatorTestContract("preconditions", _TESTS_DIR / "test_preconditions.py", "PreconditionsValidator", ("missing_verification_signal",)),
+    "subagent": ValidatorTestContract("subagent", _TESTS_DIR / "test_subagent.py", "SubagentValidator", ("subagent_scope_declared",)),
+    "rust": ValidatorTestContract("rust", _TESTS_DIR / "test_rust.py", "RustValidator", ("missing_cargo_evidence",)),
+    "odin": ValidatorTestContract("odin", _TESTS_DIR / "test_odin.py", "OdinValidator", ("missing_odin_check_evidence",)),
+    "abi": ValidatorTestContract("abi", _TESTS_DIR / "test_abi.py", "AbiValidator", ("missing_generated_binding",)),
     "protocol_contract_alignment": ValidatorTestContract(
         "protocol_contract_alignment",
         _TESTS_DIR / "test_protocol_contract_alignment.py",
         "ProtocolContractValidator",
+        ("missing_rust_heartbeat_syscall_reference",),
     ),
-    "layout_parity": ValidatorTestContract("layout_parity", _TESTS_DIR / "test_layout_parity.py", "LayoutParityValidator"),
+    "layout_parity": ValidatorTestContract("layout_parity", _TESTS_DIR / "test_layout_parity.py", "LayoutParityValidator", ("wrong_normative_layout",)),
     "execution_foundation": ValidatorTestContract(
         "execution_foundation",
         _TESTS_DIR / "test_execution_foundation.py",
         "ExecutionFoundationValidator",
+        ("missing_boot_start_symbol",),
     ),
-    "bridge_alignment": ValidatorTestContract("bridge_alignment", _TESTS_DIR / "test_bridge_alignment.py", "BridgeAlignmentValidator"),
-    "runtime_trap_path": ValidatorTestContract("runtime_trap_path", _TESTS_DIR / "test_runtime_trap_path.py", "RuntimeTrapPathValidator"),
-    "return_path_proof": ValidatorTestContract("return_path_proof", _TESTS_DIR / "test_return_path_proof.py", "ReturnPathProofValidator"),
-    "execution_proof": ValidatorTestContract("execution_proof", _TESTS_DIR / "test_execution_proof.py", "ExecutionProofValidator"),
-    "validator_coverage": ValidatorTestContract("validator_coverage", _TESTS_DIR / "test_validator_coverage.py", "ValidatorCoverageValidator"),
-    "evidence": ValidatorTestContract("evidence", _TESTS_DIR / "test_evidence.py", "EvidenceValidator"),
+    "bridge_alignment": ValidatorTestContract(
+        "bridge_alignment",
+        _TESTS_DIR / "test_bridge_alignment.py",
+        "BridgeAlignmentValidator",
+        (
+            "dead_snippets_outside_entry",
+            "out_of_order_anchors",
+            "missing_dispatcher_handoff",
+            "missing_odin_dispatcher_signature",
+            "missing_entry_block",
+        ),
+    ),
+    "runtime_trap_path": ValidatorTestContract(
+        "runtime_trap_path",
+        _TESTS_DIR / "test_runtime_trap_path.py",
+        "RuntimeTrapPathValidator",
+        (
+            "dead_extern_call_outside_helper",
+            "missing_payload_construction",
+            "wrong_sequence_sentinel",
+            "wrong_timestamp_sentinel",
+            "wrong_status_bits_initialization",
+            "out_of_order_live_path",
+            "missing_heartbeat_block",
+        ),
+    ),
+    "return_path_proof": ValidatorTestContract(
+        "return_path_proof",
+        _TESTS_DIR / "test_return_path_proof.py",
+        "ReturnPathProofValidator",
+        (
+            "missing_rust_status_bits_check",
+            "missing_odin_status_bits_write",
+            "status_bits_diagnostic",
+            "unrelated_status_bits_text",
+        ),
+    ),
+    "execution_proof": ValidatorTestContract(
+        "execution_proof",
+        _TESTS_DIR / "test_execution_proof.py",
+        "ExecutionProofValidator",
+        (
+            "missing_nil_guard",
+            "missing_heartbeat_branch",
+            "dead_mutations_outside_branch",
+            "out_of_order_mutations",
+            "missing_status_bits_mutation",
+            "missing_serial_observation",
+            "status_bits_diagnostic",
+        ),
+    ),
+    "validator_coverage": ValidatorTestContract(
+        "validator_coverage",
+        _TESTS_DIR / "test_validator_coverage.py",
+        "ValidatorCoverageValidator",
+        (
+            "missing_test_file",
+            "missing_coverage_mapping",
+            "missing_negative_test",
+            "placeholder_negative_rejected",
+            "missing_failure_assertion",
+            "missing_validator_invocation",
+            "token_outside_negative_test",
+            "missing_coverage_metadata",
+            "missing_required_marker",
+            "unknown_marker",
+            "mapped_test_missing",
+            "mapped_test_placeholder",
+            "mapped_test_missing_failure_assertion",
+            "mapped_test_missing_validator_invocation",
+            "diagnostic_names_requirement",
+        ),
+    ),
+    "evidence": ValidatorTestContract("evidence", _TESTS_DIR / "test_evidence.py", "EvidenceValidator", ("missing_evidence_file",)),
 }
 
 
@@ -112,7 +185,11 @@ def build_coverage_diagnostics(issue: CoverageIssue) -> ValidationResult:
         code=VALIDATOR_COVERAGE_INVALID,
         detail=f"Validator coverage invalid: {issue.reason}: {issue.validator_name}: {issue.detail}",
         action="Add focused tests with at least one named negative-path test for every registered validator",
-        meta={"reason": issue.reason, "validator_name": issue.validator_name},
+        meta={
+            "reason": issue.reason,
+            "validator_name": issue.validator_name,
+            "marker_name": issue.marker_name,
+        },
     )
 
 
@@ -190,7 +267,7 @@ def _test_contract_issue(contract: ValidatorTestContract) -> CoverageIssue | Non
     analysis = _analyze_test_file(contract.test_path)
     if contract.coverage_token not in analysis.source:
         return CoverageIssue("missing_validator_invocation", contract.validator_name, contract.coverage_token)
-    return _negative_coverage_issue(contract, analysis)
+    return _negative_coverage_issue(contract, analysis) or _marker_coverage_issue(contract, analysis)
 
 
 def _negative_coverage_issue(
@@ -223,6 +300,49 @@ def _negative_candidate_issue(
     return None
 
 
+def _marker_coverage_issue(
+    contract: ValidatorTestContract,
+    analysis: TestFileAnalysis,
+) -> CoverageIssue | None:
+    metadata = analysis.negative_coverage.get(contract.validator_name)
+    if metadata is None:
+        return CoverageIssue("missing_coverage_metadata", contract.validator_name, "KOZO_NEGATIVE_COVERAGE")
+    required_markers = set(contract.required_negative_markers)
+    declared_markers = set(metadata)
+    missing_markers = sorted(required_markers - declared_markers)
+    if missing_markers:
+        return _marker_issue("missing_required_marker", contract, missing_markers[0])
+    unknown_markers = sorted(declared_markers - required_markers)
+    if unknown_markers:
+        return _marker_issue("unknown_marker", contract, unknown_markers[0])
+    return _mapped_negative_test_issue(contract, analysis, metadata)
+
+
+def _mapped_negative_test_issue(
+    contract: ValidatorTestContract,
+    analysis: TestFileAnalysis,
+    metadata: dict[str, str],
+) -> CoverageIssue | None:
+    functions = {function.name: function for function in analysis.test_functions}
+    for marker in contract.required_negative_markers:
+        test_name = metadata[marker]
+        function = functions.get(test_name)
+        if function is None:
+            return _marker_issue("mapped_test_function_missing", contract, marker)
+        if not _is_negative_test(function, analysis, contract.coverage_token):
+            return _marker_issue("mapped_test_not_behavioral_negative", contract, marker)
+    return None
+
+
+def _marker_issue(reason: str, contract: ValidatorTestContract, marker: str) -> CoverageIssue:
+    return CoverageIssue(
+        reason,
+        contract.validator_name,
+        f"{marker} in {_relative_test_path(contract)}",
+        marker,
+    )
+
+
 def _relative_test_path(contract: ValidatorTestContract) -> str:
     try:
         return str(contract.test_path.relative_to(_ROOT))
@@ -235,12 +355,13 @@ def _analyze_test_file(path: Path) -> TestFileAnalysis:
     try:
         tree = ast.parse(source, filename=str(path))
     except SyntaxError:
-        return TestFileAnalysis(source, None, (), ())
+        return TestFileAnalysis(source, None, (), (), {})
     return TestFileAnalysis(
         source,
         tree,
         _test_functions(tree),
         _validator_helper_functions(tree),
+        _negative_coverage_metadata(tree),
     )
 
 
@@ -250,6 +371,39 @@ def _test_functions(tree: ast.Module) -> tuple[ast.FunctionDef, ...]:
         for node in ast.walk(tree)
         if isinstance(node, ast.FunctionDef) and node.name.startswith("test_")
     )
+
+
+def _negative_coverage_metadata(tree: ast.Module) -> dict[str, dict[str, str]]:
+    for statement in tree.body:
+        if not isinstance(statement, ast.Assign):
+            continue
+        if not any(_assignment_target_name(target) == "KOZO_NEGATIVE_COVERAGE" for target in statement.targets):
+            continue
+        try:
+            value = ast.literal_eval(statement.value)
+        except (ValueError, SyntaxError):
+            return {}
+        return _normalize_negative_coverage_metadata(value)
+    return {}
+
+
+def _assignment_target_name(target: ast.AST) -> str:
+    return target.id if isinstance(target, ast.Name) else ""
+
+
+def _normalize_negative_coverage_metadata(value: object) -> dict[str, dict[str, str]]:
+    if not isinstance(value, dict):
+        return {}
+    normalized: dict[str, dict[str, str]] = {}
+    for validator_name, marker_map in value.items():
+        if not isinstance(validator_name, str) or not isinstance(marker_map, dict):
+            continue
+        normalized[validator_name] = {
+            marker: test_name
+            for marker, test_name in marker_map.items()
+            if isinstance(marker, str) and isinstance(test_name, str)
+        }
+    return normalized
 
 
 def _is_negative_test_name(name: str) -> bool:

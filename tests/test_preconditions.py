@@ -5,6 +5,12 @@ import unittest
 from harness.codes import PRECONDITION_UNCHECKED
 from harness.validators_impl.preconditions import PreconditionsValidator
 
+KOZO_NEGATIVE_COVERAGE = {
+    "preconditions": {
+        "missing_verification_signal": "test_fails_when_preconditions_have_missing_verification_signal",
+    }
+}
+
 
 class PreconditionsValidatorTests(unittest.TestCase):
     def test_fails_when_preconditions_have_missing_verification_signal(self):
