@@ -73,7 +73,22 @@ _VALIDATOR_TEST_CONTRACTS = {
             "diagnostic_names_protocol_field",
         ),
     ),
-    "layout_parity": ValidatorTestContract("layout_parity", _TESTS_DIR / "test_layout_parity.py", "LayoutParityValidator", ("wrong_normative_layout",)),
+    "layout_parity": ValidatorTestContract(
+        "layout_parity",
+        _TESTS_DIR / "test_layout_parity.py",
+        "LayoutParityValidator",
+        (
+            "missing_field",
+            "wrong_field_order",
+            "wrong_rust_field_width",
+            "wrong_odin_field_width",
+            "wrong_rust_offset",
+            "wrong_odin_offset",
+            "wrong_struct_size",
+            "dead_or_stale_struct",
+            "diagnostic_names_layout_field",
+        ),
+    ),
     "execution_foundation": ValidatorTestContract(
         "execution_foundation",
         _TESTS_DIR / "test_execution_foundation.py",
