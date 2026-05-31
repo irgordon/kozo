@@ -15,6 +15,10 @@
 - Added focused negative tests for previously uncovered validators and regression coverage for missing files, missing mappings, missing validator invocation, missing failure assertions, and token-only false passes.
 - Extended `validator_coverage` with marker-depth governance so each validator declares required negative coverage markers that must map to behavioral negative tests.
 - Added `KOZO_NEGATIVE_COVERAGE` metadata to focused validator tests and regression coverage for missing metadata, missing required markers, unknown markers, missing mapped functions, and mapped tests without behavior.
+- Added ABI manifest v0 as the machine-readable contract for currently proven syscall constants, status constants, heartbeat payload layout, generated binding paths, and heartbeat request/response sentinels.
+- Added an `abi_manifest` validator with schema-backed manifest loading and focused negative coverage for missing files, invalid JSON, schema violations, missing binding paths, constant drift, layout drift, and diagnostic quality.
+- Rewired `protocol_contract_alignment` and `layout_parity` to read proven ABI values from the manifest instead of duplicating local validator constants.
+- Documented ABI manifest v0 as a current proof artifact only; it does not declare a stable public ABI, Linux compatibility, additional syscalls, or runtime behavior changes.
 
 ## v0.0.8 - 2026-05-30
 

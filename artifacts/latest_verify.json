@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260531T190233Z",
+  "run_id": "verify-20260531T203415Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 19,
+    "total_checks": 20,
     "failed_check_count": 0
   },
   "checks": [
@@ -78,6 +78,13 @@
       "status": "pass",
       "code": "OK",
       "detail": "Checked-in ABI bindings match the normative header"
+    },
+    {
+      "name": "abi_manifest",
+      "subsystem": "abi_manifest",
+      "status": "pass",
+      "code": "OK",
+      "detail": "ABI manifest exists, is schema-valid, and matches the canonical header paths, constants, and heartbeat layout"
     },
     {
       "name": "protocol_contract_alignment",
@@ -163,5 +170,5 @@
     "artifacts/logs/cargo-check.log",
     "artifacts/logs/nm-kernel.log"
   ],
-  "generated_at": "2026-05-31T19:02:33Z"
+  "generated_at": "2026-05-31T20:34:15Z"
 }
