@@ -21,6 +21,7 @@ from harness.validators_impl.bridge_validator import BridgeAlignmentValidator
 from harness.validators_impl.runtime_trap_path import RuntimeTrapPathValidator
 from harness.validators_impl.return_path_proof import ReturnPathProofValidator
 from harness.validators_impl.execution_proof import ExecutionProofValidator
+from harness.validators_impl.validator_coverage import ValidatorCoverageValidator
 from harness.validators_impl.evidence import EvidenceValidator
 
 _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
@@ -41,6 +42,7 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "runtime_trap_path": RuntimeTrapPathValidator,
     "return_path_proof": ReturnPathProofValidator,
     "execution_proof": ExecutionProofValidator,
+    "validator_coverage": ValidatorCoverageValidator,
     "evidence": EvidenceValidator,
 }
 

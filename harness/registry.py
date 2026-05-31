@@ -40,6 +40,7 @@ SUBSYSTEMS = MappingProxyType(
         "runtime_trap_path": (),
         "return_path_proof": (),
         "execution_proof": (),
+        "validator_coverage": (),
         "evidence": (),
     }
 )
@@ -70,6 +71,7 @@ CHECKS = MappingProxyType(
         "runtime_trap_path": "runtime_trap_path",
         "return_path_proof": "return_path_proof",
         "execution_proof": "execution_proof",
+        "validator_coverage": "validator_coverage",
         "evidence": "evidence",
     }
 )

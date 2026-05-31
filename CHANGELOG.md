@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.0.9 - 2026-05-31
+
+- Hardened `bridge_alignment` so the harness validates the ordered live `syscall_entry` block instead of accepting bridge snippets that merely appear somewhere in `syscall.asm`.
+- Added named immutable bridge contracts for the assembly symbols, Odin dispatcher signature, ordered register moves, stack alignment, dispatcher handoff, restore path, and return instruction.
+- Added focused negative tests for dead snippets outside `syscall_entry`, out-of-order anchors, missing dispatcher handoff, missing Odin dispatcher signature, and missing entry block diagnostics.
+- Hardened `runtime_trap_path` so the harness validates the live Rust `heartbeat_request` path and bridge helper instead of accepting unrelated extern bridge snippets.
+- Added focused `runtime_trap_path` tests for missing live anchors, wrong request sentinels, out-of-order request construction, dead extern calls, and missing heartbeat request diagnostics.
+- Hardened `execution_proof` as the high-level observable heartbeat execution proof by validating the live Odin `DEBUG_HEARTBEAT` branch and stable serial observation strings.
+- Added focused `execution_proof` tests for missing nil guards, missing heartbeat branch, dead mutation snippets, out-of-order mutations, missing `status_bits` mutation, and missing serial observations.
+- Regenerated the verification artifact so `latest_verify.json` records `bridge_alignment`, `runtime_trap_path`, `return_path_proof`, and `execution_proof` passing with the hardened proof details.
+- Added `validator_coverage` governance so every registered validator must declare a focused test file with behavioral negative-path coverage.
+- Added AST-based coverage checks that reject placeholder negative tests unless they invoke the validator or approved harness/helper path, assert failure behavior, and tie the negative test body to the configured validator token.
+- Added focused negative tests for previously uncovered validators and regression coverage for missing files, missing mappings, missing validator invocation, missing failure assertions, and token-only false passes.
+- Extended `validator_coverage` with marker-depth governance so each validator declares required negative coverage markers that must map to behavioral negative tests.
+- Added `KOZO_NEGATIVE_COVERAGE` metadata to focused validator tests and regression coverage for missing metadata, missing required markers, unknown markers, missing mapped functions, and mapped tests without behavior.
+
 ## v0.0.8 - 2026-05-30
 
 - Replaced Rust-side debug assertions with explicit post-call return-path validation so the caller checks `abi::K_OK`, `payload.sequence == 0xCAFEFEEE`, `payload.timestamp == 0xDEADBEEF`, and `payload.status_bits == abi::K_OK` after `syscall_entry` returns.

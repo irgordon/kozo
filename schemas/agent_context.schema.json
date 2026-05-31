@@ -123,6 +123,7 @@
               "runtime_trap_path",
               "return_path_proof",
               "execution_proof",
+              "validator_coverage",
               "evidence"
             ]
           },
@@ -145,6 +146,7 @@
               "runtime_trap_path",
               "return_path_proof",
               "execution_proof",
+              "validator_coverage",
               "evidence"
             ]
           },

@@ -1,9 +1,9 @@
 {
   "artifact_version": "1",
-  "task_id": "kozo-return-path-proof-v1",
-  "task_title": "KOZO Return Path Proof V1",
+  "task_id": "kozo-bridge-alignment-proof-v1",
+  "task_title": "KOZO Bridge Alignment Proof V1",
   "plan_status": "complete",
-  "current_step_id": 7,
+  "current_step_id": 8,
   "replan_required": false,
   "halted": false,
   "failure_state": {
@@ -13,7 +13,7 @@
   "execution": {
     "step_attempt": 1,
     "last_step_started_at": "2026-03-15T09:00:00Z",
-    "last_step_completed_at": "2026-03-19T20:50:00Z"
+    "last_step_completed_at": "2026-05-30T23:30:00Z"
   },
-  "updated_at": "2026-03-19T20:50:00Z"
+  "updated_at": "2026-05-30T23:30:00Z"
 }
