@@ -16,6 +16,7 @@ from harness.validators_impl.odin import OdinValidator
 from harness.validators_impl.abi import AbiValidator
 from harness.validators_impl.abi_manifest import AbiManifestValidator
 from harness.validators_impl.syscall_boundary_contract import SyscallBoundaryContractValidator
+from harness.validators_impl.syscall_boundary_conformance import SyscallBoundaryConformanceValidator
 from harness.validators_impl.protocol_validator import ProtocolContractValidator
 from harness.validators_impl.layout_parity import LayoutParityValidator
 from harness.validators_impl.entrypoint_validator import ExecutionFoundationValidator
@@ -39,6 +40,7 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "abi": AbiValidator,
     "abi_manifest": AbiManifestValidator,
     "syscall_boundary_contract": SyscallBoundaryContractValidator,
+    "syscall_boundary_conformance": SyscallBoundaryConformanceValidator,
     "protocol_contract_alignment": ProtocolContractValidator,
     "layout_parity": LayoutParityValidator,
     "execution_foundation": ExecutionFoundationValidator,

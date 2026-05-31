@@ -391,6 +391,29 @@
         "verification.tests_run[10]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 15,
+      "title": "Validate live source conformance to syscall boundary contract v0",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "tasks/todo.json",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/syscall_boundary_conformance.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/agent_context.schema.json",
+        "schemas/latest_verify.schema.json",
+        "tests/test_syscall_boundary_conformance.py"
+      ],
+      "verification_refs": [
+        "verification.tests_run[5]",
+        "verification.tests_run[9]",
+        "verification.tests_run[10]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -409,7 +432,8 @@
     "validator_coverage prevents registered validators from entering the harness without focused behavioral negative-path tests",
     "validator_coverage requires declared failure-mode markers to map to behavioral negative tests",
     "ABI manifest v0 provides the Python-side source of truth for proven syscall constants, status constants, heartbeat payload layout, and heartbeat sentinels",
-    "Syscall boundary contract v0 describes and validates only the currently proven x86_64 heartbeat trap boundary"
+    "Syscall boundary contract v0 describes and validates only the currently proven x86_64 heartbeat trap boundary",
+    "syscall_boundary_conformance proves live assembly, Rust, and Odin sources conform to syscall boundary contract v0"
   ],
   "verification": {
     "tests_run": [
