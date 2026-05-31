@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260531T225448Z",
+  "run_id": "verify-20260531T232839Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 22,
+    "total_checks": 23,
     "failed_check_count": 0
   },
   "checks": [
@@ -101,6 +101,13 @@
       "detail": "Live sources conform to syscall boundary contract v0 for the heartbeat trap path"
     },
     {
+      "name": "syscall_table_contract",
+      "subsystem": "syscall_table_contract",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Syscall table contract v0 matches the live heartbeat dispatcher model"
+    },
+    {
       "name": "protocol_contract_alignment",
       "subsystem": "protocol_contract_alignment",
       "status": "pass",
@@ -184,5 +191,5 @@
     "artifacts/logs/cargo-check.log",
     "artifacts/logs/nm-kernel.log"
   ],
-  "generated_at": "2026-05-31T22:54:48Z"
+  "generated_at": "2026-05-31T23:28:39Z"
 }

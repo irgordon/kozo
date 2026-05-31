@@ -26,6 +26,10 @@
 - Added `syscall_boundary_conformance` as a contract-driven validator for the currently proven x86_64 heartbeat/debug syscall implementation.
 - Added focused negative coverage for assembly entry drift, dispatcher/register drift, Rust extern/request/return-validation drift, Odin dispatcher/branch/invalid-return/mutation drift, proof ownership drift, and diagnostic quality.
 - Documented syscall boundary conformance as a source proof against syscall boundary contract v0 only; it does not add new syscalls, Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, or runtime behavior changes.
+- Added syscall table contract v0 for the currently proven heartbeat/debug dispatcher behavior.
+- Added a schema-backed syscall table loader and `syscall_table_contract` validator.
+- Added focused negative coverage for dispatcher metadata, ABI references, branch selector mapping, unknown/default syscall behavior, no-mutation guarantees, and diagnostic quality.
+- Documented syscall table contract v0 as a current heartbeat/debug dispatcher proof only; it does not add new syscalls, Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, or runtime behavior changes.
 
 ## v0.0.8 - 2026-05-30
 
