@@ -1,0 +1,108 @@
+# .github/workflows/ci.yml
+name: ci
+
+on:
+  pull_request:
+    branches:
+      - main
+      - godan
+  push:
+    branches:
+      - main
+      - godan
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: full verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install system tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            binutils \
+            build-essential \
+            python3 \
+            python3-pip
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-none
+
+      - name: Install Odin
+        uses: laytan/setup-odin@v2
+
+      - name: Show tool versions
+        run: |
+          python3 --version
+          git --version
+          cargo --version
+          rustc --version
+          nm --version | head -n 1
+          odin version
+
+      - name: Validate shell syntax
+        run: |
+          bash -n scripts/verify.sh
+
+      - name: Validate JSON documents
+        run: |
+          python3 -m json.tool tasks/todo.json >/dev/null
+          python3 -m json.tool tasks/runtime.json >/dev/null
+          python3 -m json.tool tasks/lessons.json >/dev/null
+          python3 -m json.tool schemas/latest_verify.schema.json >/dev/null
+          python3 -m json.tool schemas/agent_context.schema.json >/dev/null
+
+      - name: Run Python unit tests
+        run: |
+          python3 -m unittest discover -s tests
+
+      - name: Check Odin kernel
+        run: |
+          odin check kernel
+
+      - name: Check Rust userspace core service
+        run: |
+          cargo check \
+            --manifest-path userspace/core_service/Cargo.toml \
+            --target x86_64-unknown-none
+
+      - name: Run KOZO verification harness
+        run: |
+          scripts/verify.sh
+
+      - name: Validate generated verification artifact
+        run: |
+          python3 -m json.tool artifacts/latest_verify.json >/dev/null
+
+      - name: Assert transient verify output was cleaned
+        run: |
+          test ! -e artifacts/kernel-build-check
+
+      - name: Check for whitespace errors
+        run: |
+          git diff --check
+
+      - name: Upload verification logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kozo-verification-logs
+          path: |
+            artifacts/latest_verify.json
+            artifacts/logs/*.log
+          if-no-files-found: warn
