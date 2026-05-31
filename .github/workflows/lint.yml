@@ -1,0 +1,74 @@
+# .github/workflows/lint.yml
+name: lint
+
+on:
+  pull_request:
+    branches:
+      - main
+      - godan
+  push:
+    branches:
+      - main
+      - godan
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lint-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-checks:
+    name: static checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install system tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            binutils \
+            build-essential \
+            python3 \
+            python3-pip
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-none
+
+      - name: Install Odin
+        uses: laytan/setup-odin@v2
+
+      - name: Shell syntax
+        run: |
+          bash -n scripts/verify.sh
+
+      - name: JSON syntax
+        run: |
+          find tasks schemas artifacts -name '*.json' -print0 \
+            | xargs -0 -n 1 python3 -m json.tool >/dev/null
+
+      - name: Python tests
+        run: |
+          python3 -m unittest discover -s tests
+
+      - name: Rust cargo check
+        run: |
+          cargo check \
+            --manifest-path userspace/core_service/Cargo.toml \
+            --target x86_64-unknown-none
+
+      - name: Odin check
+        run: |
+          odin check kernel
+
+      - name: Whitespace check
+        run: |
+          git diff --check
