@@ -1,74 +1,97 @@
-# .github/workflows/lint.yml
 name: lint
 
 on:
-  pull_request:
-    branches:
-      - main
-      - godan
-  push:
-    branches:
-      - main
-      - godan
-  workflow_dispatch:
+pull_request:
+branches:
+- main
+- godan
+push:
+branches:
+- main
+- godan
+workflow_dispatch:
 
 permissions:
-  contents: read
+contents: read
 
 concurrency:
-  group: lint-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+group: lint-${{ github.workflow }}-${{ github.ref }}
+cancel-in-progress: true
 
 jobs:
-  static-checks:
-    name: static checks
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+static-checks:
+name: static checks
+runs-on: ubuntu-latest
+timeout-minutes: 20
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+```
+steps:
+  - name: Checkout
+    uses: actions/checkout@v4
 
-      - name: Install system tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            binutils \
-            build-essential \
-            python3 \
-            python3-pip
+  - name: Install system tools
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y \
+        binutils \
+        build-essential \
+        python3 \
+        python3-pip
 
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: x86_64-unknown-none
+  - name: Install Rust stable
+    uses: dtolnay/rust-toolchain@stable
 
-      - name: Install Odin
-        uses: laytan/setup-odin@v2
+  - name: Install Rust bare-metal target
+    run: |
+      rustup target add x86_64-unknown-none
+      rustup target list --installed
 
-      - name: Shell syntax
-        run: |
-          bash -n scripts/verify.sh
+  - name: Install Odin
+    uses: laytan/setup-odin@v2
 
-      - name: JSON syntax
-        run: |
-          find tasks schemas artifacts -name '*.json' -print0 \
-            | xargs -0 -n 1 python3 -m json.tool >/dev/null
+  - name: Show tool versions
+    run: |
+      python3 --version
+      git --version
+      cargo --version
+      rustc --version
+      rustup --version
+      nm --version | head -n 1
+      odin version
 
-      - name: Python tests
-        run: |
-          python3 -m unittest discover -s tests
+  - name: Shell syntax
+    run: |
+      bash -n scripts/verify.sh
 
-      - name: Rust cargo check
-        run: |
-          cargo check \
-            --manifest-path userspace/core_service/Cargo.toml \
-            --target x86_64-unknown-none
+  - name: JSON syntax
+    run: |
+      python3 -m json.tool tasks/todo.json >/dev/null
+      python3 -m json.tool tasks/runtime.json >/dev/null
+      python3 -m json.tool tasks/lessons.json >/dev/null
+      python3 -m json.tool schemas/latest_verify.schema.json >/dev/null
+      python3 -m json.tool schemas/agent_context.schema.json >/dev/null
+      if [ -f contracts/kozo_abi_manifest.json ]; then
+        python3 -m json.tool contracts/kozo_abi_manifest.json >/dev/null
+      fi
+      if [ -f schemas/kozo_abi_manifest.schema.json ]; then
+        python3 -m json.tool schemas/kozo_abi_manifest.schema.json >/dev/null
+      fi
 
-      - name: Odin check
-        run: |
-          odin check kernel
+  - name: Python unit tests
+    run: |
+      python3 -m unittest discover -s tests
 
-      - name: Whitespace check
-        run: |
-          git diff --check
+  - name: Rust cargo check
+    run: |
+      cargo check \
+        --manifest-path userspace/core_service/Cargo.toml \
+        --target x86_64-unknown-none
+
+  - name: Odin check
+    run: |
+      odin check kernel
+
+  - name: Whitespace check
+    run: |
+      git diff --check
+```
