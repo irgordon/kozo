@@ -364,6 +364,33 @@
         "verification.tests_run[10]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 14,
+      "title": "Introduce syscall boundary contract v0 for the heartbeat trap path",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "tasks/todo.json",
+        "contracts/syscall_boundary_contract.v0.json",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/syscall_boundary_contract.py",
+        "harness/validators.py",
+        "harness/validators_impl/schema.py",
+        "harness/validators_impl/syscall_boundary_contract.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/agent_context.schema.json",
+        "schemas/latest_verify.schema.json",
+        "schemas/syscall_boundary_contract.schema.json",
+        "tests/test_syscall_boundary_contract.py"
+      ],
+      "verification_refs": [
+        "verification.tests_run[5]",
+        "verification.tests_run[9]",
+        "verification.tests_run[10]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -381,7 +408,8 @@
     "The regenerated verification artifact records the hardened bridge, runtime, return-path, and execution proofs",
     "validator_coverage prevents registered validators from entering the harness without focused behavioral negative-path tests",
     "validator_coverage requires declared failure-mode markers to map to behavioral negative tests",
-    "ABI manifest v0 provides the Python-side source of truth for proven syscall constants, status constants, heartbeat payload layout, and heartbeat sentinels"
+    "ABI manifest v0 provides the Python-side source of truth for proven syscall constants, status constants, heartbeat payload layout, and heartbeat sentinels",
+    "Syscall boundary contract v0 describes and validates only the currently proven x86_64 heartbeat trap boundary"
   ],
   "verification": {
     "tests_run": [

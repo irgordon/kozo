@@ -23,6 +23,7 @@ ODIN_CHECK_FAILED = "ODIN_CHECK_FAILED"
 ABI_WIDTH_MISMATCH = "ABI_WIDTH_MISMATCH"
 ABI_LAYOUT_MISMATCH = "ABI_LAYOUT_MISMATCH"
 ABI_MANIFEST_INVALID = "ABI_MANIFEST_INVALID"
+SYSCALL_BOUNDARY_CONTRACT_INVALID = "SYSCALL_BOUNDARY_CONTRACT_INVALID"
 PROTOCOL_MISMATCH = "PROTOCOL_MISMATCH"
 LAYOUT_PARITY_MISMATCH = "LAYOUT_PARITY_MISMATCH"
 EXECUTION_FOUNDATION_INVALID = "EXECUTION_FOUNDATION_INVALID"
@@ -56,6 +57,7 @@ CODES = MappingProxyType(
         ABI_WIDTH_MISMATCH: "ABI width mismatch",
         ABI_LAYOUT_MISMATCH: "ABI layout mismatch",
         ABI_MANIFEST_INVALID: "ABI manifest is missing, invalid, or inconsistent with the canonical ABI",
+        SYSCALL_BOUNDARY_CONTRACT_INVALID: "Syscall boundary contract is missing, invalid, or inconsistent with the proven trap path",
         PROTOCOL_MISMATCH: "Kernel and service protocol usage drifted from the ABI",
         LAYOUT_PARITY_MISMATCH: "Generated bindings do not preserve the heartbeat payload layout",
         EXECUTION_FOUNDATION_INVALID: "Kernel boot and trap entry symbols are misaligned with the execution foundation contract",

@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "entry",
+    "calling_convention",
+    "syscalls",
+    "ownership",
+    "proof_ownership"
+  ],
+  "properties": {
+    "version": {
+      "const": 0
+    },
+    "architecture": {
+      "type": "string",
+      "pattern": ".*\\S.*"
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "symbol",
+        "assembly_path",
+        "dispatcher_symbol"
+      ],
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "assembly_path": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "dispatcher_symbol": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        }
+      }
+    },
+    "calling_convention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "syscall_id",
+        "payload",
+        "return"
+      ],
+      "properties": {
+        "syscall_id": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "register",
+            "type"
+          ],
+          "properties": {
+            "source": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "register": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "type": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            }
+          }
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "register",
+            "type",
+            "nullable"
+          ],
+          "properties": {
+            "source": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "register": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "type": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "nullable": {
+              "type": "boolean"
+            }
+          }
+        },
+        "return": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "register",
+            "type"
+          ],
+          "properties": {
+            "register": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "type": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            }
+          }
+        }
+      }
+    },
+    "syscalls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "debug_heartbeat"
+      ],
+      "properties": {
+        "debug_heartbeat": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "constant",
+            "payload_layout",
+            "request",
+            "response",
+            "invalid_behavior",
+            "success_behavior"
+          ],
+          "properties": {
+            "constant": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "payload_layout": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "request": {
+              "type": "object"
+            },
+            "response": {
+              "type": "object"
+            },
+            "invalid_behavior": {
+              "type": "object"
+            },
+            "success_behavior": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "ownership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "payload_owner",
+        "kernel_may_mutate",
+        "kernel_may_retain_payload"
+      ],
+      "properties": {
+        "payload_owner": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "kernel_may_mutate": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": ".*\\S.*"
+          }
+        },
+        "kernel_may_retain_payload": {
+          "type": "boolean"
+        }
+      }
+    },
+    "proof_ownership": {
+      "type": "object"
+    }
+  }
+}

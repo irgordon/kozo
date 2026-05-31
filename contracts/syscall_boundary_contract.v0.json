@@ -1,0 +1,89 @@
+{
+  "version": 0,
+  "architecture": "x86_64",
+  "entry": {
+    "symbol": "syscall_entry",
+    "assembly_path": "kernel/arch/x86_64/syscall.asm",
+    "dispatcher_symbol": "syscall_dispatch"
+  },
+  "calling_convention": {
+    "syscall_id": {
+      "source": "rust",
+      "register": "rdi",
+      "type": "K_SYSCALL_ID"
+    },
+    "payload": {
+      "source": "rust",
+      "register": "rsi",
+      "type": "HeartbeatPayload*",
+      "nullable": false
+    },
+    "return": {
+      "register": "rax",
+      "type": "K_STATUS"
+    }
+  },
+  "syscalls": {
+    "debug_heartbeat": {
+      "constant": "K_SYSCALL_DEBUG_HEARTBEAT",
+      "payload_layout": "heartbeat_payload",
+      "request": {
+        "sequence": "0xCAFEFEED",
+        "timestamp": 0,
+        "status_bits": "K_INVALID"
+      },
+      "response": {
+        "sequence": "0xCAFEFEEE",
+        "timestamp": "0xDEADBEEF",
+        "status_bits": "K_OK"
+      },
+      "invalid_behavior": {
+        "null_payload": "K_INVALID",
+        "bad_sequence": "K_INVALID"
+      },
+      "success_behavior": {
+        "return_status": "K_OK",
+        "mutates_payload": [
+          "sequence",
+          "timestamp",
+          "status_bits"
+        ]
+      }
+    }
+  },
+  "ownership": {
+    "payload_owner": "rust_caller",
+    "kernel_may_mutate": [
+      "sequence",
+      "timestamp",
+      "status_bits"
+    ],
+    "kernel_may_retain_payload": false
+  },
+  "proof_ownership": {
+    "bridge_alignment": [
+      "entry_symbol",
+      "register_handoff",
+      "dispatcher_handoff"
+    ],
+    "runtime_trap_path": [
+      "rust_request_payload",
+      "extern_bridge_call"
+    ],
+    "execution_proof": [
+      "odin_branch",
+      "kernel_mutations",
+      "serial_observation"
+    ],
+    "return_path_proof": [
+      "rust_return_validation",
+      "response_payload_contract"
+    ],
+    "protocol_contract_alignment": [
+      "syscall_constant_agreement"
+    ],
+    "layout_parity": [
+      "payload_layout_agreement"
+    ]
+  }
+}

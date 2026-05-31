@@ -16,6 +16,7 @@ _SCHEMA_PATHS = {
     "latest_verify": _SCHEMA_DIR / "latest_verify.schema.json",
     "agent_context": _SCHEMA_DIR / "agent_context.schema.json",
     "kozo_abi_manifest": _SCHEMA_DIR / "kozo_abi_manifest.schema.json",
+    "syscall_boundary_contract": _SCHEMA_DIR / "syscall_boundary_contract.schema.json",
 }
 
 
