@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260531T052850Z",
+  "run_id": "verify-20260531T155700Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 18,
+    "total_checks": 19,
     "failed_check_count": 0
   },
   "checks": [
@@ -141,6 +141,13 @@
       ]
     },
     {
+      "name": "validator_coverage",
+      "subsystem": "validator_coverage",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Every registered validator has focused test coverage with at least one negative-path test"
+    },
+    {
       "name": "evidence",
       "subsystem": "evidence",
       "status": "pass",
@@ -160,5 +167,5 @@
     "artifacts/logs/odin-build.log",
     "artifacts/logs/odin-check.log"
   ],
-  "generated_at": "2026-05-31T05:28:50Z"
+  "generated_at": "2026-05-31T15:57:00Z"
 }

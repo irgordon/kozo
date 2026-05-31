@@ -10,6 +10,9 @@
 - Hardened `execution_proof` as the high-level observable heartbeat execution proof by validating the live Odin `DEBUG_HEARTBEAT` branch and stable serial observation strings.
 - Added focused `execution_proof` tests for missing nil guards, missing heartbeat branch, dead mutation snippets, out-of-order mutations, missing `status_bits` mutation, and missing serial observations.
 - Regenerated the verification artifact so `latest_verify.json` records `bridge_alignment`, `runtime_trap_path`, `return_path_proof`, and `execution_proof` passing with the hardened proof details.
+- Added `validator_coverage` governance so every registered validator must declare a focused test file with behavioral negative-path coverage.
+- Added AST-based coverage checks that reject placeholder negative tests unless they invoke the validator or approved harness/helper path, assert failure behavior, and tie the negative test body to the configured validator token.
+- Added focused negative tests for previously uncovered validators and regression coverage for missing files, missing mappings, missing validator invocation, missing failure assertions, and token-only false passes.
 
 ## v0.0.8 - 2026-03-19
 
