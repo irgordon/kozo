@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260531T232839Z",
+  "run_id": "verify-20260531T234646Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 23,
+    "total_checks": 24,
     "failed_check_count": 0
   },
   "checks": [
@@ -108,6 +108,13 @@
       "detail": "Syscall table contract v0 matches the live heartbeat dispatcher model"
     },
     {
+      "name": "syscall_table_conformance",
+      "subsystem": "syscall_table_conformance",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Live dispatcher source conforms to syscall table contract v0"
+    },
+    {
       "name": "protocol_contract_alignment",
       "subsystem": "protocol_contract_alignment",
       "status": "pass",
@@ -191,5 +198,5 @@
     "artifacts/logs/cargo-check.log",
     "artifacts/logs/nm-kernel.log"
   ],
-  "generated_at": "2026-05-31T23:28:39Z"
+  "generated_at": "2026-05-31T23:46:46Z"
 }
