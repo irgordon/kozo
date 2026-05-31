@@ -12,8 +12,17 @@ LESSONS_JSON="$TASKS_DIR/lessons.json"
 VERIFY_JSON="$ARTIFACTS_DIR/latest_verify.json"
 
 EMPTY_TREE="4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+KERNEL_BUILD_CHECK="$ARTIFACTS_DIR/kernel-build-check"
+VERIFY_TMP=""
 
 mkdir -p "$LOG_DIR" "$ARTIFACTS_DIR"
+
+cleanup() {
+  [[ -n "${VERIFY_TMP:-}" && -f "$VERIFY_TMP" ]] && rm -f "$VERIFY_TMP"
+  rm -f "$KERNEL_BUILD_CHECK"
+}
+
+trap cleanup EXIT
 
 fail() {
   printf "FAIL: %s\n" "$*" >&2
@@ -131,23 +140,15 @@ PY
 
 write_verify_artifact_atomically() {
   local verify_output=$1
-  local tmp_file=""
 
-  tmp_file="$(mktemp "$ARTIFACTS_DIR/latest_verify.XXXXXX.tmp")"
-
-  cleanup_tmp() {
-    [[ -n "${tmp_file:-}" && -f "$tmp_file" ]] && rm -f "$tmp_file"
-  }
-
-  trap cleanup_tmp RETURN
-
-  printf "%s\n" "$verify_output" >"$tmp_file"
+  VERIFY_TMP="$(mktemp "$ARTIFACTS_DIR/latest_verify.XXXXXX.tmp")"
+  printf "%s\n" "$verify_output" >"$VERIFY_TMP"
 
   local status
-  status="$(validate_verify_artifact "$tmp_file")"
+  status="$(validate_verify_artifact "$VERIFY_TMP")"
 
-  mv "$tmp_file" "$VERIFY_JSON"
-  trap - RETURN
+  mv "$VERIFY_TMP" "$VERIFY_JSON"
+  VERIFY_TMP=""
 
   printf "%s\n" "$status"
 }
@@ -171,7 +172,7 @@ run_logged_command "$LOG_DIR/odin-check.log" \
   odin check "$ROOT/kernel"
 
 run_logged_command "$LOG_DIR/odin-build.log" \
-  odin build "$ROOT/kernel" "-out:$ARTIFACTS_DIR/kernel-build-check"
+  odin build "$ROOT/kernel" "-out:$KERNEL_BUILD_CHECK"
 
 run_logged_command "$LOG_DIR/cargo-check.log" \
   cargo check --manifest-path "$ROOT/userspace/core_service/Cargo.toml" --target x86_64-unknown-none
