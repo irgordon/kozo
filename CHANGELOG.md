@@ -19,6 +19,10 @@
 - Added an `abi_manifest` validator with schema-backed manifest loading and focused negative coverage for missing files, invalid JSON, schema violations, missing binding paths, constant drift, layout drift, and diagnostic quality.
 - Rewired `protocol_contract_alignment` and `layout_parity` to read proven ABI values from the manifest instead of duplicating local validator constants.
 - Documented ABI manifest v0 as a current proof artifact only; it does not declare a stable public ABI, Linux compatibility, additional syscalls, or runtime behavior changes.
+- Added syscall boundary contract v0 for the currently proven x86_64 heartbeat/debug syscall path.
+- Added a schema-backed syscall boundary loader and `syscall_boundary_contract` validator.
+- Added focused negative coverage for boundary contract failures, including register drift, missing ABI manifest references, sentinel mismatches, invalid payload retention, unknown mutable fields, and unknown proof validator references.
+- Documented syscall boundary contract v0 as a current heartbeat/debug proof artifact only; it does not add new syscalls, Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, or runtime behavior changes.
 
 ## v0.0.8 - 2026-05-30
 

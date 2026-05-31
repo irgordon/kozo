@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260531T203415Z",
+  "run_id": "verify-20260531T223545Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 20,
+    "total_checks": 21,
     "failed_check_count": 0
   },
   "checks": [
@@ -85,6 +85,13 @@
       "status": "pass",
       "code": "OK",
       "detail": "ABI manifest exists, is schema-valid, and matches the canonical header paths, constants, and heartbeat layout"
+    },
+    {
+      "name": "syscall_boundary_contract",
+      "subsystem": "syscall_boundary_contract",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Syscall boundary contract v0 matches the currently proven heartbeat trap path"
     },
     {
       "name": "protocol_contract_alignment",
@@ -170,5 +177,5 @@
     "artifacts/logs/cargo-check.log",
     "artifacts/logs/nm-kernel.log"
   ],
-  "generated_at": "2026-05-31T20:34:15Z"
+  "generated_at": "2026-05-31T22:35:45Z"
 }
