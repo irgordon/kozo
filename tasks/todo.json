@@ -233,6 +233,36 @@
         "verification.tests_run[6]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 9,
+      "title": "Harden runtime trap path proof against dead Rust bridge snippets",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "harness/validators_impl/runtime_trap_path.py",
+        "tests/test_runtime_trap_path.py"
+      ],
+      "verification_refs": [
+        "verification.tests_run[5]",
+        "verification.tests_run[7]"
+      ],
+      "failure_count": 0
+    },
+    {
+      "id": 10,
+      "title": "Harden execution proof around the live Odin heartbeat branch",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "harness/validators_impl/execution_proof.py",
+        "tests/test_execution_proof.py"
+      ],
+      "verification_refs": [
+        "verification.tests_run[5]",
+        "verification.tests_run[8]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -244,7 +274,10 @@
     "Tracked Python cache artifacts are removed from version control so ignored cache files no longer dirty the workspace",
     "Rust explicitly validates returned payload mutations after syscall_entry and the verify artifact records return_path_proof",
     "Focused return_path_proof tests cover status_bits negative paths and unrelated status_bits text",
-    "bridge_alignment validates the ordered live syscall_entry block and rejects dead or unordered bridge snippets"
+    "bridge_alignment validates the ordered live syscall_entry block and rejects dead or unordered bridge snippets",
+    "runtime_trap_path validates the live Rust heartbeat request path with focused positive and negative tests",
+    "execution_proof validates the live Odin heartbeat branch and serial observations with focused positive and negative tests",
+    "The regenerated verification artifact records the hardened bridge, runtime, return-path, and execution proofs"
   ],
   "verification": {
     "tests_run": [
@@ -282,6 +315,16 @@
         "tool": "shell",
         "command": "python3 -m unittest tests/test_bridge_alignment.py",
         "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "python3 -m unittest tests/test_runtime_trap_path.py",
+        "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "python3 -m unittest tests/test_execution_proof.py",
+        "status": "passed"
       }
     ],
     "logs": [
@@ -307,7 +350,11 @@
       "Removing the Rust status_bits check causes return_path_proof to fail",
       "Removing the Odin status_bits success write causes return_path_proof to fail",
       "Moving required bridge snippets outside the live syscall_entry block causes bridge_alignment to fail",
-      "Reordering required live syscall_entry anchors causes bridge_alignment to fail"
+      "Reordering required live syscall_entry anchors causes bridge_alignment to fail",
+      "Moving required Rust bridge snippets outside the live helper causes runtime_trap_path to fail",
+      "Changing heartbeat request sentinels or ordering causes runtime_trap_path to fail",
+      "Moving required Odin mutations outside the live heartbeat branch causes execution_proof to fail",
+      "Removing nil guards, status_bits mutation, or serial observations causes execution_proof to fail"
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -324,7 +371,12 @@
       "A stray status_bits mention does not satisfy the required Rust return-path status_bits check.",
       "bridge_alignment rejects dead snippets outside syscall_entry with a named diagnostic.",
       "bridge_alignment rejects out-of-order live syscall_entry anchors with a named diagnostic.",
-      "bridge_alignment rejects missing dispatcher handoff and missing Odin dispatcher signatures."
+      "bridge_alignment rejects missing dispatcher handoff and missing Odin dispatcher signatures.",
+      "runtime_trap_path rejects dead extern bridge calls outside the live helper with a named diagnostic.",
+      "runtime_trap_path rejects missing request anchors, wrong request sentinels, and out-of-order live path construction.",
+      "execution_proof rejects dead Odin mutation snippets outside the live heartbeat branch with a named diagnostic.",
+      "execution_proof rejects missing nil guards, missing status_bits mutation, out-of-order mutations, and missing serial observation strings.",
+      "scripts/verify.sh regenerated latest_verify.json after the hardened validator commits."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -340,6 +392,9 @@
     "Removed the tracked Python cache artifacts from version control so ignored cache files no longer pollute repository state.",
     "Added return_path_proof so the Rust caller must explicitly validate the returned payload mutations after the bridge call, with negative proofs for wrong sequence and missing timestamp checks.",
     "Hardened return_path_proof so status_bits checks and writes are required anchors with focused negative unit coverage.",
-    "Hardened bridge_alignment so ordered live syscall_entry anchors are required and covered by focused negative tests."
+    "Hardened bridge_alignment so ordered live syscall_entry anchors are required and covered by focused negative tests.",
+    "Hardened runtime_trap_path so the live Rust heartbeat request path and bridge helper are required and covered by focused negative tests.",
+    "Hardened execution_proof so the live Odin heartbeat branch and stable serial observations are required and covered by focused negative tests.",
+    "Regenerated latest_verify.json so the current artifact records the hardened proof details."
   ]
 }
