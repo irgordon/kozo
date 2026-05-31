@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260531T161244Z",
+  "run_id": "verify-20260531T164252Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -156,16 +156,12 @@
     }
   ],
   "failed_checks": [],
-  "changed_files": [
-    "CHANGELOG.md",
-    "artifacts/latest_verify.json",
-    "tasks/todo.json"
-  ],
+  "changed_files": [],
   "evidence_files": [
-    "artifacts/logs/cargo-check.log",
-    "artifacts/logs/nm-kernel.log",
+    "artifacts/logs/odin-check.log",
     "artifacts/logs/odin-build.log",
-    "artifacts/logs/odin-check.log"
+    "artifacts/logs/cargo-check.log",
+    "artifacts/logs/nm-kernel.log"
   ],
-  "generated_at": "2026-05-31T16:12:44Z"
+  "generated_at": "2026-05-31T16:42:52Z"
 }
