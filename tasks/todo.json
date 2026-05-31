@@ -298,6 +298,40 @@
         "verification.tests_run[10]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 12,
+      "title": "Enforce validator coverage depth governance",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "harness/validators_impl/validator_coverage.py",
+        "tests/test_validator_coverage.py",
+        "tests/test_schema.py",
+        "tests/test_plan_lifecycle.py",
+        "tests/test_step_scope.py",
+        "tests/test_verification_refs.py",
+        "tests/test_explanation.py",
+        "tests/test_preconditions.py",
+        "tests/test_subagent.py",
+        "tests/test_rust.py",
+        "tests/test_odin.py",
+        "tests/test_abi.py",
+        "tests/test_protocol_contract_alignment.py",
+        "tests/test_layout_parity.py",
+        "tests/test_execution_foundation.py",
+        "tests/test_bridge_alignment.py",
+        "tests/test_runtime_trap_path.py",
+        "tests/test_return_path_proof.py",
+        "tests/test_execution_proof.py",
+        "tests/test_evidence.py"
+      ],
+      "verification_refs": [
+        "verification.tests_run[5]",
+        "verification.tests_run[9]",
+        "verification.tests_run[10]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -313,7 +347,8 @@
     "runtime_trap_path validates the live Rust heartbeat request path with focused positive and negative tests",
     "execution_proof validates the live Odin heartbeat branch and serial observations with focused positive and negative tests",
     "The regenerated verification artifact records the hardened bridge, runtime, return-path, and execution proofs",
-    "validator_coverage prevents registered validators from entering the harness without focused behavioral negative-path tests"
+    "validator_coverage prevents registered validators from entering the harness without focused behavioral negative-path tests",
+    "validator_coverage requires declared failure-mode markers to map to behavioral negative tests"
   ],
   "verification": {
     "tests_run": [
@@ -402,7 +437,9 @@
       "Moving required Odin mutations outside the live heartbeat branch causes execution_proof to fail",
       "Removing nil guards, status_bits mutation, or serial observations causes execution_proof to fail",
       "A registered validator without a focused test file causes validator_coverage to fail",
-      "A placeholder negative-looking test without validator invocation or failure assertion causes validator_coverage to fail"
+      "A placeholder negative-looking test without validator invocation or failure assertion causes validator_coverage to fail",
+      "Missing KOZO_NEGATIVE_COVERAGE metadata causes validator_coverage to fail",
+      "Missing required markers, unknown markers, missing mapped tests, and non-behavioral mapped tests cause validator_coverage to fail"
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -426,7 +463,9 @@
       "execution_proof rejects missing nil guards, missing status_bits mutation, out-of-order mutations, and missing serial observation strings.",
       "scripts/verify.sh regenerated latest_verify.json after the hardened validator commits.",
       "validator_coverage reports pass only when every registered validator has focused tests with behavioral negative-path coverage.",
-      "A placeholder test containing only a validator token and negative-looking name fails validator_coverage with a named missing-invocation diagnostic."
+      "A placeholder test containing only a validator token and negative-looking name fails validator_coverage with a named missing-invocation diagnostic.",
+      "validator_coverage reports pass only when each declared negative marker maps to an existing behavioral negative test.",
+      "Missing marker metadata, missing required markers, unknown markers, missing mapped test functions, and mapped placeholder tests fail with named diagnostics."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -446,6 +485,7 @@
     "Hardened runtime_trap_path so the live Rust heartbeat request path and bridge helper are required and covered by focused negative tests.",
     "Hardened execution_proof so the live Odin heartbeat branch and stable serial observations are required and covered by focused negative tests.",
     "Regenerated latest_verify.json so the current artifact records the hardened proof details.",
-    "Added validator_coverage so registered validators must have focused test files with AST-verified behavioral negative-path coverage."
+    "Added validator_coverage so registered validators must have focused test files with AST-verified behavioral negative-path coverage.",
+    "Extended validator_coverage so registered validators must declare marker-level coverage for their known false-pass risks."
   ]
 }

@@ -13,6 +13,8 @@
 - Added `validator_coverage` governance so every registered validator must declare a focused test file with behavioral negative-path coverage.
 - Added AST-based coverage checks that reject placeholder negative tests unless they invoke the validator or approved harness/helper path, assert failure behavior, and tie the negative test body to the configured validator token.
 - Added focused negative tests for previously uncovered validators and regression coverage for missing files, missing mappings, missing validator invocation, missing failure assertions, and token-only false passes.
+- Extended `validator_coverage` with marker-depth governance so each validator declares required negative coverage markers that must map to behavioral negative tests.
+- Added `KOZO_NEGATIVE_COVERAGE` metadata to focused validator tests and regression coverage for missing metadata, missing required markers, unknown markers, missing mapped functions, and mapped tests without behavior.
 
 ## v0.0.8 - 2026-03-19
 
