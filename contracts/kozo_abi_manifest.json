@@ -1,0 +1,57 @@
+{
+  "version": 0,
+  "canonical_header": "contracts/kozo_abi.h",
+  "generated_bindings": {
+    "rust": "bindings/rust/kozo_abi.rs",
+    "odin": "bindings/odin/kozo_abi.odin"
+  },
+  "constants": {
+    "status": {
+      "K_OK": 0,
+      "K_INVALID": 1,
+      "K_DENIED": 2
+    },
+    "syscalls": {
+      "K_SYSCALL_NOP": 0,
+      "K_SYSCALL_DEBUG_HEARTBEAT": 1
+    }
+  },
+  "layouts": {
+    "heartbeat_payload": {
+      "c_name": "k_heartbeat_payload_t",
+      "rust_name": "HeartbeatPayload",
+      "odin_name": "Heartbeat_Payload",
+      "size": 24,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "sequence",
+          "width": 8,
+          "offset": 0
+        },
+        {
+          "name": "timestamp",
+          "width": 8,
+          "offset": 8
+        },
+        {
+          "name": "status_bits",
+          "width": 4,
+          "offset": 16
+        }
+      ]
+    }
+  },
+  "heartbeat": {
+    "request": {
+      "sequence": "0xCAFEFEED",
+      "timestamp": 0,
+      "status_bits": "K_INVALID"
+    },
+    "response": {
+      "sequence": "0xCAFEFEEE",
+      "timestamp": "0xDEADBEEF",
+      "status_bits": "K_OK"
+    }
+  }
+}

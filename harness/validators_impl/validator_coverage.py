@@ -59,11 +59,27 @@ _VALIDATOR_TEST_CONTRACTS = {
     "rust": ValidatorTestContract("rust", _TESTS_DIR / "test_rust.py", "RustValidator", ("missing_cargo_evidence",)),
     "odin": ValidatorTestContract("odin", _TESTS_DIR / "test_odin.py", "OdinValidator", ("missing_odin_check_evidence",)),
     "abi": ValidatorTestContract("abi", _TESTS_DIR / "test_abi.py", "AbiValidator", ("missing_generated_binding",)),
+    "abi_manifest": ValidatorTestContract(
+        "abi_manifest",
+        _TESTS_DIR / "test_abi_manifest.py",
+        "AbiManifestValidator",
+        (
+            "missing_manifest_file",
+            "invalid_json",
+            "schema_violation",
+            "missing_generated_binding_path",
+            "syscall_constant_mismatch",
+            "layout_field_offset_mismatch",
+            "diagnostic_names_manifest_field",
+        ),
+    ),
     "protocol_contract_alignment": ValidatorTestContract(
         "protocol_contract_alignment",
         _TESTS_DIR / "test_protocol_contract_alignment.py",
         "ProtocolContractValidator",
         (
+            "missing_manifest_syscall_constant",
+            "manifest_syscall_value_mismatch",
             "missing_rust_syscall_constant",
             "missing_odin_syscall_constant",
             "rust_hardcoded_syscall_id",
@@ -79,6 +95,8 @@ _VALIDATOR_TEST_CONTRACTS = {
         "LayoutParityValidator",
         (
             "missing_field",
+            "missing_manifest_layout_field",
+            "manifest_layout_mismatch",
             "wrong_field_order",
             "wrong_rust_field_width",
             "wrong_odin_field_width",

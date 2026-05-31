@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "canonical_header",
+    "generated_bindings",
+    "constants",
+    "layouts",
+    "heartbeat"
+  ],
+  "properties": {
+    "version": {
+      "const": 0
+    },
+    "canonical_header": {
+      "type": "string",
+      "pattern": ".*\\S.*"
+    },
+    "generated_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rust",
+        "odin"
+      ],
+      "properties": {
+        "rust": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "odin": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        }
+      }
+    },
+    "constants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "syscalls"
+      ],
+      "properties": {
+        "status": {
+          "type": "object"
+        },
+        "syscalls": {
+          "type": "object"
+        }
+      }
+    },
+    "layouts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "heartbeat_payload"
+      ],
+      "properties": {
+        "heartbeat_payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "c_name",
+            "rust_name",
+            "odin_name",
+            "size",
+            "alignment",
+            "fields"
+          ],
+          "properties": {
+            "c_name": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "rust_name": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "odin_name": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "size": {
+              "type": "integer"
+            },
+            "alignment": {
+              "type": "integer"
+            },
+            "fields": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "width",
+                  "offset"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "pattern": ".*\\S.*"
+                  },
+                  "width": {
+                    "type": "integer"
+                  },
+                  "offset": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "heartbeat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request",
+        "response"
+      ],
+      "properties": {
+        "request": {
+          "type": "object"
+        },
+        "response": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

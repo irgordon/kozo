@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -11,6 +12,8 @@ from harness.validators_impl.layout_parity import LayoutParityValidator
 KOZO_NEGATIVE_COVERAGE = {
     "layout_parity": {
         "missing_field": "test_fails_when_canonical_field_is_missing",
+        "missing_manifest_layout_field": "test_fails_when_manifest_layout_field_is_missing",
+        "manifest_layout_mismatch": "test_fails_when_manifest_layout_field_offset_is_wrong",
         "wrong_field_order": "test_fails_when_rust_field_order_is_wrong",
         "wrong_rust_field_width": "test_fails_when_rust_field_width_is_wrong",
         "wrong_odin_field_width": "test_fails_when_odin_field_width_is_wrong",
@@ -37,6 +40,20 @@ class LayoutParityValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
 
         self.assert_layout_failure(result, "canonical_missing_field", "canonical.status_bits")
+
+    def test_fails_when_manifest_layout_field_is_missing(self):
+        result = self.validate_layout(manifest=self.valid_manifest_without_timestamp)
+
+        self.assertEqual(result.status, "fail")
+
+        self.assert_layout_failure(result, "manifest_missing_layout_field", "manifest.layouts.heartbeat_payload.fields.timestamp")
+
+    def test_fails_when_manifest_layout_field_offset_is_wrong(self):
+        result = self.validate_layout(manifest=self.valid_manifest_with_wrong_timestamp_offset)
+
+        self.assertEqual(result.status, "fail")
+
+        self.assert_layout_failure(result, "canonical_wrong_field_offset", "canonical.timestamp")
 
     def test_fails_when_rust_field_order_is_wrong(self):
         result = self.validate_layout(
@@ -126,6 +143,7 @@ class LayoutParityValidatorTests(unittest.TestCase):
         header: str | None = None,
         rust: str | None = None,
         odin: str | None = None,
+        manifest=None,
     ):
         with tempfile.TemporaryDirectory() as temporary_directory:
             paths = self.write_layout_sources(
@@ -134,6 +152,8 @@ class LayoutParityValidatorTests(unittest.TestCase):
                 rust or self.valid_rust(),
                 odin or self.valid_odin(),
             )
+            manifest_data = manifest(paths) if manifest is not None else self.valid_manifest(paths)
+            paths["manifest"] = self.write_manifest(Path(temporary_directory), manifest_data)
             original_paths = self.capture_layout_paths()
             self.install_layout_paths(paths)
             try:
@@ -158,22 +178,21 @@ class LayoutParityValidatorTests(unittest.TestCase):
         paths["odin"].write_text(odin)
         return paths
 
+    def write_manifest(self, root: Path, manifest: dict[str, object]) -> Path:
+        manifest_path = root / "kozo_abi_manifest.json"
+        manifest_path.write_text(json.dumps(manifest))
+        return manifest_path
+
     def capture_layout_paths(self) -> dict[str, Path]:
         return {
-            "header": layout_parity._HEADER_PATH,
-            "rust": layout_parity._RUST_BINDINGS,
-            "odin": layout_parity._ODIN_BINDINGS,
+            "manifest": layout_parity._ABI_MANIFEST_PATH,
         }
 
     def install_layout_paths(self, paths: dict[str, Path]) -> None:
-        layout_parity._HEADER_PATH = paths["header"]
-        layout_parity._RUST_BINDINGS = paths["rust"]
-        layout_parity._ODIN_BINDINGS = paths["odin"]
+        layout_parity._ABI_MANIFEST_PATH = paths["manifest"]
 
     def restore_layout_paths(self, paths: dict[str, Path]) -> None:
-        layout_parity._HEADER_PATH = paths["header"]
-        layout_parity._RUST_BINDINGS = paths["rust"]
-        layout_parity._ODIN_BINDINGS = paths["odin"]
+        layout_parity._ABI_MANIFEST_PATH = paths["manifest"]
 
     def assert_layout_failure(self, result, reason: str, layout_field: str) -> None:
         self.assertEqual(result.status, "fail")
@@ -208,6 +227,65 @@ class LayoutParityValidatorTests(unittest.TestCase):
             "\tstatus_bits: u32,\n"
             "}\n"
         )
+
+    def valid_manifest(self, paths: dict[str, Path]) -> dict[str, object]:
+        return {
+            "version": 0,
+            "canonical_header": str(paths["header"]),
+            "generated_bindings": {
+                "rust": str(paths["rust"]),
+                "odin": str(paths["odin"]),
+            },
+            "constants": {
+                "status": {
+                    "K_OK": 0,
+                    "K_INVALID": 1,
+                },
+                "syscalls": {
+                    "K_SYSCALL_DEBUG_HEARTBEAT": 1,
+                },
+            },
+            "layouts": {
+                "heartbeat_payload": {
+                    "c_name": "k_heartbeat_payload_t",
+                    "rust_name": "HeartbeatPayload",
+                    "odin_name": "Heartbeat_Payload",
+                    "size": 24,
+                    "alignment": 8,
+                    "fields": [
+                        {"name": "sequence", "width": 8, "offset": 0},
+                        {"name": "timestamp", "width": 8, "offset": 8},
+                        {"name": "status_bits", "width": 4, "offset": 16},
+                    ],
+                }
+            },
+            "heartbeat": {
+                "request": {
+                    "sequence": "0xCAFEFEED",
+                    "timestamp": 0,
+                    "status_bits": "K_INVALID",
+                },
+                "response": {
+                    "sequence": "0xCAFEFEEE",
+                    "timestamp": "0xDEADBEEF",
+                    "status_bits": "K_OK",
+                },
+            },
+        }
+
+    def valid_manifest_without_timestamp(self, paths: dict[str, Path]) -> dict[str, object]:
+        manifest = self.valid_manifest(paths)
+        manifest["layouts"]["heartbeat_payload"]["fields"] = [
+            field
+            for field in manifest["layouts"]["heartbeat_payload"]["fields"]
+            if field["name"] != "timestamp"
+        ]
+        return manifest
+
+    def valid_manifest_with_wrong_timestamp_offset(self, paths: dict[str, Path]) -> dict[str, object]:
+        manifest = self.valid_manifest(paths)
+        manifest["layouts"]["heartbeat_payload"]["fields"][1]["offset"] = 12
+        return manifest
 
 
 if __name__ == "__main__":

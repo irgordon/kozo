@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -10,6 +11,8 @@ from harness.validators_impl.protocol_validator import ProtocolContractValidator
 
 KOZO_NEGATIVE_COVERAGE = {
     "protocol_contract_alignment": {
+        "missing_manifest_syscall_constant": "test_fails_when_manifest_syscall_constant_is_missing",
+        "manifest_syscall_value_mismatch": "test_fails_when_manifest_syscall_value_mismatches_bindings",
         "missing_rust_syscall_constant": "test_fails_when_generated_rust_syscall_constant_is_missing",
         "missing_odin_syscall_constant": "test_fails_when_generated_odin_syscall_constant_is_missing",
         "rust_hardcoded_syscall_id": "test_fails_when_rust_uses_hardcoded_syscall_id",
@@ -26,6 +29,24 @@ class ProtocolContractValidatorTests(unittest.TestCase):
         result = self.validate_contract()
 
         self.assertEqual(result.status, "pass")
+
+    def test_fails_when_manifest_syscall_constant_is_missing(self):
+        result = self.validate_contract(
+            manifest=self.valid_manifest_without_debug_heartbeat
+        )
+
+        self.assertEqual(result.status, "fail")
+
+        self.assert_protocol_failure(result, "missing_manifest_syscall_constant", "constants.syscalls.K_SYSCALL_DEBUG_HEARTBEAT")
+
+    def test_fails_when_manifest_syscall_value_mismatches_bindings(self):
+        result = self.validate_contract(
+            manifest=self.valid_manifest_with_wrong_heartbeat_value
+        )
+
+        self.assertEqual(result.status, "fail")
+
+        self.assert_protocol_failure(result, "rust_mismatched_generated_syscall_constant", "rust_K_SYSCALL_DEBUG_HEARTBEAT")
 
     def test_fails_when_generated_rust_syscall_constant_is_missing(self):
         result = self.validate_contract(
@@ -120,6 +141,7 @@ class ProtocolContractValidatorTests(unittest.TestCase):
         odin_bindings: str | None = None,
         kernel: str | None = None,
         service: str | None = None,
+        manifest=None,
     ):
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
@@ -131,6 +153,8 @@ class ProtocolContractValidatorTests(unittest.TestCase):
                 kernel or self.valid_kernel(),
                 service or self.valid_service(),
             )
+            manifest_data = manifest(paths) if manifest is not None else self.valid_manifest(paths)
+            paths["manifest"] = self.write_manifest(root, manifest_data)
             original_paths = self.capture_protocol_paths()
             self.install_protocol_paths(paths)
             try:
@@ -161,26 +185,25 @@ class ProtocolContractValidatorTests(unittest.TestCase):
         paths["service"].write_text(service)
         return paths
 
+    def write_manifest(self, root: Path, manifest: dict[str, object]) -> Path:
+        manifest_path = root / "kozo_abi_manifest.json"
+        manifest_path.write_text(json.dumps(manifest))
+        return manifest_path
+
     def capture_protocol_paths(self) -> dict[str, Path]:
         return {
-            "header": protocol_validator._HEADER_PATH,
-            "rust_bindings": protocol_validator._RUST_BINDINGS_PATH,
-            "odin_bindings": protocol_validator._ODIN_BINDINGS_PATH,
+            "manifest": protocol_validator._ABI_MANIFEST_PATH,
             "kernel": protocol_validator._KERNEL_PATH,
             "service": protocol_validator._SERVICE_PATH,
         }
 
     def install_protocol_paths(self, paths: dict[str, Path]) -> None:
-        protocol_validator._HEADER_PATH = paths["header"]
-        protocol_validator._RUST_BINDINGS_PATH = paths["rust_bindings"]
-        protocol_validator._ODIN_BINDINGS_PATH = paths["odin_bindings"]
+        protocol_validator._ABI_MANIFEST_PATH = paths["manifest"]
         protocol_validator._KERNEL_PATH = paths["kernel"]
         protocol_validator._SERVICE_PATH = paths["service"]
 
     def restore_protocol_paths(self, paths: dict[str, Path]) -> None:
-        protocol_validator._HEADER_PATH = paths["header"]
-        protocol_validator._RUST_BINDINGS_PATH = paths["rust_bindings"]
-        protocol_validator._ODIN_BINDINGS_PATH = paths["odin_bindings"]
+        protocol_validator._ABI_MANIFEST_PATH = paths["manifest"]
         protocol_validator._KERNEL_PATH = paths["kernel"]
         protocol_validator._SERVICE_PATH = paths["service"]
 
@@ -241,6 +264,62 @@ class ProtocolContractValidatorTests(unittest.TestCase):
             "    return invoke_heartbeat_bridge(syscall, &mut payload);\n"
             "}\n"
         )
+
+    def valid_manifest(self, paths: dict[str, Path]) -> dict[str, object]:
+        return {
+            "version": 0,
+            "canonical_header": str(paths["header"]),
+            "generated_bindings": {
+                "rust": str(paths["rust_bindings"]),
+                "odin": str(paths["odin_bindings"]),
+            },
+            "constants": {
+                "status": {
+                    "K_OK": 0,
+                    "K_INVALID": 1,
+                },
+                "syscalls": {
+                    "K_SYSCALL_NOP": 0,
+                    "K_SYSCALL_DEBUG_HEARTBEAT": 1,
+                },
+            },
+            "layouts": {
+                "heartbeat_payload": {
+                    "c_name": "k_heartbeat_payload_t",
+                    "rust_name": "HeartbeatPayload",
+                    "odin_name": "Heartbeat_Payload",
+                    "size": 24,
+                    "alignment": 8,
+                    "fields": [
+                        {"name": "sequence", "width": 8, "offset": 0},
+                        {"name": "timestamp", "width": 8, "offset": 8},
+                        {"name": "status_bits", "width": 4, "offset": 16},
+                    ],
+                }
+            },
+            "heartbeat": {
+                "request": {
+                    "sequence": "0xCAFEFEED",
+                    "timestamp": 0,
+                    "status_bits": "K_INVALID",
+                },
+                "response": {
+                    "sequence": "0xCAFEFEEE",
+                    "timestamp": "0xDEADBEEF",
+                    "status_bits": "K_OK",
+                },
+            },
+        }
+
+    def valid_manifest_without_debug_heartbeat(self, paths: dict[str, Path]) -> dict[str, object]:
+        manifest = self.valid_manifest(paths)
+        del manifest["constants"]["syscalls"]["K_SYSCALL_DEBUG_HEARTBEAT"]
+        return manifest
+
+    def valid_manifest_with_wrong_heartbeat_value(self, paths: dict[str, Path]) -> dict[str, object]:
+        manifest = self.valid_manifest(paths)
+        manifest["constants"]["syscalls"]["K_SYSCALL_DEBUG_HEARTBEAT"] = 2
+        return manifest
 
 
 if __name__ == "__main__":

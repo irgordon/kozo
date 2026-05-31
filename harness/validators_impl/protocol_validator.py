@@ -4,18 +4,16 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from harness import abi_manifest
 from harness.codes import OK, PROTOCOL_MISMATCH
 from harness.validator import BaseValidator, ValidationResult
 from harness.validators_impl.runtime_trap_path import runtime_trap_path_observations
 
 _ROOT = Path(__file__).resolve().parents[2]
-_HEADER_PATH = _ROOT / "contracts" / "kozo_abi.h"
-_ODIN_BINDINGS_PATH = _ROOT / "bindings" / "odin" / "kozo_abi.odin"
-_RUST_BINDINGS_PATH = _ROOT / "bindings" / "rust" / "kozo_abi.rs"
+_ABI_MANIFEST_PATH = abi_manifest.MANIFEST_PATH
 _KERNEL_PATH = _ROOT / "kernel" / "main.odin"
 _SERVICE_PATH = _ROOT / "userspace" / "core_service" / "src" / "main.rs"
 
-_HEADER_SYSCALL_PATTERN = re.compile(r"\b(K_SYSCALL_[A-Z0-9_]+)\s*=\s*(\d+)")
 _RUST_SYSCALL_PATTERN = re.compile(r"\bpub\s+const\s+(K_SYSCALL_[A-Z0-9_]+)\s*:\s*K_SYSCALL_ID\s*=\s*(\d+)\s*;")
 _ODIN_SYSCALL_PATTERN = re.compile(r"\b(K_SYSCALL_[A-Z0-9_]+)\s*:\s*K_SYSCALL_ID\s*:\s*(\d+)")
 
@@ -28,7 +26,6 @@ class ProtocolConstant:
 
 @dataclass(frozen=True)
 class ProtocolSources:
-    header: str
     rust_bindings: str
     odin_bindings: str
     kernel: str
@@ -83,33 +80,13 @@ _ODIN_USAGE_ANCHORS = (
     ),
 )
 
-_RUST_FORBIDDEN_CONSTANTS = (
-    ForbiddenLocalConstant(
-        "rust_hardcoded_heartbeat_syscall_id",
-        re.compile(r"\blet\s+syscall\s*:\s*abi::K_SYSCALL_ID\s*=\s*1\s*;|\binvoke_heartbeat_bridge\s*\(\s*1\s*,"),
-        "Rust heartbeat_request must not hardcode the DEBUG_HEARTBEAT syscall id",
-        _SERVICE_PATH,
-    ),
-)
-
-_ODIN_FORBIDDEN_CONSTANTS = (
-    ForbiddenLocalConstant(
-        "odin_hardcoded_heartbeat_syscall_id",
-        re.compile(r"\bsyscall_dispatch\s*\(\s*1\s*,|case\s+1\s*:"),
-        "Odin heartbeat paths must not hardcode the DEBUG_HEARTBEAT syscall id",
-        _KERNEL_PATH,
-    ),
-)
-
-
 class ProtocolContractValidator(BaseValidator):
     name = "protocol_contract_alignment"
     subsystem = "protocol_contract_alignment"
 
     def validate(self, artifact_bundle):
         _ = artifact_bundle
-        sources = _load_protocol_sources()
-        issue = _first_protocol_issue(sources)
+        issue = _protocol_validation_issue()
         if issue is not None:
             return _failure_result(issue)
         return ValidationResult.pass_(
@@ -118,42 +95,64 @@ class ProtocolContractValidator(BaseValidator):
         )
 
 
-def _first_protocol_issue(sources: ProtocolSources) -> ProtocolIssue | None:
-    canonical_syscalls = _parse_canonical_syscalls(sources.header)
+def _protocol_validation_issue() -> ProtocolIssue | None:
+    manifest = _load_protocol_manifest()
+    if isinstance(manifest, ProtocolIssue):
+        return manifest
+    sources = _load_protocol_sources(manifest)
+    if isinstance(sources, ProtocolIssue):
+        return sources
+    return _first_protocol_issue(manifest, sources)
+
+
+def _first_protocol_issue(
+    manifest: abi_manifest.AbiManifest,
+    sources: ProtocolSources,
+) -> ProtocolIssue | None:
+    manifest_syscalls = _manifest_syscalls(manifest)
     return _first_issue(
-        _canonical_syscall_issue(canonical_syscalls),
-        _binding_alignment_issue(canonical_syscalls, sources),
-        _kernel_dispatch_issue(canonical_syscalls, sources.kernel),
-        _rust_live_usage_issue(sources.service),
-        _odin_live_usage_issue(sources.kernel),
+        _manifest_syscall_issue(manifest_syscalls),
+        _binding_alignment_issue(manifest_syscalls, sources),
+        _kernel_dispatch_issue(manifest_syscalls, sources.kernel),
+        _rust_live_usage_issue(manifest, sources.service),
+        _odin_live_usage_issue(manifest, sources.kernel),
         _bridge_path_issue(sources.service),
     )
 
 
-def _load_protocol_sources() -> ProtocolSources:
-    return ProtocolSources(
-        _HEADER_PATH.read_text(),
-        _RUST_BINDINGS_PATH.read_text(),
-        _ODIN_BINDINGS_PATH.read_text(),
-        _KERNEL_PATH.read_text(),
-        _SERVICE_PATH.read_text(),
-    )
+def _load_protocol_manifest() -> abi_manifest.AbiManifest | ProtocolIssue:
+    try:
+        return abi_manifest.load_abi_manifest(_ABI_MANIFEST_PATH)
+    except (KeyError, OSError, TypeError, ValueError) as exc:
+        return _issue("manifest_unavailable", "abi_manifest", f"Protocol mismatch: ABI manifest could not be loaded: {exc}")
 
 
-def _parse_canonical_syscalls(header_source: str) -> tuple[ProtocolConstant, ...]:
+def _load_protocol_sources(manifest: abi_manifest.AbiManifest) -> ProtocolSources | ProtocolIssue:
+    try:
+        return ProtocolSources(
+            abi_manifest.manifest_repo_path(manifest.generated_bindings.rust).read_text(),
+            abi_manifest.manifest_repo_path(manifest.generated_bindings.odin).read_text(),
+            _KERNEL_PATH.read_text(),
+            _SERVICE_PATH.read_text(),
+        )
+    except OSError as exc:
+        return _issue("manifest_source_unavailable", "abi_manifest.generated_bindings", f"Protocol mismatch: ABI manifest source path could not be read: {exc}")
+
+
+def _manifest_syscalls(manifest: abi_manifest.AbiManifest) -> tuple[ProtocolConstant, ...]:
     return tuple(
-        ProtocolConstant(name, int(value))
-        for name, value in _HEADER_SYSCALL_PATTERN.findall(header_source)
+        ProtocolConstant(name, value)
+        for name, value in manifest.constants.syscalls.items()
     )
 
 
-def _canonical_syscall_issue(constants: tuple[ProtocolConstant, ...]) -> ProtocolIssue | None:
+def _manifest_syscall_issue(constants: tuple[ProtocolConstant, ...]) -> ProtocolIssue | None:
     if _constant_named(constants, "K_SYSCALL_DEBUG_HEARTBEAT") is not None:
         return None
     return _issue(
-        "missing_canonical_syscall_constant",
-        "K_SYSCALL_DEBUG_HEARTBEAT",
-        "Protocol mismatch: contracts/kozo_abi.h is missing K_SYSCALL_DEBUG_HEARTBEAT",
+        "missing_manifest_syscall_constant",
+        "constants.syscalls.K_SYSCALL_DEBUG_HEARTBEAT",
+        "Protocol mismatch: ABI manifest is missing K_SYSCALL_DEBUG_HEARTBEAT",
     )
 
 
@@ -241,23 +240,29 @@ def _missing_kernel_case_issue(
     return None
 
 
-def _rust_live_usage_issue(service_source: str) -> ProtocolIssue | None:
+def _rust_live_usage_issue(
+    manifest: abi_manifest.AbiManifest,
+    service_source: str,
+) -> ProtocolIssue | None:
     heartbeat_block = _extract_rust_function_block(service_source, "heartbeat_request")
     if heartbeat_block is None:
         return _issue("missing_rust_heartbeat_path", "heartbeat_request", "Protocol mismatch: Rust heartbeat_request is missing")
     return _first_issue(
-        _forbidden_constant_issue(heartbeat_block, _RUST_FORBIDDEN_CONSTANTS),
+        _forbidden_constant_issue(heartbeat_block, _rust_forbidden_constants(manifest)),
         _missing_anchor_issue(heartbeat_block, _RUST_USAGE_ANCHORS),
     )
 
 
-def _odin_live_usage_issue(kernel_source: str) -> ProtocolIssue | None:
+def _odin_live_usage_issue(
+    manifest: abi_manifest.AbiManifest,
+    kernel_source: str,
+) -> ProtocolIssue | None:
     signal_block = _extract_odin_proc_block(kernel_source, "signal_kernel_heartbeat")
     dispatch_block = _extract_odin_proc_block(kernel_source, "syscall_dispatch")
     if signal_block is None or dispatch_block is None:
         return None
     return _first_issue(
-        _forbidden_constant_issue(f"{signal_block}\n{dispatch_block}", _ODIN_FORBIDDEN_CONSTANTS),
+        _forbidden_constant_issue(f"{signal_block}\n{dispatch_block}", _odin_forbidden_constants(manifest)),
         _missing_anchor_issue(signal_block, (_ODIN_USAGE_ANCHORS[0],)),
         _missing_anchor_issue(dispatch_block, (_ODIN_USAGE_ANCHORS[1],)),
     )
@@ -290,6 +295,38 @@ def _missing_anchor_issue(
         if anchor.needle not in source:
             return _issue("missing_live_protocol_usage", anchor.name, f"Protocol mismatch: {anchor.detail}")
     return None
+
+
+def _rust_forbidden_constants(
+    manifest: abi_manifest.AbiManifest,
+) -> tuple[ForbiddenLocalConstant, ...]:
+    heartbeat_id = _heartbeat_syscall_value(manifest)
+    return (
+        ForbiddenLocalConstant(
+            "rust_hardcoded_heartbeat_syscall_id",
+            re.compile(rf"\blet\s+syscall\s*:\s*abi::K_SYSCALL_ID\s*=\s*{heartbeat_id}\s*;|\binvoke_heartbeat_bridge\s*\(\s*{heartbeat_id}\s*,"),
+            "Rust heartbeat_request must not hardcode the DEBUG_HEARTBEAT syscall id",
+            _SERVICE_PATH,
+        ),
+    )
+
+
+def _odin_forbidden_constants(
+    manifest: abi_manifest.AbiManifest,
+) -> tuple[ForbiddenLocalConstant, ...]:
+    heartbeat_id = _heartbeat_syscall_value(manifest)
+    return (
+        ForbiddenLocalConstant(
+            "odin_hardcoded_heartbeat_syscall_id",
+            re.compile(rf"\bsyscall_dispatch\s*\(\s*{heartbeat_id}\s*,|case\s+{heartbeat_id}\s*:"),
+            "Odin heartbeat paths must not hardcode the DEBUG_HEARTBEAT syscall id",
+            _KERNEL_PATH,
+        ),
+    )
+
+
+def _heartbeat_syscall_value(manifest: abi_manifest.AbiManifest) -> int:
+    return manifest.constants.syscalls.get("K_SYSCALL_DEBUG_HEARTBEAT", 0)
 
 
 def _constant_named(

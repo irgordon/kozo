@@ -4,28 +4,18 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from harness import abi_manifest
 from harness.codes import LAYOUT_PARITY_MISMATCH, OK
 from harness.validator import BaseValidator, ValidationResult
 
 _ROOT = Path(__file__).resolve().parents[2]
-_HEADER_PATH = _ROOT / "contracts" / "kozo_abi.h"
-_ODIN_BINDINGS = _ROOT / "bindings" / "odin" / "kozo_abi.odin"
-_RUST_BINDINGS = _ROOT / "bindings" / "rust" / "kozo_abi.rs"
+_ABI_MANIFEST_PATH = abi_manifest.MANIFEST_PATH
 
-_C_STRUCT_PATTERN = re.compile(
-    r"typedef\s+struct\s+k_heartbeat_payload_t\s*\{(?P<body>.*?)\}\s*k_heartbeat_payload_t\s*;",
-    re.DOTALL,
-)
+_C_STRUCT_TEMPLATE = r"typedef\s+struct\s+{name}\s*\{{(?P<body>.*?)\}}\s*{name}\s*;"
 _C_FIELD_PATTERN = re.compile(r"(uint64_t|uint32_t)\s+([a-z_][a-z0-9_]*)\s*;")
-_ODIN_STRUCT_PATTERN = re.compile(
-    r"Heartbeat_Payload\s*::\s*struct(?:\s+#align\((\d+)\))?\s*\{(?P<body>.*?)\}",
-    re.DOTALL,
-)
+_ODIN_STRUCT_TEMPLATE = r"{name}\s*::\s*struct(?:\s+#align\((\d+)\))?\s*\{{(?P<body>.*?)\}}"
 _ODIN_FIELD_PATTERN = re.compile(r"([a-z_][a-z0-9_]*)\s*:\s*(u64|u32),")
-_RUST_STRUCT_PATTERN = re.compile(
-    r"#\[repr\(C\)\]\s*pub\s+struct\s+HeartbeatPayload\s*\{(?P<body>.*?)\}",
-    re.DOTALL,
-)
+_RUST_STRUCT_TEMPLATE = r"#\[repr\(C\)\]\s*pub\s+struct\s+{name}\s*\{{(?P<body>.*?)\}}"
 _RUST_FIELD_PATTERN = re.compile(r"pub\s+([a-z_][a-z0-9_]*)\s*:\s*(u64|u32),")
 
 
@@ -76,19 +66,6 @@ class LayoutIssue:
     action: str
 
 
-_HEARTBEAT_LAYOUT = LayoutContract(
-    c_name="k_heartbeat_payload_t",
-    rust_name="HeartbeatPayload",
-    odin_name="Heartbeat_Payload",
-    fields=(
-        LayoutField("sequence", "uint64_t", "u64", "u64", 8, 8, 0),
-        LayoutField("timestamp", "uint64_t", "u64", "u64", 8, 8, 8),
-        LayoutField("status_bits", "uint32_t", "u32", "u32", 4, 4, 16),
-    ),
-    size=24,
-    alignment=8,
-)
-
 _C_TYPE_LAYOUT = {"uint64_t": (8, 8), "uint32_t": (4, 4)}
 _RUST_TYPE_LAYOUT = {"u64": (8, 8), "u32": (4, 4)}
 _ODIN_TYPE_LAYOUT = {"u64": (8, 8), "u32": (4, 4)}
@@ -100,13 +77,71 @@ class LayoutParityValidator(BaseValidator):
 
     def validate(self, artifact_bundle):
         _ = artifact_bundle
-        issue = _first_layout_issue(_HEARTBEAT_LAYOUT, _load_layout_sources())
+        issue = _layout_validation_issue()
         if issue is not None:
             return _failure_result(issue)
         return ValidationResult.pass_(
             code=OK,
             detail="Heartbeat payload layout matches across the C contract, Odin bindings, and Rust bindings",
         )
+
+
+def _layout_validation_issue() -> LayoutIssue | None:
+    manifest = _load_layout_manifest()
+    if isinstance(manifest, LayoutIssue):
+        return manifest
+    contract = _layout_contract_from_manifest(manifest)
+    if isinstance(contract, LayoutIssue):
+        return contract
+    sources = _load_layout_sources(manifest)
+    if isinstance(sources, LayoutIssue):
+        return sources
+    return _first_layout_issue(contract, sources)
+
+
+def _load_layout_manifest() -> abi_manifest.AbiManifest | LayoutIssue:
+    try:
+        return abi_manifest.load_abi_manifest(_ABI_MANIFEST_PATH)
+    except (KeyError, OSError, TypeError, ValueError) as exc:
+        return _issue("manifest_unavailable", "manifest", f"ABI manifest could not be loaded: {exc}")
+
+
+def _layout_contract_from_manifest(
+    manifest: abi_manifest.AbiManifest,
+) -> LayoutContract | LayoutIssue:
+    manifest_layout = manifest.heartbeat_payload
+    fields = tuple(_layout_field_from_manifest(field) for field in manifest_layout.fields)
+    issue = _manifest_contract_field_issue(fields)
+    if issue is not None:
+        return issue
+    return LayoutContract(
+        c_name=manifest_layout.c_name,
+        rust_name=manifest_layout.rust_name,
+        odin_name=manifest_layout.odin_name,
+        fields=fields,
+        size=manifest_layout.size,
+        alignment=manifest_layout.alignment,
+    )
+
+
+def _layout_field_from_manifest(field: abi_manifest.ManifestLayoutField) -> LayoutField:
+    return LayoutField(
+        name=field.name,
+        c_type=_c_type_for_width(field.width),
+        rust_type=_rust_type_for_width(field.width),
+        odin_type=_odin_type_for_width(field.width),
+        width=field.width,
+        alignment=field.width,
+        offset=field.offset,
+    )
+
+
+def _manifest_contract_field_issue(fields: tuple[LayoutField, ...]) -> LayoutIssue | None:
+    actual_names = tuple(field.name for field in fields)
+    for name in ("sequence", "timestamp", "status_bits"):
+        if name not in actual_names:
+            return _issue("manifest_missing_layout_field", f"manifest.layouts.heartbeat_payload.fields.{name}", f"ABI manifest is missing heartbeat payload field {name}")
+    return None
 
 
 def _first_layout_issue(
@@ -126,16 +161,19 @@ def _first_layout_issue(
     )
 
 
-def _load_layout_sources() -> dict[str, str]:
-    return {
-        "header": _HEADER_PATH.read_text(),
-        "rust": _RUST_BINDINGS.read_text(),
-        "odin": _ODIN_BINDINGS.read_text(),
-    }
+def _load_layout_sources(manifest: abi_manifest.AbiManifest) -> dict[str, str]:
+    try:
+        return {
+            "header": abi_manifest.manifest_repo_path(manifest.canonical_header).read_text(),
+            "rust": abi_manifest.manifest_repo_path(manifest.generated_bindings.rust).read_text(),
+            "odin": abi_manifest.manifest_repo_path(manifest.generated_bindings.odin).read_text(),
+        }
+    except OSError as exc:
+        return _issue("manifest_source_unavailable", "manifest.generated_bindings", f"ABI manifest source path could not be read: {exc}")
 
 
 def _parse_c_layout(source: str, contract: LayoutContract) -> LanguageLayout | LayoutIssue:
-    matches = tuple(_C_STRUCT_PATTERN.finditer(source))
+    matches = tuple(_c_struct_pattern(contract.c_name).finditer(source))
     if len(matches) != 1:
         return _struct_count_issue("canonical", contract.c_name, len(matches))
     fields = tuple((name, scalar_type) for scalar_type, name in _C_FIELD_PATTERN.findall(matches[0].group("body")))
@@ -143,7 +181,7 @@ def _parse_c_layout(source: str, contract: LayoutContract) -> LanguageLayout | L
 
 
 def _parse_rust_layout(source: str, contract: LayoutContract) -> LanguageLayout | LayoutIssue:
-    matches = tuple(_RUST_STRUCT_PATTERN.finditer(source))
+    matches = tuple(_rust_struct_pattern(contract.rust_name).finditer(source))
     if len(matches) != 1:
         return _struct_count_issue("rust", contract.rust_name, len(matches))
     fields = tuple(_RUST_FIELD_PATTERN.findall(matches[0].group("body")))
@@ -151,12 +189,24 @@ def _parse_rust_layout(source: str, contract: LayoutContract) -> LanguageLayout 
 
 
 def _parse_odin_layout(source: str, contract: LayoutContract) -> LanguageLayout | LayoutIssue:
-    matches = tuple(_ODIN_STRUCT_PATTERN.finditer(source))
+    matches = tuple(_odin_struct_pattern(contract.odin_name).finditer(source))
     if len(matches) != 1:
         return _struct_count_issue("odin", contract.odin_name, len(matches))
     forced_alignment = int(matches[0].group(1)) if matches[0].group(1) else None
     fields = tuple(_ODIN_FIELD_PATTERN.findall(matches[0].group("body")))
     return _build_language_layout("odin", contract.odin_name, fields, _ODIN_TYPE_LAYOUT, forced_alignment)
+
+
+def _c_struct_pattern(struct_name: str) -> re.Pattern[str]:
+    return re.compile(_C_STRUCT_TEMPLATE.format(name=re.escape(struct_name)), re.DOTALL)
+
+
+def _rust_struct_pattern(struct_name: str) -> re.Pattern[str]:
+    return re.compile(_RUST_STRUCT_TEMPLATE.format(name=re.escape(struct_name)), re.DOTALL)
+
+
+def _odin_struct_pattern(struct_name: str) -> re.Pattern[str]:
+    return re.compile(_ODIN_STRUCT_TEMPLATE.format(name=re.escape(struct_name)), re.DOTALL)
 
 
 def _build_language_layout(
@@ -277,6 +327,18 @@ def _layout_parse_issue(layout: LanguageLayout | LayoutIssue) -> LayoutIssue | N
 
 def _contract_field_names(contract: LayoutContract) -> tuple[str, ...]:
     return tuple(field.name for field in contract.fields)
+
+
+def _c_type_for_width(width: int) -> str:
+    return {8: "uint64_t", 4: "uint32_t"}.get(width, f"unsupported_width_{width}")
+
+
+def _rust_type_for_width(width: int) -> str:
+    return {8: "u64", 4: "u32"}.get(width, f"unsupported_width_{width}")
+
+
+def _odin_type_for_width(width: int) -> str:
+    return {8: "u64", 4: "u32"}.get(width, f"unsupported_width_{width}")
 
 
 def _parsed_field_named(layout: LanguageLayout, name: str) -> ParsedField | None:

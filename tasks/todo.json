@@ -24,6 +24,7 @@
     "artifacts/",
     "agent/",
     "docs/",
+    "contracts/",
     "kernel/",
     "userspace/",
     "harness/",
@@ -332,6 +333,37 @@
         "verification.tests_run[10]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 13,
+      "title": "Introduce ABI manifest v0 and wire protocol and layout proofs",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "tasks/todo.json",
+        "contracts/kozo_abi_manifest.json",
+        "harness/abi_manifest.py",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/abi_manifest.py",
+        "harness/validators_impl/layout_parity.py",
+        "harness/validators_impl/protocol_validator.py",
+        "harness/validators_impl/schema.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/agent_context.schema.json",
+        "schemas/kozo_abi_manifest.schema.json",
+        "schemas/latest_verify.schema.json",
+        "tests/test_abi_manifest.py",
+        "tests/test_layout_parity.py",
+        "tests/test_protocol_contract_alignment.py"
+      ],
+      "verification_refs": [
+        "verification.tests_run[5]",
+        "verification.tests_run[9]",
+        "verification.tests_run[10]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -348,7 +380,8 @@
     "execution_proof validates the live Odin heartbeat branch and serial observations with focused positive and negative tests",
     "The regenerated verification artifact records the hardened bridge, runtime, return-path, and execution proofs",
     "validator_coverage prevents registered validators from entering the harness without focused behavioral negative-path tests",
-    "validator_coverage requires declared failure-mode markers to map to behavioral negative tests"
+    "validator_coverage requires declared failure-mode markers to map to behavioral negative tests",
+    "ABI manifest v0 provides the Python-side source of truth for proven syscall constants, status constants, heartbeat payload layout, and heartbeat sentinels"
   ],
   "verification": {
     "tests_run": [
