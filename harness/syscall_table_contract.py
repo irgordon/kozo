@@ -20,12 +20,22 @@ class TableDispatcher:
 
 
 @dataclass(frozen=True)
-class TableSyscall:
+class PayloadSyscall:
     name: str
     constant: str
     payload_layout: str
     branch_selector: str
     boundary_contract: str
+
+
+@dataclass(frozen=True)
+class NoPayloadSyscall:
+    name: str
+    constant: str
+    branch_selector: str
+    return_status: str
+    must_not_mutate_payload: bool
+    prohibited_fields: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -45,8 +55,7 @@ class SyscallTableContract:
     version: int
     architecture: str
     dispatcher: TableDispatcher
-    valid_syscalls: tuple[TableSyscall, ...]
-    allowed_nonpayload_branches: tuple[str, ...]
+    valid_syscalls: tuple[PayloadSyscall | NoPayloadSyscall, ...]
     unknown_syscall_behavior: UnknownSyscallBehavior
     relationships: TableRelationships
 
@@ -71,7 +80,6 @@ def parse_syscall_table_contract(data: dict[str, Any]) -> SyscallTableContract:
         architecture=data["architecture"],
         dispatcher=_dispatcher(data),
         valid_syscalls=_valid_syscalls(data),
-        allowed_nonpayload_branches=_allowed_nonpayload_branches(data),
         unknown_syscall_behavior=_unknown_syscall_behavior(data),
         relationships=_relationships(data),
     )
@@ -94,27 +102,36 @@ def _dispatcher(data: dict[str, Any]) -> TableDispatcher:
     )
 
 
-def _valid_syscalls(data: dict[str, Any]) -> tuple[TableSyscall, ...]:
+def _valid_syscalls(data: dict[str, Any]) -> tuple[PayloadSyscall | NoPayloadSyscall, ...]:
     syscalls = data["valid_syscalls"]
     return tuple(
-        TableSyscall(
-            name,
-            syscall["constant"],
-            syscall["payload_layout"],
-            syscall["branch_selector"],
-            syscall["boundary_contract"],
-        )
+        _valid_syscall(name, syscall)
         for name, syscall in syscalls.items()
         if isinstance(name, str) and isinstance(syscall, dict)
     )
 
 
-def _allowed_nonpayload_branches(data: dict[str, Any]) -> tuple[str, ...]:
-    return tuple(
-        selector
-        for selector in data.get("allowed_nonpayload_branches", ())
-        if isinstance(selector, str)
+def _valid_syscall(name: str, syscall: dict[str, Any]) -> PayloadSyscall | NoPayloadSyscall:
+    if syscall["kind"] == "no_payload":
+        return NoPayloadSyscall(
+            name,
+            syscall["constant"],
+            syscall["branch_selector"],
+            syscall["return_status"],
+            syscall["must_not_mutate_payload"],
+            _prohibited_no_payload_fields(syscall),
+        )
+    return PayloadSyscall(
+        name,
+        syscall["constant"],
+        syscall["payload_layout"],
+        syscall["branch_selector"],
+        syscall["boundary_contract"],
     )
+
+
+def _prohibited_no_payload_fields(syscall: dict[str, Any]) -> tuple[str, ...]:
+    return tuple(field for field in ("payload_layout", "boundary_contract") if field in syscall)
 
 
 def _unknown_syscall_behavior(data: dict[str, Any]) -> UnknownSyscallBehavior:

@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.0.22 - 2026-05-31
+
+**Status:** NOP is governed as the first no-payload syscall table entry.
+
+### Added
+
+* Promoted `K_SYSCALL_NOP` from an allowed dispatcher branch into a first-class `no_payload` syscall entry in syscall table contract v0.
+* Added schema and loader support for distinct payload and no-payload syscall table entries without leaking unchecked optional payload fields into validators.
+* Hardened `syscall_table_contract` and `syscall_table_conformance` so NOP must use `abi.K_SYSCALL_NOP`, return `K_OK`, avoid payload mutation, and avoid heartbeat payload layout or sentinels.
+* Added focused negative coverage for missing NOP manifest/binding/header constants, payload-layout references on no-payload entries, missing/wrong NOP return status, missing or hardcoded NOP dispatcher branches, NOP payload mutation, NOP heartbeat layout usage, and NOP diagnostics.
+
+### Notes
+
+* This version governs the existing NOP dispatcher branch as a no-payload syscall contract; it does not add a payload layout, request/response sentinels, or a new runtime behavior path.
+* This change does not add Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or runtime expansion beyond NOP governance.
+
 ## v0.0.21 - 2026-05-31
 
 - Added `syscall_table_conformance` as a source-level validator for the live Odin dispatcher implementation.

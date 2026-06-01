@@ -241,9 +241,20 @@ def _syscall_contract_issue(context: TableContext, blocks: DispatcherBlocks) -> 
 def _single_syscall_issue(
     context: TableContext,
     blocks: DispatcherBlocks,
-    syscall: syscall_table_contract.TableSyscall,
+    syscall: syscall_table_contract.PayloadSyscall | syscall_table_contract.NoPayloadSyscall,
 ) -> TableIssue | None:
     branch = _case_block(blocks.switch_body, f"case {syscall.branch_selector}:")
+    if isinstance(syscall, syscall_table_contract.NoPayloadSyscall):
+        return _no_payload_syscall_issue(context, blocks, syscall, branch)
+    return _payload_syscall_issue(context, blocks, syscall, branch)
+
+
+def _payload_syscall_issue(
+    context: TableContext,
+    blocks: DispatcherBlocks,
+    syscall: syscall_table_contract.PayloadSyscall,
+    branch: str | None,
+) -> TableIssue | None:
     return _first_issue(
         _syscall_constant_issue(context, syscall),
         _payload_layout_issue(context, syscall),
@@ -255,9 +266,26 @@ def _single_syscall_issue(
     )
 
 
+def _no_payload_syscall_issue(
+    context: TableContext,
+    blocks: DispatcherBlocks,
+    syscall: syscall_table_contract.NoPayloadSyscall,
+    branch: str | None,
+) -> TableIssue | None:
+    return _first_issue(
+        _syscall_constant_issue(context, syscall),
+        _no_payload_shape_issue(syscall),
+        _status_constant_issue(context, syscall.return_status, f"valid_syscalls.{syscall.name}.return_status"),
+        _branch_selector_consistency_issue(syscall),
+        _branch_selector_presence_issue(branch, syscall),
+        _no_payload_branch_issue(branch or "", syscall),
+        _unique_branch_selector_issue(blocks.switch_body, syscall),
+    )
+
+
 def _syscall_constant_issue(
     context: TableContext,
-    syscall: syscall_table_contract.TableSyscall,
+    syscall: syscall_table_contract.PayloadSyscall | syscall_table_contract.NoPayloadSyscall,
 ) -> TableIssue | None:
     if syscall.constant in context.manifest.constants.syscalls:
         return None
@@ -266,7 +294,7 @@ def _syscall_constant_issue(
 
 def _payload_layout_issue(
     context: TableContext,
-    syscall: syscall_table_contract.TableSyscall,
+    syscall: syscall_table_contract.PayloadSyscall,
 ) -> TableIssue | None:
     if syscall.payload_layout == "heartbeat_payload":
         return None
@@ -275,33 +303,74 @@ def _payload_layout_issue(
 
 def _boundary_mapping_issue(
     context: TableContext,
-    syscall: syscall_table_contract.TableSyscall,
+    syscall: syscall_table_contract.PayloadSyscall,
 ) -> TableIssue | None:
     if syscall.boundary_contract == _EXPECTED_BOUNDARY_CONTRACT and syscall.constant == context.boundary.debug_heartbeat.constant:
         return None
     return _issue("wrong_branch_mapping", f"valid_syscalls.{syscall.name}.boundary_contract", "Table syscall does not map to the debug heartbeat boundary contract")
 
 
-def _branch_selector_consistency_issue(syscall: syscall_table_contract.TableSyscall) -> TableIssue | None:
+def _branch_selector_consistency_issue(
+    syscall: syscall_table_contract.PayloadSyscall | syscall_table_contract.NoPayloadSyscall,
+) -> TableIssue | None:
     expected_selector = f"abi.{syscall.constant}"
     if syscall.branch_selector == expected_selector:
         return None
     return _issue("wrong_branch_mapping", f"valid_syscalls.{syscall.name}.branch_selector", f"Expected {expected_selector}, got {syscall.branch_selector}")
 
 
-def _branch_selector_presence_issue(branch: str | None, syscall: syscall_table_contract.TableSyscall) -> TableIssue | None:
+def _branch_selector_presence_issue(
+    branch: str | None,
+    syscall: syscall_table_contract.PayloadSyscall | syscall_table_contract.NoPayloadSyscall,
+) -> TableIssue | None:
     if branch is not None:
         return None
     return _issue("missing_branch_selector", f"valid_syscalls.{syscall.name}.branch_selector", f"Dispatcher is missing {syscall.branch_selector}")
 
 
-def _branch_mapping_issue(branch: str, syscall: syscall_table_contract.TableSyscall) -> TableIssue | None:
+def _branch_mapping_issue(branch: str, syscall: syscall_table_contract.PayloadSyscall) -> TableIssue | None:
     if "payload.sequence != 0xCAFEFEED" in branch and "payload.status_bits = u32(abi.K_OK)" in branch:
         return None
     return _issue("wrong_branch_mapping", f"valid_syscalls.{syscall.name}.branch_selector", f"{syscall.branch_selector} does not map to the heartbeat branch body")
 
 
-def _unique_branch_selector_issue(switch_body: str, syscall: syscall_table_contract.TableSyscall) -> TableIssue | None:
+def _no_payload_shape_issue(syscall: syscall_table_contract.NoPayloadSyscall) -> TableIssue | None:
+    if not syscall.prohibited_fields:
+        return None
+    field = syscall.prohibited_fields[0]
+    return _issue("no_payload_payload_layout_reference", f"valid_syscalls.{syscall.name}.{field}", f"No-payload syscall {syscall.name} must not declare {field}")
+
+
+def _no_payload_branch_issue(branch: str, syscall: syscall_table_contract.NoPayloadSyscall) -> TableIssue | None:
+    return _first_issue(
+        _no_payload_return_issue(branch, syscall),
+        _no_payload_mutation_issue(branch, syscall),
+        _no_payload_heartbeat_layout_issue(branch, syscall),
+    )
+
+
+def _no_payload_return_issue(branch: str, syscall: syscall_table_contract.NoPayloadSyscall) -> TableIssue | None:
+    if f"return abi.{syscall.return_status}" in branch:
+        return None
+    return _issue("wrong_no_payload_return_status", f"valid_syscalls.{syscall.name}.return_status", f"{syscall.name} must return abi.{syscall.return_status}")
+
+
+def _no_payload_mutation_issue(branch: str, syscall: syscall_table_contract.NoPayloadSyscall) -> TableIssue | None:
+    if not syscall.must_not_mutate_payload or re.search(r"\bpayload\.[a-z_][a-z0-9_]*\s*=(?!=)", branch) is None:
+        return None
+    return _issue("no_payload_mutates_payload", f"valid_syscalls.{syscall.name}.must_not_mutate_payload", f"{syscall.name} must not mutate payload")
+
+
+def _no_payload_heartbeat_layout_issue(branch: str, syscall: syscall_table_contract.NoPayloadSyscall) -> TableIssue | None:
+    if "payload" not in branch and "Heartbeat_Payload" not in branch and "0xCAFE" not in branch:
+        return None
+    return _issue("no_payload_uses_payload_layout", f"valid_syscalls.{syscall.name}", f"{syscall.name} must not use heartbeat payload layout or sentinels")
+
+
+def _unique_branch_selector_issue(
+    switch_body: str,
+    syscall: syscall_table_contract.PayloadSyscall | syscall_table_contract.NoPayloadSyscall,
+) -> TableIssue | None:
     if switch_body.count(f"case {syscall.branch_selector}:") == 1:
         return None
     return _issue("wrong_branch_mapping", f"valid_syscalls.{syscall.name}.branch_selector", f"{syscall.branch_selector} must appear exactly once")
@@ -336,7 +405,7 @@ def _unknown_return_issue(default_path: str, status: str) -> TableIssue | None:
 
 
 def _unknown_mutation_issue(default_path: str, must_not_mutate: bool) -> TableIssue | None:
-    if not must_not_mutate or re.search(r"\bpayload\.[a-z_][a-z0-9_]*\s*=", default_path) is None:
+    if not must_not_mutate or re.search(r"\bpayload\.[a-z_][a-z0-9_]*\s*=(?!=)", default_path) is None:
         return None
     return _issue("unknown_path_mutates_payload", "unknown_syscall_behavior.must_not_mutate_payload", "Unknown syscall path mutates the heartbeat payload")
 

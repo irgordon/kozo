@@ -81,6 +81,19 @@ class AbiManifestValidatorTests(unittest.TestCase):
 
         self.assert_manifest_failure(result, "manifest_constant_mismatch", "constants.syscalls.K_SYSCALL_DEBUG_HEARTBEAT")
 
+    def test_fails_when_header_is_missing_nop_syscall_constant(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            paths = self.write_manifest_fixture(root)
+            paths["header"].write_text(self.valid_header().replace("\tK_SYSCALL_NOP = 0,\n", ""))
+            manifest_path = self.write_manifest(root, self.valid_manifest(paths))
+
+            result = self.validate_manifest(manifest_path)
+
+        self.assertEqual(result.status, "fail")
+
+        self.assert_manifest_failure(result, "manifest_constant_missing_in_header", "constants.syscalls.K_SYSCALL_NOP")
+
     def test_fails_when_manifest_layout_field_offset_mismatches_header(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
@@ -130,8 +143,14 @@ class AbiManifestValidatorTests(unittest.TestCase):
             "odin": root / "kozo_abi.odin",
         }
         paths["header"].write_text(self.valid_header())
-        paths["rust"].write_text("pub const K_SYSCALL_DEBUG_HEARTBEAT: K_SYSCALL_ID = 1;\n")
-        paths["odin"].write_text("K_SYSCALL_DEBUG_HEARTBEAT : K_SYSCALL_ID : 1\n")
+        paths["rust"].write_text(
+            "pub const K_SYSCALL_NOP: K_SYSCALL_ID = 0;\n"
+            "pub const K_SYSCALL_DEBUG_HEARTBEAT: K_SYSCALL_ID = 1;\n"
+        )
+        paths["odin"].write_text(
+            "K_SYSCALL_NOP : K_SYSCALL_ID : 0\n"
+            "K_SYSCALL_DEBUG_HEARTBEAT : K_SYSCALL_ID : 1\n"
+        )
         return paths
 
     def write_manifest(self, root: Path, manifest: dict[str, object]) -> Path:
@@ -153,6 +172,7 @@ class AbiManifestValidatorTests(unittest.TestCase):
                     "K_INVALID": 1,
                 },
                 "syscalls": {
+                    "K_SYSCALL_NOP": 0,
                     "K_SYSCALL_DEBUG_HEARTBEAT": 1,
                 },
             },
@@ -191,6 +211,7 @@ class AbiManifestValidatorTests(unittest.TestCase):
             "\tK_INVALID = 1,\n"
             "} k_status_t;\n"
             "typedef enum k_syscall_id_t {\n"
+            "\tK_SYSCALL_NOP = 0,\n"
             "\tK_SYSCALL_DEBUG_HEARTBEAT = 1,\n"
             "} k_syscall_id_t;\n"
             "typedef struct k_heartbeat_payload_t {\n"

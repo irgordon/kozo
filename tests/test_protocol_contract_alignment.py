@@ -60,6 +60,18 @@ class ProtocolContractValidatorTests(unittest.TestCase):
 
         self.assert_protocol_failure(result, "rust_missing_generated_syscall_constant", "rust_K_SYSCALL_DEBUG_HEARTBEAT")
 
+    def test_fails_when_generated_rust_nop_syscall_constant_is_missing(self):
+        result = self.validate_contract(
+            rust_bindings=self.valid_rust_bindings().replace(
+                "pub const K_SYSCALL_NOP: K_SYSCALL_ID = 0;\n",
+                "",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+
+        self.assert_protocol_failure(result, "rust_missing_generated_syscall_constant", "rust_K_SYSCALL_NOP")
+
     def test_fails_when_generated_odin_syscall_constant_is_missing(self):
         result = self.validate_contract(
             odin_bindings=self.valid_odin_bindings().replace(
@@ -71,6 +83,18 @@ class ProtocolContractValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
 
         self.assert_protocol_failure(result, "odin_missing_generated_syscall_constant", "odin_K_SYSCALL_DEBUG_HEARTBEAT")
+
+    def test_fails_when_generated_odin_nop_syscall_constant_is_missing(self):
+        result = self.validate_contract(
+            odin_bindings=self.valid_odin_bindings().replace(
+                "K_SYSCALL_NOP : K_SYSCALL_ID : 0\n",
+                "",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+
+        self.assert_protocol_failure(result, "odin_missing_generated_syscall_constant", "odin_K_SYSCALL_NOP")
 
     def test_fails_when_rust_uses_hardcoded_syscall_id(self):
         result = self.validate_contract(

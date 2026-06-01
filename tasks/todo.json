@@ -467,6 +467,32 @@
         "verification.tests_run[10]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 18,
+      "title": "Govern K_SYSCALL_NOP as a no-payload syscall table entry",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "contracts/syscall_table_contract.v0.json",
+        "harness/syscall_table_contract.py",
+        "harness/validators_impl/syscall_table_contract.py",
+        "harness/validators_impl/syscall_table_conformance.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/syscall_table_contract.schema.json",
+        "tests/test_abi_manifest.py",
+        "tests/test_protocol_contract_alignment.py",
+        "tests/test_syscall_table_contract.py",
+        "tests/test_syscall_table_conformance.py"
+      ],
+      "verification_refs": [
+        "verification.tests_run[5]",
+        "verification.tests_run[9]",
+        "verification.tests_run[10]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -488,7 +514,8 @@
     "Syscall boundary contract v0 describes and validates only the currently proven x86_64 heartbeat trap boundary",
     "syscall_boundary_conformance proves live assembly, Rust, and Odin sources conform to syscall boundary contract v0",
     "Syscall table contract v0 describes and validates the currently proven heartbeat/debug dispatcher branch and unknown-syscall default behavior",
-    "syscall_table_conformance proves the live Odin dispatcher implements syscall table contract v0 without uncontracted payload-mutating branches"
+    "syscall_table_conformance proves the live Odin dispatcher implements syscall table contract v0 without uncontracted payload-mutating branches",
+    "K_SYSCALL_NOP is governed as a first-class no-payload syscall table entry that returns K_OK and never mutates or inspects heartbeat payload state"
   ],
   "verification": {
     "tests_run": [
@@ -605,7 +632,8 @@
       "validator_coverage reports pass only when every registered validator has focused tests with behavioral negative-path coverage.",
       "A placeholder test containing only a validator token and negative-looking name fails validator_coverage with a named missing-invocation diagnostic.",
       "validator_coverage reports pass only when each declared negative marker maps to an existing behavioral negative test.",
-      "Missing marker metadata, missing required markers, unknown markers, missing mapped test functions, and mapped placeholder tests fail with named diagnostics."
+      "Missing marker metadata, missing required markers, unknown markers, missing mapped test functions, and mapped placeholder tests fail with named diagnostics.",
+      "K_SYSCALL_NOP is represented in syscall table contract v0 as a no-payload entry that requires abi.K_SYSCALL_NOP, returns K_OK, and rejects payload mutation or heartbeat payload layout usage."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -626,6 +654,7 @@
     "Hardened execution_proof so the live Odin heartbeat branch and stable serial observations are required and covered by focused negative tests.",
     "Regenerated latest_verify.json so the current artifact records the hardened proof details.",
     "Added validator_coverage so registered validators must have focused test files with AST-verified behavioral negative-path coverage.",
-    "Extended validator_coverage so registered validators must declare marker-level coverage for their known false-pass risks."
+    "Extended validator_coverage so registered validators must declare marker-level coverage for their known false-pass risks.",
+    "Promoted K_SYSCALL_NOP into a governed no-payload syscall table entry without adding payload layout, userspace execution, Linux compatibility, or broader runtime behavior."
   ]
 }

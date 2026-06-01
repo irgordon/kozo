@@ -149,21 +149,48 @@ def _valid_syscall_issue(
 def _single_syscall_issue(
     context: ConformanceContext,
     dispatcher: DispatcherSource,
-    syscall: syscall_table_contract.TableSyscall,
+    syscall: syscall_table_contract.PayloadSyscall | syscall_table_contract.NoPayloadSyscall,
 ) -> ConformanceIssue | None:
     branch = _branch_for_syscall(dispatcher, syscall)
+    if isinstance(syscall, syscall_table_contract.NoPayloadSyscall):
+        return _no_payload_syscall_issue(context, dispatcher, syscall, branch)
+    return _payload_syscall_issue(context, dispatcher, syscall, branch)
+
+
+def _payload_syscall_issue(
+    context: ConformanceContext,
+    dispatcher: DispatcherSource,
+    syscall: syscall_table_contract.PayloadSyscall,
+    branch: DispatcherBranch | None,
+) -> ConformanceIssue | None:
     return _first_issue(
         _abi_syscall_constant_issue(context, syscall),
         _abi_payload_layout_issue(context, syscall),
-        _branch_selector_issue(dispatcher, syscall, branch),
+        _branch_selector_issue(context, dispatcher, syscall, branch),
         _payload_layout_issue(context, dispatcher),
         _branch_body_issue(branch, syscall),
     )
 
 
+def _no_payload_syscall_issue(
+    context: ConformanceContext,
+    dispatcher: DispatcherSource,
+    syscall: syscall_table_contract.NoPayloadSyscall,
+    branch: DispatcherBranch | None,
+) -> ConformanceIssue | None:
+    return _first_issue(
+        _abi_syscall_constant_issue(context, syscall),
+        _branch_selector_issue(context, dispatcher, syscall, branch),
+        _no_payload_return_issue(branch, syscall),
+        _no_payload_mutation_issue(branch, syscall),
+        _no_payload_heartbeat_layout_issue(branch, syscall),
+        _status_constant_issue(context, syscall),
+    )
+
+
 def _abi_syscall_constant_issue(
     context: ConformanceContext,
-    syscall: syscall_table_contract.TableSyscall,
+    syscall: syscall_table_contract.PayloadSyscall | syscall_table_contract.NoPayloadSyscall,
 ) -> ConformanceIssue | None:
     if syscall.constant in context.manifest.constants.syscalls:
         return None
@@ -172,7 +199,7 @@ def _abi_syscall_constant_issue(
 
 def _abi_payload_layout_issue(
     context: ConformanceContext,
-    syscall: syscall_table_contract.TableSyscall,
+    syscall: syscall_table_contract.PayloadSyscall,
 ) -> ConformanceIssue | None:
     if syscall.payload_layout == "heartbeat_payload":
         return None
@@ -180,13 +207,14 @@ def _abi_payload_layout_issue(
 
 
 def _branch_selector_issue(
+    context: ConformanceContext,
     dispatcher: DispatcherSource,
-    syscall: syscall_table_contract.TableSyscall,
+    syscall: syscall_table_contract.PayloadSyscall | syscall_table_contract.NoPayloadSyscall,
     branch: DispatcherBranch | None,
 ) -> ConformanceIssue | None:
     if not syscall.branch_selector.startswith("abi."):
         return _issue("hardcoded_branch_selector", f"valid_syscalls.{syscall.name}.branch_selector", f"{syscall.branch_selector} is not ABI namespaced")
-    if _has_hardcoded_case(dispatcher.switch_body):
+    if _has_hardcoded_case_for_syscall(context, dispatcher.switch_body, syscall):
         return _issue("hardcoded_branch_selector", f"valid_syscalls.{syscall.name}.branch_selector", "Dispatcher contains a numeric syscall case")
     if branch is not None:
         return None
@@ -205,7 +233,7 @@ def _payload_layout_issue(
 
 def _branch_body_issue(
     branch: DispatcherBranch | None,
-    syscall: syscall_table_contract.TableSyscall,
+    syscall: syscall_table_contract.PayloadSyscall,
 ) -> ConformanceIssue | None:
     if branch is None:
         return None
@@ -220,7 +248,6 @@ def _extra_branch_issue(
 ) -> ConformanceIssue | None:
     allowed = {
         *(syscall.branch_selector for syscall in context.contract.valid_syscalls),
-        *context.contract.allowed_nonpayload_branches,
     }
     for selector in _case_selectors(dispatcher.switch_body):
         if selector not in allowed:
@@ -256,7 +283,7 @@ def _unknown_return_issue(default_path: str, status: str) -> ConformanceIssue | 
 
 
 def _unknown_mutation_issue(default_path: str, must_not_mutate: bool) -> ConformanceIssue | None:
-    if not must_not_mutate or re.search(r"\bpayload\.[a-z_][a-z0-9_]*\s*=", default_path) is None:
+    if not must_not_mutate or re.search(r"\bpayload\.[a-z_][a-z0-9_]*\s*=(?!=)", default_path) is None:
         return None
     return _issue("unknown_path_mutates_payload", "unknown_syscall_behavior.must_not_mutate_payload", "Unknown syscall path mutates payload state")
 
@@ -279,9 +306,47 @@ def _unknown_status_manifest_issue(context: ConformanceContext, status: str) -> 
     return _issue("missing_abi_status_constant", "unknown_syscall_behavior.return_status", f"{status} is not declared in ABI manifest status constants")
 
 
+def _status_constant_issue(
+    context: ConformanceContext,
+    syscall: syscall_table_contract.NoPayloadSyscall,
+) -> ConformanceIssue | None:
+    if syscall.return_status in context.manifest.constants.status:
+        return None
+    return _issue("missing_abi_status_constant", f"valid_syscalls.{syscall.name}.return_status", f"{syscall.return_status} is not declared in ABI manifest status constants")
+
+
+def _no_payload_return_issue(
+    branch: DispatcherBranch | None,
+    syscall: syscall_table_contract.NoPayloadSyscall,
+) -> ConformanceIssue | None:
+    if branch is not None and f"return abi.{syscall.return_status}" in branch.body:
+        return None
+    return _issue("wrong_no_payload_return_status", f"valid_syscalls.{syscall.name}.return_status", f"{syscall.name} must return abi.{syscall.return_status}")
+
+
+def _no_payload_mutation_issue(
+    branch: DispatcherBranch | None,
+    syscall: syscall_table_contract.NoPayloadSyscall,
+) -> ConformanceIssue | None:
+    if branch is None or not syscall.must_not_mutate_payload or re.search(r"\bpayload\.[a-z_][a-z0-9_]*\s*=(?!=)", branch.body) is None:
+        return None
+    return _issue("no_payload_mutates_payload", f"valid_syscalls.{syscall.name}.must_not_mutate_payload", f"{syscall.name} must not mutate payload")
+
+
+def _no_payload_heartbeat_layout_issue(
+    branch: DispatcherBranch | None,
+    syscall: syscall_table_contract.NoPayloadSyscall,
+) -> ConformanceIssue | None:
+    if branch is None:
+        return None
+    if "payload" not in branch.body and "Heartbeat_Payload" not in branch.body and "0xCAFE" not in branch.body:
+        return None
+    return _issue("no_payload_uses_payload_layout", f"valid_syscalls.{syscall.name}", f"{syscall.name} must not use heartbeat payload layout or sentinels")
+
+
 def _branch_for_syscall(
     dispatcher: DispatcherSource,
-    syscall: syscall_table_contract.TableSyscall,
+    syscall: syscall_table_contract.PayloadSyscall | syscall_table_contract.NoPayloadSyscall,
 ) -> DispatcherBranch | None:
     body = _case_block(dispatcher.switch_body, f"case {syscall.branch_selector}:")
     if body is None:
@@ -298,8 +363,17 @@ def _is_heartbeat_body(branch: str) -> bool:
     )
 
 
-def _has_hardcoded_case(switch_body: str) -> bool:
-    return any(re.fullmatch(r"\d+", selector) for selector in _case_selectors(switch_body))
+def _has_hardcoded_case_for_syscall(
+    context: ConformanceContext,
+    switch_body: str,
+    syscall: syscall_table_contract.PayloadSyscall | syscall_table_contract.NoPayloadSyscall,
+) -> bool:
+    expected_value = context.manifest.constants.syscalls.get(syscall.constant)
+    return expected_value is not None and str(expected_value) in _numeric_case_selectors(switch_body)
+
+
+def _numeric_case_selectors(switch_body: str) -> tuple[str, ...]:
+    return tuple(selector for selector in _case_selectors(switch_body) if re.fullmatch(r"\d+", selector))
 
 
 def _case_selectors(switch_body: str) -> tuple[str, ...]:

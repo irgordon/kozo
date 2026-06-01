@@ -28,6 +28,12 @@ KOZO_NEGATIVE_COVERAGE = {
         "unknown_path_unreachable": "test_fails_when_unknown_default_path_is_unreachable",
         "missing_abi_syscall_constant": "test_fails_when_abi_manifest_is_missing_syscall_constant",
         "missing_abi_payload_layout": "test_fails_when_payload_layout_reference_is_missing_from_abi_manifest",
+        "missing_nop_branch": "test_fails_when_nop_branch_is_missing",
+        "nop_hardcoded_selector": "test_fails_when_nop_branch_selector_is_hardcoded_numeric",
+        "wrong_nop_return_status": "test_fails_when_nop_return_status_mismatches",
+        "nop_mutates_payload": "test_fails_when_nop_branch_mutates_payload",
+        "nop_uses_payload_layout": "test_fails_when_nop_branch_uses_heartbeat_payload_layout",
+        "missing_nop_abi_constant": "test_fails_when_nop_abi_constant_is_missing",
         "diagnostic_names_contract_field": "test_failure_diagnostic_names_contract_field",
     }
 }
@@ -183,6 +189,63 @@ class SyscallTableConformanceValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
         self.assert_conformance_failure(result, "missing_abi_payload_layout", "valid_syscalls.debug_heartbeat.payload_layout")
 
+    def test_fails_when_nop_branch_is_missing(self):
+        result = self.validate_syscall_table_conformance(
+            mutate_dispatcher=lambda source: source.replace("case abi.K_SYSCALL_NOP:", "case abi.K_SYSCALL_NOP_DISABLED:")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_conformance_failure(result, "missing_valid_syscall_branch", "valid_syscalls.nop.branch_selector")
+
+    def test_fails_when_nop_branch_selector_is_hardcoded_numeric(self):
+        result = self.validate_syscall_table_conformance(
+            mutate_dispatcher=lambda source: source.replace("case abi.K_SYSCALL_NOP:", "case 0:")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_conformance_failure(result, "hardcoded_branch_selector", "valid_syscalls.nop.branch_selector")
+
+    def test_fails_when_nop_return_status_mismatches(self):
+        result = self.validate_syscall_table_conformance(
+            mutate_dispatcher=lambda source: source.replace(
+                "case abi.K_SYSCALL_NOP:\n\t\treturn abi.K_OK",
+                "case abi.K_SYSCALL_NOP:\n\t\treturn abi.K_INVALID",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_conformance_failure(result, "wrong_no_payload_return_status", "valid_syscalls.nop.return_status")
+
+    def test_fails_when_nop_branch_mutates_payload(self):
+        result = self.validate_syscall_table_conformance(
+            mutate_dispatcher=lambda source: source.replace(
+                "case abi.K_SYSCALL_NOP:\n\t\treturn abi.K_OK",
+                "case abi.K_SYSCALL_NOP:\n\t\tpayload.sequence = 0\n\t\treturn abi.K_OK",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_conformance_failure(result, "no_payload_mutates_payload", "valid_syscalls.nop.must_not_mutate_payload")
+
+    def test_fails_when_nop_branch_uses_heartbeat_payload_layout(self):
+        result = self.validate_syscall_table_conformance(
+            mutate_dispatcher=lambda source: source.replace(
+                "case abi.K_SYSCALL_NOP:\n\t\treturn abi.K_OK",
+                "case abi.K_SYSCALL_NOP:\n\t\tif payload != nil {}\n\t\treturn abi.K_OK",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_conformance_failure(result, "no_payload_uses_payload_layout", "valid_syscalls.nop")
+
+    def test_fails_when_nop_abi_constant_is_missing(self):
+        result = self.validate_syscall_table_conformance(
+            mutate_manifest=lambda manifest: manifest["constants"]["syscalls"].pop("K_SYSCALL_NOP")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_conformance_failure(result, "missing_abi_syscall_constant", "valid_syscalls.nop.constant")
+
     def test_failure_diagnostic_names_contract_field(self):
         result = self.validate_syscall_table_conformance(
             mutate_dispatcher=lambda source: source.replace("-> abi.K_STATUS", "-> abi.K_SYSCALL_ID")
@@ -262,14 +325,21 @@ class SyscallTableConformanceValidatorTests(unittest.TestCase):
                     "return_type": "K_STATUS",
                 },
                 "valid_syscalls": {
+                    "nop": {
+                        "kind": "no_payload",
+                        "constant": "K_SYSCALL_NOP",
+                        "branch_selector": "abi.K_SYSCALL_NOP",
+                        "return_status": "K_OK",
+                        "must_not_mutate_payload": True,
+                    },
                     "debug_heartbeat": {
+                        "kind": "payload",
                         "constant": "K_SYSCALL_DEBUG_HEARTBEAT",
                         "payload_layout": "heartbeat_payload",
                         "branch_selector": "abi.K_SYSCALL_DEBUG_HEARTBEAT",
                         "boundary_contract": "debug_heartbeat",
                     }
                 },
-                "allowed_nonpayload_branches": ["abi.K_SYSCALL_NOP"],
                 "unknown_syscall_behavior": {
                     "return_status": "K_INVALID",
                     "must_not_mutate_payload": True,

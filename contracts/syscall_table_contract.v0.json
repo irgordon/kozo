@@ -8,16 +8,21 @@
     "return_type": "K_STATUS"
   },
   "valid_syscalls": {
+    "nop": {
+      "kind": "no_payload",
+      "constant": "K_SYSCALL_NOP",
+      "branch_selector": "abi.K_SYSCALL_NOP",
+      "return_status": "K_OK",
+      "must_not_mutate_payload": true
+    },
     "debug_heartbeat": {
+      "kind": "payload",
       "constant": "K_SYSCALL_DEBUG_HEARTBEAT",
       "payload_layout": "heartbeat_payload",
       "branch_selector": "abi.K_SYSCALL_DEBUG_HEARTBEAT",
       "boundary_contract": "debug_heartbeat"
     }
   },
-  "allowed_nonpayload_branches": [
-    "abi.K_SYSCALL_NOP"
-  ],
   "unknown_syscall_behavior": {
     "return_status": "K_INVALID",
     "must_not_mutate_payload": true
