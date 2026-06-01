@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.0.23 - 2026-06-01
+
+**Status:** NOP is exercised from Rust through the existing bridge with a null payload argument.
+
+### Added
+
+* Added a narrow Rust `nop_request` probe that calls `syscall_entry` with `K_SYSCALL_NOP` and a null payload pointer.
+* Added NOP return-status validation so the Rust probe requires `K_OK` without creating or mutating a payload.
+* Extended syscall boundary contract v0 to record the NOP no-payload argument as `null` and keep NOP mutation behavior empty.
+* Hardened `runtime_trap_path` with focused NOP anchors for the generated syscall constant, null payload handoff, status validation, and live entrypoint probe.
+* Added focused negative coverage for NOP hardcoded IDs, non-null payloads, payload-layout usage, missing return validation, missing NOP path, missing entrypoint invocation, and boundary-contract drift.
+
+### Notes
+
+* This version proves the existing two-argument bridge can carry a no-payload syscall by using a null payload pointer for `K_SYSCALL_NOP`.
+* This change does not generalize userspace syscalls and does not add Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or runtime subsystem behavior beyond the NOP probe.
+
 ## v0.0.22 - 2026-05-31
 
 **Status:** NOP is governed as the first no-payload syscall table entry.

@@ -24,6 +24,14 @@
     }
   },
   "syscalls": {
+    "nop": {
+      "constant": "K_SYSCALL_NOP",
+      "payload_argument": "null",
+      "success_behavior": {
+        "return_status": "K_OK",
+        "mutates_payload": []
+      }
+    },
     "debug_heartbeat": {
       "constant": "K_SYSCALL_DEBUG_HEARTBEAT",
       "payload_layout": "heartbeat_payload",
@@ -68,7 +76,8 @@
     ],
     "runtime_trap_path": [
       "rust_request_payload",
-      "extern_bridge_call"
+      "extern_bridge_call",
+      "rust_nop_null_payload"
     ],
     "execution_proof": [
       "odin_branch",

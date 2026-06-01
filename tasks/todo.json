@@ -493,6 +493,33 @@
         "verification.tests_run[10]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 19,
+      "title": "Exercise K_SYSCALL_NOP from Rust with a null payload bridge call",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "contracts/syscall_boundary_contract.v0.json",
+        "harness/syscall_boundary_contract.py",
+        "harness/validators_impl/runtime_trap_path.py",
+        "harness/validators_impl/syscall_boundary_contract.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/syscall_boundary_contract.schema.json",
+        "tests/test_runtime_trap_path.py",
+        "tests/test_syscall_boundary_contract.py",
+        "userspace/core_service/src/main.rs"
+      ],
+      "verification_refs": [
+        "verification.tests_run[1]",
+        "verification.tests_run[5]",
+        "verification.tests_run[7]",
+        "verification.tests_run[9]",
+        "verification.tests_run[10]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -515,7 +542,8 @@
     "syscall_boundary_conformance proves live assembly, Rust, and Odin sources conform to syscall boundary contract v0",
     "Syscall table contract v0 describes and validates the currently proven heartbeat/debug dispatcher branch and unknown-syscall default behavior",
     "syscall_table_conformance proves the live Odin dispatcher implements syscall table contract v0 without uncontracted payload-mutating branches",
-    "K_SYSCALL_NOP is governed as a first-class no-payload syscall table entry that returns K_OK and never mutates or inspects heartbeat payload state"
+    "K_SYSCALL_NOP is governed as a first-class no-payload syscall table entry that returns K_OK and never mutates or inspects heartbeat payload state",
+    "The Rust core service exercises K_SYSCALL_NOP through syscall_entry with a null payload pointer and validates the K_OK return status"
   ],
   "verification": {
     "tests_run": [
@@ -633,7 +661,8 @@
       "A placeholder test containing only a validator token and negative-looking name fails validator_coverage with a named missing-invocation diagnostic.",
       "validator_coverage reports pass only when each declared negative marker maps to an existing behavioral negative test.",
       "Missing marker metadata, missing required markers, unknown markers, missing mapped test functions, and mapped placeholder tests fail with named diagnostics.",
-      "K_SYSCALL_NOP is represented in syscall table contract v0 as a no-payload entry that requires abi.K_SYSCALL_NOP, returns K_OK, and rejects payload mutation or heartbeat payload layout usage."
+      "K_SYSCALL_NOP is represented in syscall table contract v0 as a no-payload entry that requires abi.K_SYSCALL_NOP, returns K_OK, and rejects payload mutation or heartbeat payload layout usage.",
+      "The Rust NOP probe calls syscall_entry with abi::K_SYSCALL_NOP and core::ptr::null_mut(), validates abi::K_OK, and is exercised before the heartbeat request."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -655,6 +684,7 @@
     "Regenerated latest_verify.json so the current artifact records the hardened proof details.",
     "Added validator_coverage so registered validators must have focused test files with AST-verified behavioral negative-path coverage.",
     "Extended validator_coverage so registered validators must declare marker-level coverage for their known false-pass risks.",
-    "Promoted K_SYSCALL_NOP into a governed no-payload syscall table entry without adding payload layout, userspace execution, Linux compatibility, or broader runtime behavior."
+    "Promoted K_SYSCALL_NOP into a governed no-payload syscall table entry without adding payload layout, userspace execution, Linux compatibility, or broader runtime behavior.",
+    "Added a narrow Rust NOP probe through the existing syscall_entry bridge using a null payload argument and no payload mutation."
   ]
 }

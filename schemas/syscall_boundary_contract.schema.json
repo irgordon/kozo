@@ -125,9 +125,50 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "nop",
         "debug_heartbeat"
       ],
       "properties": {
+        "nop": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "constant",
+            "payload_argument",
+            "success_behavior"
+          ],
+          "properties": {
+            "constant": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "payload_argument": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "success_behavior": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "return_status",
+                "mutates_payload"
+              ],
+              "properties": {
+                "return_status": {
+                  "type": "string",
+                  "pattern": ".*\\S.*"
+                },
+                "mutates_payload": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": ".*\\S.*"
+                  }
+                }
+              }
+            }
+          }
+        },
         "debug_heartbeat": {
           "type": "object",
           "additionalProperties": false,

@@ -34,6 +34,13 @@ class OrderedRuntimeAnchor:
     detail: str
 
 
+@dataclass(frozen=True)
+class ForbiddenRuntimeSnippet:
+    name: str
+    needle: str
+    detail: str
+
+
 _HEARTBEAT_REQUEST_ANCHORS = (
     OrderedRuntimeAnchor(
         "payload_initialization",
@@ -72,6 +79,24 @@ _HEARTBEAT_REQUEST_ANCHORS = (
     ),
 )
 
+_NOP_REQUEST_ANCHORS = (
+    OrderedRuntimeAnchor(
+        "nop_syscall_constant",
+        "let syscall: abi::K_SYSCALL_ID = abi::K_SYSCALL_NOP;",
+        "nop_request must select the generated NOP syscall id",
+    ),
+    OrderedRuntimeAnchor(
+        "nop_bridge_call",
+        "let status = invoke_nop_bridge(syscall);",
+        "nop_request must call invoke_nop_bridge without a payload",
+    ),
+    OrderedRuntimeAnchor(
+        "nop_return_validation",
+        "return validate_nop_return_status(status);",
+        "nop_request must validate the returned NOP status",
+    ),
+)
+
 _BRIDGE_HELPER_ANCHORS = (
     RuntimePathAnchor(
         "extern_bridge_call",
@@ -85,6 +110,63 @@ _BRIDGE_HELPER_ANCHORS = (
     ),
 )
 
+_NOP_BRIDGE_HELPER_ANCHORS = (
+    RuntimePathAnchor(
+        "nop_null_payload_argument",
+        "syscall_entry(u64::from(syscall), core::ptr::null_mut())",
+        "invoke_nop_bridge must call syscall_entry with a null payload pointer",
+    ),
+    RuntimePathAnchor(
+        "nop_bridge_status_cast",
+        "as abi::K_STATUS",
+        "invoke_nop_bridge must return the bridge result as abi::K_STATUS",
+    ),
+)
+
+_NOP_RETURN_VALIDATION_ANCHORS = (
+    RuntimePathAnchor(
+        "nop_status_check",
+        "if status != abi::K_OK",
+        "validate_nop_return_status must reject non-K_OK returns",
+    ),
+    RuntimePathAnchor(
+        "nop_success_status",
+        "abi::K_OK",
+        "validate_nop_return_status must return abi::K_OK on success",
+    ),
+)
+
+_CORE_SERVICE_ENTRY_ANCHORS = (
+    OrderedRuntimeAnchor(
+        "core_entry_nop_probe",
+        "let _ = nop_request();",
+        "core_service_entry must exercise the NOP probe before heartbeat",
+    ),
+    OrderedRuntimeAnchor(
+        "core_entry_heartbeat_request",
+        "heartbeat_request()",
+        "core_service_entry must preserve the heartbeat request path",
+    ),
+)
+
+_NOP_FORBIDDEN_SNIPPETS = (
+    ForbiddenRuntimeSnippet(
+        "nop_payload_construction",
+        "HeartbeatPayload",
+        "NOP runtime path must not construct or depend on heartbeat payload layout",
+    ),
+    ForbiddenRuntimeSnippet(
+        "nop_mutable_payload_reference",
+        "&mut",
+        "NOP runtime path must not require a mutable payload reference",
+    ),
+    ForbiddenRuntimeSnippet(
+        "nop_payload_variable",
+        "payload",
+        "NOP runtime path must not use a payload variable",
+    ),
+)
+
 
 def runtime_trap_path_observations(rust_source: str, asm_source: str | None = None) -> dict[str, bool]:
     _ = asm_source
@@ -92,7 +174,9 @@ def runtime_trap_path_observations(rust_source: str, asm_source: str | None = No
     has_extern_decl = extern_block is not None and _EXTERN_SYSCALL_FN.search(extern_block.group("body")) is not None
     call_count = len(_EXTERN_SYSCALL_CALL.findall(rust_source))
     heartbeat_block = _extract_rust_function_block(rust_source, "heartbeat_request")
+    nop_block = _extract_rust_function_block(rust_source, "nop_request")
     bridge_block = _extract_rust_function_block(rust_source, "invoke_heartbeat_bridge")
+    nop_bridge_block = _extract_rust_function_block(rust_source, "invoke_nop_bridge")
     return {
         "has_local_stub": _LOCAL_STUB_SIGNATURE in rust_source,
         "has_stub_marker": _STUB_MODE_MARKER in rust_source,
@@ -102,6 +186,11 @@ def runtime_trap_path_observations(rust_source: str, asm_source: str | None = No
         "has_live_bridge_call": (
             bridge_block is not None
             and _BRIDGE_HELPER_ANCHORS[0].needle in bridge_block
+        ),
+        "has_live_nop_block": nop_block is not None,
+        "has_live_nop_bridge_call": (
+            nop_bridge_block is not None
+            and _NOP_BRIDGE_HELPER_ANCHORS[0].needle in nop_bridge_block
         ),
     }
 
@@ -163,6 +252,20 @@ def _validate_live_heartbeat_block(rust_source: str) -> ValidationResult | None:
     return _ordered_anchor_result(heartbeat_block, rust_source, _HEARTBEAT_REQUEST_ANCHORS)
 
 
+def _validate_live_nop_block(rust_source: str) -> ValidationResult | None:
+    nop_block = _extract_rust_function_block(rust_source, "nop_request")
+    if nop_block is None:
+        return _failure_result(
+            "missing_live_nop_block",
+            "nop_request",
+            "core_service must define the live nop_request path",
+        )
+    return _first_result(
+        _forbidden_snippet_result(nop_block, _NOP_FORBIDDEN_SNIPPETS),
+        _ordered_anchor_result(nop_block, rust_source, _NOP_REQUEST_ANCHORS),
+    )
+
+
 def _validate_bridge_helper_block(rust_source: str) -> ValidationResult | None:
     bridge_block = _extract_rust_function_block(rust_source, "invoke_heartbeat_bridge")
     if bridge_block is None:
@@ -172,6 +275,46 @@ def _validate_bridge_helper_block(rust_source: str) -> ValidationResult | None:
             "core_service must define the live bridge helper",
         )
     return _required_anchor_result(bridge_block, rust_source, _BRIDGE_HELPER_ANCHORS)
+
+
+def _validate_nop_bridge_helper_block(rust_source: str) -> ValidationResult | None:
+    bridge_block = _extract_rust_function_block(rust_source, "invoke_nop_bridge")
+    if bridge_block is None:
+        return _failure_result(
+            "missing_nop_bridge_helper_block",
+            "invoke_nop_bridge",
+            "core_service must define the live NOP bridge helper",
+        )
+    return _first_result(
+        _forbidden_snippet_result(bridge_block, _NOP_FORBIDDEN_SNIPPETS),
+        _required_anchor_result(bridge_block, rust_source, _NOP_BRIDGE_HELPER_ANCHORS),
+    )
+
+
+def _validate_nop_return_status_block(rust_source: str) -> ValidationResult | None:
+    validation_block = _extract_rust_function_block(rust_source, "validate_nop_return_status")
+    if validation_block is None:
+        return _failure_result(
+            "missing_nop_return_validation_block",
+            "validate_nop_return_status",
+            "core_service must validate the NOP return status",
+        )
+    return _required_anchor_result(validation_block, rust_source, _NOP_RETURN_VALIDATION_ANCHORS)
+
+
+def _validate_core_service_entry_block(rust_source: str) -> ValidationResult | None:
+    entry_block = _extract_rust_function_block(rust_source, "core_service_entry")
+    if entry_block is None:
+        return _failure_result(
+            "missing_core_service_entry",
+            "core_service_entry",
+            "core_service must expose the live entrypoint",
+        )
+    return _ordered_anchor_result(entry_block, rust_source, _CORE_SERVICE_ENTRY_ANCHORS)
+
+
+def _first_result(*results: ValidationResult | None) -> ValidationResult | None:
+    return next((result for result in results if result is not None), None)
 
 
 def _ordered_anchor_result(
@@ -199,6 +342,16 @@ def _required_anchor_result(
     return None
 
 
+def _forbidden_snippet_result(
+    block: str,
+    snippets: tuple[ForbiddenRuntimeSnippet, ...],
+) -> ValidationResult | None:
+    for snippet in snippets:
+        if snippet.needle in block:
+            return _failure_result("forbidden_nop_payload_usage", snippet.name, snippet.detail)
+    return None
+
+
 def _runtime_anchor_failure(
     block: str,
     source: str,
@@ -215,7 +368,7 @@ def _failure_result(reason: str, contract_field: str, detail: str) -> Validation
     return ValidationResult.fail(
         code=RUNTIME_TRAP_PATH_INVALID,
         detail=f"Runtime trap path invalid: {reason}: {contract_field}: {detail}",
-        action="Keep the live heartbeat_request path routed through the extern syscall_entry bridge",
+        action="Keep the live heartbeat_request and nop_request paths routed through the extern syscall_entry bridge",
         meta={"reason": reason, "contract_field": contract_field},
     )
 
@@ -231,12 +384,16 @@ class RuntimeTrapPathValidator(BaseValidator):
         for result in (
             _validate_extern_contract(rust_source),
             _validate_bridge_helper_block(rust_source),
+            _validate_nop_bridge_helper_block(rust_source),
+            _validate_nop_return_status_block(rust_source),
+            _validate_live_nop_block(rust_source),
             _validate_live_heartbeat_block(rust_source),
+            _validate_core_service_entry_block(rust_source),
         ):
             if result is not None:
                 return result
 
         return ValidationResult.pass_(
             code=OK,
-            detail="Rust heartbeat_request constructs the request payload and reaches the extern syscall_entry bridge",
+            detail="Rust heartbeat_request and nop_request reach the extern syscall_entry bridge with their required payload contracts",
         )

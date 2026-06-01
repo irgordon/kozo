@@ -286,6 +286,14 @@ class SyscallBoundaryConformanceValidatorTests(unittest.TestCase):
                     "return": {"register": "rax", "type": "K_STATUS"},
                 },
                 "syscalls": {
+                    "nop": {
+                        "constant": "K_SYSCALL_NOP",
+                        "payload_argument": "null",
+                        "success_behavior": {
+                            "return_status": "K_OK",
+                            "mutates_payload": [],
+                        },
+                    },
                     "debug_heartbeat": {
                         "constant": "K_SYSCALL_DEBUG_HEARTBEAT",
                         "payload_layout": "heartbeat_payload",
@@ -305,7 +313,7 @@ class SyscallBoundaryConformanceValidatorTests(unittest.TestCase):
                 },
                 "proof_ownership": {
                     "bridge_alignment": ["entry_symbol", "register_handoff", "dispatcher_handoff"],
-                    "runtime_trap_path": ["rust_request_payload", "extern_bridge_call"],
+                    "runtime_trap_path": ["rust_request_payload", "extern_bridge_call", "rust_nop_null_payload"],
                     "execution_proof": ["odin_branch", "kernel_mutations", "serial_observation"],
                     "return_path_proof": ["rust_return_validation", "response_payload_contract"],
                     "protocol_contract_alignment": ["syscall_constant_agreement"],

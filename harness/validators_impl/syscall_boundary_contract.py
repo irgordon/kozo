@@ -61,6 +61,7 @@ def _boundary_contract_issue(contract_path: Path, manifest_path: Path) -> Bounda
         _architecture_issue(context.contract),
         _entry_issue(context.contract),
         _calling_convention_issue(context.contract),
+        _nop_syscall_issue(context),
         _heartbeat_syscall_issue(context),
         _invalid_behavior_issue(context),
         _success_behavior_issue(context),
@@ -184,18 +185,50 @@ def _calling_convention_issue(
 def _heartbeat_syscall_issue(context: BoundaryContext) -> BoundaryIssue | None:
     heartbeat = context.contract.debug_heartbeat
     return _first_issue(
-        _abi_syscall_issue(context),
+        _abi_syscall_issue(context, heartbeat.constant, "syscalls.debug_heartbeat.constant"),
         _payload_layout_issue(context),
         _sentinel_issue("request", heartbeat.request, context.manifest.heartbeat.request),
         _sentinel_issue("response", heartbeat.response, context.manifest.heartbeat.response),
     )
 
 
-def _abi_syscall_issue(context: BoundaryContext) -> BoundaryIssue | None:
-    constant = context.contract.debug_heartbeat.constant
+def _nop_syscall_issue(context: BoundaryContext) -> BoundaryIssue | None:
+    nop = context.contract.nop
+    return _first_issue(
+        _abi_syscall_issue(context, nop.constant, "syscalls.nop.constant"),
+        _nop_payload_argument_issue(nop.payload_argument),
+        _status_constant_issue(nop.success_behavior.return_status, context.manifest.constants.status, "syscalls.nop.success_behavior.return_status"),
+        _nop_return_status_issue(nop.success_behavior.return_status),
+        _nop_mutation_issue(nop.success_behavior.mutates_payload),
+    )
+
+
+def _abi_syscall_issue(
+    context: BoundaryContext,
+    constant: str,
+    contract_field: str,
+) -> BoundaryIssue | None:
     if constant in context.manifest.constants.syscalls:
         return None
-    return _issue("missing_abi_syscall_constant", "syscalls.debug_heartbeat.constant", f"{constant} is not declared in ABI manifest syscalls")
+    return _issue("missing_abi_syscall_constant", contract_field, f"{constant} is not declared in ABI manifest syscalls")
+
+
+def _nop_payload_argument_issue(payload_argument: str) -> BoundaryIssue | None:
+    if payload_argument == "null":
+        return None
+    return _issue("wrong_nop_payload_argument", "syscalls.nop.payload_argument", f"Expected 'null', got {payload_argument!r}")
+
+
+def _nop_return_status_issue(return_status: str) -> BoundaryIssue | None:
+    if return_status == "K_OK":
+        return None
+    return _issue("wrong_nop_return_status", "syscalls.nop.success_behavior.return_status", f"Expected K_OK, got {return_status}")
+
+
+def _nop_mutation_issue(mutates_payload: tuple[str, ...]) -> BoundaryIssue | None:
+    if not mutates_payload:
+        return None
+    return _issue("nop_mutates_payload", "syscalls.nop.success_behavior.mutates_payload", "NOP must not mutate payload fields")
 
 
 def _payload_layout_issue(context: BoundaryContext) -> BoundaryIssue | None:

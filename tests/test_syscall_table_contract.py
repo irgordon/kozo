@@ -417,6 +417,14 @@ class SyscallTableContractValidatorTests(unittest.TestCase):
                     "return": {"register": "rax", "type": "K_STATUS"},
                 },
                 "syscalls": {
+                    "nop": {
+                        "constant": "K_SYSCALL_NOP",
+                        "payload_argument": "null",
+                        "success_behavior": {
+                            "return_status": "K_OK",
+                            "mutates_payload": [],
+                        },
+                    },
                     "debug_heartbeat": {
                         "constant": "K_SYSCALL_DEBUG_HEARTBEAT",
                         "payload_layout": "heartbeat_payload",

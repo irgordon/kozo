@@ -53,6 +53,13 @@ class SuccessBehavior:
 
 
 @dataclass(frozen=True)
+class NoPayloadBoundary:
+    constant: str
+    payload_argument: str
+    success_behavior: SuccessBehavior
+
+
+@dataclass(frozen=True)
 class DebugHeartbeatBoundary:
     constant: str
     payload_layout: str
@@ -81,6 +88,7 @@ class SyscallBoundaryContract:
     architecture: str
     entry: BoundaryEntry
     calling_convention: CallingConvention
+    nop: NoPayloadBoundary
     debug_heartbeat: DebugHeartbeatBoundary
     ownership: BoundaryOwnership
     proof_ownership: tuple[ProofOwnershipEntry, ...]
@@ -106,6 +114,7 @@ def parse_syscall_boundary_contract(data: dict[str, Any]) -> SyscallBoundaryCont
         architecture=data["architecture"],
         entry=_boundary_entry(data),
         calling_convention=_calling_convention(data),
+        nop=_nop(data),
         debug_heartbeat=_debug_heartbeat(data),
         ownership=_ownership(data),
         proof_ownership=_proof_ownership(data),
@@ -143,6 +152,15 @@ def _calling_value(data: dict[str, Any]) -> CallingConventionValue:
         register=data["register"],
         value_type=data["type"],
         nullable=data.get("nullable"),
+    )
+
+
+def _nop(data: dict[str, Any]) -> NoPayloadBoundary:
+    syscall = data["syscalls"]["nop"]
+    return NoPayloadBoundary(
+        constant=syscall["constant"],
+        payload_argument=syscall["payload_argument"],
+        success_behavior=_success_behavior(syscall["success_behavior"]),
     )
 
 

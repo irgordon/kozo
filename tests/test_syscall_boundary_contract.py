@@ -21,6 +21,10 @@ KOZO_NEGATIVE_COVERAGE = {
         "wrong_payload_register": "test_fails_when_payload_register_is_wrong",
         "wrong_return_register": "test_fails_when_return_register_is_wrong",
         "missing_abi_syscall_constant": "test_fails_when_abi_syscall_constant_is_missing",
+        "missing_nop_syscall_constant": "test_fails_when_nop_syscall_constant_is_missing",
+        "wrong_nop_payload_argument": "test_fails_when_nop_payload_argument_is_not_null",
+        "wrong_nop_return_status": "test_fails_when_nop_return_status_is_wrong",
+        "nop_mutates_payload": "test_fails_when_nop_mutates_payload",
         "missing_payload_layout": "test_fails_when_payload_layout_is_missing",
         "request_sentinel_mismatch": "test_fails_when_request_sentinel_mismatches_manifest",
         "response_sentinel_mismatch": "test_fails_when_response_sentinel_mismatches_manifest",
@@ -117,6 +121,38 @@ class SyscallBoundaryContractValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "fail")
         self.assert_boundary_failure(result, "missing_abi_syscall_constant", "syscalls.debug_heartbeat.constant")
+
+    def test_fails_when_nop_syscall_constant_is_missing(self):
+        result = self.validate_boundary_contract(
+            mutate_contract=lambda contract: self.set_value(contract, ("syscalls", "nop", "constant"), "K_SYSCALL_UNKNOWN")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_boundary_failure(result, "missing_abi_syscall_constant", "syscalls.nop.constant")
+
+    def test_fails_when_nop_payload_argument_is_not_null(self):
+        result = self.validate_boundary_contract(
+            mutate_contract=lambda contract: self.set_value(contract, ("syscalls", "nop", "payload_argument"), "heartbeat_payload")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_boundary_failure(result, "wrong_nop_payload_argument", "syscalls.nop.payload_argument")
+
+    def test_fails_when_nop_return_status_is_wrong(self):
+        result = self.validate_boundary_contract(
+            mutate_contract=lambda contract: self.set_value(contract, ("syscalls", "nop", "success_behavior", "return_status"), "K_INVALID")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_boundary_failure(result, "wrong_nop_return_status", "syscalls.nop.success_behavior.return_status")
+
+    def test_fails_when_nop_mutates_payload(self):
+        result = self.validate_boundary_contract(
+            mutate_contract=lambda contract: self.set_value(contract, ("syscalls", "nop", "success_behavior", "mutates_payload"), ["sequence"])
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_boundary_failure(result, "nop_mutates_payload", "syscalls.nop.success_behavior.mutates_payload")
 
     def test_fails_when_payload_layout_is_missing(self):
         result = self.validate_boundary_contract(
@@ -285,6 +321,14 @@ class SyscallBoundaryContractValidatorTests(unittest.TestCase):
                 },
             },
             "syscalls": {
+                "nop": {
+                    "constant": "K_SYSCALL_NOP",
+                    "payload_argument": "null",
+                    "success_behavior": {
+                        "return_status": "K_OK",
+                        "mutates_payload": [],
+                    },
+                },
                 "debug_heartbeat": {
                     "constant": "K_SYSCALL_DEBUG_HEARTBEAT",
                     "payload_layout": "heartbeat_payload",
@@ -315,7 +359,7 @@ class SyscallBoundaryContractValidatorTests(unittest.TestCase):
             },
             "proof_ownership": {
                 "bridge_alignment": ["entry_symbol", "register_handoff", "dispatcher_handoff"],
-                "runtime_trap_path": ["rust_request_payload", "extern_bridge_call"],
+                "runtime_trap_path": ["rust_request_payload", "extern_bridge_call", "rust_nop_null_payload"],
                 "execution_proof": ["odin_branch", "kernel_mutations", "serial_observation"],
                 "return_path_proof": ["rust_return_validation", "response_payload_contract"],
                 "protocol_contract_alignment": ["syscall_constant_agreement"],
