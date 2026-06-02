@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260602T023445Z",
+  "run_id": "verify-20260602T025611Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -154,7 +154,7 @@
       "subsystem": "runtime_trap_path",
       "status": "pass",
       "code": "OK",
-      "detail": "Rust heartbeat_request and nop_request reach the extern syscall_entry bridge with their required payload contracts"
+      "detail": "Rust heartbeat_request, nop_request, and status_request reach the extern syscall_entry bridge with their required payload contracts"
     },
     {
       "name": "return_path_proof",
@@ -205,5 +205,5 @@
     "artifacts/logs/cargo-check.log",
     "artifacts/logs/nm-kernel.log"
   ],
-  "generated_at": "2026-06-02T02:34:45Z"
+  "generated_at": "2026-06-02T02:56:11Z"
 }
