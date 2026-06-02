@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260602T025611Z",
+  "run_id": "verify-20260602T035417Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 25,
+    "total_checks": 26,
     "failed_check_count": 0
   },
   "checks": [
@@ -122,6 +122,13 @@
       "detail": "Live dispatcher source conforms to syscall table contract v0"
     },
     {
+      "name": "syscall_catalog",
+      "subsystem": "syscall_catalog",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Syscall catalog v0 summarizes the governed syscall surface without owning canonical ABI values"
+    },
+    {
       "name": "protocol_contract_alignment",
       "subsystem": "protocol_contract_alignment",
       "status": "pass",
@@ -205,5 +212,5 @@
     "artifacts/logs/cargo-check.log",
     "artifacts/logs/nm-kernel.log"
   ],
-  "generated_at": "2026-06-02T02:56:11Z"
+  "generated_at": "2026-06-02T03:54:17Z"
 }
