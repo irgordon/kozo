@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260602T035417Z",
+  "run_id": "verify-20260602T041400Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 26,
+    "total_checks": 27,
     "failed_check_count": 0
   },
   "checks": [
@@ -129,6 +129,13 @@
       "detail": "Syscall catalog v0 summarizes the governed syscall surface without owning canonical ABI values"
     },
     {
+      "name": "syscall_surface_report",
+      "subsystem": "syscall_surface_report",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Generated syscall surface report matches the current syscall catalog and contracts"
+    },
+    {
       "name": "protocol_contract_alignment",
       "subsystem": "protocol_contract_alignment",
       "status": "pass",
@@ -212,5 +219,5 @@
     "artifacts/logs/cargo-check.log",
     "artifacts/logs/nm-kernel.log"
   ],
-  "generated_at": "2026-06-02T03:54:17Z"
+  "generated_at": "2026-06-02T04:14:00Z"
 }
