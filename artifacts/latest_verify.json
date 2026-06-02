@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260601T125129Z",
+  "run_id": "verify-20260602T023445Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 24,
+    "total_checks": 25,
     "failed_check_count": 0
   },
   "checks": [
@@ -63,7 +63,7 @@
       "subsystem": "rust",
       "status": "pass",
       "code": "OK",
-      "detail": "Rust changes are backed by declared cargo check evidence"
+      "detail": "No Rust changes require validation in this bootstrap loop"
     },
     {
       "name": "odin",
@@ -106,6 +106,13 @@
       "status": "pass",
       "code": "OK",
       "detail": "Syscall table contract v0 matches the live heartbeat dispatcher model"
+    },
+    {
+      "name": "syscall_class_contract",
+      "subsystem": "syscall_class_contract",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Syscall class contract v0 matches the currently proven syscall table classes"
     },
     {
       "name": "syscall_table_conformance",
@@ -191,26 +198,12 @@
     }
   ],
   "failed_checks": [],
-  "changed_files": [
-    "CHANGELOG.md",
-    "contracts/syscall_boundary_contract.v0.json",
-    "harness/syscall_boundary_contract.py",
-    "harness/validators_impl/runtime_trap_path.py",
-    "harness/validators_impl/syscall_boundary_contract.py",
-    "harness/validators_impl/validator_coverage.py",
-    "schemas/syscall_boundary_contract.schema.json",
-    "tasks/todo.json",
-    "tests/test_runtime_trap_path.py",
-    "tests/test_syscall_boundary_conformance.py",
-    "tests/test_syscall_boundary_contract.py",
-    "tests/test_syscall_table_contract.py",
-    "userspace/core_service/src/main.rs"
-  ],
+  "changed_files": [],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
     "artifacts/logs/odin-build.log",
     "artifacts/logs/cargo-check.log",
     "artifacts/logs/nm-kernel.log"
   ],
-  "generated_at": "2026-06-01T12:51:29Z"
+  "generated_at": "2026-06-02T02:34:45Z"
 }
