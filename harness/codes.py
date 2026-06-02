@@ -23,6 +23,7 @@ ODIN_CHECK_FAILED = "ODIN_CHECK_FAILED"
 ABI_WIDTH_MISMATCH = "ABI_WIDTH_MISMATCH"
 ABI_LAYOUT_MISMATCH = "ABI_LAYOUT_MISMATCH"
 ABI_MANIFEST_INVALID = "ABI_MANIFEST_INVALID"
+ABI_SURFACE_REPORT_INVALID = "ABI_SURFACE_REPORT_INVALID"
 SYSCALL_BOUNDARY_CONTRACT_INVALID = "SYSCALL_BOUNDARY_CONTRACT_INVALID"
 SYSCALL_BOUNDARY_CONFORMANCE_INVALID = "SYSCALL_BOUNDARY_CONFORMANCE_INVALID"
 SYSCALL_TABLE_CONTRACT_INVALID = "SYSCALL_TABLE_CONTRACT_INVALID"
@@ -63,6 +64,7 @@ CODES = MappingProxyType(
         ABI_WIDTH_MISMATCH: "ABI width mismatch",
         ABI_LAYOUT_MISMATCH: "ABI layout mismatch",
         ABI_MANIFEST_INVALID: "ABI manifest is missing, invalid, or inconsistent with the canonical ABI",
+        ABI_SURFACE_REPORT_INVALID: "Generated ABI surface report is missing or stale",
         SYSCALL_BOUNDARY_CONTRACT_INVALID: "Syscall boundary contract is missing, invalid, or inconsistent with the proven trap path",
         SYSCALL_BOUNDARY_CONFORMANCE_INVALID: "Live sources do not conform to the syscall boundary contract",
         SYSCALL_TABLE_CONTRACT_INVALID: "Syscall table contract is missing, invalid, or inconsistent with the live dispatcher",

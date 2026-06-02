@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.0.28 - 2026-06-02
+
+**Status:** Generated ABI surface report.
+
+### Added
+
+* Added generated ABI surface report for currently governed ABI constants, binding paths, heartbeat payload layout, and request/response sentinels.
+* Added deterministic ABI surface report renderer and registered `abi_surface_report` validator.
+* Added focused negative coverage for stale reports, manual edits, missing constants, missing binding paths, missing layout fields, missing sentinels, manifest-driven report drift, and diagnostic quality.
+
+### Notes
+
+* The ABI surface report is generated and non-authoritative.
+* The source of truth remains the ABI manifest, checked-in ABI files, and validators.
+* This change does not change ABI constants, ABI layouts, generated bindings, runtime behavior, syscall behavior, Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, or file descriptor behavior.
+
 ## v0.0.27 - 2026-06-02
 
 **Status:** Generated syscall surface report.

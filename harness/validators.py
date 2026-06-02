@@ -15,6 +15,7 @@ from harness.validators_impl.rust import RustValidator
 from harness.validators_impl.odin import OdinValidator
 from harness.validators_impl.abi import AbiValidator
 from harness.validators_impl.abi_manifest import AbiManifestValidator
+from harness.validators_impl.abi_surface_report import AbiSurfaceReportValidator
 from harness.validators_impl.syscall_boundary_contract import SyscallBoundaryContractValidator
 from harness.validators_impl.syscall_boundary_conformance import SyscallBoundaryConformanceValidator
 from harness.validators_impl.syscall_table_contract import SyscallTableContractValidator
@@ -44,6 +45,7 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "odin": OdinValidator,
     "abi": AbiValidator,
     "abi_manifest": AbiManifestValidator,
+    "abi_surface_report": AbiSurfaceReportValidator,
     "syscall_boundary_contract": SyscallBoundaryContractValidator,
     "syscall_boundary_conformance": SyscallBoundaryConformanceValidator,
     "syscall_table_contract": SyscallTableContractValidator,
