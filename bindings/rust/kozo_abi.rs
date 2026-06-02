@@ -10,6 +10,7 @@ pub const K_DENIED: K_STATUS = 2;
 pub type K_SYSCALL_ID = u32;
 pub const K_SYSCALL_NOP: K_SYSCALL_ID = 0;
 pub const K_SYSCALL_DEBUG_HEARTBEAT: K_SYSCALL_ID = 1;
+pub const K_SYSCALL_STATUS: K_SYSCALL_ID = 2;
 
 #[repr(C)]
 pub struct HeartbeatPayload {

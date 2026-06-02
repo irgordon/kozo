@@ -16,6 +16,7 @@ KOZO_NEGATIVE_COVERAGE = {
         "schema_violation": "test_fails_when_manifest_schema_is_invalid",
         "missing_generated_binding_path": "test_fails_when_generated_binding_path_is_missing",
         "syscall_constant_mismatch": "test_fails_when_manifest_syscall_constant_mismatches_header",
+        "missing_status_syscall_constant": "test_fails_when_manifest_is_missing_status_syscall_constant",
         "layout_field_offset_mismatch": "test_fails_when_manifest_layout_field_offset_mismatches_header",
         "diagnostic_names_manifest_field": "test_failure_diagnostic_names_manifest_field",
     }
@@ -94,6 +95,33 @@ class AbiManifestValidatorTests(unittest.TestCase):
 
         self.assert_manifest_failure(result, "manifest_constant_missing_in_header", "constants.syscalls.K_SYSCALL_NOP")
 
+    def test_fails_when_header_is_missing_status_syscall_constant(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            paths = self.write_manifest_fixture(root)
+            paths["header"].write_text(self.valid_header().replace("\tK_SYSCALL_STATUS = 2,\n", ""))
+            manifest_path = self.write_manifest(root, self.valid_manifest(paths))
+
+            result = self.validate_manifest(manifest_path)
+
+        self.assertEqual(result.status, "fail")
+
+        self.assert_manifest_failure(result, "manifest_constant_missing_in_header", "constants.syscalls.K_SYSCALL_STATUS")
+
+    def test_fails_when_manifest_is_missing_status_syscall_constant(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            paths = self.write_manifest_fixture(root)
+            manifest = self.valid_manifest(paths)
+            manifest["constants"]["syscalls"].pop("K_SYSCALL_STATUS")
+            manifest_path = self.write_manifest(root, manifest)
+
+            result = self.validate_manifest(manifest_path)
+
+        self.assertEqual(result.status, "fail")
+
+        self.assert_manifest_failure(result, "manifest_constant_missing", "constants.syscalls.K_SYSCALL_STATUS")
+
     def test_fails_when_manifest_layout_field_offset_mismatches_header(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
@@ -146,10 +174,12 @@ class AbiManifestValidatorTests(unittest.TestCase):
         paths["rust"].write_text(
             "pub const K_SYSCALL_NOP: K_SYSCALL_ID = 0;\n"
             "pub const K_SYSCALL_DEBUG_HEARTBEAT: K_SYSCALL_ID = 1;\n"
+            "pub const K_SYSCALL_STATUS: K_SYSCALL_ID = 2;\n"
         )
         paths["odin"].write_text(
             "K_SYSCALL_NOP : K_SYSCALL_ID : 0\n"
             "K_SYSCALL_DEBUG_HEARTBEAT : K_SYSCALL_ID : 1\n"
+            "K_SYSCALL_STATUS : K_SYSCALL_ID : 2\n"
         )
         return paths
 
@@ -174,6 +204,7 @@ class AbiManifestValidatorTests(unittest.TestCase):
                 "syscalls": {
                     "K_SYSCALL_NOP": 0,
                     "K_SYSCALL_DEBUG_HEARTBEAT": 1,
+                    "K_SYSCALL_STATUS": 2,
                 },
             },
             "layouts": {
@@ -213,6 +244,7 @@ class AbiManifestValidatorTests(unittest.TestCase):
             "typedef enum k_syscall_id_t {\n"
             "\tK_SYSCALL_NOP = 0,\n"
             "\tK_SYSCALL_DEBUG_HEARTBEAT = 1,\n"
+            "\tK_SYSCALL_STATUS = 2,\n"
             "} k_syscall_id_t;\n"
             "typedef struct k_heartbeat_payload_t {\n"
             "\tuint64_t sequence;\n"

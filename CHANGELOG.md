@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.0.25 - 2026-06-01
+
+**Status:** STATUS is governed as the second no-payload syscall and exercised from Rust through the existing bridge.
+
+### Added
+
+* Added `K_SYSCALL_STATUS` to the canonical ABI header, generated Rust bindings, generated Odin bindings, and ABI manifest.
+* Added STATUS as a `no_payload_status` syscall table entry that uses a null payload argument, returns `K_OK`, and declares no payload mutation.
+* Added a live Odin `abi.K_SYSCALL_STATUS` dispatcher branch that returns `abi.K_OK` without reading or mutating payload state.
+* Added a narrow Rust `status_request` probe that calls the existing `syscall_entry` bridge with `K_SYSCALL_STATUS` and a null payload pointer, then validates the `K_OK` return status.
+* Hardened protocol, syscall table, syscall class, and runtime trap validators with focused negative coverage for missing STATUS constants, hardcoded IDs, payload use, payload mutation, missing dispatcher branches, missing Rust probes, and diagnostic quality.
+
+### Notes
+
+* STATUS uses the existing two-argument bridge convention with a null payload pointer.
+* This change does not add Linux compatibility, userspace generalization, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or runtime subsystem behavior.
+
 ## v0.0.24 - 2026-06-01
 
 **Status:** Syscall classes are governed as semantic categories for currently proven dispatcher entries.

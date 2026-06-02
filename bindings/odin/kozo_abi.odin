@@ -12,6 +12,7 @@ K_DENIED : K_STATUS : 2
 K_SYSCALL_ID :: u32
 K_SYSCALL_NOP : K_SYSCALL_ID : 0
 K_SYSCALL_DEBUG_HEARTBEAT : K_SYSCALL_ID : 1
+K_SYSCALL_STATUS : K_SYSCALL_ID : 2
 
 Heartbeat_Payload :: struct #align(8) {
 	sequence: u64,

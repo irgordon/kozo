@@ -13,7 +13,19 @@
       "class": "no_payload_status",
       "constant": "K_SYSCALL_NOP",
       "branch_selector": "abi.K_SYSCALL_NOP",
+      "payload_argument": "null",
       "return_status": "K_OK",
+      "mutates_payload": [],
+      "must_not_mutate_payload": true
+    },
+    "status": {
+      "kind": "no_payload",
+      "class": "no_payload_status",
+      "constant": "K_SYSCALL_STATUS",
+      "branch_selector": "abi.K_SYSCALL_STATUS",
+      "payload_argument": "null",
+      "return_status": "K_OK",
+      "mutates_payload": [],
       "must_not_mutate_payload": true
     },
     "debug_heartbeat": {

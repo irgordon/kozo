@@ -16,6 +16,7 @@ typedef enum k_status_t {
 typedef enum k_syscall_id_t {
 	K_SYSCALL_NOP = 0,
 	K_SYSCALL_DEBUG_HEARTBEAT = 1,
+	K_SYSCALL_STATUS = 2,
 } k_syscall_id_t;
 
 typedef struct k_heartbeat_payload_t {

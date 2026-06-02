@@ -35,7 +35,9 @@ class NoPayloadSyscall:
     syscall_class: str
     constant: str
     branch_selector: str
+    payload_argument: str
     return_status: str
+    mutates_payload: tuple[str, ...]
     must_not_mutate_payload: bool
     prohibited_fields: tuple[str, ...]
 
@@ -120,7 +122,9 @@ def _valid_syscall(name: str, syscall: dict[str, Any]) -> PayloadSyscall | NoPay
             syscall["class"],
             syscall["constant"],
             syscall["branch_selector"],
+            syscall["payload_argument"],
             syscall["return_status"],
+            tuple(syscall["mutates_payload"]),
             syscall["must_not_mutate_payload"],
             _prohibited_no_payload_fields(syscall),
         )
@@ -135,7 +139,7 @@ def _valid_syscall(name: str, syscall: dict[str, Any]) -> PayloadSyscall | NoPay
 
 
 def _prohibited_no_payload_fields(syscall: dict[str, Any]) -> tuple[str, ...]:
-    return tuple(field for field in ("payload_layout", "boundary_contract") if field in syscall)
+    return tuple(field for field in ("payload_layout", "boundary_contract", "request", "response") if field in syscall)
 
 
 def _unknown_syscall_behavior(data: dict[str, Any]) -> UnknownSyscallBehavior:

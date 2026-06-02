@@ -23,12 +23,15 @@ KOZO_NEGATIVE_COVERAGE = {
         "missing_syscall_class": "test_fails_when_syscall_table_entry_lacks_class",
         "unknown_syscall_class": "test_fails_when_syscall_table_entry_uses_unknown_class",
         "nop_wrong_class": "test_fails_when_nop_uses_payload_mutating_class",
+        "status_wrong_class": "test_fails_when_status_uses_payload_mutating_class",
         "heartbeat_wrong_class": "test_fails_when_heartbeat_uses_no_payload_class",
         "kind_class_mismatch": "test_fails_when_kind_and_class_mismatch",
         "no_payload_has_layout": "test_fails_when_no_payload_syscall_has_payload_layout",
         "no_payload_has_request": "test_fails_when_no_payload_syscall_has_request",
         "no_payload_has_response": "test_fails_when_no_payload_syscall_has_response",
         "no_payload_mutates_payload": "test_fails_when_no_payload_syscall_allows_payload_mutation",
+        "status_payload_layout_reference": "test_fails_when_status_syscall_has_payload_layout",
+        "status_mutates_payload": "test_fails_when_status_declares_payload_mutation",
         "payload_missing_layout": "test_fails_when_payload_mutating_syscall_lacks_payload_layout",
         "payload_missing_request": "test_fails_when_payload_mutating_syscall_lacks_request",
         "payload_missing_response": "test_fails_when_payload_mutating_syscall_lacks_response",
@@ -126,6 +129,14 @@ class SyscallClassContractValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
         self.assert_class_failure(result, "nop_wrong_class", "valid_syscalls.nop.class")
 
+    def test_fails_when_status_uses_payload_mutating_class(self):
+        result = self.validate_syscall_class_contract(
+            mutate_table=lambda table: self.set_value(table, ("valid_syscalls", "status", "class"), "payload_mutating_status")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_class_failure(result, "status_wrong_class", "valid_syscalls.status.class")
+
     def test_fails_when_heartbeat_uses_no_payload_class(self):
         result = self.validate_syscall_class_contract(
             mutate_table=lambda table: self.set_value(table, ("valid_syscalls", "debug_heartbeat", "class"), "no_payload_status")
@@ -173,6 +184,22 @@ class SyscallClassContractValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "fail")
         self.assert_class_failure(result, "no_payload_mutates_payload", "valid_syscalls.nop.must_not_mutate_payload")
+
+    def test_fails_when_status_syscall_has_payload_layout(self):
+        result = self.validate_syscall_class_contract(
+            mutate_table=lambda table: self.set_value(table, ("valid_syscalls", "status", "payload_layout"), "heartbeat_payload")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_class_failure(result, "no_payload_has_layout", "valid_syscalls.status.payload_layout")
+
+    def test_fails_when_status_declares_payload_mutation(self):
+        result = self.validate_syscall_class_contract(
+            mutate_table=lambda table: self.set_value(table, ("valid_syscalls", "status", "mutates_payload"), ["sequence"])
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_class_failure(result, "no_payload_mutates_payload", "valid_syscalls.status.mutates_payload")
 
     def test_fails_when_payload_mutating_syscall_lacks_payload_layout(self):
         result = self.validate_syscall_class_contract(
@@ -293,7 +320,7 @@ class SyscallClassContractValidatorTests(unittest.TestCase):
                         "response_required": False,
                         "mutates_payload": "forbidden",
                         "return_status_required": True,
-                        "valid_examples": ["nop"],
+                        "valid_examples": ["nop", "status"],
                     },
                     "payload_mutating_status": {
                         "payload_argument": "pointer",
@@ -326,7 +353,19 @@ class SyscallClassContractValidatorTests(unittest.TestCase):
                         "class": "no_payload_status",
                         "constant": "K_SYSCALL_NOP",
                         "branch_selector": "abi.K_SYSCALL_NOP",
+                        "payload_argument": "null",
                         "return_status": "K_OK",
+                        "mutates_payload": [],
+                        "must_not_mutate_payload": True,
+                    },
+                    "status": {
+                        "kind": "no_payload",
+                        "class": "no_payload_status",
+                        "constant": "K_SYSCALL_STATUS",
+                        "branch_selector": "abi.K_SYSCALL_STATUS",
+                        "payload_argument": "null",
+                        "return_status": "K_OK",
+                        "mutates_payload": [],
                         "must_not_mutate_payload": True,
                     },
                     "debug_heartbeat": {
@@ -364,7 +403,7 @@ class SyscallClassContractValidatorTests(unittest.TestCase):
             },
             "constants": {
                 "status": {"K_OK": 0, "K_INVALID": 1, "K_DENIED": 2},
-                "syscalls": {"K_SYSCALL_NOP": 0, "K_SYSCALL_DEBUG_HEARTBEAT": 1},
+                "syscalls": {"K_SYSCALL_NOP": 0, "K_SYSCALL_DEBUG_HEARTBEAT": 1, "K_SYSCALL_STATUS": 2},
             },
             "layouts": {
                 "heartbeat_payload": {

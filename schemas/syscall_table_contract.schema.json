@@ -62,7 +62,9 @@
             "class",
             "constant",
             "branch_selector",
+            "payload_argument",
             "return_status",
+            "mutates_payload",
             "must_not_mutate_payload"
           ],
           "properties": {
@@ -81,9 +83,20 @@
               "type": "string",
               "pattern": ".*\\S.*"
             },
+            "payload_argument": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
             "return_status": {
               "type": "string",
               "pattern": ".*\\S.*"
+            },
+            "mutates_payload": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": ".*\\S.*"
+              }
             },
             "must_not_mutate_payload": {
               "type": "boolean"
@@ -95,6 +108,69 @@
             "boundary_contract": {
               "type": "string",
               "pattern": ".*\\S.*"
+            }
+          }
+        },
+        "status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "class",
+            "constant",
+            "branch_selector",
+            "payload_argument",
+            "return_status",
+            "mutates_payload",
+            "must_not_mutate_payload"
+          ],
+          "properties": {
+            "kind": {
+              "const": "no_payload"
+            },
+            "class": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "constant": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "branch_selector": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "payload_argument": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "return_status": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "mutates_payload": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": ".*\\S.*"
+              }
+            },
+            "must_not_mutate_payload": {
+              "type": "boolean"
+            },
+            "payload_layout": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "boundary_contract": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "request": {
+              "type": "object"
+            },
+            "response": {
+              "type": "object"
             }
           }
         },

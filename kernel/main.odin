@@ -38,6 +38,8 @@ syscall_dispatch :: proc "c" (
 	switch id {
 	case abi.K_SYSCALL_NOP:
 		return abi.K_OK
+	case abi.K_SYSCALL_STATUS:
+		return abi.K_OK
 	case abi.K_SYSCALL_DEBUG_HEARTBEAT:
 		if payload == nil {
 			return abi.K_INVALID

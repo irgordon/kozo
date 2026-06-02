@@ -26,11 +26,17 @@ KOZO_NEGATIVE_COVERAGE = {
         "wrong_unknown_syscall_return": "test_fails_when_unknown_syscall_returns_wrong_status",
         "unknown_path_mutates_payload": "test_fails_when_unknown_syscall_path_mutates_payload",
         "missing_nop_syscall_constant": "test_fails_when_nop_syscall_constant_is_missing_from_manifest",
+        "missing_status_syscall": "test_fails_when_status_syscall_is_missing_from_table_contract",
+        "missing_status_syscall_constant": "test_fails_when_status_syscall_constant_is_missing_from_manifest",
         "no_payload_payload_layout_reference": "test_fails_when_no_payload_syscall_declares_payload_layout",
         "no_payload_missing_return_status": "test_fails_when_no_payload_syscall_lacks_expected_return_status",
         "wrong_no_payload_return_status": "test_fails_when_nop_expected_return_status_mismatches_dispatcher",
         "no_payload_mutates_payload": "test_fails_when_nop_branch_mutates_payload",
         "no_payload_uses_payload_layout": "test_fails_when_nop_branch_uses_heartbeat_payload_layout",
+        "status_payload_layout_reference": "test_fails_when_status_syscall_declares_payload_layout",
+        "status_wrong_return_status": "test_fails_when_status_expected_return_status_mismatches_dispatcher",
+        "status_mutates_payload": "test_fails_when_status_branch_mutates_payload",
+        "status_uses_payload_layout": "test_fails_when_status_branch_uses_heartbeat_payload_layout",
         "diagnostic_names_contract_field": "test_failure_diagnostic_names_contract_field",
     }
 }
@@ -165,6 +171,22 @@ class SyscallTableContractValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
         self.assert_table_failure(result, "missing_abi_syscall_constant", "valid_syscalls.nop.constant")
 
+    def test_fails_when_status_syscall_is_missing_from_table_contract(self):
+        result = self.validate_syscall_table_contract(
+            mutate_contract=lambda contract: contract["valid_syscalls"].pop("status")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_table_failure(result, "missing_valid_syscall", "valid_syscalls.status")
+
+    def test_fails_when_status_syscall_constant_is_missing_from_manifest(self):
+        result = self.validate_syscall_table_contract(
+            mutate_manifest=lambda manifest: manifest["constants"]["syscalls"].pop("K_SYSCALL_STATUS")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_table_failure(result, "missing_abi_syscall_constant", "valid_syscalls.status.constant")
+
     def test_fails_when_no_payload_syscall_declares_payload_layout(self):
         result = self.validate_syscall_table_contract(
             mutate_contract=lambda contract: self.set_value(
@@ -218,6 +240,52 @@ class SyscallTableContractValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "fail")
         self.assert_table_failure(result, "no_payload_uses_payload_layout", "valid_syscalls.nop")
+
+    def test_fails_when_status_syscall_declares_payload_layout(self):
+        result = self.validate_syscall_table_contract(
+            mutate_contract=lambda contract: self.set_value(
+                contract,
+                ("valid_syscalls", "status", "payload_layout"),
+                "heartbeat_payload",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_table_failure(result, "no_payload_payload_layout_reference", "valid_syscalls.status.payload_layout")
+
+    def test_fails_when_status_expected_return_status_mismatches_dispatcher(self):
+        result = self.validate_syscall_table_contract(
+            mutate_contract=lambda contract: self.set_value(
+                contract,
+                ("valid_syscalls", "status", "return_status"),
+                "K_INVALID",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_table_failure(result, "wrong_no_payload_return_status", "valid_syscalls.status.return_status")
+
+    def test_fails_when_status_branch_mutates_payload(self):
+        result = self.validate_syscall_table_contract(
+            mutate_dispatcher=lambda source: source.replace(
+                "case abi.K_SYSCALL_STATUS:\n\t\treturn abi.K_OK",
+                "case abi.K_SYSCALL_STATUS:\n\t\tpayload.sequence = 0\n\t\treturn abi.K_OK",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_table_failure(result, "no_payload_mutates_payload", "valid_syscalls.status.must_not_mutate_payload")
+
+    def test_fails_when_status_branch_uses_heartbeat_payload_layout(self):
+        result = self.validate_syscall_table_contract(
+            mutate_dispatcher=lambda source: source.replace(
+                "case abi.K_SYSCALL_STATUS:\n\t\treturn abi.K_OK",
+                "case abi.K_SYSCALL_STATUS:\n\t\tif payload.sequence == 0xCAFEFEED {}\n\t\treturn abi.K_OK",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_table_failure(result, "no_payload_uses_payload_layout", "valid_syscalls.status")
 
     def test_failure_diagnostic_names_contract_field(self):
         result = self.validate_syscall_table_contract(
@@ -346,7 +414,19 @@ class SyscallTableContractValidatorTests(unittest.TestCase):
                         "class": "no_payload_status",
                         "constant": "K_SYSCALL_NOP",
                         "branch_selector": "abi.K_SYSCALL_NOP",
+                        "payload_argument": "null",
                         "return_status": "K_OK",
+                        "mutates_payload": [],
+                        "must_not_mutate_payload": True,
+                    },
+                    "status": {
+                        "kind": "no_payload",
+                        "class": "no_payload_status",
+                        "constant": "K_SYSCALL_STATUS",
+                        "branch_selector": "abi.K_SYSCALL_STATUS",
+                        "payload_argument": "null",
+                        "return_status": "K_OK",
+                        "mutates_payload": [],
                         "must_not_mutate_payload": True,
                     },
                     "debug_heartbeat": {
@@ -380,7 +460,7 @@ class SyscallTableContractValidatorTests(unittest.TestCase):
                 },
                 "constants": {
                     "status": {"K_OK": 0, "K_INVALID": 1, "K_DENIED": 2},
-                    "syscalls": {"K_SYSCALL_NOP": 0, "K_SYSCALL_DEBUG_HEARTBEAT": 1},
+                    "syscalls": {"K_SYSCALL_NOP": 0, "K_SYSCALL_DEBUG_HEARTBEAT": 1, "K_SYSCALL_STATUS": 2},
                 },
                 "layouts": {
                     "heartbeat_payload": {
@@ -456,6 +536,8 @@ class SyscallTableContractValidatorTests(unittest.TestCase):
 	switch id {
 	case abi.K_SYSCALL_NOP:
 		return abi.K_OK
+	case abi.K_SYSCALL_STATUS:
+		return abi.K_OK
 	case abi.K_SYSCALL_DEBUG_HEARTBEAT:
 		if payload == nil {
 			return abi.K_INVALID
@@ -477,6 +559,7 @@ class SyscallTableContractValidatorTests(unittest.TestCase):
 pub type K_SYSCALL_ID = u32;
 pub const K_INVALID: K_STATUS = 1;
 pub const K_SYSCALL_DEBUG_HEARTBEAT: K_SYSCALL_ID = 1;
+pub const K_SYSCALL_STATUS: K_SYSCALL_ID = 2;
 """
 
     def odin_binding_source(self) -> str:
@@ -484,6 +567,7 @@ pub const K_SYSCALL_DEBUG_HEARTBEAT: K_SYSCALL_ID = 1;
 K_SYSCALL_ID :: u32
 K_INVALID : K_STATUS : 1
 K_SYSCALL_DEBUG_HEARTBEAT : K_SYSCALL_ID : 1
+K_SYSCALL_STATUS : K_SYSCALL_ID : 2
 """
 
     def set_value(self, data: dict, path: tuple[str, ...], value) -> None:

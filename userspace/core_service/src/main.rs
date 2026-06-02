@@ -22,7 +22,7 @@ fn invoke_heartbeat_bridge(
     unsafe { syscall_entry(u64::from(syscall), payload as *mut abi::HeartbeatPayload) as abi::K_STATUS }
 }
 
-fn invoke_nop_bridge(syscall: abi::K_SYSCALL_ID) -> abi::K_STATUS {
+fn invoke_no_payload_bridge(syscall: abi::K_SYSCALL_ID) -> abi::K_STATUS {
     unsafe { syscall_entry(u64::from(syscall), core::ptr::null_mut()) as abi::K_STATUS }
 }
 
@@ -32,6 +32,10 @@ fn fail_heartbeat_contract() -> ! {
 
 fn fail_nop_contract() -> ! {
     panic!("nop return path contract violated")
+}
+
+fn fail_status_contract() -> ! {
+    panic!("status return path contract violated")
 }
 
 fn validate_heartbeat_return_path(
@@ -60,10 +64,23 @@ fn validate_nop_return_status(status: abi::K_STATUS) -> abi::K_STATUS {
     abi::K_OK
 }
 
+fn validate_status_return_status(status: abi::K_STATUS) -> abi::K_STATUS {
+    if status != abi::K_OK {
+        fail_status_contract();
+    }
+    abi::K_OK
+}
+
 pub fn nop_request() -> abi::K_STATUS {
     let syscall: abi::K_SYSCALL_ID = abi::K_SYSCALL_NOP;
-    let status = invoke_nop_bridge(syscall);
+    let status = invoke_no_payload_bridge(syscall);
     return validate_nop_return_status(status);
+}
+
+pub fn status_request() -> abi::K_STATUS {
+    let syscall: abi::K_SYSCALL_ID = abi::K_SYSCALL_STATUS;
+    let status = invoke_no_payload_bridge(syscall);
+    return validate_status_return_status(status);
 }
 
 pub fn heartbeat_request() -> abi::K_STATUS {
@@ -82,5 +99,6 @@ pub fn heartbeat_request() -> abi::K_STATUS {
 pub extern "C" fn core_service_entry(handle: K_HANDLE) -> K_STATUS {
     let _ = handle;
     let _ = nop_request();
+    let _ = status_request();
     heartbeat_request()
 }

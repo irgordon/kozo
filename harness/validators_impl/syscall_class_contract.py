@@ -245,11 +245,19 @@ def _unknown_class_issue(
 
 
 def _expected_named_class_issue(syscall_name: str, class_name: str) -> ClassIssue | None:
-    expected = {"nop": _NO_PAYLOAD_CLASS, "debug_heartbeat": _PAYLOAD_MUTATING_CLASS}.get(syscall_name)
+    expected = {"nop": _NO_PAYLOAD_CLASS, "status": _NO_PAYLOAD_CLASS, "debug_heartbeat": _PAYLOAD_MUTATING_CLASS}.get(syscall_name)
     if expected is None or class_name == expected:
         return None
-    reason = "nop_wrong_class" if syscall_name == "nop" else "heartbeat_wrong_class"
+    reason = _wrong_class_reason(syscall_name)
     return _issue(reason, f"valid_syscalls.{syscall_name}.class", f"Expected {expected}, got {class_name}")
+
+
+def _wrong_class_reason(syscall_name: str) -> str:
+    if syscall_name == "nop":
+        return "nop_wrong_class"
+    if syscall_name == "status":
+        return "status_wrong_class"
+    return "heartbeat_wrong_class"
 
 
 def _kind_class_issue(syscall_name: str, syscall: dict[str, Any]) -> ClassIssue | None:
@@ -274,6 +282,8 @@ def _no_payload_syscall_issue(
 ) -> ClassIssue | None:
     return _first_issue(
         _status_issue(name, syscall.get("return_status"), manifest),
+        _payload_argument_issue(name, syscall),
+        _empty_mutates_payload_issue(name, syscall),
         _forbidden_field_issue(name, syscall, "payload_layout", "no_payload_has_layout"),
         _forbidden_field_issue(name, syscall, "request", "no_payload_has_request"),
         _forbidden_field_issue(name, syscall, "response", "no_payload_has_response"),
@@ -305,6 +315,19 @@ def _status_issue(
     if isinstance(status, str) and status in manifest.constants.status:
         return None
     return _issue("unknown_status_constant", f"valid_syscalls.{syscall_name}.return_status", f"{status!r} is not a known status constant")
+
+
+def _payload_argument_issue(syscall_name: str, syscall: dict[str, Any]) -> ClassIssue | None:
+    if syscall.get("payload_argument") == "null":
+        return None
+    return _issue("wrong_no_payload_argument", f"valid_syscalls.{syscall_name}.payload_argument", "No-payload status syscalls must use a null payload argument")
+
+
+def _empty_mutates_payload_issue(syscall_name: str, syscall: dict[str, Any]) -> ClassIssue | None:
+    mutations = syscall.get("mutates_payload")
+    if isinstance(mutations, list) and not mutations:
+        return None
+    return _issue("no_payload_mutates_payload", f"valid_syscalls.{syscall_name}.mutates_payload", "No-payload status syscalls must declare no payload mutations")
 
 
 def _forbidden_field_issue(

@@ -29,11 +29,17 @@ KOZO_NEGATIVE_COVERAGE = {
         "missing_abi_syscall_constant": "test_fails_when_abi_manifest_is_missing_syscall_constant",
         "missing_abi_payload_layout": "test_fails_when_payload_layout_reference_is_missing_from_abi_manifest",
         "missing_nop_branch": "test_fails_when_nop_branch_is_missing",
+        "missing_status_branch": "test_fails_when_status_branch_is_missing",
         "nop_hardcoded_selector": "test_fails_when_nop_branch_selector_is_hardcoded_numeric",
+        "status_hardcoded_selector": "test_fails_when_status_branch_selector_is_hardcoded_numeric",
         "wrong_nop_return_status": "test_fails_when_nop_return_status_mismatches",
+        "wrong_status_return_status": "test_fails_when_status_return_status_mismatches",
         "nop_mutates_payload": "test_fails_when_nop_branch_mutates_payload",
+        "status_mutates_payload": "test_fails_when_status_branch_mutates_payload",
         "nop_uses_payload_layout": "test_fails_when_nop_branch_uses_heartbeat_payload_layout",
+        "status_uses_payload_layout": "test_fails_when_status_branch_uses_heartbeat_payload_layout",
         "missing_nop_abi_constant": "test_fails_when_nop_abi_constant_is_missing",
+        "missing_status_abi_constant": "test_fails_when_status_abi_constant_is_missing",
         "diagnostic_names_contract_field": "test_failure_diagnostic_names_contract_field",
     }
 }
@@ -246,6 +252,63 @@ class SyscallTableConformanceValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
         self.assert_conformance_failure(result, "missing_abi_syscall_constant", "valid_syscalls.nop.constant")
 
+    def test_fails_when_status_branch_is_missing(self):
+        result = self.validate_syscall_table_conformance(
+            mutate_dispatcher=lambda source: source.replace("case abi.K_SYSCALL_STATUS:", "case abi.K_SYSCALL_STATUS_DISABLED:")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_conformance_failure(result, "missing_valid_syscall_branch", "valid_syscalls.status.branch_selector")
+
+    def test_fails_when_status_branch_selector_is_hardcoded_numeric(self):
+        result = self.validate_syscall_table_conformance(
+            mutate_dispatcher=lambda source: source.replace("case abi.K_SYSCALL_STATUS:", "case 2:")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_conformance_failure(result, "hardcoded_branch_selector", "valid_syscalls.status.branch_selector")
+
+    def test_fails_when_status_return_status_mismatches(self):
+        result = self.validate_syscall_table_conformance(
+            mutate_dispatcher=lambda source: source.replace(
+                "case abi.K_SYSCALL_STATUS:\n\t\treturn abi.K_OK",
+                "case abi.K_SYSCALL_STATUS:\n\t\treturn abi.K_INVALID",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_conformance_failure(result, "wrong_no_payload_return_status", "valid_syscalls.status.return_status")
+
+    def test_fails_when_status_branch_mutates_payload(self):
+        result = self.validate_syscall_table_conformance(
+            mutate_dispatcher=lambda source: source.replace(
+                "case abi.K_SYSCALL_STATUS:\n\t\treturn abi.K_OK",
+                "case abi.K_SYSCALL_STATUS:\n\t\tpayload.sequence = 0\n\t\treturn abi.K_OK",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_conformance_failure(result, "no_payload_mutates_payload", "valid_syscalls.status.must_not_mutate_payload")
+
+    def test_fails_when_status_branch_uses_heartbeat_payload_layout(self):
+        result = self.validate_syscall_table_conformance(
+            mutate_dispatcher=lambda source: source.replace(
+                "case abi.K_SYSCALL_STATUS:\n\t\treturn abi.K_OK",
+                "case abi.K_SYSCALL_STATUS:\n\t\tif payload != nil {}\n\t\treturn abi.K_OK",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_conformance_failure(result, "no_payload_uses_payload_layout", "valid_syscalls.status")
+
+    def test_fails_when_status_abi_constant_is_missing(self):
+        result = self.validate_syscall_table_conformance(
+            mutate_manifest=lambda manifest: manifest["constants"]["syscalls"].pop("K_SYSCALL_STATUS")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_conformance_failure(result, "missing_abi_syscall_constant", "valid_syscalls.status.constant")
+
     def test_failure_diagnostic_names_contract_field(self):
         result = self.validate_syscall_table_conformance(
             mutate_dispatcher=lambda source: source.replace("-> abi.K_STATUS", "-> abi.K_SYSCALL_ID")
@@ -330,7 +393,19 @@ class SyscallTableConformanceValidatorTests(unittest.TestCase):
                         "class": "no_payload_status",
                         "constant": "K_SYSCALL_NOP",
                         "branch_selector": "abi.K_SYSCALL_NOP",
+                        "payload_argument": "null",
                         "return_status": "K_OK",
+                        "mutates_payload": [],
+                        "must_not_mutate_payload": True,
+                    },
+                    "status": {
+                        "kind": "no_payload",
+                        "class": "no_payload_status",
+                        "constant": "K_SYSCALL_STATUS",
+                        "branch_selector": "abi.K_SYSCALL_STATUS",
+                        "payload_argument": "null",
+                        "return_status": "K_OK",
+                        "mutates_payload": [],
                         "must_not_mutate_payload": True,
                     },
                     "debug_heartbeat": {
@@ -364,7 +439,7 @@ class SyscallTableConformanceValidatorTests(unittest.TestCase):
                 },
                 "constants": {
                     "status": {"K_OK": 0, "K_INVALID": 1, "K_DENIED": 2},
-                    "syscalls": {"K_SYSCALL_NOP": 0, "K_SYSCALL_DEBUG_HEARTBEAT": 1},
+                    "syscalls": {"K_SYSCALL_NOP": 0, "K_SYSCALL_DEBUG_HEARTBEAT": 1, "K_SYSCALL_STATUS": 2},
                 },
                 "layouts": {
                     "heartbeat_payload": {
@@ -394,6 +469,8 @@ class SyscallTableConformanceValidatorTests(unittest.TestCase):
 ) -> abi.K_STATUS {
 	switch id {
 	case abi.K_SYSCALL_NOP:
+		return abi.K_OK
+	case abi.K_SYSCALL_STATUS:
 		return abi.K_OK
 	case abi.K_SYSCALL_DEBUG_HEARTBEAT:
 		if payload == nil {

@@ -13,7 +13,8 @@
     },
     "syscalls": {
       "K_SYSCALL_NOP": 0,
-      "K_SYSCALL_DEBUG_HEARTBEAT": 1
+      "K_SYSCALL_DEBUG_HEARTBEAT": 1,
+      "K_SYSCALL_STATUS": 2
     }
   },
   "layouts": {

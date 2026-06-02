@@ -63,6 +63,12 @@ _RUST_USAGE_ANCHORS = (
         "Rust heartbeat_request must select the generated heartbeat syscall constant",
         _SERVICE_PATH,
     ),
+    ProtocolUsageAnchor(
+        "rust_live_status_syscall_constant",
+        "let syscall: abi::K_SYSCALL_ID = abi::K_SYSCALL_STATUS;",
+        "Rust status_request must select the generated STATUS syscall constant",
+        _SERVICE_PATH,
+    ),
 )
 
 _ODIN_USAGE_ANCHORS = (
@@ -147,13 +153,14 @@ def _manifest_syscalls(manifest: abi_manifest.AbiManifest) -> tuple[ProtocolCons
 
 
 def _manifest_syscall_issue(constants: tuple[ProtocolConstant, ...]) -> ProtocolIssue | None:
-    if _constant_named(constants, "K_SYSCALL_DEBUG_HEARTBEAT") is not None:
-        return None
-    return _issue(
-        "missing_manifest_syscall_constant",
-        "constants.syscalls.K_SYSCALL_DEBUG_HEARTBEAT",
-        "Protocol mismatch: ABI manifest is missing K_SYSCALL_DEBUG_HEARTBEAT",
-    )
+    for name in ("K_SYSCALL_NOP", "K_SYSCALL_DEBUG_HEARTBEAT", "K_SYSCALL_STATUS"):
+        if _constant_named(constants, name) is None:
+            return _issue(
+                "missing_manifest_syscall_constant",
+                f"constants.syscalls.{name}",
+                f"Protocol mismatch: ABI manifest is missing {name}",
+            )
+    return None
 
 
 def _binding_alignment_issue(
@@ -245,11 +252,15 @@ def _rust_live_usage_issue(
     service_source: str,
 ) -> ProtocolIssue | None:
     heartbeat_block = _extract_rust_function_block(service_source, "heartbeat_request")
+    status_block = _extract_rust_function_block(service_source, "status_request")
     if heartbeat_block is None:
         return _issue("missing_rust_heartbeat_path", "heartbeat_request", "Protocol mismatch: Rust heartbeat_request is missing")
+    if status_block is None:
+        return _issue("missing_rust_status_path", "status_request", "Protocol mismatch: Rust status_request is missing")
     return _first_issue(
-        _forbidden_constant_issue(heartbeat_block, _rust_forbidden_constants(manifest)),
-        _missing_anchor_issue(heartbeat_block, _RUST_USAGE_ANCHORS),
+        _forbidden_constant_issue(f"{heartbeat_block}\n{status_block}", _rust_forbidden_constants(manifest)),
+        _missing_anchor_issue(heartbeat_block, (_RUST_USAGE_ANCHORS[0],)),
+        _missing_anchor_issue(status_block, (_RUST_USAGE_ANCHORS[1],)),
     )
 
 
@@ -301,11 +312,18 @@ def _rust_forbidden_constants(
     manifest: abi_manifest.AbiManifest,
 ) -> tuple[ForbiddenLocalConstant, ...]:
     heartbeat_id = _heartbeat_syscall_value(manifest)
+    status_id = _status_syscall_value(manifest)
     return (
         ForbiddenLocalConstant(
             "rust_hardcoded_heartbeat_syscall_id",
             re.compile(rf"\blet\s+syscall\s*:\s*abi::K_SYSCALL_ID\s*=\s*{heartbeat_id}\s*;|\binvoke_heartbeat_bridge\s*\(\s*{heartbeat_id}\s*,"),
             "Rust heartbeat_request must not hardcode the DEBUG_HEARTBEAT syscall id",
+            _SERVICE_PATH,
+        ),
+        ForbiddenLocalConstant(
+            "rust_hardcoded_status_syscall_id",
+            re.compile(rf"\blet\s+syscall\s*:\s*abi::K_SYSCALL_ID\s*=\s*{status_id}\s*;|\binvoke_no_payload_bridge\s*\(\s*{status_id}\s*\)"),
+            "Rust status_request must not hardcode the STATUS syscall id",
             _SERVICE_PATH,
         ),
     )
@@ -327,6 +345,10 @@ def _odin_forbidden_constants(
 
 def _heartbeat_syscall_value(manifest: abi_manifest.AbiManifest) -> int:
     return manifest.constants.syscalls.get("K_SYSCALL_DEBUG_HEARTBEAT", 0)
+
+
+def _status_syscall_value(manifest: abi_manifest.AbiManifest) -> int:
+    return manifest.constants.syscalls.get("K_SYSCALL_STATUS", 0)
 
 
 def _constant_named(

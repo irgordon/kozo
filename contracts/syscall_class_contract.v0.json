@@ -9,7 +9,8 @@
       "mutates_payload": "forbidden",
       "return_status_required": true,
       "valid_examples": [
-        "nop"
+        "nop",
+        "status"
       ]
     },
     "payload_mutating_status": {

@@ -12,10 +12,14 @@ from harness.validators_impl.protocol_validator import ProtocolContractValidator
 KOZO_NEGATIVE_COVERAGE = {
     "protocol_contract_alignment": {
         "missing_manifest_syscall_constant": "test_fails_when_manifest_syscall_constant_is_missing",
+        "missing_status_manifest_syscall_constant": "test_fails_when_manifest_status_syscall_constant_is_missing",
         "manifest_syscall_value_mismatch": "test_fails_when_manifest_syscall_value_mismatches_bindings",
         "missing_rust_syscall_constant": "test_fails_when_generated_rust_syscall_constant_is_missing",
+        "missing_status_rust_syscall_constant": "test_fails_when_generated_rust_status_syscall_constant_is_missing",
         "missing_odin_syscall_constant": "test_fails_when_generated_odin_syscall_constant_is_missing",
+        "missing_status_odin_syscall_constant": "test_fails_when_generated_odin_status_syscall_constant_is_missing",
         "rust_hardcoded_syscall_id": "test_fails_when_rust_uses_hardcoded_syscall_id",
+        "rust_hardcoded_status_syscall_id": "test_fails_when_rust_status_uses_hardcoded_syscall_id",
         "odin_hardcoded_syscall_id": "test_fails_when_odin_uses_hardcoded_syscall_id",
         "constant_mismatch": "test_fails_when_generated_syscall_constants_disagree",
         "dead_or_stale_constant": "test_fails_when_stale_constant_exists_outside_live_rust_path",
@@ -38,6 +42,15 @@ class ProtocolContractValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
 
         self.assert_protocol_failure(result, "missing_manifest_syscall_constant", "constants.syscalls.K_SYSCALL_DEBUG_HEARTBEAT")
+
+    def test_fails_when_manifest_status_syscall_constant_is_missing(self):
+        result = self.validate_contract(
+            manifest=self.valid_manifest_without_status
+        )
+
+        self.assertEqual(result.status, "fail")
+
+        self.assert_protocol_failure(result, "missing_manifest_syscall_constant", "constants.syscalls.K_SYSCALL_STATUS")
 
     def test_fails_when_manifest_syscall_value_mismatches_bindings(self):
         result = self.validate_contract(
@@ -72,6 +85,18 @@ class ProtocolContractValidatorTests(unittest.TestCase):
 
         self.assert_protocol_failure(result, "rust_missing_generated_syscall_constant", "rust_K_SYSCALL_NOP")
 
+    def test_fails_when_generated_rust_status_syscall_constant_is_missing(self):
+        result = self.validate_contract(
+            rust_bindings=self.valid_rust_bindings().replace(
+                "pub const K_SYSCALL_STATUS: K_SYSCALL_ID = 2;\n",
+                "",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+
+        self.assert_protocol_failure(result, "rust_missing_generated_syscall_constant", "rust_K_SYSCALL_STATUS")
+
     def test_fails_when_generated_odin_syscall_constant_is_missing(self):
         result = self.validate_contract(
             odin_bindings=self.valid_odin_bindings().replace(
@@ -96,6 +121,18 @@ class ProtocolContractValidatorTests(unittest.TestCase):
 
         self.assert_protocol_failure(result, "odin_missing_generated_syscall_constant", "odin_K_SYSCALL_NOP")
 
+    def test_fails_when_generated_odin_status_syscall_constant_is_missing(self):
+        result = self.validate_contract(
+            odin_bindings=self.valid_odin_bindings().replace(
+                "K_SYSCALL_STATUS : K_SYSCALL_ID : 2\n",
+                "",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+
+        self.assert_protocol_failure(result, "odin_missing_generated_syscall_constant", "odin_K_SYSCALL_STATUS")
+
     def test_fails_when_rust_uses_hardcoded_syscall_id(self):
         result = self.validate_contract(
             service=self.valid_service().replace(
@@ -107,6 +144,18 @@ class ProtocolContractValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
 
         self.assert_protocol_failure(result, "hardcoded_syscall_id", "rust_hardcoded_heartbeat_syscall_id")
+
+    def test_fails_when_rust_status_uses_hardcoded_syscall_id(self):
+        result = self.validate_contract(
+            service=self.valid_service().replace(
+                "let syscall: abi::K_SYSCALL_ID = abi::K_SYSCALL_STATUS;",
+                "let syscall: abi::K_SYSCALL_ID = 2;",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+
+        self.assert_protocol_failure(result, "hardcoded_syscall_id", "rust_hardcoded_status_syscall_id")
 
     def test_fails_when_odin_uses_hardcoded_syscall_id(self):
         result = self.validate_contract(
@@ -242,6 +291,7 @@ class ProtocolContractValidatorTests(unittest.TestCase):
             "typedef enum k_syscall_id_t {\n"
             "\tK_SYSCALL_NOP = 0,\n"
             "\tK_SYSCALL_DEBUG_HEARTBEAT = 1,\n"
+            "\tK_SYSCALL_STATUS = 2,\n"
             "} k_syscall_id_t;\n"
         )
 
@@ -250,6 +300,7 @@ class ProtocolContractValidatorTests(unittest.TestCase):
             "pub type K_SYSCALL_ID = u32;\n"
             "pub const K_SYSCALL_NOP: K_SYSCALL_ID = 0;\n"
             "pub const K_SYSCALL_DEBUG_HEARTBEAT: K_SYSCALL_ID = 1;\n"
+            "pub const K_SYSCALL_STATUS: K_SYSCALL_ID = 2;\n"
         )
 
     def valid_odin_bindings(self) -> str:
@@ -257,6 +308,7 @@ class ProtocolContractValidatorTests(unittest.TestCase):
             "K_SYSCALL_ID :: u32\n"
             "K_SYSCALL_NOP : K_SYSCALL_ID : 0\n"
             "K_SYSCALL_DEBUG_HEARTBEAT : K_SYSCALL_ID : 1\n"
+            "K_SYSCALL_STATUS : K_SYSCALL_ID : 2\n"
         )
 
     def valid_kernel(self) -> str:
@@ -268,6 +320,8 @@ class ProtocolContractValidatorTests(unittest.TestCase):
             "syscall_dispatch :: proc \"c\" (id: abi.K_SYSCALL_ID, payload: ^abi.Heartbeat_Payload) -> abi.K_STATUS {\n"
             "\tswitch id {\n"
             "\tcase abi.K_SYSCALL_NOP:\n"
+            "\t\treturn abi.K_OK\n"
+            "\tcase abi.K_SYSCALL_STATUS:\n"
             "\t\treturn abi.K_OK\n"
             "\tcase abi.K_SYSCALL_DEBUG_HEARTBEAT:\n"
             "\t\treturn abi.K_OK\n"
@@ -281,6 +335,13 @@ class ProtocolContractValidatorTests(unittest.TestCase):
             'extern "C" { fn syscall_entry(id: u64, payload: *mut abi::HeartbeatPayload) -> u64; }\n'
             "fn invoke_heartbeat_bridge(syscall: abi::K_SYSCALL_ID, payload: &mut abi::HeartbeatPayload) -> abi::K_STATUS {\n"
             "    unsafe { syscall_entry(u64::from(syscall), payload as *mut abi::HeartbeatPayload) as abi::K_STATUS }\n"
+            "}\n"
+            "fn invoke_no_payload_bridge(syscall: abi::K_SYSCALL_ID) -> abi::K_STATUS {\n"
+            "    unsafe { syscall_entry(u64::from(syscall), core::ptr::null_mut()) as abi::K_STATUS }\n"
+            "}\n"
+            "pub fn status_request() -> abi::K_STATUS {\n"
+            "    let syscall: abi::K_SYSCALL_ID = abi::K_SYSCALL_STATUS;\n"
+            "    return invoke_no_payload_bridge(syscall);\n"
             "}\n"
             "pub fn heartbeat_request() -> abi::K_STATUS {\n"
             "    let mut payload = abi::HeartbeatPayload { sequence: 0xCAFEFEED, timestamp: 0, status_bits: abi::K_INVALID };\n"
@@ -305,6 +366,7 @@ class ProtocolContractValidatorTests(unittest.TestCase):
                 "syscalls": {
                     "K_SYSCALL_NOP": 0,
                     "K_SYSCALL_DEBUG_HEARTBEAT": 1,
+                    "K_SYSCALL_STATUS": 2,
                 },
             },
             "layouts": {
@@ -338,6 +400,11 @@ class ProtocolContractValidatorTests(unittest.TestCase):
     def valid_manifest_without_debug_heartbeat(self, paths: dict[str, Path]) -> dict[str, object]:
         manifest = self.valid_manifest(paths)
         del manifest["constants"]["syscalls"]["K_SYSCALL_DEBUG_HEARTBEAT"]
+        return manifest
+
+    def valid_manifest_without_status(self, paths: dict[str, Path]) -> dict[str, object]:
+        manifest = self.valid_manifest(paths)
+        del manifest["constants"]["syscalls"]["K_SYSCALL_STATUS"]
         return manifest
 
     def valid_manifest_with_wrong_heartbeat_value(self, paths: dict[str, Path]) -> dict[str, object]:

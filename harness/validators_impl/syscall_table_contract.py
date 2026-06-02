@@ -18,6 +18,7 @@ _EXPECTED_DISPATCHER_SYMBOL = "syscall_dispatch"
 _EXPECTED_SYSCALL_ID_TYPE = "K_SYSCALL_ID"
 _EXPECTED_RETURN_TYPE = "K_STATUS"
 _EXPECTED_BOUNDARY_CONTRACT = "debug_heartbeat"
+_REQUIRED_SYSCALLS = ("nop", "status", "debug_heartbeat")
 
 
 @dataclass(frozen=True)
@@ -81,6 +82,7 @@ def _table_contract_issue(
         _relationship_issue(context.contract),
         _dispatcher_contract_issue(context, blocks),
         _type_contract_issue(context),
+        _required_syscall_issue(context.contract),
         _syscall_contract_issue(context, blocks),
         _unknown_syscall_issue(context, blocks),
     )
@@ -238,6 +240,14 @@ def _syscall_contract_issue(context: TableContext, blocks: DispatcherBlocks) -> 
     return None
 
 
+def _required_syscall_issue(contract: syscall_table_contract.SyscallTableContract) -> TableIssue | None:
+    present = {syscall.name for syscall in contract.valid_syscalls}
+    for name in _REQUIRED_SYSCALLS:
+        if name not in present:
+            return _issue("missing_valid_syscall", f"valid_syscalls.{name}", f"Required syscall table entry {name} is missing")
+    return None
+
+
 def _single_syscall_issue(
     context: TableContext,
     blocks: DispatcherBlocks,
@@ -335,6 +345,26 @@ def _branch_mapping_issue(branch: str, syscall: syscall_table_contract.PayloadSy
 
 
 def _no_payload_shape_issue(syscall: syscall_table_contract.NoPayloadSyscall) -> TableIssue | None:
+    return _first_issue(
+        _no_payload_argument_issue(syscall),
+        _no_payload_mutates_payload_issue(syscall),
+        _no_payload_prohibited_field_issue(syscall),
+    )
+
+
+def _no_payload_argument_issue(syscall: syscall_table_contract.NoPayloadSyscall) -> TableIssue | None:
+    if syscall.payload_argument == "null":
+        return None
+    return _issue("wrong_no_payload_argument", f"valid_syscalls.{syscall.name}.payload_argument", f"No-payload syscall {syscall.name} must use a null payload argument")
+
+
+def _no_payload_mutates_payload_issue(syscall: syscall_table_contract.NoPayloadSyscall) -> TableIssue | None:
+    if not syscall.mutates_payload:
+        return None
+    return _issue("no_payload_declares_payload_mutation", f"valid_syscalls.{syscall.name}.mutates_payload", f"No-payload syscall {syscall.name} must not declare payload mutations")
+
+
+def _no_payload_prohibited_field_issue(syscall: syscall_table_contract.NoPayloadSyscall) -> TableIssue | None:
     if not syscall.prohibited_fields:
         return None
     field = syscall.prohibited_fields[0]
