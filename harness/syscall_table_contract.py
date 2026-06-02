@@ -22,6 +22,7 @@ class TableDispatcher:
 @dataclass(frozen=True)
 class PayloadSyscall:
     name: str
+    syscall_class: str
     constant: str
     payload_layout: str
     branch_selector: str
@@ -31,6 +32,7 @@ class PayloadSyscall:
 @dataclass(frozen=True)
 class NoPayloadSyscall:
     name: str
+    syscall_class: str
     constant: str
     branch_selector: str
     return_status: str
@@ -115,6 +117,7 @@ def _valid_syscall(name: str, syscall: dict[str, Any]) -> PayloadSyscall | NoPay
     if syscall["kind"] == "no_payload":
         return NoPayloadSyscall(
             name,
+            syscall["class"],
             syscall["constant"],
             syscall["branch_selector"],
             syscall["return_status"],
@@ -123,6 +126,7 @@ def _valid_syscall(name: str, syscall: dict[str, Any]) -> PayloadSyscall | NoPay
         )
     return PayloadSyscall(
         name,
+        syscall["class"],
         syscall["constant"],
         syscall["payload_layout"],
         syscall["branch_selector"],

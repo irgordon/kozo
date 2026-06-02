@@ -10,6 +10,7 @@
   "valid_syscalls": {
     "nop": {
       "kind": "no_payload",
+      "class": "no_payload_status",
       "constant": "K_SYSCALL_NOP",
       "branch_selector": "abi.K_SYSCALL_NOP",
       "return_status": "K_OK",
@@ -17,10 +18,31 @@
     },
     "debug_heartbeat": {
       "kind": "payload",
+      "class": "payload_mutating_status",
       "constant": "K_SYSCALL_DEBUG_HEARTBEAT",
       "payload_layout": "heartbeat_payload",
       "branch_selector": "abi.K_SYSCALL_DEBUG_HEARTBEAT",
-      "boundary_contract": "debug_heartbeat"
+      "boundary_contract": "debug_heartbeat",
+      "return_status": "K_OK",
+      "request": {
+        "sequence": "0xCAFEFEED",
+        "timestamp": 0,
+        "status_bits": "K_INVALID"
+      },
+      "response": {
+        "sequence": "0xCAFEFEEE",
+        "timestamp": "0xDEADBEEF",
+        "status_bits": "K_OK"
+      },
+      "invalid_behavior": {
+        "null_payload": "K_INVALID",
+        "bad_sequence": "K_INVALID"
+      },
+      "mutates_payload": [
+        "sequence",
+        "timestamp",
+        "status_bits"
+      ]
     }
   },
   "unknown_syscall_behavior": {

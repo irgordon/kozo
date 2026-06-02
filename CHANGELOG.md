@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.0.24 - 2026-06-01
+
+**Status:** Syscall classes are governed as semantic categories for currently proven dispatcher entries.
+
+### Added
+
+* Added syscall class contract v0 for currently proven syscall classes: `no_payload_status` and `payload_mutating_status`.
+* Added a schema-backed syscall class loader and registered `syscall_class_contract` validator.
+* Extended syscall table contract v0 so each syscall entry keeps its structural `kind` and declares a semantic `class`.
+* Added focused negative coverage for missing class contracts, malformed class semantics, unknown examples, missing or wrong syscall classes, kind/class drift, no-payload request/response metadata, no-payload mutation, payload metadata gaps, unknown mutation fields, and diagnostic quality.
+
+### Notes
+
+* This version classifies only currently proven syscall shapes: NOP as no-payload status and debug heartbeat as payload-mutating status.
+* This change does not add new syscalls, userspace generalization, Linux compatibility, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or runtime subsystem behavior.
+
 ## v0.0.23 - 2026-06-01
 
 **Status:** NOP is exercised from Rust through the existing bridge with a null payload argument.

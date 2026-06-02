@@ -1,0 +1,31 @@
+{
+  "version": 0,
+  "classes": {
+    "no_payload_status": {
+      "payload_argument": "null",
+      "payload_layout_required": false,
+      "request_required": false,
+      "response_required": false,
+      "mutates_payload": "forbidden",
+      "return_status_required": true,
+      "valid_examples": [
+        "nop"
+      ]
+    },
+    "payload_mutating_status": {
+      "payload_argument": "pointer",
+      "payload_layout_required": true,
+      "request_required": true,
+      "response_required": true,
+      "mutates_payload": "required",
+      "return_status_required": true,
+      "invalid_behavior_required": [
+        "null_payload",
+        "bad_sequence"
+      ],
+      "valid_examples": [
+        "debug_heartbeat"
+      ]
+    }
+  }
+}

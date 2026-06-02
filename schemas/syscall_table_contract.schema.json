@@ -59,6 +59,7 @@
           "additionalProperties": false,
           "required": [
             "kind",
+            "class",
             "constant",
             "branch_selector",
             "return_status",
@@ -67,6 +68,10 @@
           "properties": {
             "kind": {
               "const": "no_payload"
+            },
+            "class": {
+              "type": "string",
+              "pattern": ".*\\S.*"
             },
             "constant": {
               "type": "string",
@@ -98,6 +103,7 @@
           "additionalProperties": false,
           "required": [
             "kind",
+            "class",
             "constant",
             "payload_layout",
             "branch_selector",
@@ -106,6 +112,10 @@
           "properties": {
             "kind": {
               "const": "payload"
+            },
+            "class": {
+              "type": "string",
+              "pattern": ".*\\S.*"
             },
             "constant": {
               "type": "string",
@@ -122,6 +132,26 @@
             "boundary_contract": {
               "type": "string",
               "pattern": ".*\\S.*"
+            },
+            "return_status": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "request": {
+              "type": "object"
+            },
+            "response": {
+              "type": "object"
+            },
+            "invalid_behavior": {
+              "type": "object"
+            },
+            "mutates_payload": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": ".*\\S.*"
+              }
             }
           }
         }

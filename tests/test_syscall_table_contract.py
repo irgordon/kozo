@@ -343,6 +343,7 @@ class SyscallTableContractValidatorTests(unittest.TestCase):
                 "valid_syscalls": {
                     "nop": {
                         "kind": "no_payload",
+                        "class": "no_payload_status",
                         "constant": "K_SYSCALL_NOP",
                         "branch_selector": "abi.K_SYSCALL_NOP",
                         "return_status": "K_OK",
@@ -350,6 +351,7 @@ class SyscallTableContractValidatorTests(unittest.TestCase):
                     },
                     "debug_heartbeat": {
                         "kind": "payload",
+                        "class": "payload_mutating_status",
                         "constant": "K_SYSCALL_DEBUG_HEARTBEAT",
                         "payload_layout": "heartbeat_payload",
                         "branch_selector": "abi.K_SYSCALL_DEBUG_HEARTBEAT",

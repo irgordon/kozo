@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "classes"
+  ],
+  "properties": {
+    "version": {
+      "const": 0
+    },
+    "classes": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "no_payload_status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "payload_argument",
+            "payload_layout_required",
+            "request_required",
+            "response_required",
+            "mutates_payload",
+            "return_status_required",
+            "valid_examples"
+          ],
+          "properties": {
+            "payload_argument": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "payload_layout_required": {
+              "type": "boolean"
+            },
+            "request_required": {
+              "type": "boolean"
+            },
+            "response_required": {
+              "type": "boolean"
+            },
+            "mutates_payload": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "return_status_required": {
+              "type": "boolean"
+            },
+            "invalid_behavior_required": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": ".*\\S.*"
+              }
+            },
+            "valid_examples": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": ".*\\S.*"
+              }
+            }
+          }
+        },
+        "payload_mutating_status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "payload_argument",
+            "payload_layout_required",
+            "request_required",
+            "response_required",
+            "mutates_payload",
+            "return_status_required",
+            "valid_examples"
+          ],
+          "properties": {
+            "payload_argument": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "payload_layout_required": {
+              "type": "boolean"
+            },
+            "request_required": {
+              "type": "boolean"
+            },
+            "response_required": {
+              "type": "boolean"
+            },
+            "mutates_payload": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "return_status_required": {
+              "type": "boolean"
+            },
+            "invalid_behavior_required": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": ".*\\S.*"
+              }
+            },
+            "valid_examples": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": ".*\\S.*"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

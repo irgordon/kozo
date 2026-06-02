@@ -18,6 +18,7 @@ _SCHEMA_PATHS = {
     "kozo_abi_manifest": _SCHEMA_DIR / "kozo_abi_manifest.schema.json",
     "syscall_boundary_contract": _SCHEMA_DIR / "syscall_boundary_contract.schema.json",
     "syscall_table_contract": _SCHEMA_DIR / "syscall_table_contract.schema.json",
+    "syscall_class_contract": _SCHEMA_DIR / "syscall_class_contract.schema.json",
 }
 
 
