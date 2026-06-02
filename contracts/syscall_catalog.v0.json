@@ -1,0 +1,95 @@
+{
+  "version": 0,
+  "syscalls": {
+    "nop": {
+      "name": "nop",
+      "constant": "K_SYSCALL_NOP",
+      "numeric_id": 0,
+      "kind": "no_payload",
+      "class": "no_payload_status",
+      "payload_behavior": {
+        "argument": "null",
+        "layout": null,
+        "required": false
+      },
+      "return_status": "K_OK",
+      "mutation_behavior": {
+        "mutates_payload": false,
+        "fields": []
+      },
+      "source_branch_selector": "abi.K_SYSCALL_NOP",
+      "proof_validators": [
+        "abi_manifest",
+        "protocol_contract_alignment",
+        "syscall_table_contract",
+        "syscall_class_contract",
+        "syscall_table_conformance",
+        "runtime_trap_path"
+      ],
+      "runtime_probe_present": true
+    },
+    "status": {
+      "name": "status",
+      "constant": "K_SYSCALL_STATUS",
+      "numeric_id": 2,
+      "kind": "no_payload",
+      "class": "no_payload_status",
+      "payload_behavior": {
+        "argument": "null",
+        "layout": null,
+        "required": false
+      },
+      "return_status": "K_OK",
+      "mutation_behavior": {
+        "mutates_payload": false,
+        "fields": []
+      },
+      "source_branch_selector": "abi.K_SYSCALL_STATUS",
+      "proof_validators": [
+        "abi_manifest",
+        "protocol_contract_alignment",
+        "syscall_table_contract",
+        "syscall_class_contract",
+        "syscall_table_conformance",
+        "runtime_trap_path"
+      ],
+      "runtime_probe_present": true
+    },
+    "debug_heartbeat": {
+      "name": "debug_heartbeat",
+      "constant": "K_SYSCALL_DEBUG_HEARTBEAT",
+      "numeric_id": 1,
+      "kind": "payload",
+      "class": "payload_mutating_status",
+      "payload_behavior": {
+        "argument": "pointer",
+        "layout": "heartbeat_payload",
+        "required": true
+      },
+      "return_status": "K_OK",
+      "mutation_behavior": {
+        "mutates_payload": true,
+        "fields": [
+          "sequence",
+          "timestamp",
+          "status_bits"
+        ]
+      },
+      "source_branch_selector": "abi.K_SYSCALL_DEBUG_HEARTBEAT",
+      "proof_validators": [
+        "abi_manifest",
+        "protocol_contract_alignment",
+        "layout_parity",
+        "syscall_boundary_contract",
+        "syscall_boundary_conformance",
+        "syscall_table_contract",
+        "syscall_class_contract",
+        "syscall_table_conformance",
+        "runtime_trap_path",
+        "execution_proof",
+        "return_path_proof"
+      ],
+      "runtime_probe_present": true
+    }
+  }
+}

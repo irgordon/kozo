@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.0.26 - 2026-06-02
+
+**Status:** Syscall catalog governance.
+
+### Added
+
+* Added syscall catalog v0 for the currently governed syscall surface.
+* Added a schema-backed syscall catalog loader and registered `syscall_catalog` validator.
+* Cataloged `nop`, `status`, and `debug_heartbeat` with class, payload behavior, return behavior, mutation behavior, branch selector, proof validator, and runtime probe metadata.
+* Added focused negative coverage for missing files, invalid JSON, schema violations, missing or unknown syscalls, field drift from table/class/ABI contracts, unknown proof validators, missing class proofs, runtime probe drift, and diagnostic quality.
+
+### Notes
+
+* The catalog summarizes existing governed syscalls and is not the source of truth for ABI constants, table structure, class semantics, or runtime behavior.
+* This change does not add new syscalls, Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or runtime behavior changes.
+
 ## v0.0.25 - 2026-06-01
 
 **Status:** STATUS is governed as the second no-payload syscall and exercised from Rust through the existing bridge.

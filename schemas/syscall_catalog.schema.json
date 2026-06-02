@@ -1,0 +1,307 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "syscalls"
+  ],
+  "properties": {
+    "version": {
+      "const": 0
+    },
+    "syscalls": {
+      "type": "object",
+      "properties": {
+        "nop": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "constant",
+            "numeric_id",
+            "kind",
+            "class",
+            "payload_behavior",
+            "return_status",
+            "mutation_behavior",
+            "source_branch_selector",
+            "proof_validators",
+            "runtime_probe_present"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "constant": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "numeric_id": {
+              "type": "integer"
+            },
+            "kind": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "class": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "payload_behavior": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "argument",
+                "layout",
+                "required"
+              ],
+              "properties": {
+                "argument": {
+                  "type": "string",
+                  "pattern": ".*\\S.*"
+                },
+                "layout": {},
+                "required": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "return_status": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "mutation_behavior": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "mutates_payload",
+                "fields"
+              ],
+              "properties": {
+                "mutates_payload": {
+                  "type": "boolean"
+                },
+                "fields": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": ".*\\S.*"
+                  }
+                }
+              }
+            },
+            "source_branch_selector": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "proof_validators": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "pattern": ".*\\S.*"
+              }
+            },
+            "runtime_probe_present": {
+              "type": "boolean"
+            }
+          }
+        },
+        "status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "constant",
+            "numeric_id",
+            "kind",
+            "class",
+            "payload_behavior",
+            "return_status",
+            "mutation_behavior",
+            "source_branch_selector",
+            "proof_validators",
+            "runtime_probe_present"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "constant": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "numeric_id": {
+              "type": "integer"
+            },
+            "kind": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "class": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "payload_behavior": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "argument",
+                "layout",
+                "required"
+              ],
+              "properties": {
+                "argument": {
+                  "type": "string",
+                  "pattern": ".*\\S.*"
+                },
+                "layout": {},
+                "required": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "return_status": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "mutation_behavior": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "mutates_payload",
+                "fields"
+              ],
+              "properties": {
+                "mutates_payload": {
+                  "type": "boolean"
+                },
+                "fields": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": ".*\\S.*"
+                  }
+                }
+              }
+            },
+            "source_branch_selector": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "proof_validators": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "pattern": ".*\\S.*"
+              }
+            },
+            "runtime_probe_present": {
+              "type": "boolean"
+            }
+          }
+        },
+        "debug_heartbeat": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "constant",
+            "numeric_id",
+            "kind",
+            "class",
+            "payload_behavior",
+            "return_status",
+            "mutation_behavior",
+            "source_branch_selector",
+            "proof_validators",
+            "runtime_probe_present"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "constant": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "numeric_id": {
+              "type": "integer"
+            },
+            "kind": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "class": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "payload_behavior": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "argument",
+                "layout",
+                "required"
+              ],
+              "properties": {
+                "argument": {
+                  "type": "string",
+                  "pattern": ".*\\S.*"
+                },
+                "layout": {},
+                "required": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "return_status": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "mutation_behavior": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "mutates_payload",
+                "fields"
+              ],
+              "properties": {
+                "mutates_payload": {
+                  "type": "boolean"
+                },
+                "fields": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": ".*\\S.*"
+                  }
+                }
+              }
+            },
+            "source_branch_selector": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            },
+            "proof_validators": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "pattern": ".*\\S.*"
+              }
+            },
+            "runtime_probe_present": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}
