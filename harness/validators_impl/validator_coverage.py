@@ -253,6 +253,21 @@ _VALIDATOR_TEST_CONTRACTS = {
             "diagnostic_names_catalog_field",
         ),
     ),
+    "syscall_surface_report": ValidatorTestContract(
+        "syscall_surface_report",
+        _TESTS_DIR / "test_syscall_surface_report.py",
+        "SyscallSurfaceReportValidator",
+        (
+            "missing_report_file",
+            "stale_report_content",
+            "manual_edit_detected",
+            "missing_syscall",
+            "missing_syscall_class",
+            "missing_source_reference",
+            "catalog_change_updates_report",
+            "diagnostic_names_report_field",
+        ),
+    ),
     "protocol_contract_alignment": ValidatorTestContract(
         "protocol_contract_alignment",
         _TESTS_DIR / "test_protocol_contract_alignment.py",

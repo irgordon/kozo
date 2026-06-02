@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.0.27 - 2026-06-02
+
+**Status:** Generated syscall surface report.
+
+### Added
+
+* Added generated syscall surface report for currently governed syscalls.
+* Added deterministic report renderer and registered `syscall_surface_report` validator.
+* Added focused negative coverage for stale reports, manual edits, missing syscalls, missing classes, missing source references, catalog-driven report drift, and diagnostic quality.
+
+### Notes
+
+* The syscall surface report is generated and non-authoritative.
+* The source of truth remains the checked-in contracts and validators.
+* This change does not add new syscalls, Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or runtime behavior changes.
+
 ## v0.0.26 - 2026-06-02
 
 **Status:** Syscall catalog governance.

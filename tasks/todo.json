@@ -620,6 +620,32 @@
         "verification.tests_run[10]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 23,
+      "title": "Add generated syscall surface report",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "docs/generated/syscall_surface.md",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/syscall_surface_report.py",
+        "harness/validators.py",
+        "harness/validators_impl/syscall_surface_report.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/agent_context.schema.json",
+        "schemas/latest_verify.schema.json",
+        "tests/test_syscall_surface_report.py"
+      ],
+      "verification_refs": [
+        "verification.tests_run[5]",
+        "verification.tests_run[9]",
+        "verification.tests_run[10]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -646,7 +672,8 @@
     "The Rust core service exercises K_SYSCALL_NOP through syscall_entry with a null payload pointer and validates the K_OK return status",
     "Syscall class contract v0 classifies only currently proven syscall shapes and validates syscall table class assignments",
     "K_SYSCALL_STATUS is governed as a no-payload status syscall with a null payload argument, K_OK return status, no payload mutation, live Odin dispatch, and a Rust bridge probe",
-    "Syscall catalog v0 summarizes nop, status, and debug_heartbeat without owning ABI constants, table structure, class semantics, or runtime behavior"
+    "Syscall catalog v0 summarizes nop, status, and debug_heartbeat without owning ABI constants, table structure, class semantics, or runtime behavior",
+    "docs/generated/syscall_surface.md provides a deterministic non-authoritative Markdown report generated from the syscall catalog and existing contracts"
   ],
   "verification": {
     "tests_run": [
@@ -768,7 +795,8 @@
       "The Rust NOP probe calls syscall_entry with abi::K_SYSCALL_NOP and core::ptr::null_mut(), validates abi::K_OK, and is exercised before the heartbeat request.",
       "syscall_class_contract validates no_payload_status and payload_mutating_status semantics, requires table entries to declare classes, rejects kind/class drift, forbids request/response metadata on no-payload entries, and rejects missing payload-mutating metadata.",
       "K_SYSCALL_STATUS is represented in the ABI manifest, syscall table contract, syscall class contract, live Odin dispatcher, and Rust core service probe as a no-payload status syscall that returns K_OK and does not inspect or mutate payload state.",
-      "syscall_catalog validates the cataloged syscall summaries against the ABI manifest, syscall table contract, syscall class contract, registered proof validators, and live Rust runtime probe presence."
+      "syscall_catalog validates the cataloged syscall summaries against the ABI manifest, syscall table contract, syscall class contract, registered proof validators, and live Rust runtime probe presence.",
+      "syscall_surface_report validates that docs/generated/syscall_surface.md matches the deterministic renderer output and fails on stale content, manual edits, missing syscall sections, missing class summaries, and missing source references."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -794,6 +822,7 @@
     "Added a narrow Rust NOP probe through the existing syscall_entry bridge using a null payload argument and no payload mutation.",
     "Added syscall class contract v0 so currently proven syscall table entries declare semantic classes without adding new syscalls or runtime behavior.",
     "Added K_SYSCALL_STATUS as a governed no-payload status syscall without adding Linux compatibility, userspace generalization, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or runtime subsystem behavior.",
-    "Added syscall catalog v0 as a governed summary of existing syscall contracts without adding new syscalls or runtime behavior."
+    "Added syscall catalog v0 as a governed summary of existing syscall contracts without adding new syscalls or runtime behavior.",
+    "Added generated syscall surface report as non-authoritative Markdown derived from existing contracts without adding new syscalls or runtime behavior."
   ]
 }

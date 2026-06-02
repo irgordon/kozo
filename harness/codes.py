@@ -29,6 +29,7 @@ SYSCALL_TABLE_CONTRACT_INVALID = "SYSCALL_TABLE_CONTRACT_INVALID"
 SYSCALL_CLASS_CONTRACT_INVALID = "SYSCALL_CLASS_CONTRACT_INVALID"
 SYSCALL_TABLE_CONFORMANCE_INVALID = "SYSCALL_TABLE_CONFORMANCE_INVALID"
 SYSCALL_CATALOG_INVALID = "SYSCALL_CATALOG_INVALID"
+SYSCALL_SURFACE_REPORT_INVALID = "SYSCALL_SURFACE_REPORT_INVALID"
 PROTOCOL_MISMATCH = "PROTOCOL_MISMATCH"
 LAYOUT_PARITY_MISMATCH = "LAYOUT_PARITY_MISMATCH"
 EXECUTION_FOUNDATION_INVALID = "EXECUTION_FOUNDATION_INVALID"
@@ -68,6 +69,7 @@ CODES = MappingProxyType(
         SYSCALL_CLASS_CONTRACT_INVALID: "Syscall class contract is missing, invalid, or inconsistent with the syscall table contract",
         SYSCALL_TABLE_CONFORMANCE_INVALID: "Live dispatcher source does not conform to the syscall table contract",
         SYSCALL_CATALOG_INVALID: "Syscall catalog is missing, invalid, or inconsistent with governed syscall contracts",
+        SYSCALL_SURFACE_REPORT_INVALID: "Generated syscall surface report is missing or stale",
         PROTOCOL_MISMATCH: "Kernel and service protocol usage drifted from the ABI",
         LAYOUT_PARITY_MISMATCH: "Generated bindings do not preserve the heartbeat payload layout",
         EXECUTION_FOUNDATION_INVALID: "Kernel boot and trap entry symbols are misaligned with the execution foundation contract",
