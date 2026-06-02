@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260602T041400Z",
+  "run_id": "verify-20260602T042924Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 27,
+    "total_checks": 28,
     "failed_check_count": 0
   },
   "checks": [
@@ -85,6 +85,13 @@
       "status": "pass",
       "code": "OK",
       "detail": "ABI manifest exists, is schema-valid, and matches the canonical header paths, constants, and heartbeat layout"
+    },
+    {
+      "name": "abi_surface_report",
+      "subsystem": "abi_surface_report",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Generated ABI surface report matches the current ABI manifest"
     },
     {
       "name": "syscall_boundary_contract",
@@ -219,5 +226,5 @@
     "artifacts/logs/cargo-check.log",
     "artifacts/logs/nm-kernel.log"
   ],
-  "generated_at": "2026-06-02T04:14:00Z"
+  "generated_at": "2026-06-02T04:29:24Z"
 }
