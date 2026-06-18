@@ -20,10 +20,10 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 28
+* Total checks: 29
 * Failed checks: 0
-* Run ID: `verify-20260618T024948Z`
-* Generated at: `2026-06-18T02:49:48Z`
+* Run ID: `verify-20260618T025935Z`
+* Generated at: `2026-06-18T02:59:35Z`
 
 ## Registered validators
 
@@ -95,7 +95,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 28
+* Check count: 29
 * Failure count: 0
 
 ## Non-goals

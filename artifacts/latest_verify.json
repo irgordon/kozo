@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260618T024948Z",
+  "run_id": "verify-20260618T025935Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 28,
+    "total_checks": 29,
     "failed_check_count": 0
   },
   "checks": [
@@ -143,6 +143,13 @@
       "detail": "Generated syscall surface report matches the current syscall catalog and contracts"
     },
     {
+      "name": "governance_index_report",
+      "subsystem": "governance_index_report",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Generated governance index matches the current governance surfaces"
+    },
+    {
       "name": "protocol_contract_alignment",
       "subsystem": "protocol_contract_alignment",
       "status": "pass",
@@ -219,18 +226,12 @@
     }
   ],
   "failed_checks": [],
-  "changed_files": [
-    ".github/workflows/ci.yml",
-    ".github/workflows/lint.yml",
-    "CHANGELOG.md",
-    "scripts/verify.sh",
-    "tasks/todo.json"
-  ],
+  "changed_files": [],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
     "artifacts/logs/odin-build.log",
     "artifacts/logs/cargo-check.log",
     "artifacts/logs/nm-kernel.log"
   ],
-  "generated_at": "2026-06-18T02:49:48Z"
+  "generated_at": "2026-06-18T02:59:35Z"
 }
