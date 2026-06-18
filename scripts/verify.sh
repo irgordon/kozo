@@ -15,6 +15,7 @@ RUST_TARGET="x86_64-unknown-none"
 
 EMPTY_TREE="4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 KERNEL_BUILD_CHECK="$ARTIFACTS_DIR/kernel-build-check"
+RUNTIME_SMOKE_LOG="$ARTIFACTS_DIR/runtime/runtime_smoke.log"
 VERIFY_TMP=""
 
 mkdir -p "$LOG_DIR" "$ARTIFACTS_DIR"
@@ -124,6 +125,7 @@ collect_evidence_files() {
     "$LOG_DIR/odin-build.log"
     "$LOG_DIR/cargo-check.log"
     "$LOG_DIR/nm-kernel.log"
+    "$RUNTIME_SMOKE_LOG"
   )
 
   local file
@@ -232,6 +234,8 @@ run_logged_command "$LOG_DIR/cargo-check.log" \
   run_pinned_cargo check --manifest-path "$ROOT/userspace/core_service/Cargo.toml" --target "$RUST_TARGET"
 
 build_kernel_object_artifact
+
+"$ROOT/scripts/runtime_smoke.sh"
 
 EVIDENCE_FILES_TEXT="$(collect_evidence_files)"
 

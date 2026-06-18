@@ -114,10 +114,12 @@ Required checklist:
 Evidence references:
 
 * `artifacts/latest_verify.json`
+* `artifacts/runtime/runtime_smoke.log`
 * `artifacts/logs/odin-check.log`
 * `artifacts/logs/odin-build.log`
 * `artifacts/logs/cargo-check.log`
 * `artifacts/logs/nm-kernel.log`
+* `docs/RUNTIME_EVIDENCE.md`
 
 ---
 
@@ -236,6 +238,7 @@ Required checklist:
 * Changelog is included.
 * Release notes are included when available.
 * CI run references are included when available.
+* Runtime smoke evidence is included for v0.2.0 and later.
 
 The release evidence bundle shape is owned by `docs/RELEASE_EVIDENCE.md`.
 

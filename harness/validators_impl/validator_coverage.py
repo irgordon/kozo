@@ -391,6 +391,20 @@ _VALIDATOR_TEST_CONTRACTS = {
             "status_not_invoked",
         ),
     ),
+    "runtime_smoke_evidence": ValidatorTestContract(
+        "runtime_smoke_evidence",
+        _TESTS_DIR / "test_runtime_smoke_evidence.py",
+        "RuntimeSmokeEvidenceValidator",
+        (
+            "missing_runtime_artifact",
+            "empty_runtime_artifact",
+            "missing_expected_marker",
+            "failure_marker_present",
+            "malformed_runtime_metadata",
+            "missing_release_evidence_reference",
+            "diagnostic_names_runtime_field",
+        ),
+    ),
     "return_path_proof": ValidatorTestContract(
         "return_path_proof",
         _TESTS_DIR / "test_return_path_proof.py",

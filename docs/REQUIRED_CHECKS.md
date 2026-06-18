@@ -58,6 +58,7 @@ This document does not replace `scripts/verify.sh` as the full verification entr
 | Pinned Rust cargo check | pinned cargo check for `userspace/core_service` | `docs/VALIDATION.md` | Yes | Yes | CI output, `artifacts/logs/cargo-check.log` through full verification |
 | JSON validation | `python3 -m json.tool` for task/proof artifacts | `docs/VALIDATION.md` | Yes | Yes | CI output |
 | Whitespace check | `git diff --check` | `docs/CODING_STYLE.md` | Yes | Yes | CI output |
+| Runtime smoke evidence | `scripts/runtime_smoke.sh` | `docs/RUNTIME_EVIDENCE.md` | Yes, through full verification | Yes | `artifacts/runtime/runtime_smoke.log` |
 | CI workflow | GitHub Actions `ci / full verification` | `docs/REQUIRED_CHECKS.md` | Yes | Yes | GitHub Actions status |
 | Lint workflow | GitHub Actions `lint / static checks` | `docs/REQUIRED_CHECKS.md` | Yes | Yes | GitHub Actions status |
 
@@ -86,6 +87,7 @@ Before release review, run:
 ```bash
 python3 -m unittest discover -s tests
 python3 -m json.tool tasks/todo.json
+scripts/runtime_smoke.sh
 scripts/verify.sh
 python3 -m json.tool artifacts/latest_verify.json
 python3 -m json.tool tasks/todo.json
@@ -102,7 +104,7 @@ When Odin behavior is in scope, also run `odin check kernel` before full verific
 
 | Workflow | Job | Required Surface |
 | --- | --- | --- |
-| `.github/workflows/ci.yml` | `full verification` | system tools, pinned Rust toolchain, bare-metal target, Odin, JSON validation, unit tests, Rust check, Odin check, full verification, proof artifact validation, transient artifact cleanup, whitespace check |
+| `.github/workflows/ci.yml` | `full verification` | system tools, pinned Rust toolchain, bare-metal target, Odin, JSON validation, unit tests, Rust check, Odin check, runtime smoke through full verification, proof artifact validation, transient artifact cleanup, whitespace check |
 | `.github/workflows/lint.yml` | `static checks` | system tools, pinned Rust toolchain, bare-metal target, Odin, shell syntax, JSON syntax, unit tests, Rust check, Odin check, whitespace check |
 
 The CI workflows must keep installing `nasm`, pinned Rust, `x86_64-unknown-none`, and Odin before running checks that depend on them.

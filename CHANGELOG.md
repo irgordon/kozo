@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.2.0 - 2026-06-18
+
+**Status:** Runtime execution evidence baseline.
+
+### Added
+
+* Added `scripts/runtime_smoke.sh` as the governed runtime smoke evidence command.
+* Added `docs/RUNTIME_EVIDENCE.md` to document the runtime evidence target, command, artifact, validator, limitations, and non-goals.
+* Added `runtime_smoke_evidence` as a registered validator for `artifacts/runtime/runtime_smoke.log`.
+* Added focused negative coverage for missing, empty, malformed, failed, unreferenced, and diagnostically weak runtime smoke evidence.
+
+### Changed
+
+* Updated `scripts/verify.sh` to generate runtime smoke evidence during full verification.
+* Updated release evidence, checklist, required checks, phase map, and roadmap documents to include the runtime smoke evidence path.
+
+### Notes
+
+* The v0.2.0 evidence target is runtime-adjacent object and symbol evidence, not QEMU boot evidence.
+* This change does not add Linux compatibility, POSIX completeness, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+* This change does not change ABI contracts or syscall behavior.
+
 ## v0.0.35 - 2026-06-18
 
 **Status:** Release governance baseline execution.

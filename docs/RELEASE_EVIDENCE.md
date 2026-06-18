@@ -49,6 +49,7 @@ This document does not make generated reports authoritative.
 Every release review must include:
 
 * `artifacts/latest_verify.json`
+* `artifacts/runtime/runtime_smoke.log`
 * `CHANGELOG.md`
 * `PHASEMAP.md`
 * `ROADMAP.md`
@@ -83,6 +84,7 @@ Release review must include verification logs when generated:
 * `artifacts/logs/odin-build.log`
 * `artifacts/logs/cargo-check.log`
 * `artifacts/logs/nm-kernel.log`
+* `artifacts/runtime/runtime_smoke.log`
 
 Future runtime smoke phases must add their runtime logs to this list before using them as release evidence.
 
@@ -145,6 +147,8 @@ A release evidence bundle should contain or reference:
 release-evidence/
   README.md
   latest_verify.json
+  runtime/
+    runtime_smoke.log
   logs/
     odin-check.log
     odin-build.log
