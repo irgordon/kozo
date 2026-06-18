@@ -26,10 +26,6 @@ STRUCT_BLOCK_PATTERN = re.compile(
 ENUM_ENTRY_PATTERN = re.compile(r"([A-Z0-9_]+)\s*=\s*(\d+)")
 FIELD_PATTERN = re.compile(r"(uint64_t|uint32_t)\s+([a-z_][a-z0-9_]*)\s*;")
 
-SCALAR_LAYOUT = {
-    "uint64_t": (8, 8),
-    "uint32_t": (4, 4),
-}
 GENERATED_HEADER_LINES = (
     "GENERATED FILE. DO NOT EDIT MANUALLY.",
     "Source of truth: contracts/kozo_abi.h",
@@ -133,43 +129,6 @@ def load_abi_spec(path: Path = HEADER_PATH) -> AbiSpec:
         enums=_parse_enums(header),
         structs=_parse_structs(header),
     )
-
-
-def _align_to(value: int, alignment: int) -> int:
-    return (value + alignment - 1) // alignment * alignment
-
-
-def _field_layout(c_type: str) -> tuple[int, int]:
-    if c_type in SCALAR_LAYOUT:
-        return SCALAR_LAYOUT[c_type]
-    raise ValueError(f"unsupported field type: {c_type}")
-
-
-def calculate_struct_layout(struct_spec: StructSpec) -> dict[str, object]:
-    offset = 0
-    alignment = 1
-    offsets: dict[str, int] = {}
-
-    for field in struct_spec.fields:
-        field_size, field_alignment = _field_layout(field.c_type)
-        alignment = max(alignment, field_alignment)
-        offset = _align_to(offset, field_alignment)
-        offsets[field.name] = offset
-        offset += field_size
-
-    size = _align_to(offset, alignment)
-    return {
-        "size": size,
-        "alignment": alignment,
-        "offsets": offsets,
-    }
-
-
-def get_struct(spec: AbiSpec, name: str) -> StructSpec:
-    for struct_spec in spec.structs:
-        if struct_spec.name == name:
-            return struct_spec
-    raise ValueError(f"unknown ABI struct: {name}")
 
 
 def _generated_header(comment_prefix: str) -> list[str]:

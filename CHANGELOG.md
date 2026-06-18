@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.0.33 - 2026-06-18
+
+**Status:** ABI generator cleanup.
+
+### Changed
+
+* Documented `harness/validators_impl/abi.py` as a stable shim for the registered `abi` validator import path.
+* Removed unused ABI generator helper functions that were not part of the binding generation path.
+
+### Notes
+
+* This change does not change ABI constants.
+* This change does not change ABI layouts, generated bindings, runtime behavior, syscall behavior, or validator behavior.
+
 ## v0.0.32 - 2026-06-18
 
 **Status:** Generated governance index.

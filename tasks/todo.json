@@ -783,6 +783,24 @@
         "verification.tests_run[5]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 30,
+      "title": "Document ABI validator shim and prune unused ABI generator helpers",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "harness/validators_impl/abi.py",
+        "scripts/gen_abi.py",
+        "tasks/todo.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[1]",
+        "verification.tests_run[4]",
+        "verification.tests_run[5]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -943,7 +961,8 @@
       "abi_surface_report validates that docs/generated/abi_surface.md matches the deterministic renderer output and fails on stale content, manual edits, missing constants, missing binding paths, missing layout details, missing sentinels, and manifest-driven drift.",
       "Governance documents now define document precedence, non-negotiable invariants, code construction rules, contract authority, validation policy, generated artifact policy, compatibility boundaries, security boundary rules, and ADR requirements while keeping architecture diagrams descriptive.",
       "rust-toolchain.toml pins Rust 1.96.0 and scripts/verify.sh resolves and invokes cargo and rustc from the pinned toolchain directly.",
-      "governance_index_report validates that docs/generated/governance_index.md matches the deterministic renderer output for active contracts, schemas, validators, generated reports, latest verification artifact, current version, and non-goals."
+      "governance_index_report validates that docs/generated/governance_index.md matches the deterministic renderer output for active contracts, schemas, validators, generated reports, latest verification artifact, current version, and non-goals.",
+      "harness/validators_impl/abi.py remains a documented compatibility shim for the registered abi validator while unused ABI generator helpers are pruned."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -975,6 +994,7 @@
     "Added governance document authority split without changing runtime behavior, ABI contracts, syscall contracts, generated bindings, validator logic, or compatibility behavior.",
     "Pinned Rust verification to cargo and rustc 1.96.0 without changing runtime behavior, ABI contracts, syscall contracts, generated bindings, or validator logic.",
     "Updated verification and CI to select the Rust toolchain declared by rust-toolchain.toml and invoke its cargo and rustc binaries directly instead of relying on ambient cargo or host stable dispatch.",
-    "Added generated governance index as a non-authoritative report over active governance surfaces without changing runtime behavior, ABI contracts, syscall contracts, generated bindings, or compatibility behavior."
+    "Added generated governance index as a non-authoritative report over active governance surfaces without changing runtime behavior, ABI contracts, syscall contracts, generated bindings, or compatibility behavior.",
+    "Documented the ABI validator shim and pruned unused ABI generator helpers without changing generated bindings, ABI contracts, runtime behavior, or validator behavior."
   ]
 }

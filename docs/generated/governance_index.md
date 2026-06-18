@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.0.32`
+* Version: `v0.0.33`
 * Date: `2026-06-18`
-* Status: Generated governance index.
+* Status: ABI generator cleanup.
 
 ## Verification status
 
