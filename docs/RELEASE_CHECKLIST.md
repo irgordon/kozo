@@ -106,6 +106,11 @@ Required checklist:
 * `scripts/verify.sh` passes.
 * `artifacts/latest_verify.json` status is `pass`.
 * `artifacts/latest_verify.json` failed check count is `0`.
+* `artifacts/runtime/runtime_smoke.log` is present.
+* `artifacts/runtime/runtime_smoke.metadata.json` is present.
+* `runtime_smoke_evidence` passes.
+* Runtime metadata non-goals are reviewed.
+* No QEMU or boot claim is made unless separately implemented and proven.
 * Python unit tests pass.
 * Odin check/build passes through verification.
 * Pinned Rust cargo check passes.
@@ -115,6 +120,7 @@ Evidence references:
 
 * `artifacts/latest_verify.json`
 * `artifacts/runtime/runtime_smoke.log`
+* `artifacts/runtime/runtime_smoke.metadata.json`
 * `artifacts/logs/odin-check.log`
 * `artifacts/logs/odin-build.log`
 * `artifacts/logs/cargo-check.log`
@@ -239,6 +245,7 @@ Required checklist:
 * Release notes are included when available.
 * CI run references are included when available.
 * Runtime smoke evidence is included for v0.2.0 and later.
+* Runtime smoke metadata is included for v0.2.1 and later.
 
 The release evidence bundle shape is owned by `docs/RELEASE_EVIDENCE.md`.
 

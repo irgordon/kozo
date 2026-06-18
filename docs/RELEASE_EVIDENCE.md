@@ -50,6 +50,7 @@ Every release review must include:
 
 * `artifacts/latest_verify.json`
 * `artifacts/runtime/runtime_smoke.log`
+* `artifacts/runtime/runtime_smoke.metadata.json`
 * `CHANGELOG.md`
 * `PHASEMAP.md`
 * `ROADMAP.md`
@@ -85,6 +86,7 @@ Release review must include verification logs when generated:
 * `artifacts/logs/cargo-check.log`
 * `artifacts/logs/nm-kernel.log`
 * `artifacts/runtime/runtime_smoke.log`
+* `artifacts/runtime/runtime_smoke.metadata.json`
 
 Future runtime smoke phases must add their runtime logs to this list before using them as release evidence.
 
@@ -149,6 +151,7 @@ release-evidence/
   latest_verify.json
   runtime/
     runtime_smoke.log
+    runtime_smoke.metadata.json
   logs/
     odin-check.log
     odin-build.log
@@ -172,11 +175,25 @@ release-evidence/
 
 This is the minimum directory or archive shape for release review.
 
+Runtime evidence is generated under `artifacts/runtime/`.
+
+Release packaging should copy the runtime log and metadata to `artifacts/release/runtime/` when assembling a release evidence bundle.
+
 The exact packaging command may be defined by a later release phase.
 
 ---
 
-# 11. Release Blocker Categories
+# 11. Retention Guidance
+
+Keep the latest generated runtime evidence under `artifacts/runtime/` for local review.
+
+Keep release-reviewed runtime evidence under `artifacts/release/runtime/` or an equivalent release archive.
+
+Do not rely on stale runtime evidence after runtime, ABI binding, smoke script, or runtime evidence validator changes.
+
+---
+
+# 12. Release Blocker Categories
 
 | Priority | Meaning |
 | --- | --- |

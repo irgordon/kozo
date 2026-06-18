@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.2.1 - 2026-06-18
+
+**Status:** Runtime evidence packaging.
+
+### Added
+
+* Added deterministic runtime smoke metadata at `artifacts/runtime/runtime_smoke.metadata.json`.
+* Added runtime evidence packaging, review, retention, and invalidation guidance.
+* Added validator coverage for runtime metadata integrity and release evidence metadata references.
+
+### Changed
+
+* Updated `scripts/runtime_smoke.sh` to write both runtime smoke log and metadata artifacts.
+* Updated `runtime_smoke_evidence` to validate runtime metadata fields, positive claims, non-goals, and release evidence references.
+* Updated release evidence, checklist, required checks, phase map, and roadmap documents for runtime evidence packaging.
+
+### Notes
+
+* This change does not add QEMU boot evidence.
+* This change does not add hardware trap execution evidence.
+* This change does not add Linux compatibility, POSIX completeness, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+* This change does not change runtime behavior, ABI contracts, or syscall behavior.
+
 ## v0.2.0 - 2026-06-18
 
 **Status:** Runtime execution evidence baseline.

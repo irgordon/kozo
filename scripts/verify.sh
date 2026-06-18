@@ -16,6 +16,7 @@ RUST_TARGET="x86_64-unknown-none"
 EMPTY_TREE="4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 KERNEL_BUILD_CHECK="$ARTIFACTS_DIR/kernel-build-check"
 RUNTIME_SMOKE_LOG="$ARTIFACTS_DIR/runtime/runtime_smoke.log"
+RUNTIME_SMOKE_METADATA="$ARTIFACTS_DIR/runtime/runtime_smoke.metadata.json"
 VERIFY_TMP=""
 
 mkdir -p "$LOG_DIR" "$ARTIFACTS_DIR"
@@ -126,6 +127,7 @@ collect_evidence_files() {
     "$LOG_DIR/cargo-check.log"
     "$LOG_DIR/nm-kernel.log"
     "$RUNTIME_SMOKE_LOG"
+    "$RUNTIME_SMOKE_METADATA"
   )
 
   local file

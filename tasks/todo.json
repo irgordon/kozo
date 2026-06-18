@@ -881,6 +881,36 @@
         "verification.actual_behavior[37]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 34,
+      "title": "Package runtime smoke evidence metadata",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "PHASEMAP.md",
+        "ROADMAP.md",
+        "artifacts/runtime/runtime_smoke.metadata.json",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/REQUIRED_CHECKS.md",
+        "docs/generated/governance_index.md",
+        "harness/validators_impl/runtime_smoke_evidence.py",
+        "harness/validators_impl/validator_coverage.py",
+        "scripts/runtime_smoke.sh",
+        "scripts/verify.sh",
+        "tasks/todo.json",
+        "tests/test_runtime_smoke_evidence.py"
+      ],
+      "verification_refs": [
+        "verification.tests_run[4]",
+        "verification.tests_run[5]",
+        "verification.expected_behavior[25]",
+        "verification.actual_behavior[38]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -914,7 +944,8 @@
     "Rust verification uses pinned cargo and rustc version 1.96.0",
     "Release planning documents define phase sequencing, roadmap direction, and release evidence requirements without changing runtime, ABI, syscall, or compatibility behavior",
     "Release governance baseline execution defines release checklist and required checks policy without changing runtime, ABI, syscall, or compatibility behavior",
-    "Runtime smoke evidence baseline records a bounded runtime-adjacent object and symbol evidence artifact without changing ABI, syscall, compatibility, or production-readiness claims"
+    "Runtime smoke evidence baseline records a bounded runtime-adjacent object and symbol evidence artifact without changing ABI, syscall, compatibility, or production-readiness claims",
+    "Runtime smoke evidence packaging records deterministic metadata and release bundle guidance without adding QEMU boot, hardware trap, compatibility, userspace, or production-readiness claims"
   ],
   "verification": {
     "tests_run": [
@@ -979,7 +1010,8 @@
       "artifacts/logs/cargo-check.log",
       "artifacts/logs/odin-build.log",
       "artifacts/logs/nm-kernel.log",
-      "artifacts/runtime/runtime_smoke.log"
+      "artifacts/runtime/runtime_smoke.log",
+      "artifacts/runtime/runtime_smoke.metadata.json"
     ],
     "diffs": [],
     "invariants": [
@@ -1012,7 +1044,8 @@
       "Verification fails if cargo or rustc do not report pinned version 1.96.0",
       "Release planning documents preserve non-goals for Linux compatibility, POSIX completeness, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, and production readiness",
       "Release checklist and required checks policy preserve non-goals for Linux compatibility, POSIX completeness, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, and production readiness",
-      "Runtime smoke evidence preserves non-goals for Linux compatibility, POSIX completeness, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, QEMU boot execution, hardware trap execution, and production readiness"
+      "Runtime smoke evidence preserves non-goals for Linux compatibility, POSIX completeness, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, QEMU boot execution, hardware trap execution, and production readiness",
+      "Runtime smoke metadata preserves explicit non-goals for QEMU boot, hardware trap execution, Linux compatibility, userspace execution, process model, VFS behavior, scheduler maturity, ELF loading, file descriptor behavior, and production readiness"
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -1052,7 +1085,8 @@
       "harness/validators_impl/abi.py remains a documented compatibility shim for the registered abi validator while unused ABI generator helpers are pruned.",
       "PHASEMAP.md, ROADMAP.md, and docs/RELEASE_EVIDENCE.md define release sequencing, direction, gates, evidence, and blocker categories without changing runtime behavior, ABI contracts, syscall behavior, or compatibility claims.",
       "docs/RELEASE_CHECKLIST.md and docs/REQUIRED_CHECKS.md define release approval and required-check policy while docs/RELEASE_EVIDENCE.md, PHASEMAP.md, and ROADMAP.md link to those policies without changing runtime behavior, ABI contracts, syscall behavior, or compatibility claims.",
-      "scripts/runtime_smoke.sh generates artifacts/runtime/runtime_smoke.log from freestanding kernel and assembly object evidence, and runtime_smoke_evidence validates the artifact while explicitly documenting that it is not QEMU boot or hardware trap evidence."
+      "scripts/runtime_smoke.sh generates artifacts/runtime/runtime_smoke.log from freestanding kernel and assembly object evidence, and runtime_smoke_evidence validates the artifact while explicitly documenting that it is not QEMU boot or hardware trap evidence.",
+      "scripts/runtime_smoke.sh generates deterministic artifacts/runtime/runtime_smoke.metadata.json, runtime_smoke_evidence validates metadata claims and non-goals, and release evidence docs define live and packaged runtime evidence paths."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -1088,6 +1122,7 @@
     "Documented the ABI validator shim and pruned unused ABI generator helpers without changing generated bindings, ABI contracts, runtime behavior, or validator behavior.",
     "Added release planning documents for KOZO v1.0.0 without changing runtime behavior, ABI contracts, syscall behavior, or compatibility claims.",
     "Added release checklist and required checks policy for v0.1.0 release governance baseline execution without changing runtime behavior, ABI contracts, syscall behavior, or compatibility claims.",
-    "Added a bounded runtime smoke evidence baseline for v0.2.0 using freestanding object and symbol evidence without adding runtime features, ABI changes, syscall changes, compatibility claims, or production-readiness claims."
+    "Added a bounded runtime smoke evidence baseline for v0.2.0 using freestanding object and symbol evidence without adding runtime features, ABI changes, syscall changes, compatibility claims, or production-readiness claims.",
+    "Added runtime evidence packaging metadata and release bundle guidance for v0.2.1 without adding runtime features, ABI changes, syscall changes, QEMU boot claims, compatibility claims, or production-readiness claims."
   ]
 }

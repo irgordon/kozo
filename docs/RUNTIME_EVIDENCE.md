@@ -104,11 +104,86 @@ The runtime smoke artifact is:
 artifacts/runtime/runtime_smoke.log
 ```
 
-The artifact is generated evidence. It must be reproduced by the smoke script before it is used in release review.
+The runtime smoke metadata artifact is:
+
+```text
+artifacts/runtime/runtime_smoke.metadata.json
+```
+
+The log is generated evidence. It must be reproduced by the smoke script before it is used in release review.
+
+The metadata is deterministic generated evidence. It identifies the evidence type, source log, generator, validator, positive claims, and explicit non-goals.
 
 ---
 
-# 8. Validator
+# 8. Packaging
+
+Runtime evidence is generated under:
+
+```text
+artifacts/runtime/
+```
+
+For release review, package or copy it under:
+
+```text
+artifacts/release/runtime/
+  runtime_smoke.log
+  runtime_smoke.metadata.json
+```
+
+`artifacts/runtime/runtime_smoke.log` is the live generated output.
+
+`artifacts/release/runtime/runtime_smoke.log` is the release bundle copy.
+
+Do not treat the release bundle copy as source truth. Regenerate the live artifact with `scripts/runtime_smoke.sh` when reviewing or refreshing evidence.
+
+---
+
+# 9. Review Instructions
+
+Before release review:
+
+* Run `scripts/runtime_smoke.sh`.
+* Confirm `artifacts/runtime/runtime_smoke.log` exists and is non-empty.
+* Confirm `artifacts/runtime/runtime_smoke.metadata.json` is valid JSON.
+* Confirm metadata `evidence_type` is `runtime-adjacent-object-symbol-smoke`.
+* Confirm metadata positive claims match the current smoke target.
+* Confirm metadata non-goals still include QEMU boot, hardware trap execution, Linux compatibility, userspace execution, process model, VFS behavior, scheduler maturity, ELF loading, file descriptor behavior, and production readiness.
+* Confirm `runtime_smoke_evidence` passes.
+* Copy or archive the log and metadata into the release evidence bundle.
+
+---
+
+# 10. Retention Policy
+
+The latest live runtime smoke log and metadata live under `artifacts/runtime/`.
+
+Release bundle copies live under `artifacts/release/runtime/` when a release evidence bundle is assembled.
+
+Transient object files created while generating evidence must be cleaned by `scripts/runtime_smoke.sh`.
+
+Historical release evidence may be retained outside the live artifacts directory by release tooling or GitHub release assets.
+
+---
+
+# 11. Invalidating Changes
+
+Runtime evidence is invalidated by:
+
+* changes to `kernel/`
+* changes to `kernel/arch/`
+* changes to the ABI bindings used by the kernel
+* changes to `scripts/runtime_smoke.sh`
+* changes to `docs/RUNTIME_EVIDENCE.md`
+* changes to `harness/validators_impl/runtime_smoke_evidence.py`
+* stale, missing, malformed, or failed runtime smoke artifacts
+
+When invalidated, regenerate evidence and rerun full verification.
+
+---
+
+# 12. Validator
 
 The registered validator is:
 
@@ -119,16 +194,22 @@ runtime_smoke_evidence
 It checks:
 
 * runtime smoke artifact exists
+* runtime smoke metadata exists
+* runtime smoke metadata is valid JSON
+* runtime smoke metadata fields match the governed evidence target
+* runtime smoke metadata declares required positive claims
+* runtime smoke metadata declares required non-goals
 * artifact is non-empty
 * runtime metadata is structurally valid
 * expected runtime-adjacent markers are present
 * failure markers are absent
 * release evidence policy references the artifact
+* release evidence policy references the metadata
 * diagnostics name the failed runtime evidence field
 
 ---
 
-# 9. What This Evidence Proves
+# 13. What This Evidence Proves
 
 This evidence proves:
 
@@ -141,7 +222,7 @@ This evidence proves:
 
 ---
 
-# 10. What This Evidence Does Not Prove
+# 14. What This Evidence Does Not Prove
 
 This evidence does not prove:
 
@@ -157,7 +238,7 @@ Those surfaces require later phase work.
 
 ---
 
-# 11. Known Limitations
+# 15. Known Limitations
 
 The current runtime smoke path is not a boot smoke test.
 

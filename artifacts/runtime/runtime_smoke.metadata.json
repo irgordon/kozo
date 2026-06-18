@@ -1,0 +1,26 @@
+{
+  "version": 0,
+  "evidence_type": "runtime-adjacent-object-symbol-smoke",
+  "artifact": "artifacts/runtime/runtime_smoke.log",
+  "generated_by": "scripts/runtime_smoke.sh",
+  "validator": "runtime_smoke_evidence",
+  "proves": [
+    "freestanding x86_64 kernel object generation",
+    "required entry symbol presence",
+    "dispatcher symbol presence",
+    "bridge symbol presence",
+    "serial marker presence in binary evidence"
+  ],
+  "does_not_prove": [
+    "QEMU boot",
+    "hardware trap execution",
+    "Linux compatibility",
+    "userspace execution",
+    "process model",
+    "VFS behavior",
+    "scheduler maturity",
+    "ELF loading",
+    "file descriptor behavior",
+    "production readiness"
+  ]
+}

@@ -5,6 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ARTIFACTS_DIR="$ROOT/artifacts"
 RUNTIME_DIR="$ARTIFACTS_DIR/runtime"
 LOG_FILE="$RUNTIME_DIR/runtime_smoke.log"
+METADATA_FILE="$RUNTIME_DIR/runtime_smoke.metadata.json"
 WORK_DIR="$RUNTIME_DIR/runtime-smoke-work"
 BRIDGE_TARGET="freestanding_amd64_sysv"
 
@@ -72,6 +73,37 @@ write_result() {
   printf "KOZO_RUNTIME_SMOKE_RESULT=pass\n" >>"$LOG_FILE"
 }
 
+write_metadata() {
+  cat >"$METADATA_FILE" <<'JSON'
+{
+  "version": 0,
+  "evidence_type": "runtime-adjacent-object-symbol-smoke",
+  "artifact": "artifacts/runtime/runtime_smoke.log",
+  "generated_by": "scripts/runtime_smoke.sh",
+  "validator": "runtime_smoke_evidence",
+  "proves": [
+    "freestanding x86_64 kernel object generation",
+    "required entry symbol presence",
+    "dispatcher symbol presence",
+    "bridge symbol presence",
+    "serial marker presence in binary evidence"
+  ],
+  "does_not_prove": [
+    "QEMU boot",
+    "hardware trap execution",
+    "Linux compatibility",
+    "userspace execution",
+    "process model",
+    "VFS behavior",
+    "scheduler maturity",
+    "ELF loading",
+    "file descriptor behavior",
+    "production readiness"
+  ]
+}
+JSON
+}
+
 need_cmd odin
 need_cmd nasm
 need_cmd nm
@@ -91,4 +123,6 @@ require_log_marker "SYSCALL[DEBUG_HEARTBEAT] Recv Seq: 0x"
 require_log_marker "SYSCALL[DEBUG_HEARTBEAT] New Time: 0x"
 
 write_result
+write_metadata
 printf "Runtime smoke evidence written to %s\n" "$LOG_FILE"
+printf "Runtime smoke metadata written to %s\n" "$METADATA_FILE"

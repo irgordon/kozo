@@ -58,7 +58,7 @@ This document does not replace `scripts/verify.sh` as the full verification entr
 | Pinned Rust cargo check | pinned cargo check for `userspace/core_service` | `docs/VALIDATION.md` | Yes | Yes | CI output, `artifacts/logs/cargo-check.log` through full verification |
 | JSON validation | `python3 -m json.tool` for task/proof artifacts | `docs/VALIDATION.md` | Yes | Yes | CI output |
 | Whitespace check | `git diff --check` | `docs/CODING_STYLE.md` | Yes | Yes | CI output |
-| Runtime smoke evidence | `scripts/runtime_smoke.sh` | `docs/RUNTIME_EVIDENCE.md` | Yes, through full verification | Yes | `artifacts/runtime/runtime_smoke.log` |
+| Runtime smoke evidence | `scripts/runtime_smoke.sh` | `docs/RUNTIME_EVIDENCE.md` | Yes, through full verification | Yes | `artifacts/runtime/runtime_smoke.log`, `artifacts/runtime/runtime_smoke.metadata.json` |
 | CI workflow | GitHub Actions `ci / full verification` | `docs/REQUIRED_CHECKS.md` | Yes | Yes | GitHub Actions status |
 | Lint workflow | GitHub Actions `lint / static checks` | `docs/REQUIRED_CHECKS.md` | Yes | Yes | GitHub Actions status |
 
