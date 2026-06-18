@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260618T185827Z",
+  "run_id": "verify-20260618T191921Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -237,18 +237,14 @@
     "CHANGELOG.md",
     "PHASEMAP.md",
     "ROADMAP.md",
+    "artifacts/runtime/runtime_smoke.metadata.json",
     "docs/RELEASE_CHECKLIST.md",
     "docs/RELEASE_EVIDENCE.md",
     "docs/REQUIRED_CHECKS.md",
     "docs/RUNTIME_EVIDENCE.md",
     "docs/generated/governance_index.md",
-    "harness/codes.py",
-    "harness/registry.py",
-    "harness/validators.py",
     "harness/validators_impl/runtime_smoke_evidence.py",
     "harness/validators_impl/validator_coverage.py",
-    "schemas/agent_context.schema.json",
-    "schemas/latest_verify.schema.json",
     "scripts/runtime_smoke.sh",
     "scripts/verify.sh",
     "tasks/todo.json",
@@ -259,7 +255,8 @@
     "artifacts/logs/odin-build.log",
     "artifacts/logs/cargo-check.log",
     "artifacts/logs/nm-kernel.log",
-    "artifacts/runtime/runtime_smoke.log"
+    "artifacts/runtime/runtime_smoke.log",
+    "artifacts/runtime/runtime_smoke.metadata.json"
   ],
-  "generated_at": "2026-06-18T18:58:27Z"
+  "generated_at": "2026-06-18T19:19:21Z"
 }
