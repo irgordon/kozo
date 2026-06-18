@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.0.34 - 2026-06-18
+
+**Status:** Release planning baseline.
+
+### Added
+
+* Added `PHASEMAP.md` to define release phase sequencing toward a scoped KOZO v1.0.0.
+* Added `ROADMAP.md` to define release direction, goals, non-goals, gates, evidence requirements, and deferred work.
+* Added `docs/RELEASE_EVIDENCE.md` to define required release artifacts, generated reports, logs, CI evidence, release checklist, evidence bundle structure, and blocker categories.
+
+### Notes
+
+* This change does not change runtime behavior.
+* This change does not change ABI contracts.
+* This change does not change syscall behavior.
+* This change does not add Linux compatibility, POSIX completeness, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+
 ## v0.0.33 - 2026-06-18
 
 **Status:** ABI generator cleanup.

@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.0.33`
+* Version: `v0.0.34`
 * Date: `2026-06-18`
-* Status: ABI generator cleanup.
+* Status: Release planning baseline.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 29
 * Failed checks: 0
-* Run ID: `verify-20260618T030349Z`
-* Generated at: `2026-06-18T03:03:49Z`
+* Run ID: `verify-20260618T031933Z`
+* Generated at: `2026-06-18T03:19:33Z`
 
 ## Registered validators
 
