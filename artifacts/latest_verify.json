@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260618T031944Z",
+  "run_id": "verify-20260618T042339Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -230,7 +230,9 @@
     "CHANGELOG.md",
     "PHASEMAP.md",
     "ROADMAP.md",
+    "docs/RELEASE_CHECKLIST.md",
     "docs/RELEASE_EVIDENCE.md",
+    "docs/REQUIRED_CHECKS.md",
     "docs/generated/governance_index.md",
     "tasks/todo.json"
   ],
@@ -240,5 +242,5 @@
     "artifacts/logs/cargo-check.log",
     "artifacts/logs/nm-kernel.log"
   ],
-  "generated_at": "2026-06-18T03:19:44Z"
+  "generated_at": "2026-06-18T04:23:39Z"
 }
