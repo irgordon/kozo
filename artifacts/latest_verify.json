@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260618T042339Z",
+  "run_id": "verify-20260618T185827Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 29,
+    "total_checks": 30,
     "failed_check_count": 0
   },
   "checks": [
@@ -185,6 +185,13 @@
       "detail": "Rust heartbeat_request, nop_request, and status_request reach the extern syscall_entry bridge with their required payload contracts"
     },
     {
+      "name": "runtime_smoke_evidence",
+      "subsystem": "runtime_smoke_evidence",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Runtime smoke evidence artifact exists, is bounded, and is referenced by release evidence policy"
+    },
+    {
       "name": "return_path_proof",
       "subsystem": "return_path_proof",
       "status": "pass",
@@ -233,14 +240,26 @@
     "docs/RELEASE_CHECKLIST.md",
     "docs/RELEASE_EVIDENCE.md",
     "docs/REQUIRED_CHECKS.md",
+    "docs/RUNTIME_EVIDENCE.md",
     "docs/generated/governance_index.md",
-    "tasks/todo.json"
+    "harness/codes.py",
+    "harness/registry.py",
+    "harness/validators.py",
+    "harness/validators_impl/runtime_smoke_evidence.py",
+    "harness/validators_impl/validator_coverage.py",
+    "schemas/agent_context.schema.json",
+    "schemas/latest_verify.schema.json",
+    "scripts/runtime_smoke.sh",
+    "scripts/verify.sh",
+    "tasks/todo.json",
+    "tests/test_runtime_smoke_evidence.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
     "artifacts/logs/odin-build.log",
     "artifacts/logs/cargo-check.log",
-    "artifacts/logs/nm-kernel.log"
+    "artifacts/logs/nm-kernel.log",
+    "artifacts/runtime/runtime_smoke.log"
   ],
-  "generated_at": "2026-06-18T04:23:39Z"
+  "generated_at": "2026-06-18T18:58:27Z"
 }
