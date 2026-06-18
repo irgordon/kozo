@@ -39,13 +39,28 @@ jobs:
             python3 \
             python3-pip
 
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
+      - name: Read pinned Rust toolchain
+        id: rust-toolchain
+        run: |
+          channel="$(python3 - <<'PY'
+          import tomllib
+          from pathlib import Path
+
+          data = tomllib.loads(Path("rust-toolchain.toml").read_text())
+          print(data["toolchain"]["channel"])
+          PY
+          )"
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
+
+      - name: Install pinned Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.rust-toolchain.outputs.channel }}
 
       - name: Install Rust bare-metal target
         run: |
-          rustup target add x86_64-unknown-none
-          rustup target list --installed
+          rustup target add --toolchain "${{ steps.rust-toolchain.outputs.channel }}" x86_64-unknown-none
+          rustup target list --installed --toolchain "${{ steps.rust-toolchain.outputs.channel }}"
 
       - name: Install Odin
         uses: laytan/setup-odin@v2
@@ -54,9 +69,9 @@ jobs:
         run: |
           python3 --version
           git --version
-          cargo --version
-          rustc --version
           rustup --version
+          "$(rustup which --toolchain "${{ steps.rust-toolchain.outputs.channel }}" cargo)" --version
+          "$(rustup which --toolchain "${{ steps.rust-toolchain.outputs.channel }}" rustc)" --version
           nm --version | head -n 1
           nasm -v
           odin version
@@ -85,7 +100,9 @@ jobs:
 
       - name: Check Rust userspace core service
         run: |
-          cargo check \
+          rustc_path="$(rustup which --toolchain "${{ steps.rust-toolchain.outputs.channel }}" rustc)"
+          cargo_path="$(rustup which --toolchain "${{ steps.rust-toolchain.outputs.channel }}" cargo)"
+          env RUSTC="$rustc_path" PATH="$(dirname "$rustc_path"):$PATH" "$cargo_path" check \
             --manifest-path userspace/core_service/Cargo.toml \
             --target x86_64-unknown-none
 

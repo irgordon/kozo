@@ -10,9 +10,8 @@ TODO_JSON="$TASKS_DIR/todo.json"
 RUNTIME_JSON="$TASKS_DIR/runtime.json"
 LESSONS_JSON="$TASKS_DIR/lessons.json"
 VERIFY_JSON="$ARTIFACTS_DIR/latest_verify.json"
-RUST_TOOLCHAIN_BIN="${RUST_TOOLCHAIN_BIN:-$HOME/.rustup/toolchains/stable-aarch64-apple-darwin/bin}"
-PINNED_CARGO_VERSION="cargo 1.96.0"
-PINNED_RUSTC_VERSION="rustc 1.96.0"
+RUST_TOOLCHAIN_FILE="$ROOT/rust-toolchain.toml"
+RUST_TARGET="x86_64-unknown-none"
 
 EMPTY_TREE="4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 KERNEL_BUILD_CHECK="$ARTIFACTS_DIR/kernel-build-check"
@@ -40,21 +39,51 @@ need_file() {
   [[ -f "$1" ]] || fail "Required file missing: $1"
 }
 
-configure_pinned_rust_tools() {
-  if [[ -d "$RUST_TOOLCHAIN_BIN" ]]; then
-    export PATH="$RUST_TOOLCHAIN_BIN:$PATH"
-  fi
+read_rust_toolchain() {
+  python3 - "$RUST_TOOLCHAIN_FILE" <<'PY'
+import sys
+import tomllib
+from pathlib import Path
+
+data = tomllib.loads(Path(sys.argv[1]).read_text())
+print(data["toolchain"]["channel"])
+PY
 }
 
 require_pinned_rust_versions() {
+  local expected_cargo_version="cargo $RUST_TOOLCHAIN"
+  local expected_rustc_version="rustc $RUST_TOOLCHAIN"
   local cargo_version
   local rustc_version
 
-  cargo_version="$(cargo --version)"
-  rustc_version="$(rustc --version)"
+  cargo_version="$("$PINNED_CARGO" --version)"
+  rustc_version="$("$PINNED_RUSTC" --version)"
 
-  [[ "$cargo_version" == "$PINNED_CARGO_VERSION"* ]] || fail "Expected $PINNED_CARGO_VERSION, got: $cargo_version"
-  [[ "$rustc_version" == "$PINNED_RUSTC_VERSION"* ]] || fail "Expected $PINNED_RUSTC_VERSION, got: $rustc_version"
+  [[ "$cargo_version" == "$expected_cargo_version"* ]] || fail "Expected $expected_cargo_version at $PINNED_CARGO, got: $cargo_version"
+  [[ "$rustc_version" == "$expected_rustc_version"* ]] || fail "Expected $expected_rustc_version at $PINNED_RUSTC, got: $rustc_version"
+}
+
+require_pinned_rust_toolchain() {
+  if ! PINNED_RUSTC="$(rustup which --toolchain "$RUST_TOOLCHAIN" rustc 2>/dev/null)"; then
+    fail "Pinned Rust toolchain unavailable: $RUST_TOOLCHAIN. Install with: rustup toolchain install $RUST_TOOLCHAIN"
+  fi
+  if ! PINNED_CARGO="$(rustup which --toolchain "$RUST_TOOLCHAIN" cargo 2>/dev/null)"; then
+    fail "Pinned Rust cargo unavailable: $RUST_TOOLCHAIN. Install with: rustup toolchain install $RUST_TOOLCHAIN"
+  fi
+}
+
+require_pinned_rust_target() {
+  if ! rustup target list --installed --toolchain "$RUST_TOOLCHAIN" | grep -Fx "$RUST_TARGET" >/dev/null; then
+    fail "Pinned Rust target unavailable: $RUST_TARGET for $RUST_TOOLCHAIN. Install with: rustup target add --toolchain $RUST_TOOLCHAIN $RUST_TARGET"
+  fi
+}
+
+run_pinned_cargo() {
+  local rust_bin_dir
+
+  rust_bin_dir="$(dirname "$PINNED_RUSTC")"
+
+  env RUSTC="$PINNED_RUSTC" PATH="$rust_bin_dir:$PATH" "$PINNED_CARGO" "$@"
 }
 
 repo_head_ref() {
@@ -176,11 +205,13 @@ write_verify_artifact_atomically() {
 need_cmd python3
 need_cmd git
 need_cmd odin
-configure_pinned_rust_tools
-need_cmd cargo
-need_cmd rustc
+need_cmd rustup
 need_cmd nm
+need_file "$RUST_TOOLCHAIN_FILE"
+RUST_TOOLCHAIN="$(read_rust_toolchain)"
+require_pinned_rust_toolchain
 require_pinned_rust_versions
+require_pinned_rust_target
 
 need_file "$TODO_JSON"
 need_file "$RUNTIME_JSON"
@@ -198,7 +229,7 @@ run_logged_command "$LOG_DIR/odin-build.log" \
   odin build "$ROOT/kernel" "-out:$KERNEL_BUILD_CHECK"
 
 run_logged_command "$LOG_DIR/cargo-check.log" \
-  cargo check --manifest-path "$ROOT/userspace/core_service/Cargo.toml" --target x86_64-unknown-none
+  run_pinned_cargo check --manifest-path "$ROOT/userspace/core_service/Cargo.toml" --target "$RUST_TARGET"
 
 build_kernel_object_artifact
 

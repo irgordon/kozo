@@ -17,6 +17,7 @@
   ],
   "file_scope": [
     ".codex/AGENTS.md",
+    ".github/",
     ".gitignore",
     "rust-toolchain.toml",
     "CHANGELOG.md",
@@ -737,6 +738,25 @@
         "verification.tests_run[5]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 28,
+      "title": "Select the pinned Rust toolchain through rustup during verification",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/lint.yml",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "scripts/verify.sh"
+      ],
+      "verification_refs": [
+        "verification.tests_run[1]",
+        "verification.tests_run[4]",
+        "verification.tests_run[5]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -896,7 +916,7 @@
       "syscall_surface_report validates that docs/generated/syscall_surface.md matches the deterministic renderer output and fails on stale content, manual edits, missing syscall sections, missing class summaries, and missing source references.",
       "abi_surface_report validates that docs/generated/abi_surface.md matches the deterministic renderer output and fails on stale content, manual edits, missing constants, missing binding paths, missing layout details, missing sentinels, and manifest-driven drift.",
       "Governance documents now define document precedence, non-negotiable invariants, code construction rules, contract authority, validation policy, generated artifact policy, compatibility boundaries, security boundary rules, and ADR requirements while keeping architecture diagrams descriptive.",
-      "rust-toolchain.toml pins Rust 1.96.0 and scripts/verify.sh prepends the local stable Rust toolchain path before checking cargo and rustc versions."
+      "rust-toolchain.toml pins Rust 1.96.0 and scripts/verify.sh resolves and invokes cargo and rustc from the pinned toolchain directly."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -926,6 +946,7 @@
     "Added generated syscall surface report as non-authoritative Markdown derived from existing contracts without adding new syscalls or runtime behavior.",
     "Added generated ABI surface report as non-authoritative Markdown derived from the ABI manifest without changing ABI constants, ABI layouts, generated bindings, syscalls, or runtime behavior.",
     "Added governance document authority split without changing runtime behavior, ABI contracts, syscall contracts, generated bindings, validator logic, or compatibility behavior.",
-    "Pinned Rust verification to cargo and rustc 1.96.0 without changing runtime behavior, ABI contracts, syscall contracts, generated bindings, or validator logic."
+    "Pinned Rust verification to cargo and rustc 1.96.0 without changing runtime behavior, ABI contracts, syscall contracts, generated bindings, or validator logic.",
+    "Updated verification and CI to select the Rust toolchain declared by rust-toolchain.toml and invoke its cargo and rustc binaries directly instead of relying on ambient cargo or host stable dispatch."
   ]
 }

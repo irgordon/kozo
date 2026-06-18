@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.0.31 - 2026-06-18
+
+**Status:** Rust verification selects the pinned toolchain deterministically.
+
+### Changed
+
+* Updated `scripts/verify.sh` to read the Rust channel from `rust-toolchain.toml` and invoke the pinned `cargo` and `rustc` binaries directly.
+* Updated CI and lint workflows to install the pinned Rust toolchain from `rust-toolchain.toml`, install `x86_64-unknown-none` for that toolchain, and run Rust checks through the resolved pinned `cargo` binary.
+* Preserved fail-closed checks for the pinned Rust version and bare-metal target availability.
+
+### Notes
+
+* This change does not change Rust source behavior.
+* This change does not change ABI contracts, generated bindings, runtime behavior, or syscall behavior.
+* Verification no longer depends on host `stable` being the desired Rust toolchain.
+
 ## v0.0.30 - 2026-06-17
 
 **Status:** Rust toolchain version pinned.

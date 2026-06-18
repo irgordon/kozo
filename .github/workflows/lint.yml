@@ -1,50 +1,32 @@
 name: lint
 
 on:
-pull_request:
-branches:
-- main
-- godan
-push:
-branches:
-- main
-- godan
-workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+      - godan
+  push:
+    branches:
+      - main
+      - godan
+  workflow_dispatch:
 
 permissions:
-contents: read
+  contents: read
 
 concurrency:
-group: lint-${{ github.workflow }}-${{ github.ref }}
-cancel-in-progress: true
+  group: lint-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-static-checks:
-name: static checks
-runs-on: ubuntu-latest
-timeout-minutes: 20
+  static-checks:
+    name: static checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
 
-```
-steps:
-  - name: Checkout
-    uses: actions/checkout@v4
-
-  - name: Install system tools
-    run: |
-      sudo apt-get update
-      sudo apt-get install -y \
-        binutils \
-        build-essential \
-        python3 \
-        python3-pip
-
-  - name: Install Rust stable
-    uses: dtolnay/rust-toolchain@stable
-
-  - name: Install Rust bare-metal target
-    run: |
-      rustup target add x86_64-unknown-none
-      rustup target list --installed
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Install system tools
         run: |
@@ -56,52 +38,77 @@ steps:
             python3 \
             python3-pip
 
-  - name: Install Odin
-    uses: laytan/setup-odin@v2
+      - name: Read pinned Rust toolchain
+        id: rust-toolchain
+        run: |
+          channel="$(python3 - <<'PY'
+          import tomllib
+          from pathlib import Path
 
-  - name: Show tool versions
-    run: |
-      python3 --version
-      git --version
-      cargo --version
-      rustc --version
-      rustup --version
-      nm --version | head -n 1
-      odin version
+          data = tomllib.loads(Path("rust-toolchain.toml").read_text())
+          print(data["toolchain"]["channel"])
+          PY
+          )"
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
 
-  - name: Shell syntax
-    run: |
-      bash -n scripts/verify.sh
+      - name: Install pinned Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.rust-toolchain.outputs.channel }}
 
-  - name: JSON syntax
-    run: |
-      python3 -m json.tool tasks/todo.json >/dev/null
-      python3 -m json.tool tasks/runtime.json >/dev/null
-      python3 -m json.tool tasks/lessons.json >/dev/null
-      python3 -m json.tool schemas/latest_verify.schema.json >/dev/null
-      python3 -m json.tool schemas/agent_context.schema.json >/dev/null
-      if [ -f contracts/kozo_abi_manifest.json ]; then
-        python3 -m json.tool contracts/kozo_abi_manifest.json >/dev/null
-      fi
-      if [ -f schemas/kozo_abi_manifest.schema.json ]; then
-        python3 -m json.tool schemas/kozo_abi_manifest.schema.json >/dev/null
-      fi
+      - name: Install Rust bare-metal target
+        run: |
+          rustup target add --toolchain "${{ steps.rust-toolchain.outputs.channel }}" x86_64-unknown-none
+          rustup target list --installed --toolchain "${{ steps.rust-toolchain.outputs.channel }}"
 
-  - name: Python unit tests
-    run: |
-      python3 -m unittest discover -s tests
+      - name: Install Odin
+        uses: laytan/setup-odin@v2
 
-  - name: Rust cargo check
-    run: |
-      cargo check \
-        --manifest-path userspace/core_service/Cargo.toml \
-        --target x86_64-unknown-none
+      - name: Show tool versions
+        run: |
+          python3 --version
+          git --version
+          rustup --version
+          "$(rustup which --toolchain "${{ steps.rust-toolchain.outputs.channel }}" cargo)" --version
+          "$(rustup which --toolchain "${{ steps.rust-toolchain.outputs.channel }}" rustc)" --version
+          nm --version | head -n 1
+          nasm -v
+          odin version
 
-  - name: Odin check
-    run: |
-      odin check kernel
+      - name: Shell syntax
+        run: |
+          bash -n scripts/verify.sh
 
-  - name: Whitespace check
-    run: |
-      git diff --check
-```
+      - name: JSON syntax
+        run: |
+          python3 -m json.tool tasks/todo.json >/dev/null
+          python3 -m json.tool tasks/runtime.json >/dev/null
+          python3 -m json.tool tasks/lessons.json >/dev/null
+          python3 -m json.tool schemas/latest_verify.schema.json >/dev/null
+          python3 -m json.tool schemas/agent_context.schema.json >/dev/null
+          if [ -f contracts/kozo_abi_manifest.json ]; then
+            python3 -m json.tool contracts/kozo_abi_manifest.json >/dev/null
+          fi
+          if [ -f schemas/kozo_abi_manifest.schema.json ]; then
+            python3 -m json.tool schemas/kozo_abi_manifest.schema.json >/dev/null
+          fi
+
+      - name: Python unit tests
+        run: |
+          python3 -m unittest discover -s tests
+
+      - name: Rust cargo check
+        run: |
+          rustc_path="$(rustup which --toolchain "${{ steps.rust-toolchain.outputs.channel }}" rustc)"
+          cargo_path="$(rustup which --toolchain "${{ steps.rust-toolchain.outputs.channel }}" cargo)"
+          env RUSTC="$rustc_path" PATH="$(dirname "$rustc_path"):$PATH" "$cargo_path" check \
+            --manifest-path userspace/core_service/Cargo.toml \
+            --target x86_64-unknown-none
+
+      - name: Odin check
+        run: |
+          odin check kernel
+
+      - name: Whitespace check
+        run: |
+          git diff --check
