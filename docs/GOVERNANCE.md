@@ -92,9 +92,10 @@ When governance documents disagree, the higher document in this list wins.
 8. `docs/COMPATIBILITY.md`
 9. `docs/SECURITY_MODEL.md`
 10. `docs/ADR_POLICY.md`
-11. `docs/ARCHITECTURE_DIAGRAM.md`
-12. `CHANGELOG.md`
-13. `README.md`
+11. `docs/DOCUMENTATION_STANDARD.md`
+12. `docs/ARCHITECTURE_DIAGRAM.md`
+13. `CHANGELOG.md`
+14. `README.md`
 
 The order protects the project from accidental contradiction.
 
@@ -257,7 +258,24 @@ It defines:
 
 ---
 
-## 6.11 `ARCHITECTURE_DIAGRAM.md`
+## 6.11 `DOCUMENTATION_STANDARD.md`
+
+Owns documentation construction and review rules.
+
+It defines:
+
+* documentation clarity standards
+* audience separation rules
+* claim discipline
+* terminology consistency
+* documentation review criteria
+* documentation audit rules
+
+It does not define architecture truth, ABI truth, syscall behavior, compatibility claims, generated artifact authority, validator behavior, release evidence requirements, or runtime behavior.
+
+---
+
+## 6.12 `ARCHITECTURE_DIAGRAM.md`
 
 Owns visual explanation only.
 
@@ -542,5 +560,7 @@ When relationships are unclear, this document decides the authority boundary.
 `COMPATIBILITY.md` owns compatibility claims.
 
 `SECURITY_MODEL.md` owns security boundaries.
+
+`DOCUMENTATION_STANDARD.md` owns documentation construction.
 
 `ARCHITECTURE_DIAGRAM.md` explains but does not govern.

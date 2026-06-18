@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.2.2 - 2026-06-18
+
+**Status:** Documentation clarity governance.
+
+### Added
+
+* Added `docs/DOCUMENTATION_STANDARD.md` as the authoritative standard for documentation clarity, audience separation, claim discipline, terminology consistency, onboarding structure, and documentation review.
+
+### Changed
+
+* Updated `docs/GOVERNANCE.md` to place the documentation standard in the governance authority order and define its ownership boundary.
+
+### Notes
+
+* This change does not change runtime behavior.
+* This change does not change ABI contracts.
+* This change does not change syscall behavior.
+* This change does not add Linux compatibility, POSIX completeness, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+
 ## v0.2.1 - 2026-06-18
 
 **Status:** Runtime evidence packaging.

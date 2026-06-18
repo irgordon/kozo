@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.2.1`
+* Version: `v0.2.2`
 * Date: `2026-06-18`
-* Status: Runtime evidence packaging.
+* Status: Documentation clarity governance.
 
 ## Verification status
 
