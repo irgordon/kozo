@@ -1,325 +1,180 @@
-# KOZO Operating System Architecture
+# KOZO Architecture
 
-Version: 1  
-Status: Authoritative  
-Scope: Kernel structure, system boundaries, and runtime interaction model
-
----
-
-# 1. Overview
-
-KOZO is a **capability-oriented microkernel operating system** designed for high integrity, deterministic behavior, and strict interface boundaries.
-
-The system is divided into **three primary layers**:
-
-1. **Kernel Layer (Odin)**
-2. **Userspace Services Layer (Rust)**
-3. **Harness and Validation Layer (Python)**
-
-Each layer has clearly defined responsibilities and communicates through explicit contracts.
-
-The design goal is to keep the **trusted computing base minimal**, while enforcing correctness through deterministic validation.
+Version: 1
+Status: Authoritative
+Scope: System structure, layer responsibilities, and high-level runtime boundaries
 
 ---
 
-# 2. System Layers
+# 1. Purpose
 
-## 2.1 Kernel Layer
+This document defines KOZO system structure.
+
+It owns the architectural shape of the repository and the responsibility boundaries between runtime layers and development-time validation.
+
+---
+
+# 2. Authority
+
+This document owns architecture structure only.
+
+It is subordinate to `docs/GOVERNANCE.md` and `docs/INVARIANTS.md`.
+
+It does not own coding style, ABI truth, syscall semantics, generated artifact policy, compatibility claims, security boundary details, validation mechanics, or ADR rules.
+
+---
+
+# 3. Non-Goals
+
+This document does not claim Linux compatibility.
+
+This document does not claim POSIX completeness.
+
+This document does not claim production readiness.
+
+This document does not define a monolithic or NT-style architecture.
+
+This document does not make diagrams or generated reports authoritative.
+
+---
+
+# 4. Architectural Model
+
+KOZO is currently governed as a capability-oriented microkernel operating system.
+
+The current repository is organized around three primary layers:
+
+1. Odin kernel
+2. Rust userspace services
+3. Python harness and validation
+
+Runtime authority belongs to runtime implementation and contracts, not to generated reports or the Python harness.
+
+---
+
+# 5. Odin Kernel Layer
 
 Location:
 
+```text
+kernel/
 ```
 
-/kernel
+The Odin kernel owns kernel-side runtime authority.
 
-```
+It is responsible for the currently implemented kernel entry and syscall dispatch surfaces that are backed by contracts and validators.
 
-Language:
+The kernel must use ABI constants for governed syscall selectors and must follow declared syscall contracts.
 
-```
-
-Odin
-
-```
-
-Responsibilities:
-
-- hardware abstraction
-- scheduler
-- capability enforcement
-- virtual memory management
-- interprocess communication
-- syscall dispatch
-
-The kernel must remain **small and deterministic**.
-
-The kernel must not implement:
-
-- filesystems
-- network stacks
-- device policy
-- application logic
-
-These belong in userspace services.
+Security boundary details are owned by `docs/SECURITY_MODEL.md`.
 
 ---
 
-## 2.2 Userspace Services Layer
+# 6. Rust Userspace Services Layer
 
 Location:
 
+```text
+userspace/
 ```
 
-/userspace
+Rust userspace services are kernel clients and service implementations.
 
-```
+They are not kernel authority.
 
-Language:
+Kernel-facing Rust code must use generated ABI constants and cross governed boundaries through the declared ABI.
 
-```
-
-Rust
-
-```
-
-Responsibilities:
-
-- system services
-- device drivers
-- runtime libraries
-- higher-level system components
-
-Userspace services interact with the kernel exclusively through the **KOZO ABI contract**.
-
-Rust is used to provide **memory-safe implementations** of system services.
-
-All kernel-facing Rust code must be compatible with:
-
-```
-
-no_std
-
-```
+The presence of Rust userspace code does not imply general userspace execution support, process model behavior, Linux compatibility, or production readiness.
 
 ---
 
-## 2.3 Harness Layer
+# 7. Python Harness and Validation Layer
 
-Location:
+Locations:
 
+```text
+harness/
+scripts/
+tests/
+schemas/
 ```
 
-/harness
-/scripts
+The Python harness validates repository state during development.
 
-```
+The harness is not part of the operating system runtime.
 
-Language:
+It enforces schemas, validators, generated report drift checks, artifact evidence checks, and task governance.
 
-```
-
-Python
-
-```
-
-Responsibilities:
-
-- validation of repository changes
-- artifact schema validation
-- deterministic verification pipeline
-- agent execution control
-
-The harness is **not part of the operating system runtime**.  
-It exists to enforce correctness during development.
+Harness details are owned by `docs/VALIDATION.md`.
 
 ---
 
-# 3. Interface Contracts
+# 8. Contracts Boundary
 
-All system boundaries are defined through **explicit contracts**.
+System boundaries must be contract-backed.
 
-Contracts live in:
+Contract files live under:
 
+```text
+contracts/
 ```
 
-/contracts
+The authoritative ABI contract is:
 
-```
-
-The authoritative ABI contract file is:
-
-```
-
+```text
 contracts/kozo_abi.h
-
 ```
 
-Bindings are generated from this contract into:
-
-```
-
-bindings/odin/
-bindings/rust/
-
-```
-
-Agents must **never modify generated bindings directly**.
+Contract authority and contract roles are owned by `docs/CONTRACTS.md`.
 
 ---
 
-# 4. Capability Model
+# 9. Generated Surfaces
 
-KOZO uses a **capability-based security model**.
+Generated bindings and reports are derived surfaces.
 
-Capabilities represent permission to interact with kernel objects.
+Generated ABI bindings support language use and must not be edited directly.
 
-Examples:
+Generated reports under `docs/generated/` are review surfaces, not sources of truth.
 
-- memory regions
-- IPC endpoints
-- scheduling rights
-- device handles
-
-Rules:
-
-- capabilities are opaque to userspace
-- kernel object pointers are never exposed
-- capability validation occurs at every syscall boundary
-
-Capabilities prevent pointer forgery and enforce isolation.
+Generated artifact policy is owned by `docs/GENERATED_ARTIFACTS.md`.
 
 ---
 
-# 5. System Call Interface
+# 10. Architecture Diagram
 
-Userspace communicates with the kernel through **syscalls**.
+`docs/ARCHITECTURE_DIAGRAM.md` is descriptive and non-authoritative.
 
-Syscalls follow these principles:
-
-- fixed ABI signatures
-- explicit parameter validation
-- capability verification
-- deterministic return values
-
-Kernel functions must never trust userspace pointers without validation.
+It may explain the architecture visually, but it must not override this document or any higher-authority governance document.
 
 ---
 
-# 6. Memory Model
+# 11. Related Governance Documents
 
-KOZO uses explicit memory ownership.
-
-Kernel rules:
-
-- memory allocators must be passed explicitly
-- global allocators are prohibited unless documented
-- ownership and lifetime must be visible
-
-Userspace memory must be validated before kernel access.
-
----
-
-# 7. Scheduling Model
-
-The kernel scheduler is responsible for:
-
-- thread execution
-- CPU time allocation
-- context switching
-
-Scheduling decisions must remain deterministic.
-
-Policy-level scheduling behavior may be implemented in userspace services.
+| Document | Owns |
+| --- | --- |
+| `docs/GOVERNANCE.md` | precedence, conflicts, amendments |
+| `docs/INVARIANTS.md` | non-negotiable technical truths |
+| `docs/CONTRACTS.md` | contract authority |
+| `docs/CODING_STYLE.md` | code construction rules |
+| `docs/VALIDATION.md` | harness and verification process |
+| `docs/GENERATED_ARTIFACTS.md` | generated-file policy |
+| `docs/COMPATIBILITY.md` | compatibility claims and non-goals |
+| `docs/SECURITY_MODEL.md` | capability and trust-boundary rules |
+| `docs/ADR_POLICY.md` | decision-record requirements |
 
 ---
 
-# 8. Interprocess Communication
+# 12. Summary
 
-IPC is a core microkernel primitive.
+KOZO architecture is currently governed as a capability-oriented microkernel with an Odin kernel, Rust userspace services, and Python validation harness.
 
-IPC mechanisms provide:
+The kernel is runtime authority.
 
-- message passing
-- synchronization
-- capability transfer
+Rust userspace is a kernel client layer.
 
-IPC must remain:
+The Python harness is development-time validation only.
 
-- deterministic
-- bounded
-- capability-controlled
+Contracts define boundaries.
 
----
-
-# 9. Determinism Guarantees
-
-KOZO prioritizes deterministic behavior.
-
-The kernel must avoid:
-
-- hidden global state
-- implicit allocation
-- unpredictable scheduling behavior
-- environment-dependent execution
-
-Every kernel path must be auditable and reproducible.
-
----
-
-# 10. Build and Verification Pipeline
-
-Development changes are validated by the **KOZO harness**.
-
-Validation includes:
-
-- schema verification
-- protocol compliance
-- validator execution
-- toolchain checks
-
-Changes must pass verification before integration.
-
----
-
-# 11. Development Principles
-
-KOZO development follows these principles:
-
-- minimal trusted computing base
-- strict interface boundaries
-- explicit resource ownership
-- deterministic system behavior
-- capability-based security
-
-Architecture changes require documentation through an **Architecture Decision Record (ADR)**.
-
----
-
-# 12. Future Extensions
-
-The architecture supports extension through userspace services.
-
-Examples:
-
-- filesystem servers
-- networking stacks
-- device management services
-- userland runtime environments
-
-These services remain outside the kernel to preserve microkernel integrity.
-
----
-
-# 13. Architectural Summary
-
-KOZO enforces separation of concerns across three domains:
-
-| Layer | Language | Responsibility |
-|------|---------|---------------|
-| Kernel | Odin | hardware + core primitives |
-| Services | Rust | system services |
-| Harness | Python | validation and control |
-
-The kernel remains minimal while the harness guarantees correctness during development.
-
-This architecture ensures that KOZO can evolve while maintaining strict system integrity.
+Generated reports and diagrams explain but do not govern.

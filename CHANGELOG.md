@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.0.29 - 2026-06-17
+
+**Status:** Governance document authority split.
+
+### Added
+
+* Added a documentation governance authority model covering precedence, conflict resolution, amendment rules, generated report authority, diagram authority, changelog authority, and README authority.
+* Added non-negotiable technical invariants for runtime authority, contracts, syscalls, pointers, capability boundaries, validation, generated artifacts, documentation, compatibility, and review.
+* Added KOZO coding style guidance for Python harness code, Odin kernel code, Rust userspace code, shell scripts, tests, generated files, diagnostics, and interface safety.
+* Added contract, validation, generated artifact, compatibility, security model, and ADR policy governance documents.
+
+### Changed
+
+* Clarified that `docs/ARCHITECTURE.md` owns system structure only.
+* Marked `docs/ARCHITECTURE_DIAGRAM.md` as descriptive and non-authoritative.
+
+### Notes
+
+* This change does not change runtime behavior.
+* This change does not change ABI contracts, syscall contracts, generated bindings, or validator logic.
+* This change does not add Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness.
+
 ## v0.0.28 - 2026-06-02
 
 **Status:** Generated ABI surface report.

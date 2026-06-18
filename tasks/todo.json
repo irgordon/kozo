@@ -672,6 +672,33 @@
         "verification.tests_run[10]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 25,
+      "title": "Add governance document authority split",
+      "status": "done",
+      "kind": "docs",
+      "files_expected": [
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "docs/ADR_POLICY.md",
+        "docs/ARCHITECTURE.md",
+        "docs/ARCHITECTURE_DIAGRAM.md",
+        "docs/CODING_STYLE.md",
+        "docs/COMPATIBILITY.md",
+        "docs/CONTRACTS.md",
+        "docs/GENERATED_ARTIFACTS.md",
+        "docs/GOVERNANCE.md",
+        "docs/INVARIANTS.md",
+        "docs/SECURITY_MODEL.md",
+        "docs/VALIDATION.md"
+      ],
+      "verification_refs": [
+        "verification.tests_run[5]",
+        "verification.tests_run[9]",
+        "verification.tests_run[10]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -700,7 +727,8 @@
     "K_SYSCALL_STATUS is governed as a no-payload status syscall with a null payload argument, K_OK return status, no payload mutation, live Odin dispatch, and a Rust bridge probe",
     "Syscall catalog v0 summarizes nop, status, and debug_heartbeat without owning ABI constants, table structure, class semantics, or runtime behavior",
     "docs/generated/syscall_surface.md provides a deterministic non-authoritative Markdown report generated from the syscall catalog and existing contracts",
-    "docs/generated/abi_surface.md provides a deterministic non-authoritative Markdown report generated from the ABI manifest"
+    "docs/generated/abi_surface.md provides a deterministic non-authoritative Markdown report generated from the ABI manifest",
+    "Governance documents split authority across precedence, invariants, architecture, contracts, coding style, validation, generated artifacts, compatibility, security model, and ADR policy without changing runtime, ABI, syscall, or compatibility behavior"
   ],
   "verification": {
     "tests_run": [
@@ -792,7 +820,8 @@
       "A placeholder negative-looking test without validator invocation or failure assertion causes validator_coverage to fail",
       "Missing KOZO_NEGATIVE_COVERAGE metadata causes validator_coverage to fail",
       "Missing required markers, unknown markers, missing mapped tests, and non-behavioral mapped tests cause validator_coverage to fail",
-      "Removing ABI surface report constants, binding paths, layout fields, sentinels, or generated content causes abi_surface_report to fail"
+      "Removing ABI surface report constants, binding paths, layout fields, sentinels, or generated content causes abi_surface_report to fail",
+      "Governance document updates remain bounded to documentation authority, changelog state, and task scope"
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -825,7 +854,8 @@
       "K_SYSCALL_STATUS is represented in the ABI manifest, syscall table contract, syscall class contract, live Odin dispatcher, and Rust core service probe as a no-payload status syscall that returns K_OK and does not inspect or mutate payload state.",
       "syscall_catalog validates the cataloged syscall summaries against the ABI manifest, syscall table contract, syscall class contract, registered proof validators, and live Rust runtime probe presence.",
       "syscall_surface_report validates that docs/generated/syscall_surface.md matches the deterministic renderer output and fails on stale content, manual edits, missing syscall sections, missing class summaries, and missing source references.",
-      "abi_surface_report validates that docs/generated/abi_surface.md matches the deterministic renderer output and fails on stale content, manual edits, missing constants, missing binding paths, missing layout details, missing sentinels, and manifest-driven drift."
+      "abi_surface_report validates that docs/generated/abi_surface.md matches the deterministic renderer output and fails on stale content, manual edits, missing constants, missing binding paths, missing layout details, missing sentinels, and manifest-driven drift.",
+      "Governance documents now define document precedence, non-negotiable invariants, code construction rules, contract authority, validation policy, generated artifact policy, compatibility boundaries, security boundary rules, and ADR requirements while keeping architecture diagrams descriptive."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -853,6 +883,7 @@
     "Added K_SYSCALL_STATUS as a governed no-payload status syscall without adding Linux compatibility, userspace generalization, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or runtime subsystem behavior.",
     "Added syscall catalog v0 as a governed summary of existing syscall contracts without adding new syscalls or runtime behavior.",
     "Added generated syscall surface report as non-authoritative Markdown derived from existing contracts without adding new syscalls or runtime behavior.",
-    "Added generated ABI surface report as non-authoritative Markdown derived from the ABI manifest without changing ABI constants, ABI layouts, generated bindings, syscalls, or runtime behavior."
+    "Added generated ABI surface report as non-authoritative Markdown derived from the ABI manifest without changing ABI constants, ABI layouts, generated bindings, syscalls, or runtime behavior.",
+    "Added governance document authority split without changing runtime behavior, ABI contracts, syscall contracts, generated bindings, validator logic, or compatibility behavior."
   ]
 }

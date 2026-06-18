@@ -1,0 +1,169 @@
+# KOZO Contracts
+
+Version: 1
+Status: Authoritative
+Scope: Contract purpose, contract source paths, and contract authority
+
+---
+
+# 1. Purpose
+
+This document defines what KOZO means by a contract and which files own system boundary truth.
+
+Contracts make implicit boundaries explicit. A boundary is not governed until it is backed by a checked-in contract and validation.
+
+---
+
+# 2. Authority
+
+This document owns contract purpose and contract authority.
+
+It is subordinate to `docs/GOVERNANCE.md`, `docs/INVARIANTS.md`, and `docs/ARCHITECTURE.md`.
+
+It does not own coding style, compatibility claims, security policy, generated artifact edit policy, or validator implementation details.
+
+---
+
+# 3. Non-Goals
+
+This document does not define new ABI constants.
+
+This document does not define new syscall behavior.
+
+This document does not make generated reports authoritative.
+
+This document does not claim Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness.
+
+---
+
+# 4. What a Contract Is
+
+A contract is a checked-in source of truth for a system boundary.
+
+A contract must define the surface it owns clearly enough for validators, tests, and generated artifacts to compare implementation state against it.
+
+Contracts may be human-readable, machine-readable, or both.
+
+---
+
+# 5. Rules
+
+System boundary behavior must be contract-backed before it is treated as governed.
+
+Generated bindings are outputs, not source truth.
+
+Generated reports are summaries, not source truth.
+
+Validators enforce contracts but do not create contract truth.
+
+Contract changes require focused validation and generated artifact refresh where applicable.
+
+---
+
+# 6. Contract Source Paths
+
+Current contract paths include:
+
+| Contract | Path | Authority |
+| --- | --- | --- |
+| Canonical ABI header | `contracts/kozo_abi.h` | ABI constants, types, and layout source |
+| ABI manifest | `contracts/kozo_abi_manifest.json` | Machine-readable ABI summary checked against ABI truth |
+| Syscall boundary contract | `contracts/syscall_boundary_contract.v0.json` | Currently proven syscall call-boundary shape |
+| Syscall table contract | `contracts/syscall_table_contract.v0.json` | Currently proven dispatcher table behavior |
+| Syscall class contract | `contracts/syscall_class_contract.v0.json` | Semantic syscall class rules |
+| Syscall catalog | `contracts/syscall_catalog.v0.json` | Governed syscall summary checked against source contracts |
+
+---
+
+# 7. ABI Header Authority
+
+`contracts/kozo_abi.h` is the authoritative ABI contract.
+
+Generated Rust and Odin bindings are outputs derived from ABI truth. They are not edited directly and do not override the header or governed manifest.
+
+If bindings drift from the ABI contract, fix the contract or generator path and regenerate through the governed workflow.
+
+---
+
+# 8. ABI Manifest Role
+
+`contracts/kozo_abi_manifest.json` is the machine-readable ABI manifest.
+
+It records currently governed ABI constants, generated binding paths, heartbeat payload layout, and heartbeat request/response sentinels.
+
+The manifest reduces duplicated validator constants, but it does not replace the canonical ABI header.
+
+---
+
+# 9. Syscall Contract Roles
+
+`contracts/syscall_boundary_contract.v0.json` describes the currently proven syscall boundary shape.
+
+`contracts/syscall_table_contract.v0.json` describes currently proven dispatcher entries and unknown-syscall behavior.
+
+`contracts/syscall_class_contract.v0.json` describes syscall class semantics such as no-payload status syscalls and payload-mutating status syscalls.
+
+Each syscall behavior must match its declared contract and class.
+
+---
+
+# 10. Catalog Role
+
+`contracts/syscall_catalog.v0.json` summarizes governed syscall entries.
+
+The catalog is a review and coordination surface. It does not own ABI values, table semantics, class semantics, runtime behavior, or compatibility claims.
+
+Catalog entries must be validated against the authoritative contracts and source proofs.
+
+---
+
+# 11. Generated Reports
+
+Generated reports are summaries.
+
+Examples:
+
+* `docs/generated/syscall_surface.md`
+* `docs/generated/abi_surface.md`
+* `docs/generated/governance_index.md`
+
+Generated reports do not own contract truth. If a generated report conflicts with a contract, the contract wins and the report must be regenerated.
+
+---
+
+# 12. Validators as Proof Mechanisms
+
+Validators prove that checked-in source, contracts, generated artifacts, and task state agree.
+
+Validators do not create contract truth. They enforce it.
+
+When a validator finds missing source, missing evidence, stale generated reports, or contract drift, it must fail closed.
+
+---
+
+# 13. Contract Change Requirements
+
+A contract change requires:
+
+* a clear statement of the changed boundary
+* focused tests for positive and negative paths
+* validator updates when proof behavior changes
+* generated artifact refresh when generated outputs depend on the contract
+* changelog update
+* ADR when architecture, ABI model, syscall boundary semantics, security assumptions, or document authority changes
+
+---
+
+# 14. Relationship to Other Governance Documents
+
+`GOVERNANCE.md` owns document precedence.
+
+`INVARIANTS.md` owns non-negotiable truths.
+
+`ARCHITECTURE.md` owns system structure.
+
+`VALIDATION.md` owns harness rules.
+
+`GENERATED_ARTIFACTS.md` owns generated-file edit policy.
+
+`ADR_POLICY.md` owns decision-record requirements.
