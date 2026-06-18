@@ -18,6 +18,7 @@
   "file_scope": [
     ".codex/AGENTS.md",
     ".gitignore",
+    "rust-toolchain.toml",
     "CHANGELOG.md",
     "README.md",
     "tasks/",
@@ -699,6 +700,24 @@
         "verification.tests_run[10]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 26,
+      "title": "Pin Rust toolchain version",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "rust-toolchain.toml",
+        "scripts/verify.sh"
+      ],
+      "verification_refs": [
+        "verification.tests_run[1]",
+        "verification.tests_run[4]",
+        "verification.tests_run[5]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -728,7 +747,8 @@
     "Syscall catalog v0 summarizes nop, status, and debug_heartbeat without owning ABI constants, table structure, class semantics, or runtime behavior",
     "docs/generated/syscall_surface.md provides a deterministic non-authoritative Markdown report generated from the syscall catalog and existing contracts",
     "docs/generated/abi_surface.md provides a deterministic non-authoritative Markdown report generated from the ABI manifest",
-    "Governance documents split authority across precedence, invariants, architecture, contracts, coding style, validation, generated artifacts, compatibility, security model, and ADR policy without changing runtime, ABI, syscall, or compatibility behavior"
+    "Governance documents split authority across precedence, invariants, architecture, contracts, coding style, validation, generated artifacts, compatibility, security model, and ADR policy without changing runtime, ABI, syscall, or compatibility behavior",
+    "Rust verification uses pinned cargo and rustc version 1.96.0"
   ],
   "verification": {
     "tests_run": [
@@ -821,7 +841,8 @@
       "Missing KOZO_NEGATIVE_COVERAGE metadata causes validator_coverage to fail",
       "Missing required markers, unknown markers, missing mapped tests, and non-behavioral mapped tests cause validator_coverage to fail",
       "Removing ABI surface report constants, binding paths, layout fields, sentinels, or generated content causes abi_surface_report to fail",
-      "Governance document updates remain bounded to documentation authority, changelog state, and task scope"
+      "Governance document updates remain bounded to documentation authority, changelog state, and task scope",
+      "Verification fails if cargo or rustc do not report pinned version 1.96.0"
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -855,7 +876,8 @@
       "syscall_catalog validates the cataloged syscall summaries against the ABI manifest, syscall table contract, syscall class contract, registered proof validators, and live Rust runtime probe presence.",
       "syscall_surface_report validates that docs/generated/syscall_surface.md matches the deterministic renderer output and fails on stale content, manual edits, missing syscall sections, missing class summaries, and missing source references.",
       "abi_surface_report validates that docs/generated/abi_surface.md matches the deterministic renderer output and fails on stale content, manual edits, missing constants, missing binding paths, missing layout details, missing sentinels, and manifest-driven drift.",
-      "Governance documents now define document precedence, non-negotiable invariants, code construction rules, contract authority, validation policy, generated artifact policy, compatibility boundaries, security boundary rules, and ADR requirements while keeping architecture diagrams descriptive."
+      "Governance documents now define document precedence, non-negotiable invariants, code construction rules, contract authority, validation policy, generated artifact policy, compatibility boundaries, security boundary rules, and ADR requirements while keeping architecture diagrams descriptive.",
+      "rust-toolchain.toml pins Rust 1.96.0 and scripts/verify.sh prepends the local stable Rust toolchain path before checking cargo and rustc versions."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -884,6 +906,7 @@
     "Added syscall catalog v0 as a governed summary of existing syscall contracts without adding new syscalls or runtime behavior.",
     "Added generated syscall surface report as non-authoritative Markdown derived from existing contracts without adding new syscalls or runtime behavior.",
     "Added generated ABI surface report as non-authoritative Markdown derived from the ABI manifest without changing ABI constants, ABI layouts, generated bindings, syscalls, or runtime behavior.",
-    "Added governance document authority split without changing runtime behavior, ABI contracts, syscall contracts, generated bindings, validator logic, or compatibility behavior."
+    "Added governance document authority split without changing runtime behavior, ABI contracts, syscall contracts, generated bindings, validator logic, or compatibility behavior.",
+    "Pinned Rust verification to cargo and rustc 1.96.0 without changing runtime behavior, ABI contracts, syscall contracts, generated bindings, or validator logic."
   ]
 }

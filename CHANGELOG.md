@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.0.30 - 2026-06-17
+
+**Status:** Rust toolchain version pinned.
+
+### Changed
+
+* Updated `rust-toolchain.toml` to pin Rust `1.96.0`.
+* Updated `scripts/verify.sh` to prefer the pinned local Rust toolchain path and fail if `cargo` or `rustc` do not report version `1.96.0`.
+
+### Notes
+
+* This change does not change runtime behavior.
+* This change does not change ABI contracts, syscall contracts, generated bindings, or validator logic.
+* This change only makes Rust toolchain selection explicit for verification.
+
 ## v0.0.29 - 2026-06-17
 
 **Status:** Governance document authority split.

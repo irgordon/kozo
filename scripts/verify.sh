@@ -10,6 +10,9 @@ TODO_JSON="$TASKS_DIR/todo.json"
 RUNTIME_JSON="$TASKS_DIR/runtime.json"
 LESSONS_JSON="$TASKS_DIR/lessons.json"
 VERIFY_JSON="$ARTIFACTS_DIR/latest_verify.json"
+RUST_TOOLCHAIN_BIN="${RUST_TOOLCHAIN_BIN:-$HOME/.rustup/toolchains/stable-aarch64-apple-darwin/bin}"
+PINNED_CARGO_VERSION="cargo 1.96.0"
+PINNED_RUSTC_VERSION="rustc 1.96.0"
 
 EMPTY_TREE="4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 KERNEL_BUILD_CHECK="$ARTIFACTS_DIR/kernel-build-check"
@@ -35,6 +38,23 @@ need_cmd() {
 
 need_file() {
   [[ -f "$1" ]] || fail "Required file missing: $1"
+}
+
+configure_pinned_rust_tools() {
+  if [[ -d "$RUST_TOOLCHAIN_BIN" ]]; then
+    export PATH="$RUST_TOOLCHAIN_BIN:$PATH"
+  fi
+}
+
+require_pinned_rust_versions() {
+  local cargo_version
+  local rustc_version
+
+  cargo_version="$(cargo --version)"
+  rustc_version="$(rustc --version)"
+
+  [[ "$cargo_version" == "$PINNED_CARGO_VERSION"* ]] || fail "Expected $PINNED_CARGO_VERSION, got: $cargo_version"
+  [[ "$rustc_version" == "$PINNED_RUSTC_VERSION"* ]] || fail "Expected $PINNED_RUSTC_VERSION, got: $rustc_version"
 }
 
 repo_head_ref() {
@@ -156,8 +176,11 @@ write_verify_artifact_atomically() {
 need_cmd python3
 need_cmd git
 need_cmd odin
+configure_pinned_rust_tools
 need_cmd cargo
+need_cmd rustc
 need_cmd nm
+require_pinned_rust_versions
 
 need_file "$TODO_JSON"
 need_file "$RUNTIME_JSON"
