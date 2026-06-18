@@ -824,6 +824,29 @@
         "verification.actual_behavior[35]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 32,
+      "title": "Add release checklist and required checks policy",
+      "status": "done",
+      "kind": "docs",
+      "files_expected": [
+        "CHANGELOG.md",
+        "PHASEMAP.md",
+        "ROADMAP.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/REQUIRED_CHECKS.md",
+        "docs/generated/governance_index.md",
+        "tasks/todo.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[4]",
+        "verification.tests_run[5]",
+        "verification.expected_behavior[23]",
+        "verification.actual_behavior[36]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -855,7 +878,8 @@
     "docs/generated/abi_surface.md provides a deterministic non-authoritative Markdown report generated from the ABI manifest",
     "Governance documents split authority across precedence, invariants, architecture, contracts, coding style, validation, generated artifacts, compatibility, security model, and ADR policy without changing runtime, ABI, syscall, or compatibility behavior",
     "Rust verification uses pinned cargo and rustc version 1.96.0",
-    "Release planning documents define phase sequencing, roadmap direction, and release evidence requirements without changing runtime, ABI, syscall, or compatibility behavior"
+    "Release planning documents define phase sequencing, roadmap direction, and release evidence requirements without changing runtime, ABI, syscall, or compatibility behavior",
+    "Release governance baseline execution defines release checklist and required checks policy without changing runtime, ABI, syscall, or compatibility behavior"
   ],
   "verification": {
     "tests_run": [
@@ -950,7 +974,8 @@
       "Removing ABI surface report constants, binding paths, layout fields, sentinels, or generated content causes abi_surface_report to fail",
       "Governance document updates remain bounded to documentation authority, changelog state, and task scope",
       "Verification fails if cargo or rustc do not report pinned version 1.96.0",
-      "Release planning documents preserve non-goals for Linux compatibility, POSIX completeness, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, and production readiness"
+      "Release planning documents preserve non-goals for Linux compatibility, POSIX completeness, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, and production readiness",
+      "Release checklist and required checks policy preserve non-goals for Linux compatibility, POSIX completeness, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, and production readiness"
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -988,7 +1013,8 @@
       "rust-toolchain.toml pins Rust 1.96.0 and scripts/verify.sh resolves and invokes cargo and rustc from the pinned toolchain directly.",
       "governance_index_report validates that docs/generated/governance_index.md matches the deterministic renderer output for active contracts, schemas, validators, generated reports, latest verification artifact, current version, and non-goals.",
       "harness/validators_impl/abi.py remains a documented compatibility shim for the registered abi validator while unused ABI generator helpers are pruned.",
-      "PHASEMAP.md, ROADMAP.md, and docs/RELEASE_EVIDENCE.md define release sequencing, direction, gates, evidence, and blocker categories without changing runtime behavior, ABI contracts, syscall behavior, or compatibility claims."
+      "PHASEMAP.md, ROADMAP.md, and docs/RELEASE_EVIDENCE.md define release sequencing, direction, gates, evidence, and blocker categories without changing runtime behavior, ABI contracts, syscall behavior, or compatibility claims.",
+      "docs/RELEASE_CHECKLIST.md and docs/REQUIRED_CHECKS.md define release approval and required-check policy while docs/RELEASE_EVIDENCE.md, PHASEMAP.md, and ROADMAP.md link to those policies without changing runtime behavior, ABI contracts, syscall behavior, or compatibility claims."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -1022,6 +1048,7 @@
     "Updated verification and CI to select the Rust toolchain declared by rust-toolchain.toml and invoke its cargo and rustc binaries directly instead of relying on ambient cargo or host stable dispatch.",
     "Added generated governance index as a non-authoritative report over active governance surfaces without changing runtime behavior, ABI contracts, syscall contracts, generated bindings, or compatibility behavior.",
     "Documented the ABI validator shim and pruned unused ABI generator helpers without changing generated bindings, ABI contracts, runtime behavior, or validator behavior.",
-    "Added release planning documents for KOZO v1.0.0 without changing runtime behavior, ABI contracts, syscall behavior, or compatibility claims."
+    "Added release planning documents for KOZO v1.0.0 without changing runtime behavior, ABI contracts, syscall behavior, or compatibility claims.",
+    "Added release checklist and required checks policy for v0.1.0 release governance baseline execution without changing runtime behavior, ABI contracts, syscall behavior, or compatibility claims."
   ]
 }

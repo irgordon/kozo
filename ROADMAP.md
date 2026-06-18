@@ -86,7 +86,7 @@ The roadmap does not add or imply:
 
 | Target | Theme | Goals | Non-Goals |
 | --- | --- | --- | --- |
-| `v0.1.0` | Release governance baseline | Define v1.0.0 scope, release evidence policy, required CI checks, release checklist, and generated report review inputs. | Runtime behavior changes, ABI changes, syscall changes, compatibility claims. |
+| `v0.1.0` | Release governance baseline | Define v1.0.0 scope, release evidence policy, `docs/RELEASE_CHECKLIST.md`, `docs/REQUIRED_CHECKS.md`, and generated report review inputs. | Runtime behavior changes, ABI changes, syscall changes, compatibility claims. |
 | `v0.2.0` | Runtime execution evidence | Add boot/runtime smoke evidence and governed runtime logs where technically feasible. | Broad userspace, Linux compatibility, process model. |
 | `v0.3.0` | Security boundary foundation | Back pointer/null and authority-boundary rules with implementation evidence and negative tests. | Full formal verification, complete capability system. |
 | `v0.4.0` | ABI and syscall maturity | Define ABI versioning, syscall expansion process, generated binding compatibility expectations, and regression evidence. | New syscall expansion without governed process. |
@@ -107,6 +107,7 @@ Required gates:
 * `artifacts/latest_verify.json` is valid and passing.
 * Branch protection checks are green.
 * Release checklist is complete.
+* Required checks policy is satisfied.
 * Release evidence bundle is present.
 * Compatibility claims are scoped and accurate.
 

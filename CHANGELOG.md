@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.0.35 - 2026-06-18
+
+**Status:** Release governance baseline execution.
+
+### Added
+
+* Added `docs/RELEASE_CHECKLIST.md` as the release approval checklist for repository state, verification gates, generated reports, contracts, CI, compatibility, security/governance review, evidence bundle completeness, and release decisions.
+* Added `docs/REQUIRED_CHECKS.md` as the required CI/check policy for pull requests and releases.
+
+### Changed
+
+* Refined `docs/RELEASE_EVIDENCE.md` to link release evidence requirements to the checklist and required checks policy.
+* Updated `PHASEMAP.md` and `ROADMAP.md` so the v0.1.0 release governance baseline has concrete checklist and required-check deliverables.
+
+### Notes
+
+* This change does not change runtime behavior.
+* This change does not change ABI contracts.
+* This change does not change syscall behavior.
+* This change does not add Linux compatibility, POSIX completeness, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+
 ## v0.0.34 - 2026-06-18
 
 **Status:** Release planning baseline.

@@ -1,0 +1,127 @@
+# KOZO Required Checks
+
+Version: 1
+Status: Authoritative
+Scope: Required local and CI checks for KOZO pull requests and releases
+
+---
+
+# 1. Purpose
+
+This document defines the checks required before KOZO changes may merge or release.
+
+It maps local verification commands to GitHub Actions checks and release evidence outputs.
+
+---
+
+# 2. Authority
+
+`docs/REQUIRED_CHECKS.md` owns required CI/check policy.
+
+It is subordinate to:
+
+* `docs/GOVERNANCE.md`
+* `docs/INVARIANTS.md`
+* `docs/COMPATIBILITY.md`
+* `docs/VALIDATION.md`
+* checked-in contracts
+* schemas
+* validators
+
+It does not define runtime behavior, ABI truth, syscall truth, compatibility claims, or validator internals.
+
+---
+
+# 3. Non-Goals
+
+This document does not claim production readiness.
+
+This document does not claim Linux compatibility.
+
+This document does not claim POSIX completeness.
+
+This document does not claim general userspace execution.
+
+This document does not claim process model, VFS, scheduler, ELF loading, or file descriptor behavior.
+
+This document does not replace `scripts/verify.sh` as the full verification entry point.
+
+---
+
+# 4. Required Checks Table
+
+| Check Name | Command or Workflow | Owner Document | Required for PR | Required for Release | Evidence Output |
+| --- | --- | --- | --- | --- | --- |
+| Full verification | `scripts/verify.sh` | `docs/VALIDATION.md` | Yes | Yes | `artifacts/latest_verify.json`, `artifacts/logs/*.log` |
+| Unit discovery | `python3 -m unittest discover -s tests` | `docs/VALIDATION.md` | Yes | Yes | test output |
+| Odin check | `odin check kernel` | `docs/VALIDATION.md` | Yes | Yes | CI output, `artifacts/logs/odin-check.log` through full verification |
+| Pinned Rust cargo check | pinned cargo check for `userspace/core_service` | `docs/VALIDATION.md` | Yes | Yes | CI output, `artifacts/logs/cargo-check.log` through full verification |
+| JSON validation | `python3 -m json.tool` for task/proof artifacts | `docs/VALIDATION.md` | Yes | Yes | CI output |
+| Whitespace check | `git diff --check` | `docs/CODING_STYLE.md` | Yes | Yes | CI output |
+| CI workflow | GitHub Actions `ci / full verification` | `docs/REQUIRED_CHECKS.md` | Yes | Yes | GitHub Actions status |
+| Lint workflow | GitHub Actions `lint / static checks` | `docs/REQUIRED_CHECKS.md` | Yes | Yes | GitHub Actions status |
+
+---
+
+# 5. Branch Protection Recommendation
+
+For `main`, branch protection should require:
+
+* `ci / full verification`
+* `lint / static checks`
+* pull request review before merge
+* branch up to date before merge when available
+* prevention of force push when available
+
+Bypass should not be allowed except for maintainers under a documented emergency process.
+
+An emergency bypass must not create unsupported compatibility, runtime, security, or production-readiness claims.
+
+---
+
+# 6. Local Verification Command Set
+
+Before release review, run:
+
+```bash
+python3 -m unittest discover -s tests
+python3 -m json.tool tasks/todo.json
+scripts/verify.sh
+python3 -m json.tool artifacts/latest_verify.json
+python3 -m json.tool tasks/todo.json
+git diff --check
+```
+
+When Rust behavior or Rust tooling is in scope, also run the pinned Rust cargo check used by CI.
+
+When Odin behavior is in scope, also run `odin check kernel` before full verification.
+
+---
+
+# 7. CI Workflow Mapping
+
+| Workflow | Job | Required Surface |
+| --- | --- | --- |
+| `.github/workflows/ci.yml` | `full verification` | system tools, pinned Rust toolchain, bare-metal target, Odin, JSON validation, unit tests, Rust check, Odin check, full verification, proof artifact validation, transient artifact cleanup, whitespace check |
+| `.github/workflows/lint.yml` | `static checks` | system tools, pinned Rust toolchain, bare-metal target, Odin, shell syntax, JSON syntax, unit tests, Rust check, Odin check, whitespace check |
+
+The CI workflows must keep installing `nasm`, pinned Rust, `x86_64-unknown-none`, and Odin before running checks that depend on them.
+
+---
+
+# 8. Failure Handling
+
+If a required check fails:
+
+* stop release preparation
+* classify the failure using `docs/RELEASE_CHECKLIST.md`
+* inspect the failing evidence
+* fix the source, generated artifact, task state, workflow, or documentation that owns the failure
+* rerun focused checks before rerunning full verification
+* refresh generated proof state only after source checks pass
+
+Do not ignore a failing required check because generated reports look current.
+
+Do not treat generated reports as source truth.
+
+Do not downgrade required checks without a governance update.

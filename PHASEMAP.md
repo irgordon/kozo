@@ -91,7 +91,7 @@ Detailed evidence rules are owned by `docs/RELEASE_EVIDENCE.md`.
 
 | Phase | Name | Purpose | Required Deliverables | Exit Criteria |
 | --- | --- | --- | --- | --- |
-| `v0.1.0` | Release governance baseline | Define v1.0.0 scope, release evidence requirements, required CI checks, release checklist, README claim cleanup, and generated report review inputs. | `PHASEMAP.md`, `ROADMAP.md`, `docs/RELEASE_EVIDENCE.md`, release checklist section, required CI check policy, README claim cleanup if needed. | Planning documents merged, non-goals preserved, verification passes, generated governance surfaces refreshed as needed. |
+| `v0.1.0` | Release governance baseline | Define v1.0.0 scope, release evidence requirements, required CI checks, release checklist, README claim cleanup, and generated report review inputs. | `PHASEMAP.md`, `ROADMAP.md`, `docs/RELEASE_EVIDENCE.md`, `docs/RELEASE_CHECKLIST.md`, `docs/REQUIRED_CHECKS.md`, README claim cleanup if needed. | Release checklist and required checks policy are merged, non-goals are preserved, verification passes, generated governance surfaces are refreshed as needed. |
 | `v0.2.0` | Runtime execution evidence | Add runtime execution evidence beyond source-shape proof. | Boot/runtime smoke command, runtime evidence artifact, validator for runtime evidence, release evidence logs. | Runtime smoke evidence is reproducible, governed, and included in release evidence. |
 | `v0.3.0` | Security boundary foundation | Convert security model from policy-only to minimal implementation-backed checks. | Pointer/null boundary enforcement evidence, capability/handle placeholder policy or initial implementation, fault containment expectations, negative tests for unsafe boundary cases. | Security boundary claims are backed by implementation evidence and negative tests. |
 | `v0.4.0` | ABI and syscall maturity | Stabilize current ABI/syscall governance and define expansion rules. | ABI version policy, syscall expansion checklist, generated binding compatibility expectations, regression evidence for all governed syscalls. | Current syscall surface is frozen unless changed through governed process. |
@@ -123,6 +123,8 @@ It must not claim:
 Before release:
 
 * Confirm phase exit criteria are satisfied.
+* Complete `docs/RELEASE_CHECKLIST.md`.
+* Confirm `docs/REQUIRED_CHECKS.md` required checks pass.
 * Confirm release gates pass.
 * Confirm generated reports are current.
 * Confirm release evidence bundle is present.

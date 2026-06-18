@@ -22,6 +22,10 @@ It is subordinate to `docs/GOVERNANCE.md`, `docs/INVARIANTS.md`, `docs/ARCHITECT
 
 It does not define runtime behavior, ABI truth, syscall truth, compatibility claims, or validator implementation mechanics.
 
+`docs/RELEASE_CHECKLIST.md` owns release approval checklist requirements.
+
+`docs/REQUIRED_CHECKS.md` owns required CI/check policy.
+
 ---
 
 # 3. Non-Goals
@@ -48,6 +52,8 @@ Every release review must include:
 * `CHANGELOG.md`
 * `PHASEMAP.md`
 * `ROADMAP.md`
+* `docs/RELEASE_CHECKLIST.md`
+* `docs/REQUIRED_CHECKS.md`
 * release notes
 * known non-goals list
 * checked-in contracts
@@ -86,17 +92,14 @@ Future runtime smoke phases must add their runtime logs to this list before usin
 
 Release review must record CI run URLs or statuses when available.
 
-Required checks:
+Required check policy is owned by `docs/REQUIRED_CHECKS.md`.
 
-* full verification
-* Python unit discovery
-* Odin check/build
-* pinned Rust cargo check
-* JSON validation
-* generated report drift checks
-* whitespace check
+The minimum release evidence must record:
 
-Branch protection should require the CI checks that implement these gates.
+* full verification status
+* lint/static-check status
+* required target/toolchain setup
+* CI run URL or status when available
 
 ---
 
@@ -118,19 +121,19 @@ Release notes must not introduce compatibility or production-readiness claims th
 
 # 9. Release Checklist
 
-Before release review:
+Release checklist authority is owned by `docs/RELEASE_CHECKLIST.md`.
 
-* Run `scripts/verify.sh`.
-* Run Python unit discovery.
-* Validate `artifacts/latest_verify.json`.
-* Validate `tasks/todo.json`.
-* Confirm generated reports are current.
-* Confirm required CI checks are green.
-* Confirm release evidence bundle is present.
-* Confirm changelog and release notes are current.
-* Confirm compatibility claims are scoped.
-* Confirm non-goals are listed.
-* Confirm generated artifacts were not manually edited.
+Before release review, the checklist must confirm:
+
+* repository state
+* verification gates
+* generated report gates
+* contract gates
+* CI gates
+* compatibility gates
+* security and governance gates
+* release evidence bundle completeness
+* release decision
 
 ---
 
@@ -140,6 +143,7 @@ A release evidence bundle should contain or reference:
 
 ```text
 release-evidence/
+  README.md
   latest_verify.json
   logs/
     odin-check.log
@@ -156,11 +160,15 @@ release-evidence/
   release_notes.md
   phase_map.md
   roadmap.md
+  release_checklist.md
+  required_checks.md
   ci_status.md
   non_goals.md
 ```
 
-The exact packaging mechanism may be defined by a later release phase.
+This is the minimum directory or archive shape for release review.
+
+The exact packaging command may be defined by a later release phase.
 
 ---
 
