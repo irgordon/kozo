@@ -757,6 +757,32 @@
         "verification.tests_run[5]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 29,
+      "title": "Add generated governance index report",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "docs/generated/governance_index.md",
+        "harness/codes.py",
+        "harness/governance_index_report.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/governance_index_report.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/agent_context.schema.json",
+        "schemas/latest_verify.schema.json",
+        "tasks/todo.json",
+        "tests/test_governance_index_report.py"
+      ],
+      "verification_refs": [
+        "verification.tests_run[1]",
+        "verification.tests_run[4]",
+        "verification.tests_run[5]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -916,7 +942,8 @@
       "syscall_surface_report validates that docs/generated/syscall_surface.md matches the deterministic renderer output and fails on stale content, manual edits, missing syscall sections, missing class summaries, and missing source references.",
       "abi_surface_report validates that docs/generated/abi_surface.md matches the deterministic renderer output and fails on stale content, manual edits, missing constants, missing binding paths, missing layout details, missing sentinels, and manifest-driven drift.",
       "Governance documents now define document precedence, non-negotiable invariants, code construction rules, contract authority, validation policy, generated artifact policy, compatibility boundaries, security boundary rules, and ADR requirements while keeping architecture diagrams descriptive.",
-      "rust-toolchain.toml pins Rust 1.96.0 and scripts/verify.sh resolves and invokes cargo and rustc from the pinned toolchain directly."
+      "rust-toolchain.toml pins Rust 1.96.0 and scripts/verify.sh resolves and invokes cargo and rustc from the pinned toolchain directly.",
+      "governance_index_report validates that docs/generated/governance_index.md matches the deterministic renderer output for active contracts, schemas, validators, generated reports, latest verification artifact, current version, and non-goals."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -947,6 +974,7 @@
     "Added generated ABI surface report as non-authoritative Markdown derived from the ABI manifest without changing ABI constants, ABI layouts, generated bindings, syscalls, or runtime behavior.",
     "Added governance document authority split without changing runtime behavior, ABI contracts, syscall contracts, generated bindings, validator logic, or compatibility behavior.",
     "Pinned Rust verification to cargo and rustc 1.96.0 without changing runtime behavior, ABI contracts, syscall contracts, generated bindings, or validator logic.",
-    "Updated verification and CI to select the Rust toolchain declared by rust-toolchain.toml and invoke its cargo and rustc binaries directly instead of relying on ambient cargo or host stable dispatch."
+    "Updated verification and CI to select the Rust toolchain declared by rust-toolchain.toml and invoke its cargo and rustc binaries directly instead of relying on ambient cargo or host stable dispatch.",
+    "Added generated governance index as a non-authoritative report over active governance surfaces without changing runtime behavior, ABI contracts, syscall contracts, generated bindings, or compatibility behavior."
   ]
 }

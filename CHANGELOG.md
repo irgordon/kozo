@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.0.32 - 2026-06-18
+
+**Status:** Generated governance index.
+
+### Added
+
+* Added generated governance index for active contracts, schemas, validators, generated reports, latest verification artifact, current version, and current non-goals.
+* Added deterministic governance index renderer and `governance_index_report` validator.
+* Added focused negative coverage for stale indexes, manual edits, missing validators, missing contracts, missing schemas, missing report references, missing proof artifact references, missing non-goals, and diagnostic quality.
+
+### Notes
+
+* The governance index is generated and non-authoritative.
+* The source of truth remains the checked-in contracts, schemas, validators, generated proof artifact, and changelog.
+* This change does not add new syscalls, Linux compatibility, userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, ABI changes, runtime behavior changes, or production readiness claims.
+
 ## v0.0.31 - 2026-06-18
 
 **Status:** Rust verification selects the pinned toolchain deterministically.

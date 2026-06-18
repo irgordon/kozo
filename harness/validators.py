@@ -23,6 +23,7 @@ from harness.validators_impl.syscall_class_contract import SyscallClassContractV
 from harness.validators_impl.syscall_table_conformance import SyscallTableConformanceValidator
 from harness.validators_impl.syscall_catalog import SyscallCatalogValidator
 from harness.validators_impl.syscall_surface_report import SyscallSurfaceReportValidator
+from harness.validators_impl.governance_index_report import GovernanceIndexReportValidator
 from harness.validators_impl.protocol_validator import ProtocolContractValidator
 from harness.validators_impl.layout_parity import LayoutParityValidator
 from harness.validators_impl.entrypoint_validator import ExecutionFoundationValidator
@@ -53,6 +54,7 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "syscall_table_conformance": SyscallTableConformanceValidator,
     "syscall_catalog": SyscallCatalogValidator,
     "syscall_surface_report": SyscallSurfaceReportValidator,
+    "governance_index_report": GovernanceIndexReportValidator,
     "protocol_contract_alignment": ProtocolContractValidator,
     "layout_parity": LayoutParityValidator,
     "execution_foundation": ExecutionFoundationValidator,
