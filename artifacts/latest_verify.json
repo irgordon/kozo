@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260618T025935Z",
+  "run_id": "verify-20260618T030349Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -233,5 +233,5 @@
     "artifacts/logs/cargo-check.log",
     "artifacts/logs/nm-kernel.log"
   ],
-  "generated_at": "2026-06-18T02:59:35Z"
+  "generated_at": "2026-06-18T03:03:49Z"
 }
