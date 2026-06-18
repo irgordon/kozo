@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260618T023813Z",
+  "run_id": "verify-20260618T024948Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -63,14 +63,14 @@
       "subsystem": "rust",
       "status": "pass",
       "code": "OK",
-      "detail": "Rust changes are backed by declared cargo check evidence"
+      "detail": "No Rust changes require validation in this bootstrap loop"
     },
     {
       "name": "odin",
       "subsystem": "odin",
       "status": "pass",
       "code": "OK",
-      "detail": "Odin changes are backed by declared odin check evidence"
+      "detail": "No Odin kernel changes require validation in this bootstrap loop"
     },
     {
       "name": "abi",
@@ -220,9 +220,10 @@
   ],
   "failed_checks": [],
   "changed_files": [
-    "bindings/odin/kozo_abi.odin",
-    "bindings/rust/kozo_abi.rs",
-    "scripts/gen_abi.py",
+    ".github/workflows/ci.yml",
+    ".github/workflows/lint.yml",
+    "CHANGELOG.md",
+    "scripts/verify.sh",
     "tasks/todo.json"
   ],
   "evidence_files": [
@@ -231,5 +232,5 @@
     "artifacts/logs/cargo-check.log",
     "artifacts/logs/nm-kernel.log"
   ],
-  "generated_at": "2026-06-18T02:38:13Z"
+  "generated_at": "2026-06-18T02:49:48Z"
 }
