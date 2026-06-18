@@ -30,6 +30,12 @@ SCALAR_LAYOUT = {
     "uint64_t": (8, 8),
     "uint32_t": (4, 4),
 }
+GENERATED_HEADER_LINES = (
+    "GENERATED FILE. DO NOT EDIT MANUALLY.",
+    "Source of truth: contracts/kozo_abi.h",
+    "Generator: scripts/gen_abi.py",
+    "Validation: abi_manifest, layout_parity, protocol_contract_alignment",
+)
 
 
 @dataclass(frozen=True)
@@ -166,6 +172,10 @@ def get_struct(spec: AbiSpec, name: str) -> StructSpec:
     raise ValueError(f"unknown ABI struct: {name}")
 
 
+def _generated_header(comment_prefix: str) -> list[str]:
+    return [f"{comment_prefix} {line}" for line in GENERATED_HEADER_LINES] + [""]
+
+
 def _odin_type_name(c_name: str) -> str:
     mapping = {
         "kozo_handle_t": "K_HANDLE",
@@ -187,7 +197,7 @@ def _odin_scalar_type(c_name: str) -> str:
 
 
 def generate_odin_bindings(spec: AbiSpec) -> str:
-    lines = [
+    lines = _generated_header("//") + [
         "package kozo_abi",
         "",
         f"KOZO_ABI_VERSION :: {spec.version}",
@@ -238,7 +248,7 @@ def _rust_struct_name(c_name: str) -> str:
 
 
 def generate_rust_bindings(spec: AbiSpec) -> str:
-    lines = [
+    lines = _generated_header("//") + [
         "#[allow(non_camel_case_types, dead_code)]",
         f"pub const KOZO_ABI_VERSION: u32 = {spec.version};",
         "",

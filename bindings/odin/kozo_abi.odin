@@ -1,3 +1,8 @@
+// GENERATED FILE. DO NOT EDIT MANUALLY.
+// Source of truth: contracts/kozo_abi.h
+// Generator: scripts/gen_abi.py
+// Validation: abi_manifest, layout_parity, protocol_contract_alignment
+
 package kozo_abi
 
 KOZO_ABI_VERSION :: 1

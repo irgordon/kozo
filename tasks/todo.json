@@ -23,6 +23,7 @@
     "README.md",
     "tasks/",
     "artifacts/",
+    "bindings/",
     "agent/",
     "docs/",
     "contracts/",
@@ -711,6 +712,24 @@
         "tasks/todo.json",
         "rust-toolchain.toml",
         "scripts/verify.sh"
+      ],
+      "verification_refs": [
+        "verification.tests_run[1]",
+        "verification.tests_run[4]",
+        "verification.tests_run[5]"
+      ],
+      "failure_count": 0
+    },
+    {
+      "id": 27,
+      "title": "Add generated ABI binding self-identification headers",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "tasks/todo.json",
+        "bindings/odin/kozo_abi.odin",
+        "bindings/rust/kozo_abi.rs",
+        "scripts/gen_abi.py"
       ],
       "verification_refs": [
         "verification.tests_run[1]",
