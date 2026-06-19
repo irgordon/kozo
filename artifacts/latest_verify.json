@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260618T193348Z",
+  "run_id": "verify-20260619T002021Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -235,9 +235,8 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
-    "docs/DOCUMENTATION_STANDARD.md",
-    "docs/GOVERNANCE.md",
-    "docs/generated/governance_index.md",
+    "docs/CODING_STYLE.md",
+    "docs/GENERATED_ARTIFACTS.md",
     "tasks/todo.json"
   ],
   "evidence_files": [
@@ -248,5 +247,5 @@
     "artifacts/runtime/runtime_smoke.log",
     "artifacts/runtime/runtime_smoke.metadata.json"
   ],
-  "generated_at": "2026-06-18T19:33:48Z"
+  "generated_at": "2026-06-19T00:20:21Z"
 }
