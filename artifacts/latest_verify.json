@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260619T032016Z",
+  "run_id": "verify-20260619T033721Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 35,
+    "total_checks": 36,
     "failed_check_count": 0
   },
   "checks": [
@@ -227,6 +227,13 @@
       "detail": "Boot image packaging metadata records the current Limine ISO tooling blocker without claiming boot success"
     },
     {
+      "name": "boot_tooling",
+      "subsystem": "boot_tooling",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Boot tooling policy documents Limine and xorriso acquisition without claiming ISO generation"
+    },
+    {
       "name": "return_path_proof",
       "subsystem": "return_path_proof",
       "status": "pass",
@@ -281,5 +288,5 @@
     "artifacts/runtime/boot_blocker_report.json",
     "artifacts/runtime/boot_image/package_metadata.json"
   ],
-  "generated_at": "2026-06-19T03:20:16Z"
+  "generated_at": "2026-06-19T03:37:21Z"
 }

@@ -12,18 +12,18 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.3.4`
+* Version: `v0.3.5`
 * Date: `2026-06-19`
-* Status: Bootable ISO packaging blocked by missing Limine ISO tooling.
+* Status: Limine ISO tooling acquisition.
 
 ## Verification status
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 35
+* Total checks: 36
 * Failed checks: 0
-* Run ID: `verify-20260619T032016Z`
-* Generated at: `2026-06-19T03:20:16Z`
+* Run ID: `verify-20260619T033721Z`
+* Generated at: `2026-06-19T03:37:21Z`
 
 ## Registered validators
 
@@ -60,10 +60,11 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 29 | `boot_protocol_decision` |
 | 30 | `boot_image_skeleton` |
 | 31 | `boot_image_packaging` |
-| 32 | `return_path_proof` |
-| 33 | `execution_proof` |
-| 34 | `validator_coverage` |
-| 35 | `evidence` |
+| 32 | `boot_tooling` |
+| 33 | `return_path_proof` |
+| 34 | `execution_proof` |
+| 35 | `validator_coverage` |
+| 36 | `evidence` |
 
 ## Active contracts
 
@@ -101,7 +102,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 35
+* Check count: 36
 * Failure count: 0
 
 ## Non-goals
