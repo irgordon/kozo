@@ -54,11 +54,11 @@ class BootBlockerReportValidatorTests(unittest.TestCase):
     def test_fails_when_missing_component_is_absent(self):
         self.assertEqual("boot_blocker_report", BootBlockerReportValidator.name)
         result = self.validate_fixture(
-            mutate_report_json=lambda report: remove_list_value(report, "missing_components", "bootable Limine ISO or disk image")
+            mutate_report_json=lambda report: remove_list_value(report, "missing_components", "Limine ISO packaging command")
         )
 
         self.assertEqual(result.status, "fail")
-        self.assert_boot_failure(result, "missing_component", "boot_blocker.missing_components.bootable Limine ISO or disk image")
+        self.assert_boot_failure(result, "missing_component", "boot_blocker.missing_components.Limine ISO packaging command")
 
     def test_fails_when_current_surface_is_absent(self):
         self.assertEqual("boot_blocker_report", BootBlockerReportValidator.name)
@@ -89,14 +89,14 @@ class BootBlockerReportValidatorTests(unittest.TestCase):
     def test_fails_when_documentation_reference_is_absent(self):
         self.assertEqual("boot_blocker_report", BootBlockerReportValidator.name)
         result = self.validate_fixture(
-            mutate_boot_doc=lambda text: text.replace("missing_bootable_iso_packaging", "missing")
+            mutate_boot_doc=lambda text: text.replace("missing_limine_iso_tooling", "missing")
         )
 
         self.assertEqual(result.status, "fail")
         self.assert_boot_failure(
             result,
             "missing_documentation_reference",
-            "docs/BOOT.md.missing_bootable_iso_packaging",
+            "docs/BOOT.md.missing_limine_iso_tooling",
         )
 
     def test_failure_diagnostic_names_boot_blocker_field(self):
@@ -170,16 +170,17 @@ def write_fixture_files(root: Path) -> None:
 def valid_report() -> dict[str, object]:
     return {
         "version": 0,
-        "phase": "v0.3.3",
+        "phase": "v0.3.4",
         "outcome": "blocked",
         "evidence_type": "boot-blocker-report",
         "generated_by": "scripts/boot_blocker_report.sh",
         "validator": "boot_blocker_report",
-        "blocker_category": "missing_bootable_iso_packaging",
+        "blocker_category": "missing_limine_iso_tooling",
         "missing_components": [
-            "bootable Limine ISO or disk image",
-            "Limine bootloader artifacts for image installation",
-            "ISO tooling such as xorriso or an equivalent image builder",
+            "Limine ISO packaging command",
+            "Limine bootloader installation artifacts",
+            "xorriso-compatible ISO builder",
+            "bootable ISO artifact",
             "validated QEMU serial smoke execution",
         ],
         "current_surfaces": [
@@ -189,7 +190,8 @@ def valid_report() -> dict[str, object]:
             "linker/kernel.ld defines the kernel ELF layout",
             "boot/limine.conf defines the Limine boot entry",
             "scripts/build_boot_image.sh stages the boot image skeleton",
-            "scripts/qemu_smoke.sh fails closed when no bootable ISO is present",
+            "scripts/build_boot_image.sh writes package metadata for the blocked ISO packaging attempt",
+            "scripts/qemu_smoke.sh fails closed when package metadata reports missing Limine ISO tooling",
             "scripts/runtime_smoke.sh proves runtime-adjacent object and symbol evidence",
         ],
         "cannot_claim": [
@@ -205,7 +207,7 @@ def valid_report() -> dict[str, object]:
             "file descriptor behavior",
             "production readiness",
         ],
-        "next_required_fix": "Add bootable Limine ISO or disk packaging, then run scripts/qemu_smoke.sh to capture serial output and validate an expected kernel marker before claiming QEMU boot evidence.",
+        "next_required_fix": "Add Limine ISO tooling and bootloader installation artifacts so scripts/build_boot_image.sh can produce artifacts/runtime/boot_image/kozo.iso, then run scripts/qemu_smoke.sh to capture serial output before claiming QEMU boot evidence.",
         "inspected_paths": [
             "kernel/arch/x86_64/boot.asm",
             "kernel/main.odin",
@@ -213,6 +215,7 @@ def valid_report() -> dict[str, object]:
             "linker/kernel.ld",
             "boot/limine.conf",
             "scripts/build_boot_image.sh",
+            "artifacts/runtime/boot_image/package_metadata.json",
             "scripts/qemu_smoke.sh",
             "scripts/runtime_smoke.sh",
             "docs/RUNTIME_EVIDENCE.md",
@@ -224,10 +227,12 @@ def valid_doc_text() -> str:
     return "\n".join(
         (
             "artifacts/runtime/boot_blocker_report.json",
+            "artifacts/runtime/boot_image/package_metadata.json",
+            "artifacts/runtime/boot_image/kozo.iso",
             "scripts/boot_blocker_report.sh",
             "scripts/qemu_smoke.sh",
             "boot_blocker_report",
-            "missing_bootable_iso_packaging",
+            "missing_limine_iso_tooling",
         )
     )
 

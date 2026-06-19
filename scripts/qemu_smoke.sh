@@ -5,6 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RUNTIME_DIR="$ROOT/artifacts/runtime"
 BOOT_IMAGE_DIR="$RUNTIME_DIR/boot_image"
 BOOT_ISO="$BOOT_IMAGE_DIR/kozo.iso"
+PACKAGE_METADATA="$BOOT_IMAGE_DIR/package_metadata.json"
 QEMU_LOG="$RUNTIME_DIR/qemu_smoke.log"
 EXPECTED_MARKER="KOZO_KERNEL_ENTRY"
 
@@ -38,7 +39,10 @@ build_boot_skeleton() {
 
 require_bootable_image() {
   if [[ ! -f "$BOOT_ISO" ]]; then
-    fail "missing_bootable_iso_packaging: scripts/build_boot_image.sh stages image-root and kernel ELF but does not create artifacts/runtime/boot_image/kozo.iso"
+    if [[ -f "$PACKAGE_METADATA" ]]; then
+      fail "missing_limine_iso_tooling: scripts/build_boot_image.sh did not produce artifacts/runtime/boot_image/kozo.iso; inspect artifacts/runtime/boot_image/package_metadata.json"
+    fi
+    fail "missing_limine_iso_tooling: boot image package metadata is missing and artifacts/runtime/boot_image/kozo.iso does not exist"
   fi
 }
 

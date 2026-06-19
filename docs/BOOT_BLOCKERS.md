@@ -18,23 +18,25 @@ Selected protocol: Limine.
 
 Boot image skeleton: complete.
 
-QEMU smoke command: present and fail-closed on missing bootable image packaging.
+Boot image package metadata: present.
+
+QEMU smoke command: present and fail-closed on missing Limine ISO tooling.
 
 ---
 
 # 2. Verified Blocker
 
-Blocker category: `missing_bootable_iso_packaging`.
+Blocker category: `missing_limine_iso_tooling`.
 
 The previous `missing_boot_protocol_and_image_packaging` blocker is reduced.
 
-The previous `missing_qemu_execution_evidence` blocker is refined.
+The previous `missing_bootable_iso_packaging` blocker is refined.
 
-The remaining blocker is `missing_bootable_iso_packaging`.
+The remaining blocker is `missing_limine_iso_tooling`.
 
 The current `_start` symbol is present in object evidence, Limine has been selected as the initial boot protocol, and the boot image skeleton exists.
 
-The blocker remains active because the repository does not yet produce a bootable Limine ISO or disk image for QEMU.
+The blocker remains active because the repository does not yet have Limine ISO tooling, Limine bootloader installation artifacts, or an `xorriso`-compatible ISO builder that can produce `artifacts/runtime/boot_image/kozo.iso`.
 
 Therefore the repository cannot honestly claim QEMU boot execution.
 
@@ -44,9 +46,10 @@ Therefore the repository cannot honestly claim QEMU boot execution.
 
 The current boot blocker report must name these missing components:
 
-* bootable Limine ISO or disk image
-* Limine bootloader artifacts for image installation
-* ISO tooling such as `xorriso` or an equivalent image builder
+* Limine ISO packaging command
+* Limine bootloader installation artifacts
+* `xorriso`-compatible ISO builder
+* bootable ISO artifact
 * validated QEMU serial smoke execution
 
 ---
@@ -71,6 +74,18 @@ The QEMU blocker review command is:
 scripts/qemu_smoke.sh
 ```
 
+The packaging metadata is:
+
+```text
+artifacts/runtime/boot_image/package_metadata.json
+```
+
+The expected ISO path is:
+
+```text
+artifacts/runtime/boot_image/kozo.iso
+```
+
 The validator is:
 
 ```text
@@ -84,7 +99,7 @@ boot_blocker_report
 Resolve this blocker by adding:
 
 * bootable Limine ISO or disk packaging
-* Limine bootloader artifact installation
+* Limine bootloader installation artifacts
 * deterministic image tooling such as `xorriso` or an equivalent image builder
 * serial marker validation for the booted kernel path
 * a QEMU smoke evidence validator

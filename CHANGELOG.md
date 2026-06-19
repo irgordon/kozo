@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.3.4 - 2026-06-19
+
+**Status:** Bootable ISO packaging blocked by missing Limine ISO tooling.
+
+### Added
+
+* Added boot image package metadata at `artifacts/runtime/boot_image/package_metadata.json`.
+* Added `boot_image_packaging` validation for package metadata, blocker alignment, documentation references, non-goals, and diagnostic quality.
+* Updated full verification to regenerate boot image packaging metadata through `scripts/build_boot_image.sh`.
+
+### Changed
+
+* Narrowed the active blocker from `missing_bootable_iso_packaging` to `missing_limine_iso_tooling`.
+* Updated boot, runtime evidence, release evidence, phase map, and roadmap docs to record that ISO packaging prerequisites are now checked, but no bootable ISO is produced yet.
+
+### Notes
+
+* This change does not add a bootable ISO.
+* This change does not add QEMU boot evidence.
+* This change does not add serial success evidence.
+* This change does not add hardware syscall/trap execution evidence.
+* This change does not add Linux compatibility, POSIX compatibility, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+* This change does not change ABI contracts or syscall behavior.
+
 ## v0.3.3 - 2026-06-19
 
 **Status:** QEMU serial smoke blocked by missing bootable image packaging.

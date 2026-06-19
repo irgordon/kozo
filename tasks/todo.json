@@ -1083,7 +1083,10 @@
         "docs/BOOT_IMAGE.md",
         "docs/RUNTIME_EVIDENCE.md",
         "docs/RELEASE_EVIDENCE.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/REQUIRED_CHECKS.md",
         "docs/generated/governance_index.md",
+        "scripts/verify.sh",
         "scripts/qemu_smoke.sh",
         "harness/codes.py",
         "harness/registry.py",
@@ -1091,12 +1094,14 @@
         "harness/validators_impl/boot_blocker_report.py",
         "harness/validators_impl/boot_protocol_decision.py",
         "harness/validators_impl/boot_image_skeleton.py",
+        "harness/validators_impl/boot_image_packaging.py",
         "harness/validators_impl/validator_coverage.py",
         "schemas/latest_verify.schema.json",
         "schemas/agent_context.schema.json",
         "tests/test_boot_blocker_report.py",
         "tests/test_boot_protocol_decision.py",
         "tests/test_boot_image_skeleton.py",
+        "tests/test_boot_image_packaging.py",
         "artifacts/runtime/boot_blocker_report.json",
         "artifacts/latest_verify.json"
       ],
@@ -1147,7 +1152,8 @@
     "Bootable runtime baseline records a verified v0.3.0 blocker report naming missing boot protocol, linker script, loader configuration, and boot image packaging instead of claiming QEMU boot evidence",
     "Boot protocol selection records Limine as the initial x86_64 boot protocol and keeps missing_boot_protocol_and_image_packaging active until linker script, loader configuration, image packaging, and QEMU smoke execution exist",
     "Boot image skeleton adds linker script, Limine config, boot image staging, a kernel ELF build path, and validation while reducing the active blocker to missing_qemu_execution_evidence without claiming QEMU boot",
-    "QEMU serial smoke attempt adds a fail-closed QEMU command and refines the active blocker to missing_bootable_iso_packaging without claiming QEMU boot or serial evidence"
+    "QEMU serial smoke attempt adds a fail-closed QEMU command and refines the active blocker to missing_bootable_iso_packaging without claiming QEMU boot or serial evidence",
+    "Bootable ISO packaging attempt generates deterministic package metadata and narrows the active blocker to missing_limine_iso_tooling without claiming a bootable ISO, QEMU boot, or serial evidence"
   ],
   "verification": {
     "tests_run": [
@@ -1303,7 +1309,8 @@
       "v0.3.0 boot feasibility is blocked by missing_boot_protocol_and_image_packaging; scripts/boot_blocker_report.sh generates artifacts/runtime/boot_blocker_report.json and boot_blocker_report validates the report and documentation references.",
       "v0.3.1 selects Limine as the initial x86_64 boot protocol for a future QEMU serial smoke path while preserving the active boot blocker and avoiding QEMU boot, hardware trap, compatibility, userspace, subsystem, or production-readiness claims.",
       "v0.3.2 stages a Limine boot image skeleton and kernel ELF build path under artifacts/runtime/boot_image while boot remains blocked on missing QEMU smoke execution and serial evidence capture.",
-      "v0.3.3 adds scripts/qemu_smoke.sh and records the narrower missing_bootable_iso_packaging blocker because the repository stages an image root and kernel ELF but does not yet produce a bootable Limine ISO or disk image."
+      "v0.3.3 adds scripts/qemu_smoke.sh and records the narrower missing_bootable_iso_packaging blocker because the repository stages an image root and kernel ELF but does not yet produce a bootable Limine ISO or disk image.",
+      "v0.3.4 generates boot image package metadata and records missing_limine_iso_tooling because the repository still lacks Limine ISO packaging commands, bootloader installation artifacts, and an xorriso-compatible ISO builder."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -1348,6 +1355,7 @@
     "Added the v0.3.0 bootable runtime baseline blocker path: boot is not yet honestly claimable, the missing boot protocol/linker/loader/image packaging components are reported and validated, and release evidence includes the blocker artifact without changing runtime, ABI, or syscall behavior.",
     "Selected Limine as the initial x86_64 boot protocol, added an accepted ADR and boot protocol plan, registered boot_protocol_decision validation, and kept the v0.3.0 blocker active until implementation adds linker, loader, image packaging, and QEMU smoke evidence.",
     "Added the v0.3.2 boot image skeleton with linker script, Limine config, boot image staging script, freestanding memory support, skeleton validation, and reduced blocker state while preserving the no-QEMU-boot claim boundary.",
-    "Added a fail-closed v0.3.3 QEMU smoke command and refined the active blocker to missing_bootable_iso_packaging without adding QEMU boot, serial marker, hardware trap, compatibility, userspace, subsystem, or production-readiness claims."
+    "Added a fail-closed v0.3.3 QEMU smoke command and refined the active blocker to missing_bootable_iso_packaging without adding QEMU boot, serial marker, hardware trap, compatibility, userspace, subsystem, or production-readiness claims.",
+    "Added v0.3.4 boot image packaging metadata and boot_image_packaging validation, narrowing the active blocker to missing_limine_iso_tooling without adding a bootable ISO, QEMU boot, serial marker, hardware trap, compatibility, userspace, subsystem, or production-readiness claims."
   ]
 }

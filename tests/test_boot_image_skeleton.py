@@ -118,16 +118,16 @@ def write_fixture_files(root: Path) -> dict[str, Path]:
     paths["script"].write_text("linker/kernel.ld\nboot/limine.conf\nartifacts/runtime/boot_image\n")
     paths["memory"].write_text("global memset\nglobal memmove\n")
     paths["doc"].write_text("This phase does not prove boot success.\nThis phase does not prove QEMU execution.\nartifacts/runtime/boot_image/\n")
-    paths["boot_doc"].write_text("Remaining blocker: `missing_bootable_iso_packaging`.\n")
-    paths["blockers"].write_text("The remaining blocker is `missing_bootable_iso_packaging`.\n")
+    paths["boot_doc"].write_text("Remaining blocker: `missing_limine_iso_tooling`.\n")
+    paths["blockers"].write_text("The remaining blocker is `missing_limine_iso_tooling`.\n")
     paths["report"].write_text(json.dumps(valid_report(), indent=2) + "\n")
     return paths
 
 
 def valid_report() -> dict[str, object]:
     return {
-        "blocker_category": "missing_bootable_iso_packaging",
-        "missing_components": ["bootable Limine ISO or disk image"],
+        "blocker_category": "missing_limine_iso_tooling",
+        "missing_components": ["Limine ISO packaging command"],
     }
 
 

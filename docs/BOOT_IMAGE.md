@@ -107,6 +107,18 @@ The build manifest is:
 artifacts/runtime/boot_image/manifest.json
 ```
 
+The boot image packaging metadata is:
+
+```text
+artifacts/runtime/boot_image/package_metadata.json
+```
+
+The expected ISO path is:
+
+```text
+artifacts/runtime/boot_image/kozo.iso
+```
+
 ---
 
 # 6. Current Limitations
@@ -119,7 +131,9 @@ The skeleton does not include serial output capture.
 
 The skeleton does not include a `qemu_smoke` validator.
 
-The skeleton does not produce a bootable Limine ISO or disk image.
+The package metadata currently records `missing_limine_iso_tooling`.
+
+The skeleton does not produce `artifacts/runtime/boot_image/kozo.iso`.
 
 ---
 
@@ -127,7 +141,7 @@ The skeleton does not produce a bootable Limine ISO or disk image.
 
 The previous `missing_boot_protocol_and_image_packaging` blocker is reduced by this phase because the boot protocol, linker script, Limine configuration, and boot image staging path now exist.
 
-The remaining blocker is `missing_bootable_iso_packaging`.
+The remaining blocker is `missing_limine_iso_tooling`.
 
 QEMU boot may not be claimed until a later phase captures and validates serial output.
 

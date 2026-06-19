@@ -18,6 +18,7 @@ KERNEL_BUILD_CHECK="$ARTIFACTS_DIR/kernel-build-check"
 RUNTIME_SMOKE_LOG="$ARTIFACTS_DIR/runtime/runtime_smoke.log"
 RUNTIME_SMOKE_METADATA="$ARTIFACTS_DIR/runtime/runtime_smoke.metadata.json"
 BOOT_BLOCKER_REPORT="$ARTIFACTS_DIR/runtime/boot_blocker_report.json"
+BOOT_IMAGE_PACKAGE_METADATA="$ARTIFACTS_DIR/runtime/boot_image/package_metadata.json"
 VERIFY_TMP=""
 
 mkdir -p "$LOG_DIR" "$ARTIFACTS_DIR"
@@ -130,6 +131,7 @@ collect_evidence_files() {
     "$RUNTIME_SMOKE_LOG"
     "$RUNTIME_SMOKE_METADATA"
     "$BOOT_BLOCKER_REPORT"
+    "$BOOT_IMAGE_PACKAGE_METADATA"
   )
 
   local file
@@ -240,6 +242,7 @@ run_logged_command "$LOG_DIR/cargo-check.log" \
 build_kernel_object_artifact
 
 "$ROOT/scripts/runtime_smoke.sh"
+"$ROOT/scripts/build_boot_image.sh"
 "$ROOT/scripts/boot_blocker_report.sh"
 
 EVIDENCE_FILES_TEXT="$(collect_evidence_files)"

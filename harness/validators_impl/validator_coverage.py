@@ -480,6 +480,22 @@ _VALIDATOR_TEST_CONTRACTS = {
             "diagnostic_names_field",
         ),
     ),
+    "boot_image_packaging": ValidatorTestContract(
+        "boot_image_packaging",
+        _TESTS_DIR / "test_boot_image_packaging.py",
+        "BootImagePackagingValidator",
+        (
+            "missing_image",
+            "missing_metadata",
+            "invalid_metadata",
+            "wrong_boot_protocol",
+            "wrong_architecture",
+            "image_path_mismatch",
+            "missing_non_goal",
+            "blocker_state_mismatch",
+            "diagnostic_names_field",
+        ),
+    ),
     "return_path_proof": ValidatorTestContract(
         "return_path_proof",
         _TESTS_DIR / "test_return_path_proof.py",

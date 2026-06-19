@@ -109,9 +109,11 @@ Required checklist:
 * `artifacts/runtime/runtime_smoke.log` is present.
 * `artifacts/runtime/runtime_smoke.metadata.json` is present.
 * `artifacts/runtime/boot_blocker_report.json` is present while boot is blocked.
+* `artifacts/runtime/boot_image/package_metadata.json` is present while boot image packaging is blocked.
 * `runtime_smoke_evidence` passes.
 * `runtime_evidence_review` passes.
 * `boot_blocker_report` passes while boot is blocked.
+* `boot_image_packaging` passes while boot image packaging is blocked.
 * Runtime evidence review is complete.
 * Runtime metadata non-goals are reviewed.
 * Full CI uploaded `artifacts/runtime/runtime_smoke.log` when available.

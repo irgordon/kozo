@@ -20,7 +20,9 @@ v0.3.2 added the boot image skeleton.
 
 v0.3.3 added a bounded QEMU smoke command and attempted the first QEMU serial path.
 
-Remaining blocker: `missing_bootable_iso_packaging`.
+v0.3.4 added deterministic boot image packaging metadata and confirmed that Limine ISO tooling is still missing.
+
+Remaining blocker: `missing_limine_iso_tooling`.
 
 ---
 
@@ -28,15 +30,15 @@ Remaining blocker: `missing_bootable_iso_packaging`.
 
 Boot feasibility result: blocked.
 
-Blocker category: `missing_bootable_iso_packaging`.
+Blocker category: `missing_limine_iso_tooling`.
 
 Selected boot protocol: Limine.
 
 The current repository has a 64-bit `_start` symbol, an exported `kernel_entry`, early serial initialization, and runtime-adjacent object/symbol smoke evidence.
 
-The boot protocol decision and boot image skeleton are complete, and the QEMU smoke command now fails closed when a bootable image is missing.
+The boot protocol decision and boot image skeleton are complete, and `scripts/build_boot_image.sh` now writes `artifacts/runtime/boot_image/package_metadata.json`.
 
-The current repository does not yet produce a bootable Limine ISO or disk image, so it does not have QEMU smoke execution or captured serial evidence.
+The expected ISO path is `artifacts/runtime/boot_image/kozo.iso`, but the current repository does not yet produce that image, so it does not have QEMU smoke execution or captured serial evidence.
 
 ---
 
@@ -44,9 +46,10 @@ The current repository does not yet produce a bootable Limine ISO or disk image,
 
 The concrete remaining missing components are:
 
-* bootable Limine ISO or disk image
-* Limine bootloader artifacts for image installation
-* ISO tooling such as `xorriso` or an equivalent image builder
+* Limine ISO packaging command
+* Limine bootloader installation artifacts
+* `xorriso`-compatible ISO builder
+* bootable ISO artifact
 * validated QEMU serial smoke execution
 
 Until those exist, KOZO must not claim QEMU boot evidence.
@@ -74,11 +77,11 @@ The current source surfaces relevant to future boot work are:
 
 # 5. Required Next Fix
 
-The previous `missing_qemu_execution_evidence` blocker is refined.
+The previous `missing_bootable_iso_packaging` blocker is refined.
 
-The next boot-enabling fix must add bootable Limine ISO or disk packaging before QEMU smoke execution, serial evidence capture, and QEMU smoke validation can be claimed.
+The next boot-enabling fix must add Limine ISO tooling and bootloader installation artifacts before QEMU smoke execution, serial evidence capture, and QEMU smoke validation can be claimed.
 
-The existing QEMU smoke command writes blocked output to `artifacts/runtime/qemu_smoke.log` and stops when `artifacts/runtime/boot_image/kozo.iso` is missing.
+The existing QEMU smoke command writes blocked output to `artifacts/runtime/qemu_smoke.log` and stops when `artifacts/runtime/boot_image/package_metadata.json` reports missing ISO tooling or when `artifacts/runtime/boot_image/kozo.iso` is missing.
 
 The selected protocol and implementation plan are owned by `docs/BOOT_PROTOCOL.md`.
 
@@ -130,4 +133,10 @@ It is validated by:
 
 ```text
 boot_blocker_report
+```
+
+The current boot image packaging metadata is:
+
+```text
+artifacts/runtime/boot_image/package_metadata.json
 ```

@@ -121,7 +121,7 @@ The phase does not claim boot success because serial evidence has not been captu
 
 The v0.3.0 blocker is reduced.
 
-Current blocker: `missing_bootable_iso_packaging`
+Current blocker: `missing_limine_iso_tooling`
 
 The boot protocol decision resolved the protocol selection part of the blocker.
 
@@ -131,6 +131,18 @@ Remaining blocker components:
 * Limine bootloader artifacts for image installation
 * ISO tooling such as `xorriso` or an equivalent image builder
 * validated QEMU serial smoke execution
+
+Current packaging metadata:
+
+```text
+artifacts/runtime/boot_image/package_metadata.json
+```
+
+Expected ISO path:
+
+```text
+artifacts/runtime/boot_image/kozo.iso
+```
 
 ---
 
