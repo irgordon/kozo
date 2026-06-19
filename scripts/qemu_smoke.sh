@@ -40,9 +40,9 @@ build_boot_skeleton() {
 require_bootable_image() {
   if [[ ! -f "$BOOT_ISO" ]]; then
     if [[ -f "$PACKAGE_METADATA" ]]; then
-      fail "missing_limine_iso_tooling: scripts/build_boot_image.sh did not produce artifacts/runtime/boot_image/kozo.iso; inspect artifacts/runtime/boot_image/package_metadata.json"
+      fail "missing_bootable_iso_generation: scripts/build_boot_image.sh did not produce artifacts/runtime/boot_image/kozo.iso; inspect artifacts/runtime/boot_image/package_metadata.json"
     fi
-    fail "missing_limine_iso_tooling: boot image package metadata is missing and artifacts/runtime/boot_image/kozo.iso does not exist"
+    fail "missing_bootable_iso_generation: boot image package metadata is missing and artifacts/runtime/boot_image/kozo.iso does not exist"
   fi
 }
 

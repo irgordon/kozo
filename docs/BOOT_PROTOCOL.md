@@ -121,7 +121,7 @@ The phase does not claim boot success because serial evidence has not been captu
 
 The v0.3.0 blocker is reduced.
 
-Current blocker: `missing_limine_iso_tooling`
+Current blocker: `missing_bootable_iso_generation`
 
 The boot protocol decision resolved the protocol selection part of the blocker.
 

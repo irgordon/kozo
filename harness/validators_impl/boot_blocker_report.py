@@ -15,19 +15,17 @@ _RUNTIME_EVIDENCE_PATH = _ROOT / "docs" / "RUNTIME_EVIDENCE.md"
 _RELEASE_EVIDENCE_PATH = _ROOT / "docs" / "RELEASE_EVIDENCE.md"
 
 _EXPECTED_FIELDS = {
-    "phase": "v0.3.4",
+    "phase": "v0.3.5",
     "outcome": "blocked",
     "evidence_type": "boot-blocker-report",
     "generated_by": "scripts/boot_blocker_report.sh",
     "validator": "boot_blocker_report",
-    "blocker_category": "missing_limine_iso_tooling",
-    "next_required_fix": "Add Limine ISO tooling and bootloader installation artifacts so scripts/build_boot_image.sh can produce artifacts/runtime/boot_image/kozo.iso, then run scripts/qemu_smoke.sh to capture serial output before claiming QEMU boot evidence.",
+    "blocker_category": "missing_bootable_iso_generation",
+    "next_required_fix": "Implement bootable ISO generation in scripts/build_boot_image.sh using the documented Limine and xorriso tooling path, then run scripts/qemu_smoke.sh to capture serial output before claiming QEMU boot evidence.",
 }
 
 _REQUIRED_MISSING_COMPONENTS = (
-    "Limine ISO packaging command",
-    "Limine bootloader installation artifacts",
-    "xorriso-compatible ISO builder",
+    "ISO generation command integration",
     "bootable ISO artifact",
     "validated QEMU serial smoke execution",
 )
@@ -39,8 +37,9 @@ _REQUIRED_CURRENT_SURFACES = (
     "linker/kernel.ld defines the kernel ELF layout",
     "boot/limine.conf defines the Limine boot entry",
     "scripts/build_boot_image.sh stages the boot image skeleton",
-    "scripts/build_boot_image.sh writes package metadata for the blocked ISO packaging attempt",
-    "scripts/qemu_smoke.sh fails closed when package metadata reports missing Limine ISO tooling",
+    "docs/BOOT_TOOLING.md documents Limine and xorriso acquisition paths",
+    "scripts/build_boot_image.sh writes package metadata for the blocked ISO generation attempt",
+    "scripts/qemu_smoke.sh fails closed when package metadata reports missing ISO generation",
     "scripts/runtime_smoke.sh proves runtime-adjacent object and symbol evidence",
 )
 
@@ -62,10 +61,11 @@ _REQUIRED_DOC_REFERENCES = (
     "artifacts/runtime/boot_blocker_report.json",
     "artifacts/runtime/boot_image/package_metadata.json",
     "artifacts/runtime/boot_image/kozo.iso",
+    "docs/BOOT_TOOLING.md",
     "scripts/boot_blocker_report.sh",
     "scripts/qemu_smoke.sh",
     "boot_blocker_report",
-    "missing_limine_iso_tooling",
+    "missing_bootable_iso_generation",
 )
 
 

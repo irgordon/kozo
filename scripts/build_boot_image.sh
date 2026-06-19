@@ -92,9 +92,9 @@ from pathlib import Path
 
 metadata = {
     "version": 0,
-    "phase": "v0.3.4",
+    "phase": "v0.3.5",
     "outcome": "blocked",
-    "blocker_category": "missing_limine_iso_tooling",
+    "blocker_category": "missing_bootable_iso_generation",
     "image_type": "iso",
     "boot_protocol": "Limine",
     "architecture": "x86_64",
@@ -102,9 +102,7 @@ metadata = {
     "image_exists": False,
     "generated_by": "scripts/build_boot_image.sh",
     "missing_components": [
-        "Limine ISO packaging command",
-        "Limine bootloader installation artifacts",
-        "xorriso-compatible ISO builder",
+        "ISO generation command integration",
         "bootable ISO artifact"
     ],
     "proves": [

@@ -160,9 +160,9 @@ def write_fixture_files(root: Path) -> dict[str, Path]:
 def valid_metadata() -> dict[str, object]:
     return {
         "version": 0,
-        "phase": "v0.3.4",
+        "phase": "v0.3.5",
         "outcome": "blocked",
-        "blocker_category": "missing_limine_iso_tooling",
+        "blocker_category": "missing_bootable_iso_generation",
         "image_type": "iso",
         "boot_protocol": "Limine",
         "architecture": "x86_64",
@@ -170,9 +170,7 @@ def valid_metadata() -> dict[str, object]:
         "image_exists": False,
         "generated_by": "scripts/build_boot_image.sh",
         "missing_components": [
-            "Limine ISO packaging command",
-            "Limine bootloader installation artifacts",
-            "xorriso-compatible ISO builder",
+            "ISO generation command integration",
             "bootable ISO artifact",
         ],
         "proves": [
@@ -198,8 +196,8 @@ def valid_metadata() -> dict[str, object]:
 
 def valid_blocker() -> dict[str, object]:
     return {
-        "phase": "v0.3.4",
-        "blocker_category": "missing_limine_iso_tooling",
+        "phase": "v0.3.5",
+        "blocker_category": "missing_bootable_iso_generation",
     }
 
 
@@ -208,7 +206,7 @@ def valid_doc_text() -> str:
         (
             "artifacts/runtime/boot_image/package_metadata.json",
             "artifacts/runtime/boot_image/kozo.iso",
-            "missing_limine_iso_tooling",
+            "missing_bootable_iso_generation",
         )
     )
 

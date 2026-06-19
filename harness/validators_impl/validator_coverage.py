@@ -496,6 +496,20 @@ _VALIDATOR_TEST_CONTRACTS = {
             "diagnostic_names_field",
         ),
     ),
+    "boot_tooling": ValidatorTestContract(
+        "boot_tooling",
+        _TESTS_DIR / "test_boot_tooling.py",
+        "BootToolingValidator",
+        (
+            "missing_limine_doc",
+            "missing_xorriso_doc",
+            "missing_ci_install_path",
+            "missing_local_install_path",
+            "missing_provenance",
+            "blocker_mismatch",
+            "diagnostic_names_field",
+        ),
+    ),
     "return_path_proof": ValidatorTestContract(
         "return_path_proof",
         _TESTS_DIR / "test_return_path_proof.py",

@@ -18,9 +18,9 @@ _RELEASE_EVIDENCE_PATH = _ROOT / "docs" / "RELEASE_EVIDENCE.md"
 _IMAGE_PATH = _ROOT / "artifacts" / "runtime" / "boot_image" / "kozo.iso"
 
 _EXPECTED_FIELDS = {
-    "phase": "v0.3.4",
+    "phase": "v0.3.5",
     "outcome": "blocked",
-    "blocker_category": "missing_limine_iso_tooling",
+    "blocker_category": "missing_bootable_iso_generation",
     "image_type": "iso",
     "boot_protocol": "Limine",
     "architecture": "x86_64",
@@ -30,9 +30,7 @@ _EXPECTED_FIELDS = {
 }
 
 _REQUIRED_MISSING_COMPONENTS = (
-    "Limine ISO packaging command",
-    "Limine bootloader installation artifacts",
-    "xorriso-compatible ISO builder",
+    "ISO generation command integration",
     "bootable ISO artifact",
 )
 
@@ -55,7 +53,7 @@ _REQUIRED_NON_GOALS = (
 _REQUIRED_DOC_REFERENCES = (
     "artifacts/runtime/boot_image/package_metadata.json",
     "artifacts/runtime/boot_image/kozo.iso",
-    "missing_limine_iso_tooling",
+    "missing_bootable_iso_generation",
 )
 
 
@@ -143,10 +141,10 @@ def _list_contract_issue(
 
 
 def _blocker_state_issue(blocker_report: dict[str, object]) -> BootImagePackagingIssue | None:
-    if blocker_report.get("phase") != "v0.3.4":
-        return _issue("blocker_state_mismatch", "boot_blocker.phase", "Boot blocker report must be updated for v0.3.4")
-    if blocker_report.get("blocker_category") != "missing_limine_iso_tooling":
-        return _issue("blocker_state_mismatch", "boot_blocker.blocker_category", "Boot blocker must name missing_limine_iso_tooling")
+    if blocker_report.get("phase") != "v0.3.5":
+        return _issue("blocker_state_mismatch", "boot_blocker.phase", "Boot blocker report must be updated for v0.3.5")
+    if blocker_report.get("blocker_category") != "missing_bootable_iso_generation":
+        return _issue("blocker_state_mismatch", "boot_blocker.blocker_category", "Boot blocker must name missing_bootable_iso_generation")
     return None
 
 

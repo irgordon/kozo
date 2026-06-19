@@ -57,6 +57,7 @@ Every release review must include:
 * `artifacts/runtime/qemu_smoke.log` when a QEMU smoke blocker or QEMU serial evidence is under review
 * `docs/BOOT_PROTOCOL.md`
 * `docs/BOOT_IMAGE.md`
+* `docs/BOOT_TOOLING.md`
 * `docs/decisions/0001-boot-protocol.md`
 * `CHANGELOG.md`
 * `PHASEMAP.md`
@@ -106,9 +107,9 @@ Runtime evidence review is required for release review and is governed by `docs/
 
 The boot blocker report is required while v0.3.0 remains blocked and is governed by `docs/BOOT.md`, `docs/BOOT_BLOCKERS.md`, `scripts/boot_blocker_report.sh`, and `boot_blocker_report`.
 
-The current boot blocker category is `missing_limine_iso_tooling`.
+The current boot blocker category is `missing_bootable_iso_generation`.
 
-The current packaging metadata records the missing Limine ISO tooling blocker:
+The current packaging metadata records the missing ISO generation blocker:
 
 ```text
 artifacts/runtime/boot_image/package_metadata.json
@@ -118,6 +119,12 @@ The expected future ISO path is:
 
 ```text
 artifacts/runtime/boot_image/kozo.iso
+```
+
+The boot tooling acquisition policy is:
+
+```text
+docs/BOOT_TOOLING.md
 ```
 
 The blocked QEMU smoke command is:
@@ -221,6 +228,7 @@ release-evidence/
   release_checklist.md
   required_checks.md
   runtime_evidence_review.md
+  boot_tooling.md
   ci_status.md
   non_goals.md
 ```

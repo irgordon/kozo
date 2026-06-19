@@ -20,9 +20,11 @@ v0.3.2 added a boot image skeleton, but QEMU smoke is still planned and not yet 
 
 v0.3.3 added a bounded QEMU smoke command, but it currently fails closed because no bootable Limine ISO or disk image is produced.
 
-v0.3.4 added boot image package metadata at `artifacts/runtime/boot_image/package_metadata.json`, but it records `missing_limine_iso_tooling`.
+v0.3.4 added boot image package metadata at `artifacts/runtime/boot_image/package_metadata.json`, recording the packaging blocker.
 
-Current boot blocker: `missing_limine_iso_tooling`.
+v0.3.5 added `docs/BOOT_TOOLING.md` to define the Limine and xorriso acquisition path, but ISO generation is not yet implemented.
+
+Current boot blocker: `missing_bootable_iso_generation`.
 
 ---
 
@@ -83,7 +85,7 @@ runtime-adjacent-object-symbol-smoke
 
 The smoke path builds freestanding x86_64 Odin kernel objects, assembles the current x86_64 boot and syscall bridge objects, records `nm` and `strings` evidence, and verifies required entry, dispatcher, bridge, and serial marker surfaces.
 
-This remains the narrowest passing runtime evidence target because the repository does not yet include Limine ISO tooling capable of producing `artifacts/runtime/boot_image/kozo.iso`.
+This remains the narrowest passing runtime evidence target because the repository does not yet generate `artifacts/runtime/boot_image/kozo.iso`.
 
 ---
 
@@ -154,6 +156,12 @@ The expected boot image path is:
 
 ```text
 artifacts/runtime/boot_image/kozo.iso
+```
+
+The boot tooling policy path is:
+
+```text
+docs/BOOT_TOOLING.md
 ```
 
 The QEMU smoke log is currently blocker evidence only. It is not passing QEMU serial smoke evidence.

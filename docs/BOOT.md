@@ -20,9 +20,11 @@ v0.3.2 added the boot image skeleton.
 
 v0.3.3 added a bounded QEMU smoke command and attempted the first QEMU serial path.
 
-v0.3.4 added deterministic boot image packaging metadata and confirmed that Limine ISO tooling is still missing.
+v0.3.4 added deterministic boot image packaging metadata and confirmed that Limine ISO tooling was still missing.
 
-Remaining blocker: `missing_limine_iso_tooling`.
+v0.3.5 added `docs/BOOT_TOOLING.md` to define the Limine and xorriso acquisition path.
+
+Remaining blocker: `missing_bootable_iso_generation`.
 
 ---
 
@@ -30,13 +32,15 @@ Remaining blocker: `missing_limine_iso_tooling`.
 
 Boot feasibility result: blocked.
 
-Blocker category: `missing_limine_iso_tooling`.
+Blocker category: `missing_bootable_iso_generation`.
 
 Selected boot protocol: Limine.
 
 The current repository has a 64-bit `_start` symbol, an exported `kernel_entry`, early serial initialization, and runtime-adjacent object/symbol smoke evidence.
 
-The boot protocol decision and boot image skeleton are complete, and `scripts/build_boot_image.sh` now writes `artifacts/runtime/boot_image/package_metadata.json`.
+The boot protocol decision, boot image skeleton, and boot tooling acquisition policy are complete.
+
+`scripts/build_boot_image.sh` writes `artifacts/runtime/boot_image/package_metadata.json`.
 
 The expected ISO path is `artifacts/runtime/boot_image/kozo.iso`, but the current repository does not yet produce that image, so it does not have QEMU smoke execution or captured serial evidence.
 
@@ -46,9 +50,7 @@ The expected ISO path is `artifacts/runtime/boot_image/kozo.iso`, but the curren
 
 The concrete remaining missing components are:
 
-* Limine ISO packaging command
-* Limine bootloader installation artifacts
-* `xorriso`-compatible ISO builder
+* ISO generation command integration
 * bootable ISO artifact
 * validated QEMU serial smoke execution
 
@@ -66,6 +68,7 @@ The current source surfaces relevant to future boot work are:
 * `scripts/runtime_smoke.sh`
 * `scripts/build_boot_image.sh`
 * `scripts/qemu_smoke.sh`
+* `docs/BOOT_TOOLING.md`
 
 `kernel/arch/x86_64/boot.asm` defines `_start`, and `scripts/build_boot_image.sh` links a kernel ELF for the Limine image skeleton.
 
@@ -77,9 +80,11 @@ The current source surfaces relevant to future boot work are:
 
 # 5. Required Next Fix
 
-The previous `missing_bootable_iso_packaging` blocker is refined.
+The previous `missing_bootable_iso_packaging` blocker was refined to `missing_limine_iso_tooling`.
 
-The next boot-enabling fix must add Limine ISO tooling and bootloader installation artifacts before QEMU smoke execution, serial evidence capture, and QEMU smoke validation can be claimed.
+The previous `missing_limine_iso_tooling` blocker is refined by `docs/BOOT_TOOLING.md`.
+
+The next boot-enabling fix must implement bootable ISO generation in `scripts/build_boot_image.sh` before QEMU smoke execution, serial evidence capture, and QEMU smoke validation can be claimed.
 
 The existing QEMU smoke command writes blocked output to `artifacts/runtime/qemu_smoke.log` and stops when `artifacts/runtime/boot_image/package_metadata.json` reports missing ISO tooling or when `artifacts/runtime/boot_image/kozo.iso` is missing.
 

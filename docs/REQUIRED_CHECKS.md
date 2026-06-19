@@ -119,7 +119,7 @@ Full CI requires runtime smoke evidence because `.github/workflows/ci.yml` runs 
 
 The lint workflow does not require runtime smoke evidence because `.github/workflows/lint.yml` does not run full verification. If lint is changed to run `scripts/verify.sh`, runtime smoke evidence becomes required there through the same full-verification path.
 
-QEMU smoke is not a required CI check while the active blocker is `missing_limine_iso_tooling`. `scripts/qemu_smoke.sh` is a release-local blocker review command until `artifacts/runtime/boot_image/kozo.iso` exists and CI support is explicitly added.
+QEMU smoke is not a required CI check while the active blocker is `missing_bootable_iso_generation`. `scripts/qemu_smoke.sh` is a release-local blocker review command until `artifacts/runtime/boot_image/kozo.iso` exists and CI support is explicitly added.
 
 Full verification runs `scripts/build_boot_image.sh` to produce `artifacts/runtime/boot_image/package_metadata.json`; while packaging is blocked, that metadata is blocker evidence rather than boot evidence.
 

@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.3.5 - 2026-06-19
+
+**Status:** Limine ISO tooling acquisition.
+
+### Added
+
+* Added `docs/BOOT_TOOLING.md` to define the Limine and xorriso acquisition path, local development path, CI installation path, provenance requirements, tool verification, and future ISO generation path.
+* Added `boot_tooling` validation and focused negative coverage for missing Limine documentation, xorriso documentation, local install path, CI install path, provenance, blocker state, and diagnostic quality.
+
+### Changed
+
+* Narrowed the active boot blocker from `missing_limine_iso_tooling` to `missing_bootable_iso_generation`.
+* Updated boot, boot image, boot blocker, runtime evidence, release evidence, phase map, and roadmap docs to record the tooling acquisition policy without claiming ISO generation.
+
+### Notes
+
+* This change does not add a bootable ISO.
+* This change does not add QEMU boot evidence.
+* This change does not add serial success evidence.
+* This change does not add hardware syscall/trap execution evidence.
+* This change does not add Linux compatibility, POSIX compatibility, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+* This change does not change ABI contracts or syscall behavior.
+
 ## v0.3.4 - 2026-06-19
 
 **Status:** Bootable ISO packaging blocked by missing Limine ISO tooling.
