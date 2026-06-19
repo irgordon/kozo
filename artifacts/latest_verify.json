@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260619T002021Z",
+  "run_id": "verify-20260619T003152Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 30,
+    "total_checks": 31,
     "failed_check_count": 0
   },
   "checks": [
@@ -192,6 +192,13 @@
       "detail": "Runtime smoke evidence artifact exists, is bounded, and is referenced by release evidence policy"
     },
     {
+      "name": "runtime_evidence_review",
+      "subsystem": "runtime_evidence_review",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Runtime evidence review policy names the evidence scope, limits, release gates, and protected metadata"
+    },
+    {
       "name": "return_path_proof",
       "subsystem": "return_path_proof",
       "status": "pass",
@@ -235,9 +242,22 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
-    "docs/CODING_STYLE.md",
-    "docs/GENERATED_ARTIFACTS.md",
-    "tasks/todo.json"
+    "PHASEMAP.md",
+    "ROADMAP.md",
+    "docs/RELEASE_CHECKLIST.md",
+    "docs/RELEASE_EVIDENCE.md",
+    "docs/REQUIRED_CHECKS.md",
+    "docs/RUNTIME_EVIDENCE_REVIEW.md",
+    "docs/generated/governance_index.md",
+    "harness/codes.py",
+    "harness/registry.py",
+    "harness/validators.py",
+    "harness/validators_impl/runtime_evidence_review.py",
+    "harness/validators_impl/validator_coverage.py",
+    "schemas/agent_context.schema.json",
+    "schemas/latest_verify.schema.json",
+    "tasks/todo.json",
+    "tests/test_runtime_evidence_review.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -247,5 +267,5 @@
     "artifacts/runtime/runtime_smoke.log",
     "artifacts/runtime/runtime_smoke.metadata.json"
   ],
-  "generated_at": "2026-06-19T00:20:21Z"
+  "generated_at": "2026-06-19T00:31:52Z"
 }
