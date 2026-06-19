@@ -17,6 +17,7 @@ EMPTY_TREE="4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 KERNEL_BUILD_CHECK="$ARTIFACTS_DIR/kernel-build-check"
 RUNTIME_SMOKE_LOG="$ARTIFACTS_DIR/runtime/runtime_smoke.log"
 RUNTIME_SMOKE_METADATA="$ARTIFACTS_DIR/runtime/runtime_smoke.metadata.json"
+BOOT_BLOCKER_REPORT="$ARTIFACTS_DIR/runtime/boot_blocker_report.json"
 VERIFY_TMP=""
 
 mkdir -p "$LOG_DIR" "$ARTIFACTS_DIR"
@@ -128,6 +129,7 @@ collect_evidence_files() {
     "$LOG_DIR/nm-kernel.log"
     "$RUNTIME_SMOKE_LOG"
     "$RUNTIME_SMOKE_METADATA"
+    "$BOOT_BLOCKER_REPORT"
   )
 
   local file
@@ -238,6 +240,7 @@ run_logged_command "$LOG_DIR/cargo-check.log" \
 build_kernel_object_artifact
 
 "$ROOT/scripts/runtime_smoke.sh"
+"$ROOT/scripts/boot_blocker_report.sh"
 
 EVIDENCE_FILES_TEXT="$(collect_evidence_files)"
 

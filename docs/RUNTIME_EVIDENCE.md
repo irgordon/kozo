@@ -12,6 +12,8 @@ This document defines KOZO's current runtime smoke evidence path.
 
 The current path is a bounded runtime-adjacent object and symbol smoke check. It proves that the freestanding x86_64 kernel objects and assembly bridge objects can be built together with the current entry, dispatcher, syscall bridge, and serial marker surfaces present in binary evidence.
 
+The v0.3.0 boot baseline attempted to move beyond runtime-adjacent evidence. It is currently blocked by `missing_boot_protocol_and_image_packaging`.
+
 ---
 
 # 2. Authority
@@ -52,6 +54,8 @@ This evidence does not prove file descriptor behavior.
 This evidence does not prove production readiness.
 
 This evidence does not prove QEMU boot execution, hardware syscall execution, interrupt handling, or privilege transition behavior.
+
+The current boot blocker report also does not prove QEMU boot.
 
 ---
 
@@ -114,11 +118,19 @@ The runtime smoke metadata artifact is:
 artifacts/runtime/runtime_smoke.metadata.json
 ```
 
+The boot blocker artifact is:
+
+```text
+artifacts/runtime/boot_blocker_report.json
+```
+
 The log is generated evidence. It must be reproduced by the smoke script before it is used in release review.
 
 The metadata is deterministic generated evidence. It identifies the evidence type, source log, generator, validator, positive claims, and explicit non-goals.
 
 Full CI should upload both runtime smoke artifacts when full verification runs.
+
+Full CI should also upload the boot blocker report while v0.3.0 remains blocked.
 
 ---
 
@@ -129,6 +141,8 @@ Runtime evidence is generated under:
 ```text
 artifacts/runtime/
 ```
+
+The boot blocker report is generated under the same directory.
 
 For release review, package or copy it under:
 
@@ -151,13 +165,16 @@ Do not treat the release bundle copy as source truth. Regenerate the live artifa
 Before release review:
 
 * Run `scripts/runtime_smoke.sh`.
+* Run `scripts/boot_blocker_report.sh` while v0.3.0 remains blocked.
 * Confirm `artifacts/runtime/runtime_smoke.log` exists and is non-empty.
 * Confirm `artifacts/runtime/runtime_smoke.metadata.json` is valid JSON.
+* Confirm `artifacts/runtime/boot_blocker_report.json` is valid JSON while boot is blocked.
 * Confirm metadata `evidence_type` is `runtime-adjacent-object-symbol-smoke`.
 * Confirm metadata positive claims match the current smoke target.
 * Confirm metadata non-goals still include QEMU boot, hardware trap execution, Linux compatibility, userspace execution, process model, VFS behavior, scheduler maturity, ELF loading, file descriptor behavior, and production readiness.
 * Confirm `runtime_smoke_evidence` passes.
 * Copy or archive the log and metadata into the release evidence bundle.
+* Copy or archive the boot blocker report into the release evidence bundle while boot is blocked.
 
 ---
 
@@ -183,7 +200,10 @@ Runtime evidence is invalidated by:
 * changes to `scripts/runtime_smoke.sh`
 * changes to `docs/RUNTIME_EVIDENCE.md`
 * changes to `harness/validators_impl/runtime_smoke_evidence.py`
+* changes to `scripts/boot_blocker_report.sh`
+* changes to `harness/validators_impl/boot_blocker_report.py`
 * stale, missing, malformed, or failed runtime smoke artifacts
+* stale, missing, malformed, or failed boot blocker artifacts while boot is blocked
 
 When invalidated, regenerate evidence and rerun full verification.
 

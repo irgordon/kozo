@@ -51,6 +51,7 @@ Every release review must include:
 * `artifacts/latest_verify.json`
 * `artifacts/runtime/runtime_smoke.log`
 * `artifacts/runtime/runtime_smoke.metadata.json`
+* `artifacts/runtime/boot_blocker_report.json`
 * `CHANGELOG.md`
 * `PHASEMAP.md`
 * `ROADMAP.md`
@@ -88,10 +89,15 @@ Release review must include verification logs when generated:
 * `artifacts/logs/nm-kernel.log`
 * `artifacts/runtime/runtime_smoke.log`
 * `artifacts/runtime/runtime_smoke.metadata.json`
+* `artifacts/runtime/boot_blocker_report.json`
 
 Future runtime smoke phases must add their runtime logs to this list before using them as release evidence.
 
 Runtime evidence review is required for release review and is governed by `docs/RUNTIME_EVIDENCE_REVIEW.md`.
+
+The boot blocker report is required while v0.3.0 remains blocked and is governed by `docs/BOOT.md`, `docs/BOOT_BLOCKERS.md`, `scripts/boot_blocker_report.sh`, and `boot_blocker_report`.
+
+The current boot blocker category is `missing_boot_protocol_and_image_packaging`.
 
 ---
 
@@ -107,9 +113,12 @@ The minimum release evidence must record:
 * lint/static-check status
 * required target/toolchain setup
 * runtime smoke log and metadata artifact availability from full CI when available
+* boot blocker report artifact availability from full CI while boot is blocked
 * CI run URL or status when available
 
 Full CI runs `scripts/verify.sh`, so runtime smoke evidence is required there through full verification and should be uploaded as CI artifacts.
+
+Full CI also runs the boot blocker report generator through `scripts/verify.sh` while boot remains blocked, and should upload `artifacts/runtime/boot_blocker_report.json`.
 
 The lint workflow is static-check only. It does not own runtime smoke evidence unless it is changed to run full verification.
 
@@ -160,6 +169,7 @@ release-evidence/
   runtime/
     runtime_smoke.log
     runtime_smoke.metadata.json
+    boot_blocker_report.json
   logs/
     odin-check.log
     odin-build.log

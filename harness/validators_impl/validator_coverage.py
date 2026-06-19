@@ -438,6 +438,21 @@ _VALIDATOR_TEST_CONTRACTS = {
             "diagnostic_names_review_field",
         ),
     ),
+    "boot_blocker_report": ValidatorTestContract(
+        "boot_blocker_report",
+        _TESTS_DIR / "test_boot_blocker_report.py",
+        "BootBlockerReportValidator",
+        (
+            "missing_report",
+            "invalid_report_json",
+            "field_mismatch",
+            "missing_component",
+            "missing_current_surface",
+            "missing_non_claim",
+            "missing_documentation_reference",
+            "diagnostic_names_boot_blocker_field",
+        ),
+    ),
     "return_path_proof": ValidatorTestContract(
         "return_path_proof",
         _TESTS_DIR / "test_return_path_proof.py",

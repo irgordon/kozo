@@ -31,6 +31,7 @@ from harness.validators_impl.bridge_validator import BridgeAlignmentValidator
 from harness.validators_impl.runtime_trap_path import RuntimeTrapPathValidator
 from harness.validators_impl.runtime_smoke_evidence import RuntimeSmokeEvidenceValidator
 from harness.validators_impl.runtime_evidence_review import RuntimeEvidenceReviewValidator
+from harness.validators_impl.boot_blocker_report import BootBlockerReportValidator
 from harness.validators_impl.return_path_proof import ReturnPathProofValidator
 from harness.validators_impl.execution_proof import ExecutionProofValidator
 from harness.validators_impl.validator_coverage import ValidatorCoverageValidator
@@ -64,6 +65,7 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "runtime_trap_path": RuntimeTrapPathValidator,
     "runtime_smoke_evidence": RuntimeSmokeEvidenceValidator,
     "runtime_evidence_review": RuntimeEvidenceReviewValidator,
+    "boot_blocker_report": BootBlockerReportValidator,
     "return_path_proof": ReturnPathProofValidator,
     "execution_proof": ExecutionProofValidator,
     "validator_coverage": ValidatorCoverageValidator,

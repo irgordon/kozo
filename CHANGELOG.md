@@ -1,5 +1,30 @@
 # Changelog
 
+## v0.3.0 - 2026-06-19
+
+**Status:** Bootable runtime baseline blocked by missing boot protocol and image packaging.
+
+### Added
+
+* Added `docs/BOOT.md` and `docs/BOOT_BLOCKERS.md` to record the current boot baseline and exact blocker preventing an honest QEMU boot claim.
+* Added `scripts/boot_blocker_report.sh` to generate `artifacts/runtime/boot_blocker_report.json`.
+* Added `boot_blocker_report` as a registered validator for the v0.3.0 boot blocker report and documentation references.
+* Added focused negative coverage for missing, malformed, incomplete, and diagnostically weak boot blocker reports.
+
+### Changed
+
+* Updated full verification, release evidence, release checklist, required checks, phase map, roadmap, and CI artifact upload policy to include the boot blocker report while boot remains blocked.
+
+### Notes
+
+* Boot feasibility result: blocked.
+* Exact blocker: `missing_boot_protocol_and_image_packaging`.
+* Missing components: linker script, boot protocol, loader configuration, and boot image packaging.
+* This change does not add QEMU boot evidence.
+* This change does not add hardware syscall/trap execution evidence.
+* This change does not add Linux compatibility, POSIX compatibility, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+* This change does not change runtime behavior, ABI contracts, or syscall behavior.
+
 ## v0.2.4 - 2026-06-19
 
 **Status:** CI/runtime evidence policy alignment.

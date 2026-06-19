@@ -136,4 +136,5 @@ jobs:
             artifacts/logs/*.log
             artifacts/runtime/runtime_smoke.log
             artifacts/runtime/runtime_smoke.metadata.json
+            artifacts/runtime/boot_blocker_report.json
           if-no-files-found: warn

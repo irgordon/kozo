@@ -988,6 +988,43 @@
         "verification.tests_run[5]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 38,
+      "title": "Add bootable runtime baseline blocker report",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "PHASEMAP.md",
+        "ROADMAP.md",
+        "tasks/todo.json",
+        ".github/workflows/ci.yml",
+        "scripts/verify.sh",
+        "scripts/boot_blocker_report.sh",
+        "docs/BOOT.md",
+        "docs/BOOT_BLOCKERS.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/REQUIRED_CHECKS.md",
+        "docs/generated/governance_index.md",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/boot_blocker_report.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/latest_verify.schema.json",
+        "schemas/agent_context.schema.json",
+        "tests/test_boot_blocker_report.py",
+        "artifacts/runtime/boot_blocker_report.json",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[4]",
+        "verification.tests_run[5]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -1026,7 +1063,8 @@
     "Documentation standard v1 governs documentation clarity, audience separation, claim discipline, terminology consistency, onboarding structure, and documentation review without changing runtime, ABI, syscall, validator, compatibility, or production-readiness claims",
     "Documentation consistency corrections keep coding-style authority references and generated governance-index artifact ownership aligned with docs/GOVERNANCE.md and governed report generation without changing runtime, ABI, syscall, validator, compatibility, or production-readiness claims",
     "Runtime evidence review gate documents and validates the runtime-adjacent-object-symbol-smoke evidence type, live evidence paths, release bundle paths, validator ownership, release references, metadata non-goals, and overclaim blockers without adding QEMU boot, hardware trap, compatibility, userspace, or production-readiness claims",
-    "CI/runtime evidence policy alignment documents that full CI requires runtime smoke through scripts/verify.sh, release review requires runtime smoke log and metadata, lint remains static unless it runs full verification, and CI uploads runtime smoke artifacts without adding QEMU boot, hardware trap, compatibility, userspace, or production-readiness claims"
+    "CI/runtime evidence policy alignment documents that full CI requires runtime smoke through scripts/verify.sh, release review requires runtime smoke log and metadata, lint remains static unless it runs full verification, and CI uploads runtime smoke artifacts without adding QEMU boot, hardware trap, compatibility, userspace, or production-readiness claims",
+    "Bootable runtime baseline records a verified v0.3.0 blocker report naming missing boot protocol, linker script, loader configuration, and boot image packaging instead of claiming QEMU boot evidence"
   ],
   "verification": {
     "tests_run": [
@@ -1130,7 +1168,8 @@
       "Documentation standard changes remain bounded to documentation construction governance, governance precedence, changelog state, task scope, generated governance index refresh, and verification artifact refresh",
       "Documentation consistency fixes remove duplicated precedence drift and replace governance-index placeholder generator wording without altering document authority, runtime behavior, ABI contracts, syscall behavior, or generated report authority",
       "runtime_evidence_review fails if runtime evidence review documentation, release evidence references, release checklist gates, required checks references, or metadata non-goals are missing or drift from the current runtime-adjacent evidence scope",
-      "CI/runtime evidence policy alignment preserves the runtime-adjacent-object-symbol-smoke scope while making full CI, lint, required checks, release checklist, and release evidence policy agree on runtime smoke evidence requirements"
+      "CI/runtime evidence policy alignment preserves the runtime-adjacent-object-symbol-smoke scope while making full CI, lint, required checks, release checklist, and release evidence policy agree on runtime smoke evidence requirements",
+      "boot_blocker_report validates that v0.3.0 cannot honestly claim QEMU boot until missing boot protocol and image packaging components are implemented"
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -1175,7 +1214,8 @@
       "docs/DOCUMENTATION_STANDARD.md defines documentation construction and review standards while docs/GOVERNANCE.md records its authority boundary below higher technical governance documents and above descriptive documents.",
       "docs/CODING_STYLE.md now points to docs/GOVERNANCE.md for the complete precedence order, and docs/GENERATED_ARTIFACTS.md names harness/governance_index_report.py and governance_index_report for docs/generated/governance_index.md.",
       "runtime_evidence_review validates docs/RUNTIME_EVIDENCE_REVIEW.md, release evidence/checklist/check policy references, and runtime smoke metadata non-goals while keeping runtime evidence scoped to runtime-adjacent-object-symbol-smoke.",
-      "Full CI runs scripts/verify.sh, uploads artifacts/runtime/runtime_smoke.log and artifacts/runtime/runtime_smoke.metadata.json, lint remains static-check only, and release review requires runtime smoke evidence without changing runtime behavior or evidence scope."
+      "Full CI runs scripts/verify.sh, uploads artifacts/runtime/runtime_smoke.log and artifacts/runtime/runtime_smoke.metadata.json, lint remains static-check only, and release review requires runtime smoke evidence without changing runtime behavior or evidence scope.",
+      "v0.3.0 boot feasibility is blocked by missing_boot_protocol_and_image_packaging; scripts/boot_blocker_report.sh generates artifacts/runtime/boot_blocker_report.json and boot_blocker_report validates the report and documentation references."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -1216,6 +1256,7 @@
     "Added documentation clarity governance standard without changing runtime behavior, ABI contracts, syscall behavior, generated bindings, validator logic, compatibility claims, or production-readiness claims.",
     "Fixed documentation authority consistency issues by removing a duplicated precedence list from coding style guidance and replacing governance-index generated artifact placeholder wording with actual generator and validator references.",
     "Added runtime evidence review gate for release claim discipline without changing runtime behavior, ABI contracts, syscall behavior, QEMU boot evidence, hardware trap evidence, compatibility claims, userspace execution claims, or production-readiness claims.",
-    "Aligned CI/runtime evidence policy so full CI requires and uploads runtime smoke evidence through scripts/verify.sh, lint remains static unless it runs full verification, and release evidence/checklist docs require runtime smoke log and metadata without expanding runtime claims."
+    "Aligned CI/runtime evidence policy so full CI requires and uploads runtime smoke evidence through scripts/verify.sh, lint remains static unless it runs full verification, and release evidence/checklist docs require runtime smoke log and metadata without expanding runtime claims.",
+    "Added the v0.3.0 bootable runtime baseline blocker path: boot is not yet honestly claimable, the missing boot protocol/linker/loader/image packaging components are reported and validated, and release evidence includes the blocker artifact without changing runtime, ABI, or syscall behavior."
   ]
 }
