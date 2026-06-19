@@ -489,6 +489,7 @@ _VALIDATOR_TEST_CONTRACTS = {
             "missing_metadata",
             "invalid_metadata",
             "wrong_boot_protocol",
+            "wrong_image_type",
             "wrong_architecture",
             "image_path_mismatch",
             "missing_non_goal",

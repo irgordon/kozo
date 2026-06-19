@@ -128,7 +128,7 @@ def write_fixture_files(root: Path) -> dict[str, Path]:
 
     adr.write_text(valid_adr_text())
     boot_protocol.write_text(valid_boot_protocol_text())
-    boot.write_text("Selected boot protocol: Limine\nRemaining blocker: `missing_bootable_iso_generation`.\n")
+    boot.write_text("Selected boot protocol: Limine\nRemaining blocker: `missing_iso_generation_tooling`.\n")
     blockers.write_text("Boot protocol decision: complete.\nThe previous `missing_boot_protocol_and_image_packaging` blocker is reduced.\n")
     phasemap.write_text("v0.3.2 Boot Image Skeleton\n")
     roadmap.write_text("v0.3.2 Boot Image Skeleton QEMU serial smoke\n")

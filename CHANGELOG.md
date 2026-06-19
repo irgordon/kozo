@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.3.6 - 2026-06-19
+
+**Status:** Bootable ISO generation blocked by missing local ISO tooling.
+
+### Added
+
+* Added a Limine/xorriso ISO generation path to `scripts/build_boot_image.sh`.
+* Added v0.3.6 package metadata for either successful ISO generation or a blocked missing-tooling result.
+* Updated `boot_image_packaging` validation to distinguish a real packaged ISO from an honest blocked ISO-generation attempt.
+
+### Changed
+
+* Narrowed the active boot blocker from `missing_bootable_iso_generation` to `missing_iso_generation_tooling` for this local environment.
+* Updated boot, boot image, blocker, runtime evidence, release evidence, phase map, and roadmap docs to record that ISO generation is implemented but cannot complete until Limine artifacts and xorriso are available.
+
+### Notes
+
+* This change does not add a bootable ISO in the current environment.
+* This change does not add QEMU boot evidence.
+* This change does not add serial success evidence.
+* This change does not add hardware syscall/trap execution evidence.
+* This change does not add Linux compatibility, POSIX compatibility, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+* This change does not change ABI contracts or syscall behavior.
+
 ## v0.3.5 - 2026-06-19
 
 **Status:** Limine ISO tooling acquisition.

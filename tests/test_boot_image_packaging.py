@@ -17,6 +17,7 @@ KOZO_NEGATIVE_COVERAGE = {
         "wrong_boot_protocol": "test_fails_when_boot_protocol_is_wrong",
         "wrong_architecture": "test_fails_when_architecture_is_wrong",
         "image_path_mismatch": "test_fails_when_image_path_mismatches_contract",
+        "wrong_image_type": "test_fails_when_image_type_is_wrong",
         "missing_non_goal": "test_fails_when_non_goal_is_missing",
         "blocker_state_mismatch": "test_fails_when_blocker_state_mismatches_metadata",
         "diagnostic_names_field": "test_failure_diagnostic_names_field",
@@ -33,7 +34,13 @@ class BootImagePackagingValidatorTests(unittest.TestCase):
 
     def test_fails_when_success_metadata_has_no_image(self):
         self.assertEqual("boot_image_packaging", BootImagePackagingValidator.name)
-        result = self.validate_fixture(mutate_metadata=lambda metadata: metadata | {"outcome": "packaged", "image_exists": True})
+        result = self.validate_fixture(
+            mutate_metadata=lambda metadata: metadata | {
+                "outcome": "packaged",
+                "blocker_category": "missing_qemu_serial_evidence",
+                "image_exists": True,
+            }
+        )
 
         self.assertEqual(result.status, "fail")
         self.assert_packaging_failure(result, "missing_image", "boot_image_packaging.image_path")
@@ -58,6 +65,13 @@ class BootImagePackagingValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "fail")
         self.assert_packaging_failure(result, "field_mismatch", "boot_image_packaging.boot_protocol")
+
+    def test_fails_when_image_type_is_wrong(self):
+        self.assertEqual("boot_image_packaging", BootImagePackagingValidator.name)
+        result = self.validate_fixture(mutate_metadata=lambda metadata: metadata | {"image_type": "disk"})
+
+        self.assertEqual(result.status, "fail")
+        self.assert_packaging_failure(result, "field_mismatch", "boot_image_packaging.image_type")
 
     def test_fails_when_architecture_is_wrong(self):
         self.assertEqual("boot_image_packaging", BootImagePackagingValidator.name)
@@ -160,9 +174,9 @@ def write_fixture_files(root: Path) -> dict[str, Path]:
 def valid_metadata() -> dict[str, object]:
     return {
         "version": 0,
-        "phase": "v0.3.5",
+        "phase": "v0.3.6",
         "outcome": "blocked",
-        "blocker_category": "missing_bootable_iso_generation",
+        "blocker_category": "missing_iso_generation_tooling",
         "image_type": "iso",
         "boot_protocol": "Limine",
         "architecture": "x86_64",
@@ -170,14 +184,14 @@ def valid_metadata() -> dict[str, object]:
         "image_exists": False,
         "generated_by": "scripts/build_boot_image.sh",
         "missing_components": [
-            "ISO generation command integration",
-            "bootable ISO artifact",
+            "Limine executable",
+            "xorriso executable",
+            "Limine bootloader artifacts",
         ],
         "proves": [
             "boot image skeleton packaging prerequisites were checked",
         ],
         "does_not_prove": [
-            "boot image packaging completed",
             "QEMU boot",
             "serial output",
             "hardware trap execution",
@@ -196,8 +210,8 @@ def valid_metadata() -> dict[str, object]:
 
 def valid_blocker() -> dict[str, object]:
     return {
-        "phase": "v0.3.5",
-        "blocker_category": "missing_bootable_iso_generation",
+        "phase": "v0.3.6",
+        "blocker_category": "missing_iso_generation_tooling",
     }
 
 
@@ -206,7 +220,7 @@ def valid_doc_text() -> str:
         (
             "artifacts/runtime/boot_image/package_metadata.json",
             "artifacts/runtime/boot_image/kozo.iso",
-            "missing_bootable_iso_generation",
+            "missing_iso_generation_tooling",
         )
     )
 

@@ -121,7 +121,7 @@ def write_fixture_files(root: Path) -> dict[str, Path]:
     paths["tooling"].write_text(valid_tooling_text())
     for key in ("boot", "image", "blockers", "runtime", "release"):
         paths[key].write_text(valid_doc_text())
-    paths["report"].write_text(json.dumps({"blocker_category": "missing_bootable_iso_generation"}, indent=2) + "\n")
+    paths["report"].write_text(json.dumps({"blocker_category": "missing_iso_generation_tooling"}, indent=2) + "\n")
     return paths
 
 
@@ -135,13 +135,13 @@ def valid_tooling_text() -> str:
             "Tool Provenance",
             "Opaque vendored binaries are discouraged.",
             "artifacts/runtime/boot_image/kozo.iso",
-            "missing_bootable_iso_generation",
+            "missing_iso_generation_tooling",
         )
     )
 
 
 def valid_doc_text() -> str:
-    return "docs/BOOT_TOOLING.md\nmissing_bootable_iso_generation\n"
+    return "docs/BOOT_TOOLING.md\nmissing_iso_generation_tooling\n"
 
 
 def patch_validator_paths(paths: dict[str, Path]):

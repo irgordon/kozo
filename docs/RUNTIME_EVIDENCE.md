@@ -22,9 +22,11 @@ v0.3.3 added a bounded QEMU smoke command, but it currently fails closed because
 
 v0.3.4 added boot image package metadata at `artifacts/runtime/boot_image/package_metadata.json`, recording the packaging blocker.
 
-v0.3.5 added `docs/BOOT_TOOLING.md` to define the Limine and xorriso acquisition path, but ISO generation is not yet implemented.
+v0.3.5 added `docs/BOOT_TOOLING.md` to define the Limine and xorriso acquisition path.
 
-Current boot blocker: `missing_bootable_iso_generation`.
+v0.3.6 added the ISO generation command path, but local ISO generation is blocked by missing Limine artifacts and xorriso tooling.
+
+Current boot blocker: `missing_iso_generation_tooling`.
 
 ---
 

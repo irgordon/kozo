@@ -17,14 +17,16 @@ report_path = Path(sys.argv[2])
 
 report = {
     "version": 0,
-    "phase": "v0.3.5",
+    "phase": "v0.3.6",
     "outcome": "blocked",
     "evidence_type": "boot-blocker-report",
     "generated_by": "scripts/boot_blocker_report.sh",
     "validator": "boot_blocker_report",
-    "blocker_category": "missing_bootable_iso_generation",
+    "blocker_category": "missing_iso_generation_tooling",
     "missing_components": [
-        "ISO generation command integration",
+        "Limine executable",
+        "xorriso executable",
+        "Limine bootloader artifacts",
         "bootable ISO artifact",
         "validated QEMU serial smoke execution"
     ],
@@ -36,8 +38,9 @@ report = {
         "boot/limine.conf defines the Limine boot entry",
         "scripts/build_boot_image.sh stages the boot image skeleton",
         "docs/BOOT_TOOLING.md documents Limine and xorriso acquisition paths",
-        "scripts/build_boot_image.sh writes package metadata for the blocked ISO generation attempt",
-        "scripts/qemu_smoke.sh fails closed when package metadata reports missing ISO generation",
+        "scripts/build_boot_image.sh implements the Limine and xorriso ISO generation path",
+        "scripts/build_boot_image.sh writes package metadata for the blocked ISO tooling attempt",
+        "scripts/qemu_smoke.sh fails closed until kozo.iso exists",
         "scripts/runtime_smoke.sh proves runtime-adjacent object and symbol evidence"
     ],
     "cannot_claim": [
@@ -53,7 +56,7 @@ report = {
         "file descriptor behavior",
         "production readiness"
     ],
-    "next_required_fix": "Implement bootable ISO generation in scripts/build_boot_image.sh using the documented Limine and xorriso tooling path, then run scripts/qemu_smoke.sh to capture serial output before claiming QEMU boot evidence.",
+    "next_required_fix": "Install or provide the documented Limine executable, Limine bootloader artifacts, and xorriso executable so scripts/build_boot_image.sh can create artifacts/runtime/boot_image/kozo.iso, then run scripts/qemu_smoke.sh to capture serial output before claiming QEMU boot evidence.",
     "inspected_paths": [
         "kernel/arch/x86_64/boot.asm",
         "kernel/main.odin",

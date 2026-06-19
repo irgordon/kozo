@@ -12,7 +12,7 @@ This document defines the tooling required to turn the current Limine boot image
 
 It records the acquisition path for Limine and ISO generation tooling.
 
-This document does not claim that KOZO currently produces a bootable ISO.
+This document does not claim that KOZO currently produces a bootable ISO in this environment.
 
 ---
 
@@ -119,7 +119,7 @@ Verify xorriso is available before ISO generation.
 Run scripts/build_boot_image.sh.
 ```
 
-CI does not currently install Limine or xorriso because ISO generation is not yet implemented.
+CI does not currently install Limine or xorriso because QEMU boot evidence is not yet required in CI.
 
 ---
 
@@ -173,10 +173,12 @@ The future ISO generation path should:
 The current blocker is:
 
 ```text
-missing_bootable_iso_generation
+missing_iso_generation_tooling
 ```
 
 The previous `missing_limine_iso_tooling` blocker is resolved at the policy level by this document.
+
+The previous `missing_bootable_iso_generation` blocker is refined by the v0.3.6 ISO generation command path.
 
 KOZO still does not produce:
 
@@ -184,4 +186,4 @@ KOZO still does not produce:
 artifacts/runtime/boot_image/kozo.iso
 ```
 
-The next required fix is to implement the ISO generation command using the documented Limine and xorriso tooling path.
+The next required fix is to provide the documented Limine executable, Limine bootloader artifacts, and xorriso executable so the ISO generation command can produce `artifacts/runtime/boot_image/kozo.iso`.

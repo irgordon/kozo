@@ -79,7 +79,7 @@ def _required_texts() -> tuple[RequiredText, ...]:
         RequiredText("boot_protocol_doc_selects_limine", _BOOT_PROTOCOL_PATH, "Selected protocol: Limine", "Boot protocol doc must select Limine"),
         RequiredText("boot_protocol_doc_next_phase", _BOOT_PROTOCOL_PATH, "v0.3.2 Boot Image Skeleton", "Boot protocol doc must name next phase"),
         RequiredText("boot_doc_references_protocol", _BOOT_DOC_PATH, "Selected boot protocol: Limine", "Boot doc must reference selected protocol"),
-        RequiredText("boot_doc_remaining_blocker", _BOOT_DOC_PATH, "Remaining blocker: `missing_bootable_iso_generation`.", "Boot doc must name remaining blocker"),
+        RequiredText("boot_doc_remaining_blocker", _BOOT_DOC_PATH, "Remaining blocker: `missing_iso_generation_tooling`.", "Boot doc must name remaining blocker"),
         RequiredText("boot_blockers_decision_complete", _BOOT_BLOCKERS_PATH, "Boot protocol decision: complete.", "Boot blockers doc must record decision completion"),
         RequiredText("boot_blockers_reduced", _BOOT_BLOCKERS_PATH, "The previous `missing_boot_protocol_and_image_packaging` blocker is reduced.", "Boot blockers doc must record reduced blocker"),
         RequiredText("phasemap_next_phase", _PHASEMAP_PATH, "v0.3.2", "Phase map must include v0.3.2"),

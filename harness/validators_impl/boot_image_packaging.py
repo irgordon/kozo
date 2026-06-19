@@ -17,25 +17,34 @@ _RUNTIME_EVIDENCE_PATH = _ROOT / "docs" / "RUNTIME_EVIDENCE.md"
 _RELEASE_EVIDENCE_PATH = _ROOT / "docs" / "RELEASE_EVIDENCE.md"
 _IMAGE_PATH = _ROOT / "artifacts" / "runtime" / "boot_image" / "kozo.iso"
 
-_EXPECTED_FIELDS = {
-    "phase": "v0.3.5",
-    "outcome": "blocked",
-    "blocker_category": "missing_bootable_iso_generation",
+_COMMON_FIELDS = {
+    "phase": "v0.3.6",
     "image_type": "iso",
     "boot_protocol": "Limine",
     "architecture": "x86_64",
     "image_path": "artifacts/runtime/boot_image/kozo.iso",
-    "image_exists": False,
     "generated_by": "scripts/build_boot_image.sh",
 }
 
-_REQUIRED_MISSING_COMPONENTS = (
-    "ISO generation command integration",
-    "bootable ISO artifact",
+_BLOCKED_FIELDS = {
+    "outcome": "blocked",
+    "blocker_category": "missing_iso_generation_tooling",
+    "image_exists": False,
+}
+
+_PACKAGED_FIELDS = {
+    "outcome": "packaged",
+    "blocker_category": "missing_qemu_serial_evidence",
+    "image_exists": True,
+}
+
+_REQUIRED_BLOCKED_COMPONENTS = (
+    "Limine executable",
+    "xorriso executable",
+    "Limine bootloader artifacts",
 )
 
 _REQUIRED_NON_GOALS = (
-    "boot image packaging completed",
     "QEMU boot",
     "serial output",
     "hardware trap execution",
@@ -53,7 +62,7 @@ _REQUIRED_NON_GOALS = (
 _REQUIRED_DOC_REFERENCES = (
     "artifacts/runtime/boot_image/package_metadata.json",
     "artifacts/runtime/boot_image/kozo.iso",
-    "missing_bootable_iso_generation",
+    "missing_iso_generation_tooling",
 )
 
 
@@ -75,7 +84,7 @@ class BootImagePackagingValidator(BaseValidator):
             return _failure(issue)
         return ValidationResult.pass_(
             code=OK,
-            detail="Boot image packaging metadata records the current Limine ISO tooling blocker without claiming boot success",
+            detail="Boot image packaging metadata records ISO generation status without claiming boot success",
         )
 
 
@@ -89,11 +98,11 @@ def _boot_image_packaging_issue() -> BootImagePackagingIssue | None:
         return blocker_issue
 
     return _first_issue(
-        _success_image_issue(metadata),
         _metadata_contract_issue(metadata),
-        _list_contract_issue(metadata, "missing_components", _REQUIRED_MISSING_COMPONENTS, "missing_component"),
+        _image_state_issue(metadata),
+        _blocked_component_issue(metadata),
         _list_contract_issue(metadata, "does_not_prove", _REQUIRED_NON_GOALS, "missing_non_goal"),
-        _blocker_state_issue(blocker_report),
+        _blocker_state_issue(metadata, blocker_report),
         _documentation_issue(),
     )
 
@@ -111,18 +120,38 @@ def _load_json(path: Path, contract_field: str) -> tuple[BootImagePackagingIssue
 
 
 def _metadata_contract_issue(metadata: dict[str, object]) -> BootImagePackagingIssue | None:
-    for field, expected in _EXPECTED_FIELDS.items():
+    for field, expected in _COMMON_FIELDS.items():
+        if metadata.get(field) != expected:
+            return _issue("field_mismatch", f"boot_image_packaging.{field}", f"Boot image packaging field {field} must be {expected}")
+    expected_fields = _expected_outcome_fields(metadata)
+    if expected_fields is None:
+        return _issue("field_mismatch", "boot_image_packaging.outcome", "Boot image packaging outcome must be blocked or packaged")
+    for field, expected in expected_fields.items():
         if metadata.get(field) != expected:
             return _issue("field_mismatch", f"boot_image_packaging.{field}", f"Boot image packaging field {field} must be {expected}")
     return None
 
 
-def _success_image_issue(metadata: dict[str, object]) -> BootImagePackagingIssue | None:
+def _expected_outcome_fields(metadata: dict[str, object]) -> dict[str, object] | None:
+    if metadata.get("outcome") == "blocked":
+        return _BLOCKED_FIELDS
+    if metadata.get("outcome") == "packaged":
+        return _PACKAGED_FIELDS
+    return None
+
+
+def _image_state_issue(metadata: dict[str, object]) -> BootImagePackagingIssue | None:
     if metadata.get("outcome") == "packaged" and not _IMAGE_PATH.is_file():
         return _issue("missing_image", "boot_image_packaging.image_path", "Boot image metadata claims packaging succeeded but kozo.iso is missing")
     if _IMAGE_PATH.is_file() and metadata.get("outcome") == "blocked":
         return _issue("blocker_state_mismatch", "boot_image_packaging.outcome", "Boot image exists but metadata still reports blocked packaging")
     return None
+
+
+def _blocked_component_issue(metadata: dict[str, object]) -> BootImagePackagingIssue | None:
+    if metadata.get("outcome") != "blocked":
+        return None
+    return _list_contract_issue(metadata, "missing_components", _REQUIRED_BLOCKED_COMPONENTS, "missing_component")
 
 
 def _list_contract_issue(
@@ -140,11 +169,11 @@ def _list_contract_issue(
     return None
 
 
-def _blocker_state_issue(blocker_report: dict[str, object]) -> BootImagePackagingIssue | None:
-    if blocker_report.get("phase") != "v0.3.5":
-        return _issue("blocker_state_mismatch", "boot_blocker.phase", "Boot blocker report must be updated for v0.3.5")
-    if blocker_report.get("blocker_category") != "missing_bootable_iso_generation":
-        return _issue("blocker_state_mismatch", "boot_blocker.blocker_category", "Boot blocker must name missing_bootable_iso_generation")
+def _blocker_state_issue(metadata: dict[str, object], blocker_report: dict[str, object]) -> BootImagePackagingIssue | None:
+    if blocker_report.get("phase") != "v0.3.6":
+        return _issue("blocker_state_mismatch", "boot_blocker.phase", "Boot blocker report must be updated for v0.3.6")
+    if blocker_report.get("blocker_category") != metadata.get("blocker_category"):
+        return _issue("blocker_state_mismatch", "boot_blocker.blocker_category", "Boot blocker must match boot image packaging metadata")
     return None
 
 

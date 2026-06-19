@@ -78,9 +78,9 @@ def _required_texts() -> tuple[RequiredText, ...]:
         RequiredText("provenance", _BOOT_TOOLING_PATH, "Tool Provenance", "Boot tooling doc must document provenance"),
         RequiredText("no_opaque_binaries", _BOOT_TOOLING_PATH, "Opaque vendored binaries are discouraged.", "Boot tooling doc must discourage opaque vendored binaries"),
         RequiredText("future_iso_path", _BOOT_TOOLING_PATH, "artifacts/runtime/boot_image/kozo.iso", "Boot tooling doc must name expected ISO path"),
-        RequiredText("current_blocker", _BOOT_TOOLING_PATH, "missing_bootable_iso_generation", "Boot tooling doc must name current blocker"),
+        RequiredText("current_blocker", _BOOT_TOOLING_PATH, "missing_iso_generation_tooling", "Boot tooling doc must name current blocker"),
         RequiredText("boot_doc_tooling", _BOOT_DOC_PATH, "docs/BOOT_TOOLING.md", "Boot doc must reference boot tooling doc"),
-        RequiredText("boot_doc_blocker", _BOOT_DOC_PATH, "missing_bootable_iso_generation", "Boot doc must name current blocker"),
+        RequiredText("boot_doc_blocker", _BOOT_DOC_PATH, "missing_iso_generation_tooling", "Boot doc must name current blocker"),
         RequiredText("image_doc_tooling", _BOOT_IMAGE_PATH, "docs/BOOT_TOOLING.md", "Boot image doc must reference boot tooling doc"),
         RequiredText("blockers_doc_tooling", _BOOT_BLOCKERS_PATH, "docs/BOOT_TOOLING.md", "Boot blockers doc must reference boot tooling doc"),
         RequiredText("runtime_doc_tooling", _RUNTIME_EVIDENCE_PATH, "docs/BOOT_TOOLING.md", "Runtime evidence doc must reference boot tooling doc"),
@@ -107,8 +107,8 @@ def _blocker_report_issue() -> BootToolingIssue | None:
         report = json.loads(_REPORT_PATH.read_text())
     except json.JSONDecodeError:
         return _issue("invalid_report_json", _contract_field(_REPORT_PATH), "Boot blocker report must be valid JSON")
-    if report.get("blocker_category") != "missing_bootable_iso_generation":
-        return _issue("blocker_mismatch", "boot_blocker.blocker_category", "Boot blocker must be narrowed to missing_bootable_iso_generation")
+    if report.get("blocker_category") != "missing_iso_generation_tooling":
+        return _issue("blocker_mismatch", "boot_blocker.blocker_category", "Boot blocker must be narrowed to missing_iso_generation_tooling")
     return None
 
 

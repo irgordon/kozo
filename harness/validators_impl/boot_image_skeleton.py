@@ -88,8 +88,8 @@ def _required_texts() -> tuple[RequiredText, ...]:
         RequiredText("doc_no_boot_claim", _BOOT_IMAGE_DOC_PATH, "This phase does not prove boot success.", "Boot image doc must avoid boot claim"),
         RequiredText("doc_no_qemu_claim", _BOOT_IMAGE_DOC_PATH, "This phase does not prove QEMU execution.", "Boot image doc must avoid QEMU claim"),
         RequiredText("doc_output_path", _BOOT_IMAGE_DOC_PATH, "artifacts/runtime/boot_image/", "Boot image doc must name output path"),
-        RequiredText("boot_doc_remaining_blocker", _BOOT_DOC_PATH, "Remaining blocker: `missing_bootable_iso_generation`.", "Boot doc must name remaining blocker"),
-        RequiredText("blockers_doc_remaining_blocker", _BOOT_BLOCKERS_PATH, "The remaining blocker is `missing_bootable_iso_generation`.", "Boot blockers doc must name remaining blocker"),
+        RequiredText("boot_doc_remaining_blocker", _BOOT_DOC_PATH, "Remaining blocker: `missing_iso_generation_tooling`.", "Boot doc must name remaining blocker"),
+        RequiredText("blockers_doc_remaining_blocker", _BOOT_BLOCKERS_PATH, "The remaining blocker is `missing_iso_generation_tooling`.", "Boot blockers doc must name remaining blocker"),
     )
 
 
@@ -112,11 +112,11 @@ def _blocker_report_issue() -> BootImageIssue | None:
         report = json.loads(_BOOT_BLOCKER_REPORT_PATH.read_text())
     except json.JSONDecodeError:
         return _issue("invalid_blocker_report_json", _contract_field(_BOOT_BLOCKER_REPORT_PATH), "Boot blocker report must be valid JSON")
-    if report.get("blocker_category") != "missing_bootable_iso_generation":
-        return _issue("blocker_state_mismatch", "boot_blocker.blocker_category", "Boot blocker must be narrowed to missing_bootable_iso_generation")
+    if report.get("blocker_category") != "missing_iso_generation_tooling":
+        return _issue("blocker_state_mismatch", "boot_blocker.blocker_category", "Boot blocker must be narrowed to missing_iso_generation_tooling")
     missing_components = report.get("missing_components")
-    if not isinstance(missing_components, list) or "ISO generation command integration" not in missing_components:
-        return _issue("blocker_state_mismatch", "boot_blocker.missing_components", "Boot blocker must require ISO generation command integration")
+    if not isinstance(missing_components, list) or "Limine executable" not in missing_components:
+        return _issue("blocker_state_mismatch", "boot_blocker.missing_components", "Boot blocker must require Limine executable tooling")
     return None
 
 

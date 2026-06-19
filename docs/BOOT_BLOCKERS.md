@@ -22,13 +22,13 @@ Boot image package metadata: present.
 
 Boot tooling acquisition policy: present in `docs/BOOT_TOOLING.md`.
 
-QEMU smoke command: present and fail-closed on missing ISO generation.
+QEMU smoke command: present and fail-closed on missing ISO generation tooling.
 
 ---
 
 # 2. Verified Blocker
 
-Blocker category: `missing_bootable_iso_generation`.
+Blocker category: `missing_iso_generation_tooling`.
 
 The previous `missing_boot_protocol_and_image_packaging` blocker is reduced.
 
@@ -36,11 +36,13 @@ The previous `missing_bootable_iso_packaging` blocker was refined to `missing_li
 
 The previous `missing_limine_iso_tooling` blocker is refined by `docs/BOOT_TOOLING.md`.
 
-The remaining blocker is `missing_bootable_iso_generation`.
+The previous `missing_bootable_iso_generation` blocker is refined by the v0.3.6 ISO generation command path.
 
-The current `_start` symbol is present in object evidence, Limine has been selected as the initial boot protocol, and the boot image skeleton exists.
+The remaining blocker is `missing_iso_generation_tooling`.
 
-The blocker remains active because `scripts/build_boot_image.sh` does not yet implement ISO generation using the documented Limine and xorriso tooling path.
+The current `_start` symbol is present in object evidence, Limine has been selected as the initial boot protocol, the boot image skeleton exists, and `scripts/build_boot_image.sh` contains the ISO generation command path.
+
+The blocker remains active because the local environment does not provide the Limine executable, Limine bootloader artifacts, or xorriso executable needed by that path.
 
 Therefore the repository cannot honestly claim QEMU boot execution.
 
@@ -50,7 +52,9 @@ Therefore the repository cannot honestly claim QEMU boot execution.
 
 The current boot blocker report must name these missing components:
 
-* ISO generation command integration
+* Limine executable
+* xorriso executable
+* Limine bootloader artifacts
 * bootable ISO artifact
 * validated QEMU serial smoke execution
 
@@ -106,8 +110,10 @@ boot_blocker_report
 
 Resolve this blocker by adding:
 
-* bootable Limine ISO or disk packaging
-* deterministic ISO generation in `scripts/build_boot_image.sh`
+* documented Limine executable availability
+* documented Limine bootloader artifact availability
+* documented xorriso executable availability
+* a generated bootable ISO at `artifacts/runtime/boot_image/kozo.iso`
 * serial marker validation for the booted kernel path
 * a QEMU smoke evidence validator
 

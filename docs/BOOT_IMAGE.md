@@ -71,7 +71,7 @@ Build the boot image skeleton with:
 scripts/build_boot_image.sh
 ```
 
-The script builds a freestanding kernel ELF and stages the Limine configuration.
+The script builds a freestanding kernel ELF, stages the Limine configuration, and attempts ISO generation when Limine artifacts and xorriso are available.
 
 Boot tooling acquisition requirements are defined in:
 
@@ -137,9 +137,9 @@ The skeleton does not include serial output capture.
 
 The skeleton does not include a `qemu_smoke` validator.
 
-The package metadata currently records `missing_bootable_iso_generation`.
+The package metadata currently records `missing_iso_generation_tooling`.
 
-The skeleton does not produce `artifacts/runtime/boot_image/kozo.iso`.
+The current local environment does not produce `artifacts/runtime/boot_image/kozo.iso` because the Limine executable, Limine bootloader artifacts, and xorriso executable are unavailable.
 
 ---
 
@@ -147,7 +147,9 @@ The skeleton does not produce `artifacts/runtime/boot_image/kozo.iso`.
 
 The previous `missing_boot_protocol_and_image_packaging` blocker is reduced by this phase because the boot protocol, linker script, Limine configuration, and boot image staging path now exist.
 
-The remaining blocker is `missing_bootable_iso_generation`.
+The previous `missing_bootable_iso_generation` blocker is refined by the ISO generation command path.
+
+The remaining blocker is `missing_iso_generation_tooling`.
 
 QEMU boot may not be claimed until a later phase captures and validates serial output.
 
@@ -157,7 +159,8 @@ QEMU boot may not be claimed until a later phase captures and validates serial o
 
 The future QEMU smoke path should:
 
-* build a bootable Limine ISO or disk image from the staged image root
+* provide Limine and xorriso tooling for the ISO generation command
+* build a bootable Limine ISO from the staged image root
 * boot the image under QEMU
 * capture serial output to `artifacts/runtime/qemu_smoke.log`
 * validate an early serial marker from the kernel entry path
