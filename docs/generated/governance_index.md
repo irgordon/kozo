@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.3.5`
+* Version: `v0.3.6`
 * Date: `2026-06-19`
-* Status: Limine ISO tooling acquisition.
+* Status: Bootable ISO generation blocked by missing local ISO tooling.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 36
 * Failed checks: 0
-* Run ID: `verify-20260619T033721Z`
-* Generated at: `2026-06-19T03:37:21Z`
+* Run ID: `verify-20260619T034837Z`
+* Generated at: `2026-06-19T03:48:37Z`
 
 ## Registered validators
 
