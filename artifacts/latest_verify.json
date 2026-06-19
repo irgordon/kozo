@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260619T022007Z",
+  "run_id": "verify-20260619T023004Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 32,
+    "total_checks": 33,
     "failed_check_count": 0
   },
   "checks": [
@@ -206,6 +206,13 @@
       "detail": "Boot blocker report identifies why QEMU boot cannot yet be claimed"
     },
     {
+      "name": "boot_protocol_decision",
+      "subsystem": "boot_protocol_decision",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Boot protocol decision selects Limine and keeps the boot blocker active until implementation"
+    },
+    {
       "name": "return_path_proof",
       "subsystem": "return_path_proof",
       "status": "pass",
@@ -248,29 +255,25 @@
   ],
   "failed_checks": [],
   "changed_files": [
-    ".github/workflows/ci.yml",
     "CHANGELOG.md",
     "PHASEMAP.md",
     "ROADMAP.md",
-    "artifacts/runtime/boot_blocker_report.json",
     "docs/BOOT.md",
     "docs/BOOT_BLOCKERS.md",
-    "docs/RELEASE_CHECKLIST.md",
+    "docs/BOOT_PROTOCOL.md",
     "docs/RELEASE_EVIDENCE.md",
-    "docs/REQUIRED_CHECKS.md",
     "docs/RUNTIME_EVIDENCE.md",
+    "docs/decisions/0001-boot-protocol.md",
     "docs/generated/governance_index.md",
     "harness/codes.py",
     "harness/registry.py",
     "harness/validators.py",
-    "harness/validators_impl/boot_blocker_report.py",
+    "harness/validators_impl/boot_protocol_decision.py",
     "harness/validators_impl/validator_coverage.py",
     "schemas/agent_context.schema.json",
     "schemas/latest_verify.schema.json",
-    "scripts/boot_blocker_report.sh",
-    "scripts/verify.sh",
     "tasks/todo.json",
-    "tests/test_boot_blocker_report.py"
+    "tests/test_boot_protocol_decision.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -281,5 +284,5 @@
     "artifacts/runtime/runtime_smoke.metadata.json",
     "artifacts/runtime/boot_blocker_report.json"
   ],
-  "generated_at": "2026-06-19T02:20:07Z"
+  "generated_at": "2026-06-19T02:30:04Z"
 }
