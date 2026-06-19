@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260619T045535Z",
+  "run_id": "verify-20260619T120141Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 36,
+    "total_checks": 37,
     "failed_check_count": 0
   },
   "checks": [
@@ -70,7 +70,7 @@
       "subsystem": "odin",
       "status": "pass",
       "code": "OK",
-      "detail": "No Odin kernel changes require validation in this bootstrap loop"
+      "detail": "Odin changes are backed by declared odin check evidence"
     },
     {
       "name": "abi",
@@ -234,6 +234,13 @@
       "detail": "Boot tooling policy documents Limine and xorriso acquisition without claiming boot success"
     },
     {
+      "name": "qemu_smoke_evidence",
+      "subsystem": "qemu_smoke_evidence",
+      "status": "pass",
+      "code": "OK",
+      "detail": "QEMU smoke evidence records pass or exact blocker without overclaiming runtime behavior"
+    },
+    {
       "name": "return_path_proof",
       "subsystem": "return_path_proof",
       "status": "pass",
@@ -276,10 +283,37 @@
   ],
   "failed_checks": [],
   "changed_files": [
-    "harness/validators_impl/boot_image_skeleton.py",
-    "harness/validators_impl/boot_tooling.py",
-    "tests/test_boot_image_skeleton.py",
-    "tests/test_boot_tooling.py"
+    ".github/workflows/ci.yml",
+    "CHANGELOG.md",
+    "PHASEMAP.md",
+    "ROADMAP.md",
+    "artifacts/runtime/boot_blocker_report.json",
+    "artifacts/runtime/qemu_smoke.metadata.json",
+    "docs/BOOT.md",
+    "docs/BOOT_BLOCKERS.md",
+    "docs/RELEASE_CHECKLIST.md",
+    "docs/RELEASE_EVIDENCE.md",
+    "docs/REQUIRED_CHECKS.md",
+    "docs/RUNTIME_EVIDENCE.md",
+    "docs/generated/governance_index.md",
+    "harness/codes.py",
+    "harness/registry.py",
+    "harness/validators.py",
+    "harness/validators_impl/boot_blocker_report.py",
+    "harness/validators_impl/boot_image_packaging.py",
+    "harness/validators_impl/qemu_smoke_evidence.py",
+    "harness/validators_impl/validator_coverage.py",
+    "kernel/arch/x86_64/serial.odin",
+    "kernel/main.odin",
+    "schemas/agent_context.schema.json",
+    "schemas/latest_verify.schema.json",
+    "scripts/boot_blocker_report.sh",
+    "scripts/qemu_smoke.sh",
+    "scripts/verify.sh",
+    "tasks/todo.json",
+    "tests/test_boot_blocker_report.py",
+    "tests/test_boot_image_packaging.py",
+    "tests/test_qemu_smoke_evidence.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -289,7 +323,9 @@
     "artifacts/runtime/runtime_smoke.log",
     "artifacts/runtime/runtime_smoke.metadata.json",
     "artifacts/runtime/boot_blocker_report.json",
-    "artifacts/runtime/boot_image/package_metadata.json"
+    "artifacts/runtime/boot_image/package_metadata.json",
+    "artifacts/runtime/qemu_smoke.log",
+    "artifacts/runtime/qemu_smoke.metadata.json"
   ],
-  "generated_at": "2026-06-19T04:55:35Z"
+  "generated_at": "2026-06-19T12:01:41Z"
 }
