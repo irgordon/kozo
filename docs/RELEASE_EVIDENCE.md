@@ -106,7 +106,12 @@ The minimum release evidence must record:
 * full verification status
 * lint/static-check status
 * required target/toolchain setup
+* runtime smoke log and metadata artifact availability from full CI when available
 * CI run URL or status when available
+
+Full CI runs `scripts/verify.sh`, so runtime smoke evidence is required there through full verification and should be uploaded as CI artifacts.
+
+The lint workflow is static-check only. It does not own runtime smoke evidence unless it is changed to run full verification.
 
 ---
 

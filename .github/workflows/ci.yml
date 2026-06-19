@@ -134,4 +134,6 @@ jobs:
           path: |
             artifacts/latest_verify.json
             artifacts/logs/*.log
+            artifacts/runtime/runtime_smoke.log
+            artifacts/runtime/runtime_smoke.metadata.json
           if-no-files-found: warn

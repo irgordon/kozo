@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.2.3`
+* Version: `v0.2.4`
 * Date: `2026-06-19`
-* Status: Runtime evidence review gate.
+* Status: CI/runtime evidence policy alignment.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 31
 * Failed checks: 0
-* Run ID: `verify-20260619T003152Z`
-* Generated at: `2026-06-19T00:31:52Z`
+* Run ID: `verify-20260619T021026Z`
+* Generated at: `2026-06-19T02:10:26Z`
 
 ## Registered validators
 

@@ -94,6 +94,10 @@ scripts/runtime_smoke.sh
 
 Full verification runs this command through `scripts/verify.sh`.
 
+Full CI runs `scripts/verify.sh`, so runtime smoke evidence is required in full CI through the full-verification path.
+
+The lint workflow does not run runtime smoke evidence unless it is changed to run full verification.
+
 ---
 
 # 7. Artifact Path
@@ -113,6 +117,8 @@ artifacts/runtime/runtime_smoke.metadata.json
 The log is generated evidence. It must be reproduced by the smoke script before it is used in release review.
 
 The metadata is deterministic generated evidence. It identifies the evidence type, source log, generator, validator, positive claims, and explicit non-goals.
+
+Full CI should upload both runtime smoke artifacts when full verification runs.
 
 ---
 

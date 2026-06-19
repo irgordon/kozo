@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.2.4 - 2026-06-19
+
+**Status:** CI/runtime evidence policy alignment.
+
+### Changed
+
+* Aligned full CI, required checks, release checklist, release evidence policy, runtime evidence docs, and runtime evidence review docs around the runtime smoke evidence requirement.
+* Updated full CI artifact upload to include `artifacts/runtime/runtime_smoke.log` and `artifacts/runtime/runtime_smoke.metadata.json`.
+* Documented that runtime smoke evidence is required in full CI through `scripts/verify.sh`, required for release review, and not required in lint unless lint runs full verification.
+
+### Notes
+
+* Runtime evidence remains scoped as `runtime-adjacent-object-symbol-smoke`.
+* This change does not add QEMU boot evidence.
+* This change does not add hardware syscall/trap execution evidence.
+* This change does not add Linux compatibility, POSIX compatibility, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+* This change does not change runtime behavior, ABI contracts, or syscall behavior.
+
 ## v0.2.3 - 2026-06-19
 
 **Status:** Runtime evidence review gate.
