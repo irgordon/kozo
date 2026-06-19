@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260619T003152Z",
+  "run_id": "verify-20260619T021026Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -241,23 +241,17 @@
   ],
   "failed_checks": [],
   "changed_files": [
+    ".github/workflows/ci.yml",
     "CHANGELOG.md",
     "PHASEMAP.md",
     "ROADMAP.md",
     "docs/RELEASE_CHECKLIST.md",
     "docs/RELEASE_EVIDENCE.md",
     "docs/REQUIRED_CHECKS.md",
+    "docs/RUNTIME_EVIDENCE.md",
     "docs/RUNTIME_EVIDENCE_REVIEW.md",
     "docs/generated/governance_index.md",
-    "harness/codes.py",
-    "harness/registry.py",
-    "harness/validators.py",
-    "harness/validators_impl/runtime_evidence_review.py",
-    "harness/validators_impl/validator_coverage.py",
-    "schemas/agent_context.schema.json",
-    "schemas/latest_verify.schema.json",
-    "tasks/todo.json",
-    "tests/test_runtime_evidence_review.py"
+    "tasks/todo.json"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -267,5 +261,5 @@
     "artifacts/runtime/runtime_smoke.log",
     "artifacts/runtime/runtime_smoke.metadata.json"
   ],
-  "generated_at": "2026-06-19T00:31:52Z"
+  "generated_at": "2026-06-19T02:10:26Z"
 }
