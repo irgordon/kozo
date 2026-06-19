@@ -12,7 +12,7 @@
 
 ---
 
-**KOZO** is a new kind of operating system—purpose‑built for people who want their computers to feel fast, private, and trustworthy. By pairing the precision of Zig with the safety of Rust, it creates an environment that’s secure from the moment you turn it on, without slowing you down or locking you into a walled garden.
+**KOZO** is a new kind of operating system—purpose‑built for people who want their computers to feel fast, private, and trustworthy. By pairing the precision of Odin with the safety of Rust, it creates an environment that’s secure from the moment you turn it on, without slowing you down or locking you into a walled garden.
 
 Instead of patching over decades of legacy design, KOZO starts fresh. Its microkernel foundation is clean, modern, and engineered for today’s hardware and expectations, giving you a system that feels lighter, safer, and more dependable from the inside out.
 
