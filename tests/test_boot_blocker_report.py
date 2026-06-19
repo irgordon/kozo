@@ -183,7 +183,7 @@ def write_fixture_files(root: Path) -> None:
 def valid_report() -> dict[str, object]:
     return {
         "version": 0,
-            "phase": "v0.3.6",
+        "phase": "v0.3.8",
         "outcome": "blocked",
         "evidence_type": "boot-blocker-report",
         "generated_by": "scripts/boot_blocker_report.sh",
@@ -232,6 +232,8 @@ def valid_report() -> dict[str, object]:
             "docs/BOOT_TOOLING.md",
             "scripts/build_boot_image.sh",
             "artifacts/runtime/boot_image/package_metadata.json",
+            "artifacts/runtime/qemu_smoke.metadata.json",
+            "artifacts/runtime/qemu_smoke.log",
             "scripts/qemu_smoke.sh",
             "scripts/runtime_smoke.sh",
             "docs/RUNTIME_EVIDENCE.md",
@@ -266,6 +268,8 @@ def valid_doc_text() -> str:
             "artifacts/runtime/boot_blocker_report.json",
             "artifacts/runtime/boot_image/package_metadata.json",
             "artifacts/runtime/boot_image/kozo.iso",
+            "artifacts/runtime/qemu_smoke.metadata.json",
+            "artifacts/runtime/qemu_smoke.log",
             "scripts/boot_blocker_report.sh",
             "scripts/qemu_smoke.sh",
             "boot_blocker_report",

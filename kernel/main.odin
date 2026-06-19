@@ -20,6 +20,7 @@ signal_kernel_heartbeat :: proc() -> abi.K_STATUS {
 	if status != abi.K_OK {
 		return status
 	}
+	x86_64.serial_log_boot_smoke()
 	payload := abi.Heartbeat_Payload{
 		sequence = 0xCAFEFEED,
 		timestamp = 0,

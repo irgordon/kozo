@@ -1,0 +1,236 @@
+from __future__ import annotations
+
+import json
+from dataclasses import dataclass
+from pathlib import Path
+
+from harness.codes import OK, QEMU_SMOKE_EVIDENCE_INVALID
+from harness.validator import BaseValidator, ValidationResult
+
+_ROOT = Path(__file__).resolve().parents[2]
+_METADATA_PATH = _ROOT / "artifacts" / "runtime" / "qemu_smoke.metadata.json"
+_SERIAL_LOG_PATH = _ROOT / "artifacts" / "runtime" / "qemu_smoke.log"
+_BOOT_BLOCKER_REPORT_PATH = _ROOT / "artifacts" / "runtime" / "boot_blocker_report.json"
+_BOOT_DOC_PATH = _ROOT / "docs" / "BOOT.md"
+_RUNTIME_EVIDENCE_PATH = _ROOT / "docs" / "RUNTIME_EVIDENCE.md"
+_RELEASE_EVIDENCE_PATH = _ROOT / "docs" / "RELEASE_EVIDENCE.md"
+
+_COMMON_FIELDS = {
+    "phase": "v0.3.8",
+    "evidence_type": "qemu-serial-smoke",
+    "boot_protocol": "Limine",
+    "architecture": "x86_64",
+    "generated_by": "scripts/qemu_smoke.sh",
+    "serial_log": "artifacts/runtime/qemu_smoke.log",
+    "validator": "qemu_smoke_evidence",
+}
+
+_PASS_PROVES = (
+    "QEMU launched the KOZO ISO",
+    "serial output was captured",
+    "the expected KOZO boot smoke marker was observed",
+)
+
+_BLOCKED_PROVES = (
+    "QEMU serial smoke was attempted or checked",
+    "QEMU boot evidence remains unclaimed",
+)
+
+_REQUIRED_NON_GOALS = (
+    "hardware trap execution",
+    "Linux compatibility",
+    "POSIX compatibility",
+    "general userspace execution",
+    "process model behavior",
+    "VFS behavior",
+    "scheduler maturity",
+    "ELF loading",
+    "file descriptor behavior",
+    "production readiness",
+)
+
+_ALLOWED_BLOCKERS = (
+    "missing_iso_generation_tooling",
+    "missing_qemu_tooling",
+    "missing_boot_image",
+    "missing_serial_marker",
+    "qemu_launch_failed",
+    "qemu_timeout",
+    "limine_load_failed",
+    "kernel_entry_not_reached",
+)
+
+_REQUIRED_DOC_REFERENCES = (
+    "artifacts/runtime/qemu_smoke.log",
+    "artifacts/runtime/qemu_smoke.metadata.json",
+    "qemu_smoke_evidence",
+    "KOZO_BOOT_SMOKE_OK",
+)
+
+
+@dataclass(frozen=True)
+class QemuSmokeIssue:
+    reason: str
+    contract_field: str
+    detail: str
+
+
+class QemuSmokeEvidenceValidator(BaseValidator):
+    name = "qemu_smoke_evidence"
+    subsystem = "qemu_smoke_evidence"
+
+    def validate(self, artifact_bundle):
+        _ = artifact_bundle
+        issue = _qemu_smoke_issue()
+        if issue is not None:
+            return _failure(issue)
+        return ValidationResult.pass_(
+            code=OK,
+            detail="QEMU smoke evidence records pass or exact blocker without overclaiming runtime behavior",
+        )
+
+
+def _qemu_smoke_issue() -> QemuSmokeIssue | None:
+    metadata_issue, metadata = _load_json(_METADATA_PATH, "qemu_smoke.metadata")
+    if metadata_issue is not None:
+        return metadata_issue
+
+    blocker_issue, blocker_report = _load_json(_BOOT_BLOCKER_REPORT_PATH, "boot_blocker.report")
+    if blocker_issue is not None:
+        return blocker_issue
+
+    return _first_issue(
+        _common_field_issue(metadata),
+        _outcome_issue(metadata),
+        _pass_evidence_issue(metadata),
+        _list_contract_issue(metadata, "does_not_prove", _REQUIRED_NON_GOALS, "missing_non_goal"),
+        _blocker_report_issue(metadata, blocker_report),
+        _documentation_issue(),
+    )
+
+
+def _load_json(path: Path, contract_field: str) -> tuple[QemuSmokeIssue | None, dict[str, object]]:
+    if not path.is_file():
+        return _issue("missing_metadata", contract_field, f"Missing QEMU smoke metadata: {path}"), {}
+    try:
+        value = json.loads(path.read_text())
+    except json.JSONDecodeError:
+        return _issue("invalid_metadata", contract_field, f"QEMU smoke metadata is not valid JSON: {path}"), {}
+    if not isinstance(value, dict):
+        return _issue("invalid_metadata", contract_field, f"QEMU smoke metadata must be a JSON object: {path}"), {}
+    return None, value
+
+
+def _common_field_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
+    for field, expected in _COMMON_FIELDS.items():
+        if metadata.get(field) != expected:
+            return _issue("field_mismatch", f"qemu_smoke.{field}", f"QEMU smoke field {field} must be {expected}")
+    if not metadata.get("expected_marker"):
+        return _issue("missing_expected_marker", "qemu_smoke.expected_marker", "QEMU smoke expected marker must be non-empty")
+    if not metadata.get("boot_image"):
+        return _issue("missing_boot_image_reference", "qemu_smoke.boot_image", "QEMU smoke boot image reference must be non-empty")
+    return None
+
+
+def _outcome_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
+    if metadata.get("outcome") == "pass":
+        return _list_contract_issue(metadata, "proves", _PASS_PROVES, "missing_proves_claim")
+    if metadata.get("outcome") == "blocked":
+        return _blocked_outcome_issue(metadata)
+    return _issue("field_mismatch", "qemu_smoke.outcome", "QEMU smoke outcome must be pass or blocked")
+
+
+def _blocked_outcome_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
+    blocker = metadata.get("blocker_category")
+    if blocker not in _ALLOWED_BLOCKERS:
+        return _issue("unknown_blocker_category", "qemu_smoke.blocker_category", "QEMU smoke blocker category is not allowed")
+    return _list_contract_issue(metadata, "proves", _BLOCKED_PROVES, "missing_proves_claim")
+
+
+def _pass_evidence_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
+    if metadata.get("outcome") != "pass":
+        return None
+    if not _SERIAL_LOG_PATH.is_file():
+        return _issue("missing_serial_log", "qemu_smoke.serial_log", "QEMU smoke pass metadata requires a serial log")
+    marker = metadata.get("expected_marker")
+    if not isinstance(marker, str) or marker not in _SERIAL_LOG_PATH.read_text(errors="replace"):
+        return _issue("marker_missing", "qemu_smoke.expected_marker", "QEMU smoke serial log is missing the expected marker")
+    return _pass_boot_image_issue(metadata)
+
+
+def _pass_boot_image_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
+    boot_image = metadata.get("boot_image")
+    if not isinstance(boot_image, str):
+        return _issue("missing_boot_image_reference", "qemu_smoke.boot_image", "QEMU smoke boot image reference must be a string")
+    image_path = Path(boot_image)
+    if not image_path.is_absolute():
+        image_path = _ROOT / image_path
+    if not image_path.is_file():
+        return _issue("missing_boot_image", "qemu_smoke.boot_image", "QEMU smoke pass metadata references a missing boot image")
+    return None
+
+
+def _list_contract_issue(
+    metadata: dict[str, object],
+    field: str,
+    required_values: tuple[str, ...],
+    reason: str,
+) -> QemuSmokeIssue | None:
+    values = metadata.get(field)
+    if not isinstance(values, list):
+        return _issue(reason, f"qemu_smoke.{field}", f"QEMU smoke field {field} must be a list")
+    for required in required_values:
+        if required not in values:
+            return _issue(reason, f"qemu_smoke.{field}.{required}", f"QEMU smoke field {field} is missing {required}")
+    return None
+
+
+def _blocker_report_issue(metadata: dict[str, object], blocker_report: dict[str, object]) -> QemuSmokeIssue | None:
+    if metadata.get("outcome") == "pass":
+        expected_category = "none"
+    else:
+        expected_category = metadata.get("blocker_category")
+    if blocker_report.get("blocker_category") != expected_category:
+        return _issue("blocker_report_mismatch", "boot_blocker.blocker_category", "Boot blocker report must match QEMU smoke evidence")
+    return None
+
+
+def _documentation_issue() -> QemuSmokeIssue | None:
+    for path in (_BOOT_DOC_PATH, _RUNTIME_EVIDENCE_PATH, _RELEASE_EVIDENCE_PATH):
+        if not path.is_file():
+            return _issue("missing_documentation", _contract_field(path), f"Missing QEMU smoke documentation: {path}")
+        text = path.read_text()
+        for reference in _REQUIRED_DOC_REFERENCES:
+            if reference not in text:
+                return _issue("missing_documentation_reference", f"{_contract_field(path)}.{reference}", f"QEMU smoke documentation is missing {reference}")
+    return None
+
+
+def _contract_field(path: Path) -> str:
+    try:
+        return str(path.relative_to(_ROOT))
+    except ValueError:
+        return "/".join(path.parts[-2:])
+
+
+def _first_issue(*issues: QemuSmokeIssue | None) -> QemuSmokeIssue | None:
+    for issue in issues:
+        if issue is not None:
+            return issue
+    return None
+
+
+def _issue(reason: str, contract_field: str, detail: str) -> QemuSmokeIssue:
+    return QemuSmokeIssue(reason=reason, contract_field=contract_field, detail=detail)
+
+
+def _failure(issue: QemuSmokeIssue) -> ValidationResult:
+    return ValidationResult.fail(
+        code=QEMU_SMOKE_EVIDENCE_INVALID,
+        detail=issue.detail,
+        action="Run scripts/qemu_smoke.sh and keep QEMU smoke docs, metadata, and blocker state aligned",
+        meta={
+            "reason": issue.reason,
+            "contract_field": issue.contract_field,
+        },
+    )

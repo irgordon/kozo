@@ -1,0 +1,30 @@
+{
+  "version": 0,
+  "phase": "v0.3.8",
+  "evidence_type": "qemu-serial-smoke",
+  "outcome": "blocked",
+  "boot_protocol": "Limine",
+  "architecture": "x86_64",
+  "generated_by": "scripts/qemu_smoke.sh",
+  "boot_image": "artifacts/runtime/boot_image/kozo.iso",
+  "serial_log": "artifacts/runtime/qemu_smoke.log",
+  "expected_marker": "KOZO_BOOT_SMOKE_OK",
+  "validator": "qemu_smoke_evidence",
+  "proves": [
+    "QEMU serial smoke was attempted or checked",
+    "QEMU boot evidence remains unclaimed"
+  ],
+  "does_not_prove": [
+    "hardware trap execution",
+    "Linux compatibility",
+    "POSIX compatibility",
+    "general userspace execution",
+    "process model behavior",
+    "VFS behavior",
+    "scheduler maturity",
+    "ELF loading",
+    "file descriptor behavior",
+    "production readiness"
+  ],
+  "blocker_category": "missing_iso_generation_tooling"
+}

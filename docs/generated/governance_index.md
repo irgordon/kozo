@@ -12,18 +12,18 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.3.7`
+* Version: `v0.3.8`
 * Date: `2026-06-19`
-* Status: CI ISO tooling install.
+* Status: QEMU serial smoke evidence gate.
 
 ## Verification status
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 36
+* Total checks: 37
 * Failed checks: 0
-* Run ID: `verify-20260619T045535Z`
-* Generated at: `2026-06-19T04:55:35Z`
+* Run ID: `verify-20260619T120132Z`
+* Generated at: `2026-06-19T12:01:32Z`
 
 ## Registered validators
 
@@ -61,10 +61,11 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 30 | `boot_image_skeleton` |
 | 31 | `boot_image_packaging` |
 | 32 | `boot_tooling` |
-| 33 | `return_path_proof` |
-| 34 | `execution_proof` |
-| 35 | `validator_coverage` |
-| 36 | `evidence` |
+| 33 | `qemu_smoke_evidence` |
+| 34 | `return_path_proof` |
+| 35 | `execution_proof` |
+| 36 | `validator_coverage` |
+| 37 | `evidence` |
 
 ## Active contracts
 
@@ -102,7 +103,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 36
+* Check count: 37
 * Failure count: 0
 
 ## Non-goals

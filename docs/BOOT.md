@@ -28,11 +28,15 @@ v0.3.6 added the ISO generation command path to `scripts/build_boot_image.sh`, b
 
 v0.3.7 added CI installation of pinned Limine tooling and xorriso so full CI can attempt `scripts/build_boot_image.sh` and upload boot image artifacts when produced.
 
+v0.3.8 added QEMU serial smoke metadata, the `qemu_smoke_evidence` validator, and a kernel-emitted `KOZO_BOOT_SMOKE_OK` marker for future QEMU serial validation.
+
 Remaining blocker: `missing_iso_generation_tooling`.
 
 The local blocker is `missing_iso_generation_tooling`.
 
 If CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated blocker report narrows to `missing_qemu_serial_evidence` for that run.
+
+If `scripts/qemu_smoke.sh` can run against a generated ISO, it writes `artifacts/runtime/qemu_smoke.log` and `artifacts/runtime/qemu_smoke.metadata.json`. Passing QEMU evidence requires the serial log to contain `KOZO_BOOT_SMOKE_OK`; blocked metadata preserves the no-QEMU-boot claim.
 
 ---
 
@@ -54,13 +58,15 @@ The boot protocol decision, boot image skeleton, boot tooling acquisition policy
 
 `scripts/build_boot_image.sh` writes `artifacts/runtime/boot_image/package_metadata.json`.
 
+`scripts/qemu_smoke.sh` writes `artifacts/runtime/qemu_smoke.metadata.json` and `artifacts/runtime/qemu_smoke.log`.
+
 The expected ISO path is `artifacts/runtime/boot_image/kozo.iso`.
 
 GitHub Actions full CI installs xorriso, acquires Limine v12.3.3 from a pinned source release, builds Limine, and attempts ISO generation.
 
 The current local tooling does not yet provide the Limine artifacts and xorriso executable required to produce that image, so local verification continues to report blocked packaging metadata.
 
-KOZO does not have QEMU smoke execution or captured serial evidence.
+KOZO has QEMU smoke evidence metadata, but local execution currently records `missing_iso_generation_tooling`. A QEMU boot claim remains unavailable unless `qemu_smoke_evidence` validates a passing serial log with `KOZO_BOOT_SMOKE_OK`.
 
 ---
 
@@ -89,12 +95,14 @@ The current source surfaces relevant to future boot work are:
 * `scripts/build_boot_image.sh`
 * `scripts/qemu_smoke.sh`
 * `docs/BOOT_TOOLING.md`
+* `artifacts/runtime/qemu_smoke.metadata.json`
+* `artifacts/runtime/qemu_smoke.log`
 
 `kernel/arch/x86_64/boot.asm` defines `_start`, and `scripts/build_boot_image.sh` links a kernel ELF for the Limine image skeleton.
 
-`kernel/main.odin` exports `kernel_entry`, but no bootable ISO or disk image currently transfers control to it through a proven loader path.
+`kernel/main.odin` exports `kernel_entry` and emits `KOZO_BOOT_SMOKE_OK` after serial initialization, but no local bootable ISO transfers control to it through a proven loader path.
 
-`kernel/arch/x86_64/serial.odin` initializes COM1 serial output after entry, but no QEMU boot path reaches that initialization yet.
+`kernel/arch/x86_64/serial.odin` initializes COM1 serial output and owns the boot smoke marker output. That marker is not a QEMU boot claim until captured from QEMU serial output.
 
 ---
 
@@ -106,7 +114,7 @@ The previous `missing_limine_iso_tooling` blocker is refined by `docs/BOOT_TOOLI
 
 The next boot-enabling fix must use the documented CI/local Limine and xorriso tooling path to produce a bootable ISO consistently before QEMU smoke execution, serial evidence capture, and QEMU smoke validation can be claimed.
 
-The existing QEMU smoke command writes blocked output to `artifacts/runtime/qemu_smoke.log` and stops when `artifacts/runtime/boot_image/package_metadata.json` reports missing ISO tooling or when `artifacts/runtime/boot_image/kozo.iso` is missing.
+The existing QEMU smoke command writes blocked or passing metadata to `artifacts/runtime/qemu_smoke.metadata.json` and serial output to `artifacts/runtime/qemu_smoke.log`.
 
 The selected protocol and implementation plan are owned by `docs/BOOT_PROTOCOL.md`.
 
@@ -164,4 +172,16 @@ The current boot image packaging metadata is:
 
 ```text
 artifacts/runtime/boot_image/package_metadata.json
+```
+
+The current QEMU smoke metadata is:
+
+```text
+artifacts/runtime/qemu_smoke.metadata.json
+```
+
+The QEMU smoke evidence validator is:
+
+```text
+qemu_smoke_evidence
 ```

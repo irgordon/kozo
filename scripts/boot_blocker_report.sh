@@ -5,10 +5,11 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RUNTIME_DIR="$ROOT/artifacts/runtime"
 REPORT_PATH="$RUNTIME_DIR/boot_blocker_report.json"
 PACKAGE_METADATA_PATH="$RUNTIME_DIR/boot_image/package_metadata.json"
+QEMU_METADATA_PATH="$RUNTIME_DIR/qemu_smoke.metadata.json"
 
 mkdir -p "$RUNTIME_DIR"
 
-python3 - "$ROOT" "$REPORT_PATH" "$PACKAGE_METADATA_PATH" <<'PY'
+python3 - "$ROOT" "$REPORT_PATH" "$PACKAGE_METADATA_PATH" "$QEMU_METADATA_PATH" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -16,13 +17,25 @@ from pathlib import Path
 root = Path(sys.argv[1])
 report_path = Path(sys.argv[2])
 package_metadata_path = Path(sys.argv[3])
+qemu_metadata_path = Path(sys.argv[4])
+
+allowed_qemu_blockers = {
+    "missing_iso_generation_tooling",
+    "missing_qemu_tooling",
+    "missing_boot_image",
+    "missing_serial_marker",
+    "qemu_launch_failed",
+    "qemu_timeout",
+    "limine_load_failed",
+    "kernel_entry_not_reached",
+}
 
 
-def package_metadata() -> dict[str, object]:
-    if not package_metadata_path.is_file():
+def load_json(path: Path) -> dict[str, object]:
+    if not path.is_file():
         return {}
     try:
-        value = json.loads(package_metadata_path.read_text())
+        value = json.loads(path.read_text())
     except json.JSONDecodeError:
         return {}
     if not isinstance(value, dict):
@@ -38,10 +51,57 @@ def packaged_iso_exists(metadata: dict[str, object]) -> bool:
     )
 
 
+def qemu_passed(metadata: dict[str, object]) -> bool:
+    return (
+        metadata.get("outcome") == "pass"
+        and metadata.get("evidence_type") == "qemu-serial-smoke"
+    )
+
+
+def qemu_blocker(metadata: dict[str, object]) -> str:
+    if metadata.get("outcome") != "blocked":
+        return ""
+    blocker = metadata.get("blocker_category")
+    if not isinstance(blocker, str):
+        return ""
+    if blocker not in allowed_qemu_blockers:
+        return ""
+    return blocker
+
+
 def blocker_state() -> dict[str, object]:
-    metadata = package_metadata()
-    if packaged_iso_exists(metadata):
+    package_metadata = load_json(package_metadata_path)
+    qemu_metadata = load_json(qemu_metadata_path)
+    qemu_blocker_category = qemu_blocker(qemu_metadata)
+    if qemu_blocker_category == "missing_iso_generation_tooling":
+        qemu_blocker_category = ""
+    if qemu_passed(qemu_metadata):
         return {
+            "outcome": "pass",
+            "blocker_category": "none",
+            "missing_components": [],
+            "current_surfaces": [
+                "scripts/qemu_smoke.sh captured artifacts/runtime/qemu_smoke.log",
+                "artifacts/runtime/qemu_smoke.metadata.json records passing QEMU serial smoke metadata",
+            ],
+            "next_required_fix": "Do not expand runtime claims beyond QEMU serial smoke until separate hardware trap, userspace, or subsystem evidence exists.",
+        }
+    if qemu_blocker_category:
+        return {
+            "outcome": "blocked",
+            "blocker_category": qemu_blocker_category,
+            "missing_components": [
+                "validated QEMU serial smoke execution"
+            ],
+            "current_surfaces": [
+                "scripts/qemu_smoke.sh records exact QEMU serial smoke blocker metadata",
+                "artifacts/runtime/qemu_smoke.metadata.json records the current QEMU smoke blocker",
+            ],
+            "next_required_fix": "Resolve the exact QEMU smoke blocker recorded in artifacts/runtime/qemu_smoke.metadata.json before claiming QEMU boot evidence.",
+        }
+    if packaged_iso_exists(package_metadata):
+        return {
+            "outcome": "blocked",
             "blocker_category": "missing_qemu_serial_evidence",
             "missing_components": [
                 "validated QEMU serial smoke execution"
@@ -53,6 +113,7 @@ def blocker_state() -> dict[str, object]:
             "next_required_fix": "Run scripts/qemu_smoke.sh with QEMU available, capture serial output, and validate the expected KOZO marker before claiming QEMU boot evidence.",
         }
     return {
+        "outcome": "blocked",
         "blocker_category": "missing_iso_generation_tooling",
         "missing_components": [
             "Limine executable",
@@ -72,8 +133,8 @@ state = blocker_state()
 
 report = {
     "version": 0,
-    "phase": "v0.3.6",
-    "outcome": "blocked",
+    "phase": "v0.3.8",
+    "outcome": state["outcome"],
     "evidence_type": "boot-blocker-report",
     "generated_by": "scripts/boot_blocker_report.sh",
     "validator": "boot_blocker_report",
@@ -114,6 +175,8 @@ report = {
         "docs/BOOT_TOOLING.md",
         "scripts/build_boot_image.sh",
         "artifacts/runtime/boot_image/package_metadata.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.log",
         "scripts/qemu_smoke.sh",
         "scripts/runtime_smoke.sh",
         "docs/RUNTIME_EVIDENCE.md"

@@ -28,6 +28,8 @@ v0.3.6 added the ISO generation command path, but local ISO generation is blocke
 
 v0.3.7 added full-CI installation of pinned Limine source tooling and xorriso so CI can attempt ISO generation and upload boot image artifacts.
 
+v0.3.8 added QEMU serial smoke metadata, `qemu_smoke_evidence`, and the kernel-emitted `KOZO_BOOT_SMOKE_OK` marker. Local QEMU smoke remains blocked by missing ISO generation tooling unless the ISO is supplied.
+
 Current local boot blocker: `missing_iso_generation_tooling`.
 
 When CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated blocker report may narrow to `missing_qemu_serial_evidence` for that run.
@@ -152,6 +154,12 @@ The QEMU smoke log path is:
 artifacts/runtime/qemu_smoke.log
 ```
 
+The QEMU smoke metadata path is:
+
+```text
+artifacts/runtime/qemu_smoke.metadata.json
+```
+
 The boot image package metadata path is:
 
 ```text
@@ -170,7 +178,7 @@ The boot tooling policy path is:
 docs/BOOT_TOOLING.md
 ```
 
-The QEMU smoke log is currently blocker evidence only. It is not passing QEMU serial smoke evidence.
+The QEMU smoke log is passing QEMU serial smoke evidence only when `qemu_smoke_evidence` validates metadata with outcome `pass` and finds `KOZO_BOOT_SMOKE_OK` in the serial log. Blocked metadata remains blocker evidence only.
 
 The selected boot protocol is documented in:
 
@@ -194,6 +202,8 @@ Full CI should upload both runtime smoke artifacts when full verification runs.
 Full CI should also upload the boot blocker report while v0.3.0 remains blocked.
 
 Full CI should upload boot image package metadata and `artifacts/runtime/boot_image/kozo.iso` when ISO generation succeeds.
+
+Full CI should upload QEMU smoke log and metadata when `scripts/qemu_smoke.sh` runs.
 
 ---
 
@@ -230,6 +240,8 @@ Before release review:
 * Run `scripts/runtime_smoke.sh`.
 * Run `scripts/boot_blocker_report.sh` while v0.3.0 remains blocked.
 * Run `scripts/qemu_smoke.sh` only when reviewing the current QEMU blocker directly; it is expected to fail closed until bootable image packaging exists.
+* Confirm `artifacts/runtime/qemu_smoke.metadata.json` is valid JSON when QEMU smoke is in scope.
+* Confirm `qemu_smoke_evidence` passes when QEMU smoke metadata is generated.
 * Confirm `artifacts/runtime/runtime_smoke.log` exists and is non-empty.
 * Confirm `artifacts/runtime/runtime_smoke.metadata.json` is valid JSON.
 * Confirm `artifacts/runtime/boot_blocker_report.json` is valid JSON while boot is blocked.

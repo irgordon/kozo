@@ -15,21 +15,33 @@ _RUNTIME_EVIDENCE_PATH = _ROOT / "docs" / "RUNTIME_EVIDENCE.md"
 _RELEASE_EVIDENCE_PATH = _ROOT / "docs" / "RELEASE_EVIDENCE.md"
 
 _COMMON_FIELDS = {
-    "phase": "v0.3.6",
-    "outcome": "blocked",
+    "phase": "v0.3.8",
     "evidence_type": "boot-blocker-report",
     "generated_by": "scripts/boot_blocker_report.sh",
     "validator": "boot_blocker_report",
 }
 
+_PASS_FIELDS = {
+    "outcome": "pass",
+    "blocker_category": "none",
+    "next_required_fix": "Do not expand runtime claims beyond QEMU serial smoke until separate hardware trap, userspace, or subsystem evidence exists.",
+}
+
 _TOOLING_BLOCKER_FIELDS = {
+    "outcome": "blocked",
     "blocker_category": "missing_iso_generation_tooling",
     "next_required_fix": "Install or provide the documented Limine executable, Limine bootloader artifacts, and xorriso executable so scripts/build_boot_image.sh can create artifacts/runtime/boot_image/kozo.iso, then run scripts/qemu_smoke.sh to capture serial output before claiming QEMU boot evidence.",
 }
 
 _QEMU_BLOCKER_FIELDS = {
+    "outcome": "blocked",
     "blocker_category": "missing_qemu_serial_evidence",
     "next_required_fix": "Run scripts/qemu_smoke.sh with QEMU available, capture serial output, and validate the expected KOZO marker before claiming QEMU boot evidence.",
+}
+
+_EXACT_QEMU_BLOCKER_FIELDS = {
+    "outcome": "blocked",
+    "next_required_fix": "Resolve the exact QEMU smoke blocker recorded in artifacts/runtime/qemu_smoke.metadata.json before claiming QEMU boot evidence.",
 }
 
 _TOOLING_MISSING_COMPONENTS = (
@@ -42,6 +54,16 @@ _TOOLING_MISSING_COMPONENTS = (
 
 _QEMU_MISSING_COMPONENTS = (
     "validated QEMU serial smoke execution",
+)
+
+_PASS_CURRENT_SURFACES = (
+    "scripts/qemu_smoke.sh captured artifacts/runtime/qemu_smoke.log",
+    "artifacts/runtime/qemu_smoke.metadata.json records passing QEMU serial smoke metadata",
+)
+
+_EXACT_QEMU_CURRENT_SURFACES = (
+    "scripts/qemu_smoke.sh records exact QEMU serial smoke blocker metadata",
+    "artifacts/runtime/qemu_smoke.metadata.json records the current QEMU smoke blocker",
 )
 
 _COMMON_CURRENT_SURFACES = (
@@ -84,12 +106,25 @@ _REQUIRED_DOC_REFERENCES = (
     "artifacts/runtime/boot_blocker_report.json",
     "artifacts/runtime/boot_image/package_metadata.json",
     "artifacts/runtime/boot_image/kozo.iso",
+    "artifacts/runtime/qemu_smoke.metadata.json",
+    "artifacts/runtime/qemu_smoke.log",
     "docs/BOOT_TOOLING.md",
     "scripts/boot_blocker_report.sh",
     "scripts/qemu_smoke.sh",
     "boot_blocker_report",
     "missing_iso_generation_tooling",
     "missing_qemu_serial_evidence",
+)
+
+_ALLOWED_EXACT_QEMU_BLOCKERS = (
+    "missing_iso_generation_tooling",
+    "missing_qemu_tooling",
+    "missing_boot_image",
+    "missing_serial_marker",
+    "qemu_launch_failed",
+    "qemu_timeout",
+    "limine_load_failed",
+    "kernel_entry_not_reached",
 )
 
 
@@ -161,7 +196,7 @@ def _field_contract_issue(report: dict[str, object]) -> BootBlockerIssue | None:
             return _issue("field_mismatch", f"boot_blocker.{field}", f"Boot blocker field {field} must be {expected}")
     expected_fields = _expected_blocker_fields(report)
     if expected_fields is None:
-        return _issue("field_mismatch", "boot_blocker.blocker_category", "Boot blocker category must be missing_iso_generation_tooling or missing_qemu_serial_evidence")
+        return _issue("field_mismatch", "boot_blocker.blocker_category", "Boot blocker category must be none, missing_iso_generation_tooling, missing_qemu_serial_evidence, or an allowed exact QEMU blocker")
     for field, expected in expected_fields.items():
         if report.get(field) != expected:
             return _issue("field_mismatch", f"boot_blocker.{field}", f"Boot blocker field {field} must be {expected}")
@@ -169,22 +204,38 @@ def _field_contract_issue(report: dict[str, object]) -> BootBlockerIssue | None:
 
 
 def _expected_blocker_fields(report: dict[str, object]) -> dict[str, object] | None:
+    if report.get("blocker_category") == "none":
+        return _PASS_FIELDS
     if report.get("blocker_category") == "missing_iso_generation_tooling":
         return _TOOLING_BLOCKER_FIELDS
     if report.get("blocker_category") == "missing_qemu_serial_evidence":
         return _QEMU_BLOCKER_FIELDS
+    if report.get("blocker_category") in _ALLOWED_EXACT_QEMU_BLOCKERS:
+        return _EXACT_QEMU_BLOCKER_FIELDS | {"blocker_category": report.get("blocker_category")}
     return None
 
 
 def _required_missing_components(report: dict[str, object]) -> tuple[str, ...]:
+    if report.get("blocker_category") == "none":
+        return ()
+    if report.get("blocker_category") == "missing_iso_generation_tooling":
+        return _TOOLING_MISSING_COMPONENTS
     if report.get("blocker_category") == "missing_qemu_serial_evidence":
+        return _QEMU_MISSING_COMPONENTS
+    if report.get("blocker_category") in _ALLOWED_EXACT_QEMU_BLOCKERS:
         return _QEMU_MISSING_COMPONENTS
     return _TOOLING_MISSING_COMPONENTS
 
 
 def _required_current_surfaces(report: dict[str, object]) -> tuple[str, ...]:
+    if report.get("blocker_category") == "none":
+        return _COMMON_CURRENT_SURFACES + _PASS_CURRENT_SURFACES
+    if report.get("blocker_category") == "missing_iso_generation_tooling":
+        return _COMMON_CURRENT_SURFACES + _TOOLING_CURRENT_SURFACES
     if report.get("blocker_category") == "missing_qemu_serial_evidence":
         return _COMMON_CURRENT_SURFACES + _QEMU_CURRENT_SURFACES
+    if report.get("blocker_category") in _ALLOWED_EXACT_QEMU_BLOCKERS:
+        return _COMMON_CURRENT_SURFACES + _EXACT_QEMU_CURRENT_SURFACES
     return _COMMON_CURRENT_SURFACES + _TOOLING_CURRENT_SURFACES
 
 

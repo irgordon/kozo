@@ -36,6 +36,7 @@ from harness.validators_impl.boot_protocol_decision import BootProtocolDecisionV
 from harness.validators_impl.boot_image_skeleton import BootImageSkeletonValidator
 from harness.validators_impl.boot_image_packaging import BootImagePackagingValidator
 from harness.validators_impl.boot_tooling import BootToolingValidator
+from harness.validators_impl.qemu_smoke_evidence import QemuSmokeEvidenceValidator
 from harness.validators_impl.return_path_proof import ReturnPathProofValidator
 from harness.validators_impl.execution_proof import ExecutionProofValidator
 from harness.validators_impl.validator_coverage import ValidatorCoverageValidator
@@ -74,6 +75,7 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "boot_image_skeleton": BootImageSkeletonValidator,
     "boot_image_packaging": BootImagePackagingValidator,
     "boot_tooling": BootToolingValidator,
+    "qemu_smoke_evidence": QemuSmokeEvidenceValidator,
     "return_path_proof": ReturnPathProofValidator,
     "execution_proof": ExecutionProofValidator,
     "validator_coverage": ValidatorCoverageValidator,

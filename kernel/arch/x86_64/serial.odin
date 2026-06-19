@@ -17,15 +17,30 @@ line_control_8n1  :: u8(0x03)
 fifo_enable_clear :: u8(0xC7)
 modem_ready       :: u8(0x03)
 transmit_ready    :: u8(0x20)
+boot_smoke_marker :: "KOZO_BOOT_SMOKE_OK"
 
 outb :: proc "contextless" (port: u16, value: u8) {
-	_ = port
-	_ = value
+	when ODIN_ARCH == .amd64 {
+		asm(u32, u8) #side_effects #intel {
+			"mov edx, $0; mov al, $1; out dx, al",
+			"r,r",
+		}(u32(port), value)
+	} else {
+		_ = port
+		_ = value
+	}
 }
 
 inb :: proc "contextless" (port: u16) -> u8 {
-	_ = port
-	return transmit_ready
+	when ODIN_ARCH == .amd64 {
+		return asm(u32) -> u8 #side_effects #intel {
+			"mov edx, $1; in al, dx; mov $0, al",
+			"=r,r",
+		}(u32(port))
+	} else {
+		_ = port
+		return transmit_ready
+	}
 }
 
 disable_serial_interrupts :: proc() {
@@ -69,6 +84,12 @@ serial_write :: proc(s: string) -> abi.K_STATUS {
 	for i in 0..<len(s) {
 		write_serial_byte(s[i])
 	}
+	return abi.K_OK
+}
+
+serial_log_boot_smoke :: proc() -> abi.K_STATUS {
+	serial_write(boot_smoke_marker)
+	write_serial_newline()
 	return abi.K_OK
 }
 

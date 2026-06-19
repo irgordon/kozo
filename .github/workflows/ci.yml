@@ -42,6 +42,7 @@ jobs:
             nasm \
             python3 \
             python3-pip \
+            qemu-system-x86 \
             xorriso
 
       - name: Acquire pinned Limine tooling
@@ -114,6 +115,7 @@ jobs:
           "$(rustup which --toolchain "${{ steps.rust-toolchain.outputs.channel }}" rustc)" --version
           nm --version | head -n 1
           nasm -v
+          qemu-system-x86_64 --version | head -n 1
           xorriso --version | head -n 1
           "$LIMINE" --version || true
           odin version
@@ -157,6 +159,11 @@ jobs:
           scripts/build_boot_image.sh
           python3 -m json.tool artifacts/runtime/boot_image/package_metadata.json >/dev/null
 
+      - name: Run QEMU smoke evidence
+        run: |
+          scripts/qemu_smoke.sh
+          python3 -m json.tool artifacts/runtime/qemu_smoke.metadata.json >/dev/null
+
       - name: Run KOZO verification harness
         run: |
           scripts/verify.sh
@@ -186,4 +193,7 @@ jobs:
             artifacts/runtime/boot_blocker_report.json
             artifacts/runtime/boot_image/package_metadata.json
             artifacts/runtime/boot_image/kozo.iso
+            artifacts/runtime/qemu_smoke.log
+            artifacts/runtime/qemu_smoke.metadata.json
+            artifacts/runtime/qemu_smoke.qemu.log
           if-no-files-found: warn

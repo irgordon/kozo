@@ -1,5 +1,31 @@
 # Changelog
 
+## v0.3.8 - 2026-06-19
+
+**Status:** QEMU serial smoke evidence gate.
+
+### Added
+
+* Added deterministic QEMU smoke metadata at `artifacts/runtime/qemu_smoke.metadata.json`.
+* Added `qemu_smoke_evidence` validation for passing QEMU serial smoke evidence or exact blocked QEMU smoke metadata.
+* Added focused negative coverage for missing metadata, invalid metadata, missing serial logs, missing markers, wrong evidence type, wrong protocol, missing non-goals, unknown blockers, blocker mismatches, release evidence references, and diagnostic quality.
+* Added `KOZO_BOOT_SMOKE_OK` as the kernel-emitted boot smoke marker for future QEMU serial validation.
+
+### Changed
+
+* Updated `scripts/qemu_smoke.sh` to write pass or blocked metadata, bound QEMU execution, and validate that serial output contains the kernel marker before any pass outcome.
+* Updated boot blocker reporting so QEMU smoke pass or exact blocked metadata drives the generated blocker state.
+* Updated full CI to install QEMU, run QEMU smoke evidence, and upload QEMU smoke logs and metadata.
+* Updated boot, runtime evidence, release evidence, release checklist, required checks, phase map, and roadmap docs for the QEMU smoke evidence gate.
+
+### Notes
+
+* Local QEMU smoke remains blocked by `missing_iso_generation_tooling` when Limine artifacts or xorriso are unavailable.
+* This change does not claim QEMU boot unless `qemu_smoke_evidence` validates passing metadata and serial output containing `KOZO_BOOT_SMOKE_OK`.
+* This change does not claim hardware syscall/trap execution.
+* This change does not add Linux compatibility, POSIX compatibility, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+* This change does not change ABI contracts or syscall behavior.
+
 ## v0.3.7 - 2026-06-19
 
 **Status:** CI ISO tooling install.

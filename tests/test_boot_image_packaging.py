@@ -210,7 +210,7 @@ def valid_metadata() -> dict[str, object]:
 
 def valid_blocker() -> dict[str, object]:
     return {
-        "phase": "v0.3.6",
+        "phase": "v0.3.8",
         "blocker_category": "missing_iso_generation_tooling",
     }
 

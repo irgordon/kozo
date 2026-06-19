@@ -19,6 +19,8 @@ RUNTIME_SMOKE_LOG="$ARTIFACTS_DIR/runtime/runtime_smoke.log"
 RUNTIME_SMOKE_METADATA="$ARTIFACTS_DIR/runtime/runtime_smoke.metadata.json"
 BOOT_BLOCKER_REPORT="$ARTIFACTS_DIR/runtime/boot_blocker_report.json"
 BOOT_IMAGE_PACKAGE_METADATA="$ARTIFACTS_DIR/runtime/boot_image/package_metadata.json"
+QEMU_SMOKE_LOG="$ARTIFACTS_DIR/runtime/qemu_smoke.log"
+QEMU_SMOKE_METADATA="$ARTIFACTS_DIR/runtime/qemu_smoke.metadata.json"
 VERIFY_TMP=""
 
 mkdir -p "$LOG_DIR" "$ARTIFACTS_DIR"
@@ -132,6 +134,8 @@ collect_evidence_files() {
     "$RUNTIME_SMOKE_METADATA"
     "$BOOT_BLOCKER_REPORT"
     "$BOOT_IMAGE_PACKAGE_METADATA"
+    "$QEMU_SMOKE_LOG"
+    "$QEMU_SMOKE_METADATA"
   )
 
   local file
@@ -243,6 +247,7 @@ build_kernel_object_artifact
 
 "$ROOT/scripts/runtime_smoke.sh"
 "$ROOT/scripts/build_boot_image.sh"
+"$ROOT/scripts/qemu_smoke.sh"
 "$ROOT/scripts/boot_blocker_report.sh"
 
 EVIDENCE_FILES_TEXT="$(collect_evidence_files)"

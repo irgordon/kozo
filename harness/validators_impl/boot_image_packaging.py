@@ -170,8 +170,8 @@ def _list_contract_issue(
 
 
 def _blocker_state_issue(metadata: dict[str, object], blocker_report: dict[str, object]) -> BootImagePackagingIssue | None:
-    if blocker_report.get("phase") != "v0.3.6":
-        return _issue("blocker_state_mismatch", "boot_blocker.phase", "Boot blocker report must be updated for v0.3.6")
+    if blocker_report.get("phase") != "v0.3.8":
+        return _issue("blocker_state_mismatch", "boot_blocker.phase", "Boot blocker report must be updated for v0.3.8")
     if blocker_report.get("blocker_category") != metadata.get("blocker_category"):
         return _issue("blocker_state_mismatch", "boot_blocker.blocker_category", "Boot blocker must match boot image packaging metadata")
     return None

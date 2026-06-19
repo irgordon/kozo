@@ -24,7 +24,9 @@ Boot tooling acquisition policy: present in `docs/BOOT_TOOLING.md`.
 
 CI ISO tooling install path: present.
 
-QEMU smoke command: present and fail-closed on missing ISO generation tooling.
+QEMU smoke command: present and fail-closed on missing ISO generation tooling or missing serial evidence.
+
+QEMU smoke evidence validator: `qemu_smoke_evidence`.
 
 ---
 
@@ -55,6 +57,8 @@ The blocker remains active for the local environment because it does not provide
 If CI produces `artifacts/runtime/boot_image/kozo.iso`, `scripts/boot_blocker_report.sh` narrows the generated blocker report to `missing_qemu_serial_evidence`.
 
 Even then, QEMU boot evidence remains blocked until serial output is captured and validated.
+
+`scripts/qemu_smoke.sh` writes `artifacts/runtime/qemu_smoke.metadata.json` and `artifacts/runtime/qemu_smoke.log`. The expected kernel-emitted serial marker is `KOZO_BOOT_SMOKE_OK`.
 
 Therefore the repository cannot honestly claim QEMU boot execution.
 
@@ -90,6 +94,18 @@ The QEMU blocker review command is:
 
 ```text
 scripts/qemu_smoke.sh
+```
+
+The QEMU smoke metadata is:
+
+```text
+artifacts/runtime/qemu_smoke.metadata.json
+```
+
+The QEMU smoke serial log is:
+
+```text
+artifacts/runtime/qemu_smoke.log
 ```
 
 The packaging metadata is:
@@ -130,6 +146,6 @@ Resolve the local tooling part of this blocker by adding:
 Resolve the runtime evidence part of this blocker by adding:
 
 * serial marker validation for the booted kernel path
-* a QEMU smoke evidence validator
+* passing `qemu_smoke_evidence` over a QEMU serial log containing `KOZO_BOOT_SMOKE_OK`
 
 Only after that work passes verification may KOZO claim QEMU boot evidence.

@@ -55,6 +55,7 @@ Every release review must include:
 * `artifacts/runtime/boot_image/package_metadata.json`
 * `artifacts/runtime/boot_image/kozo.iso` when packaging succeeds
 * `artifacts/runtime/qemu_smoke.log` when a QEMU smoke blocker or QEMU serial evidence is under review
+* `artifacts/runtime/qemu_smoke.metadata.json` when a QEMU smoke blocker or QEMU serial evidence is under review
 * `docs/BOOT_PROTOCOL.md`
 * `docs/BOOT_IMAGE.md`
 * `docs/BOOT_TOOLING.md`
@@ -100,6 +101,7 @@ Release review must include verification logs when generated:
 * `artifacts/runtime/boot_image/package_metadata.json`
 * `artifacts/runtime/boot_image/kozo.iso` when packaging succeeds
 * `artifacts/runtime/qemu_smoke.log` when generated during QEMU smoke blocker review
+* `artifacts/runtime/qemu_smoke.metadata.json` when generated during QEMU smoke blocker review
 
 Future runtime smoke phases must add their runtime logs to this list before using them as release evidence.
 
@@ -135,7 +137,19 @@ The blocked QEMU smoke command is:
 scripts/qemu_smoke.sh
 ```
 
-The boot protocol decision, boot image skeleton, and blocked QEMU smoke command are release context only. They do not create a QEMU boot claim.
+The QEMU smoke evidence validator is:
+
+```text
+qemu_smoke_evidence
+```
+
+The expected QEMU smoke marker is:
+
+```text
+KOZO_BOOT_SMOKE_OK
+```
+
+The boot protocol decision, boot image skeleton, and blocked QEMU smoke command are release context only. They do not create a QEMU boot claim unless `qemu_smoke_evidence` validates passing metadata and serial output.
 
 ---
 
@@ -156,12 +170,15 @@ The minimum release evidence must record:
 * ISO tooling acquisition status from full CI
 * boot image package metadata artifact availability from full CI
 * boot image ISO artifact availability from full CI when produced
+* QEMU smoke metadata and serial log availability from full CI when generated
 
 Full CI runs `scripts/verify.sh`, so runtime smoke evidence is required there through full verification and should be uploaded as CI artifacts.
 
 Full CI also runs the boot blocker report generator through `scripts/verify.sh` while boot remains blocked, and should upload `artifacts/runtime/boot_blocker_report.json`.
 
 Full CI installs xorriso, acquires pinned Limine source tooling, runs `scripts/build_boot_image.sh`, and should upload `artifacts/runtime/boot_image/package_metadata.json` plus `artifacts/runtime/boot_image/kozo.iso` when the image exists.
+
+Full CI installs QEMU, runs `scripts/qemu_smoke.sh`, and should upload `artifacts/runtime/qemu_smoke.log` plus `artifacts/runtime/qemu_smoke.metadata.json` whether the result is pass or an exact blocker.
 
 The lint workflow is static-check only. It does not own runtime smoke evidence unless it is changed to run full verification.
 
@@ -217,6 +234,7 @@ release-evidence/
       package_metadata.json
       kozo.iso
     qemu_smoke.log
+    qemu_smoke.metadata.json
   logs/
     odin-check.log
     odin-build.log
