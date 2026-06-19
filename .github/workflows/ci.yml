@@ -37,6 +37,7 @@ jobs:
             build-essential \
             curl \
             lld \
+            llvm \
             mtools \
             nasm \
             python3 \
