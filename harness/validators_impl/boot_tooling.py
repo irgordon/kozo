@@ -17,6 +17,10 @@ _RELEASE_EVIDENCE_PATH = _ROOT / "docs" / "RELEASE_EVIDENCE.md"
 _CI_WORKFLOW_PATH = _ROOT / ".github" / "workflows" / "ci.yml"
 _BUILD_SCRIPT_PATH = _ROOT / "scripts" / "build_boot_image.sh"
 _REPORT_PATH = _ROOT / "artifacts" / "runtime" / "boot_blocker_report.json"
+_ALLOWED_BLOCKERS = (
+    "missing_iso_generation_tooling",
+    "missing_qemu_serial_evidence",
+)
 
 
 @dataclass(frozen=True)
@@ -124,8 +128,8 @@ def _blocker_report_issue() -> BootToolingIssue | None:
         report = json.loads(_REPORT_PATH.read_text())
     except json.JSONDecodeError:
         return _issue("invalid_report_json", _contract_field(_REPORT_PATH), "Boot blocker report must be valid JSON")
-    if report.get("blocker_category") != "missing_iso_generation_tooling":
-        return _issue("blocker_mismatch", "boot_blocker.blocker_category", "Boot blocker must be narrowed to missing_iso_generation_tooling")
+    if report.get("blocker_category") not in _ALLOWED_BLOCKERS:
+        return _issue("blocker_mismatch", "boot_blocker.blocker_category", "Boot blocker must be narrowed to ISO tooling or QEMU serial evidence")
     return None
 
 

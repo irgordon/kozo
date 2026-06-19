@@ -29,6 +29,14 @@ class BootToolingValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
 
+    def test_passes_when_iso_exists_and_qemu_serial_evidence_is_missing(self):
+        result = self.validate_fixture(
+            mutate_report=lambda report: report | {"blocker_category": "missing_qemu_serial_evidence"}
+        )
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
     def test_fails_when_limine_documentation_is_missing(self):
         self.assertEqual("boot_tooling", BootToolingValidator.name)
         result = self.validate_fixture(mutate_tooling=lambda text: text.replace("Limine purpose:", "Bootloader purpose:"))

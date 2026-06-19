@@ -16,6 +16,10 @@ _BOOT_IMAGE_DOC_PATH = _ROOT / "docs" / "BOOT_IMAGE.md"
 _BOOT_DOC_PATH = _ROOT / "docs" / "BOOT.md"
 _BOOT_BLOCKERS_PATH = _ROOT / "docs" / "BOOT_BLOCKERS.md"
 _BOOT_BLOCKER_REPORT_PATH = _ROOT / "artifacts" / "runtime" / "boot_blocker_report.json"
+_ALLOWED_BLOCKERS = (
+    "missing_iso_generation_tooling",
+    "missing_qemu_serial_evidence",
+)
 
 
 @dataclass(frozen=True)
@@ -112,12 +116,18 @@ def _blocker_report_issue() -> BootImageIssue | None:
         report = json.loads(_BOOT_BLOCKER_REPORT_PATH.read_text())
     except json.JSONDecodeError:
         return _issue("invalid_blocker_report_json", _contract_field(_BOOT_BLOCKER_REPORT_PATH), "Boot blocker report must be valid JSON")
-    if report.get("blocker_category") != "missing_iso_generation_tooling":
-        return _issue("blocker_state_mismatch", "boot_blocker.blocker_category", "Boot blocker must be narrowed to missing_iso_generation_tooling")
+    if report.get("blocker_category") not in _ALLOWED_BLOCKERS:
+        return _issue("blocker_state_mismatch", "boot_blocker.blocker_category", "Boot blocker must be narrowed to ISO tooling or QEMU serial evidence")
     missing_components = report.get("missing_components")
-    if not isinstance(missing_components, list) or "Limine executable" not in missing_components:
-        return _issue("blocker_state_mismatch", "boot_blocker.missing_components", "Boot blocker must require Limine executable tooling")
+    if not isinstance(missing_components, list) or _required_missing_component(report) not in missing_components:
+        return _issue("blocker_state_mismatch", "boot_blocker.missing_components", "Boot blocker must name the remaining required component")
     return None
+
+
+def _required_missing_component(report: dict[str, object]) -> str:
+    if report.get("blocker_category") == "missing_qemu_serial_evidence":
+        return "validated QEMU serial smoke execution"
+    return "Limine executable"
 
 
 def _contract_field(path: Path, name: str | None = None) -> str:

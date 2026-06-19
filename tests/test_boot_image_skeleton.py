@@ -28,6 +28,15 @@ class BootImageSkeletonValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
 
+    def test_passes_when_iso_exists_and_qemu_serial_evidence_is_missing(self):
+        result = self.validate_fixture(mutate_report=lambda report: report | {
+            "blocker_category": "missing_qemu_serial_evidence",
+            "missing_components": ["validated QEMU serial smoke execution"],
+        })
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
     def test_fails_when_linker_script_is_missing(self):
         self.assertEqual("boot_image_skeleton", BootImageSkeletonValidator.name)
         result = self.validate_fixture(remove="linker")
