@@ -14,6 +14,8 @@ The current path is a bounded runtime-adjacent object and symbol smoke check. It
 
 The v0.3.0 boot baseline attempted to move beyond runtime-adjacent evidence. It is currently blocked by `missing_boot_protocol_and_image_packaging`.
 
+v0.3.1 selected Limine as the planned x86_64 boot protocol, but QEMU smoke is planned and not yet proven.
+
 ---
 
 # 2. Authority
@@ -56,6 +58,8 @@ This evidence does not prove production readiness.
 This evidence does not prove QEMU boot execution, hardware syscall execution, interrupt handling, or privilege transition behavior.
 
 The current boot blocker report also does not prove QEMU boot.
+
+The boot protocol decision also does not prove QEMU boot.
 
 ---
 
@@ -122,6 +126,13 @@ The boot blocker artifact is:
 
 ```text
 artifacts/runtime/boot_blocker_report.json
+```
+
+The selected boot protocol is documented in:
+
+```text
+docs/BOOT_PROTOCOL.md
+docs/decisions/0001-boot-protocol.md
 ```
 
 The log is generated evidence. It must be reproduced by the smoke script before it is used in release review.

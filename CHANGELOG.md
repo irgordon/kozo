@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.3.1 - 2026-06-19
+
+**Status:** Boot protocol selection.
+
+### Added
+
+* Added `docs/decisions/0001-boot-protocol.md` as the accepted boot protocol decision record.
+* Added `docs/BOOT_PROTOCOL.md` as the authoritative boot protocol plan.
+* Added `boot_protocol_decision` as a registered validator for the selected boot protocol, alternatives, non-goals, boot blocker relationship, and next boot phase references.
+* Added focused negative coverage for missing decision records, wrong protocol, missing alternatives, missing non-goals, missing active-blocker wording, missing v0.3.2 phase references, and diagnostic quality.
+
+### Changed
+
+* Selected Limine as the initial x86_64 boot protocol for the planned QEMU serial smoke path.
+* Updated boot docs, runtime evidence docs, release evidence docs, phase map, and roadmap to keep the boot blocker active while recording the protocol decision.
+
+### Notes
+
+* The `missing_boot_protocol_and_image_packaging` blocker remains active until linker script, loader configuration, image packaging, and QEMU smoke execution exist.
+* This change does not add QEMU boot evidence.
+* This change does not add hardware syscall/trap execution evidence.
+* This change does not add Linux compatibility, POSIX compatibility, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+* This change does not change runtime behavior, ABI contracts, or syscall behavior.
+
 ## v0.3.0 - 2026-06-19
 
 **Status:** Bootable runtime baseline blocked by missing boot protocol and image packaging.

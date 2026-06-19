@@ -453,6 +453,20 @@ _VALIDATOR_TEST_CONTRACTS = {
             "diagnostic_names_boot_blocker_field",
         ),
     ),
+    "boot_protocol_decision": ValidatorTestContract(
+        "boot_protocol_decision",
+        _TESTS_DIR / "test_boot_protocol_decision.py",
+        "BootProtocolDecisionValidator",
+        (
+            "missing_adr",
+            "wrong_protocol",
+            "missing_alternative",
+            "missing_non_goal",
+            "missing_boot_blocker_active_statement",
+            "missing_v032_next_phase",
+            "diagnostic_names_decision_field",
+        ),
+    ),
     "return_path_proof": ValidatorTestContract(
         "return_path_proof",
         _TESTS_DIR / "test_return_path_proof.py",

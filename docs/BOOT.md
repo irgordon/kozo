@@ -14,6 +14,10 @@ The v0.3.0 bootable runtime baseline attempted to determine whether the current 
 
 The result is blocked.
 
+v0.3.1 selected Limine as the initial x86_64 boot protocol.
+
+The blocker remains active until implementation adds a linker script, loader configuration, image packaging, and QEMU smoke execution.
+
 ---
 
 # 2. Current Result
@@ -22,9 +26,11 @@ Boot feasibility result: blocked.
 
 Blocker category: `missing_boot_protocol_and_image_packaging`.
 
+Selected boot protocol: Limine.
+
 The current repository has a 64-bit `_start` symbol, an exported `kernel_entry`, early serial initialization, and runtime-adjacent object/symbol smoke evidence.
 
-The current repository does not yet have enough boot protocol and image packaging machinery to claim QEMU boot execution.
+The boot protocol decision is complete, but the current repository does not yet have enough linker, loader, image packaging, and QEMU smoke machinery to claim QEMU boot execution.
 
 ---
 
@@ -33,9 +39,9 @@ The current repository does not yet have enough boot protocol and image packagin
 The concrete missing components are:
 
 * linker script
-* boot protocol
 * loader configuration
 * boot image packaging
+* QEMU smoke execution
 
 Until those exist, KOZO must not claim QEMU boot evidence.
 
@@ -60,9 +66,13 @@ The current source surfaces relevant to future boot work are:
 
 # 5. Required Next Fix
 
-The next boot-enabling fix must add a governed boot protocol, linker script, loader configuration, and boot image packaging before any QEMU boot evidence can be claimed.
+The v0.3.0 blocker remains active.
+
+The next boot-enabling fix must add a linker script, Limine configuration, boot image packaging, and QEMU smoke execution before any QEMU boot evidence can be claimed.
 
 The implementation should then add a QEMU smoke command that writes serial output to `artifacts/runtime/qemu_smoke.log` and validates an expected KOZO kernel marker.
+
+The selected protocol and implementation plan are owned by `docs/BOOT_PROTOCOL.md`.
 
 ---
 

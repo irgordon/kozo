@@ -12,18 +12,18 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.3.0`
+* Version: `v0.3.1`
 * Date: `2026-06-19`
-* Status: Bootable runtime baseline blocked by missing boot protocol and image packaging.
+* Status: Boot protocol selection.
 
 ## Verification status
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 32
+* Total checks: 33
 * Failed checks: 0
-* Run ID: `verify-20260619T022007Z`
-* Generated at: `2026-06-19T02:20:07Z`
+* Run ID: `verify-20260619T023004Z`
+* Generated at: `2026-06-19T02:30:04Z`
 
 ## Registered validators
 
@@ -57,10 +57,11 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 26 | `runtime_smoke_evidence` |
 | 27 | `runtime_evidence_review` |
 | 28 | `boot_blocker_report` |
-| 29 | `return_path_proof` |
-| 30 | `execution_proof` |
-| 31 | `validator_coverage` |
-| 32 | `evidence` |
+| 29 | `boot_protocol_decision` |
+| 30 | `return_path_proof` |
+| 31 | `execution_proof` |
+| 32 | `validator_coverage` |
+| 33 | `evidence` |
 
 ## Active contracts
 
@@ -98,7 +99,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 32
+* Check count: 33
 * Failure count: 0
 
 ## Non-goals

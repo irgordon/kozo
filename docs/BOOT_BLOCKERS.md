@@ -12,13 +12,21 @@ This document names the concrete blockers found during the v0.3.0 bootable runti
 
 The current result is a verified blocker, not a boot success.
 
+Boot protocol decision: complete.
+
+Selected protocol: Limine.
+
 ---
 
 # 2. Verified Blocker
 
 Blocker category: `missing_boot_protocol_and_image_packaging`.
 
-The current `_start` symbol is present in object evidence, but no governed boot protocol, linker script, loader configuration, or boot image packaging exists.
+The `missing_boot_protocol_and_image_packaging` blocker remains active.
+
+The current `_start` symbol is present in object evidence, and Limine has been selected as the initial boot protocol.
+
+The blocker remains active because no linker script, loader configuration, boot image packaging, or QEMU smoke execution exists.
 
 Therefore the repository cannot honestly claim QEMU boot execution.
 
@@ -29,9 +37,9 @@ Therefore the repository cannot honestly claim QEMU boot execution.
 The current boot blocker report must name these missing components:
 
 * linker script
-* boot protocol
 * loader configuration
 * boot image packaging
+* QEMU smoke execution
 
 ---
 
@@ -61,9 +69,8 @@ boot_blocker_report
 
 Resolve this blocker by adding:
 
-* a governed boot protocol
 * a linker script
-* loader configuration
+* Limine loader configuration
 * boot image packaging
 * a bounded QEMU smoke command
 * serial marker validation for the booted kernel path
