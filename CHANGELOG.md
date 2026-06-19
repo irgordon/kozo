@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.2.3 - 2026-06-19
+
+**Status:** Runtime evidence review gate.
+
+### Added
+
+* Added `docs/RUNTIME_EVIDENCE_REVIEW.md` as the release-review gate for runtime evidence scope, paths, metadata, validators, non-goals, release blockers, and claim examples.
+* Added `runtime_evidence_review` as a registered validator for runtime evidence review policy, release references, required non-goals, and metadata alignment.
+* Added focused negative coverage for missing review policy fields, missing release gates, metadata non-goal drift, and diagnostic quality.
+
+### Changed
+
+* Updated release evidence, release checklist, required checks, phase map, and roadmap documents to require runtime evidence review before release.
+
+### Notes
+
+* Runtime evidence remains scoped as `runtime-adjacent-object-symbol-smoke`.
+* This change does not add QEMU boot evidence.
+* This change does not add hardware syscall/trap execution evidence.
+* This change does not add Linux compatibility, POSIX compatibility, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+* This change does not change runtime behavior, ABI contracts, or syscall behavior.
+
 ## v0.2.2 - 2026-06-18
 
 **Status:** Documentation clarity governance.

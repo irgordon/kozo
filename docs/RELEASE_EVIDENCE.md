@@ -56,6 +56,7 @@ Every release review must include:
 * `ROADMAP.md`
 * `docs/RELEASE_CHECKLIST.md`
 * `docs/REQUIRED_CHECKS.md`
+* `docs/RUNTIME_EVIDENCE_REVIEW.md`
 * release notes
 * known non-goals list
 * checked-in contracts
@@ -89,6 +90,8 @@ Release review must include verification logs when generated:
 * `artifacts/runtime/runtime_smoke.metadata.json`
 
 Future runtime smoke phases must add their runtime logs to this list before using them as release evidence.
+
+Runtime evidence review is required for release review and is governed by `docs/RUNTIME_EVIDENCE_REVIEW.md`.
 
 ---
 
@@ -169,6 +172,7 @@ release-evidence/
   roadmap.md
   release_checklist.md
   required_checks.md
+  runtime_evidence_review.md
   ci_status.md
   non_goals.md
 ```

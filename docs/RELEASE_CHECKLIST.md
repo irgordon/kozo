@@ -109,7 +109,10 @@ Required checklist:
 * `artifacts/runtime/runtime_smoke.log` is present.
 * `artifacts/runtime/runtime_smoke.metadata.json` is present.
 * `runtime_smoke_evidence` passes.
+* `runtime_evidence_review` passes.
+* Runtime evidence review is complete.
 * Runtime metadata non-goals are reviewed.
+* Release is blocked if runtime evidence is overclaimed or missing required non-goals.
 * No QEMU or boot claim is made unless separately implemented and proven.
 * Python unit tests pass.
 * Odin check/build passes through verification.
@@ -126,6 +129,7 @@ Evidence references:
 * `artifacts/logs/cargo-check.log`
 * `artifacts/logs/nm-kernel.log`
 * `docs/RUNTIME_EVIDENCE.md`
+* `docs/RUNTIME_EVIDENCE_REVIEW.md`
 
 ---
 
@@ -246,6 +250,7 @@ Required checklist:
 * CI run references are included when available.
 * Runtime smoke evidence is included for v0.2.0 and later.
 * Runtime smoke metadata is included for v0.2.1 and later.
+* Runtime evidence review is included for v0.2.3 and later.
 
 The release evidence bundle shape is owned by `docs/RELEASE_EVIDENCE.md`.
 

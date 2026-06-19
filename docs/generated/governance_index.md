@@ -12,18 +12,18 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.2.2`
-* Date: `2026-06-18`
-* Status: Documentation clarity governance.
+* Version: `v0.2.3`
+* Date: `2026-06-19`
+* Status: Runtime evidence review gate.
 
 ## Verification status
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 30
+* Total checks: 31
 * Failed checks: 0
-* Run ID: `verify-20260618T191921Z`
-* Generated at: `2026-06-18T19:19:21Z`
+* Run ID: `verify-20260619T003152Z`
+* Generated at: `2026-06-19T00:31:52Z`
 
 ## Registered validators
 
@@ -55,10 +55,11 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 24 | `bridge_alignment` |
 | 25 | `runtime_trap_path` |
 | 26 | `runtime_smoke_evidence` |
-| 27 | `return_path_proof` |
-| 28 | `execution_proof` |
-| 29 | `validator_coverage` |
-| 30 | `evidence` |
+| 27 | `runtime_evidence_review` |
+| 28 | `return_path_proof` |
+| 29 | `execution_proof` |
+| 30 | `validator_coverage` |
+| 31 | `evidence` |
 
 ## Active contracts
 
@@ -96,7 +97,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 30
+* Check count: 31
 * Failure count: 0
 
 ## Non-goals

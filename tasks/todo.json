@@ -932,6 +932,37 @@
         "verification.tests_run[5]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 36,
+      "title": "Add runtime evidence review gate",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "PHASEMAP.md",
+        "ROADMAP.md",
+        "tasks/todo.json",
+        "docs/RUNTIME_EVIDENCE_REVIEW.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/REQUIRED_CHECKS.md",
+        "docs/generated/governance_index.md",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/runtime_evidence_review.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/latest_verify.schema.json",
+        "schemas/agent_context.schema.json",
+        "tests/test_runtime_evidence_review.py",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[4]",
+        "verification.tests_run[5]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -968,7 +999,8 @@
     "Runtime smoke evidence baseline records a bounded runtime-adjacent object and symbol evidence artifact without changing ABI, syscall, compatibility, or production-readiness claims",
     "Runtime smoke evidence packaging records deterministic metadata and release bundle guidance without adding QEMU boot, hardware trap, compatibility, userspace, or production-readiness claims",
     "Documentation standard v1 governs documentation clarity, audience separation, claim discipline, terminology consistency, onboarding structure, and documentation review without changing runtime, ABI, syscall, validator, compatibility, or production-readiness claims",
-    "Documentation consistency corrections keep coding-style authority references and generated governance-index artifact ownership aligned with docs/GOVERNANCE.md and governed report generation without changing runtime, ABI, syscall, validator, compatibility, or production-readiness claims"
+    "Documentation consistency corrections keep coding-style authority references and generated governance-index artifact ownership aligned with docs/GOVERNANCE.md and governed report generation without changing runtime, ABI, syscall, validator, compatibility, or production-readiness claims",
+    "Runtime evidence review gate documents and validates the runtime-adjacent-object-symbol-smoke evidence type, live evidence paths, release bundle paths, validator ownership, release references, metadata non-goals, and overclaim blockers without adding QEMU boot, hardware trap, compatibility, userspace, or production-readiness claims"
   ],
   "verification": {
     "tests_run": [
@@ -1070,7 +1102,8 @@
       "Runtime smoke evidence preserves non-goals for Linux compatibility, POSIX completeness, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, QEMU boot execution, hardware trap execution, and production readiness",
       "Runtime smoke metadata preserves explicit non-goals for QEMU boot, hardware trap execution, Linux compatibility, userspace execution, process model, VFS behavior, scheduler maturity, ELF loading, file descriptor behavior, and production readiness",
       "Documentation standard changes remain bounded to documentation construction governance, governance precedence, changelog state, task scope, generated governance index refresh, and verification artifact refresh",
-      "Documentation consistency fixes remove duplicated precedence drift and replace governance-index placeholder generator wording without altering document authority, runtime behavior, ABI contracts, syscall behavior, or generated report authority"
+      "Documentation consistency fixes remove duplicated precedence drift and replace governance-index placeholder generator wording without altering document authority, runtime behavior, ABI contracts, syscall behavior, or generated report authority",
+      "runtime_evidence_review fails if runtime evidence review documentation, release evidence references, release checklist gates, required checks references, or metadata non-goals are missing or drift from the current runtime-adjacent evidence scope"
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -1113,7 +1146,8 @@
       "scripts/runtime_smoke.sh generates artifacts/runtime/runtime_smoke.log from freestanding kernel and assembly object evidence, and runtime_smoke_evidence validates the artifact while explicitly documenting that it is not QEMU boot or hardware trap evidence.",
       "scripts/runtime_smoke.sh generates deterministic artifacts/runtime/runtime_smoke.metadata.json, runtime_smoke_evidence validates metadata claims and non-goals, and release evidence docs define live and packaged runtime evidence paths.",
       "docs/DOCUMENTATION_STANDARD.md defines documentation construction and review standards while docs/GOVERNANCE.md records its authority boundary below higher technical governance documents and above descriptive documents.",
-      "docs/CODING_STYLE.md now points to docs/GOVERNANCE.md for the complete precedence order, and docs/GENERATED_ARTIFACTS.md names harness/governance_index_report.py and governance_index_report for docs/generated/governance_index.md."
+      "docs/CODING_STYLE.md now points to docs/GOVERNANCE.md for the complete precedence order, and docs/GENERATED_ARTIFACTS.md names harness/governance_index_report.py and governance_index_report for docs/generated/governance_index.md.",
+      "runtime_evidence_review validates docs/RUNTIME_EVIDENCE_REVIEW.md, release evidence/checklist/check policy references, and runtime smoke metadata non-goals while keeping runtime evidence scoped to runtime-adjacent-object-symbol-smoke."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -1152,6 +1186,7 @@
     "Added a bounded runtime smoke evidence baseline for v0.2.0 using freestanding object and symbol evidence without adding runtime features, ABI changes, syscall changes, compatibility claims, or production-readiness claims.",
     "Added runtime evidence packaging metadata and release bundle guidance for v0.2.1 without adding runtime features, ABI changes, syscall changes, QEMU boot claims, compatibility claims, or production-readiness claims.",
     "Added documentation clarity governance standard without changing runtime behavior, ABI contracts, syscall behavior, generated bindings, validator logic, compatibility claims, or production-readiness claims.",
-    "Fixed documentation authority consistency issues by removing a duplicated precedence list from coding style guidance and replacing governance-index generated artifact placeholder wording with actual generator and validator references."
+    "Fixed documentation authority consistency issues by removing a duplicated precedence list from coding style guidance and replacing governance-index generated artifact placeholder wording with actual generator and validator references.",
+    "Added runtime evidence review gate for release claim discipline without changing runtime behavior, ABI contracts, syscall behavior, QEMU boot evidence, hardware trap evidence, compatibility claims, userspace execution claims, or production-readiness claims."
   ]
 }
