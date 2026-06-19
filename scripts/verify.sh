@@ -234,7 +234,7 @@ run_logged_command "$LOG_DIR/odin-check.log" \
   odin check "$ROOT/kernel"
 
 run_logged_command "$LOG_DIR/odin-build.log" \
-  odin build "$ROOT/kernel" "-out:$KERNEL_BUILD_CHECK"
+  odin build "$ROOT/kernel" -target:freestanding_amd64_sysv -build-mode:obj "-out:$KERNEL_BUILD_CHECK"
 
 run_logged_command "$LOG_DIR/cargo-check.log" \
   run_pinned_cargo check --manifest-path "$ROOT/userspace/core_service/Cargo.toml" --target "$RUST_TARGET"
