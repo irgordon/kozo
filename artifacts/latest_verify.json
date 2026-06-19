@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260619T034837Z",
+  "run_id": "verify-20260619T042448Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -231,7 +231,7 @@
       "subsystem": "boot_tooling",
       "status": "pass",
       "code": "OK",
-      "detail": "Boot tooling policy documents Limine and xorriso acquisition without claiming ISO generation"
+      "detail": "Boot tooling policy documents Limine and xorriso acquisition without claiming boot success"
     },
     {
       "name": "return_path_proof",
@@ -276,7 +276,22 @@
   ],
   "failed_checks": [],
   "changed_files": [
-    "docs/generated/governance_index.md"
+    ".github/workflows/ci.yml",
+    "CHANGELOG.md",
+    "PHASEMAP.md",
+    "ROADMAP.md",
+    "docs/BOOT.md",
+    "docs/BOOT_BLOCKERS.md",
+    "docs/BOOT_IMAGE.md",
+    "docs/BOOT_TOOLING.md",
+    "docs/RELEASE_EVIDENCE.md",
+    "docs/REQUIRED_CHECKS.md",
+    "docs/RUNTIME_EVIDENCE.md",
+    "docs/generated/governance_index.md",
+    "harness/validators_impl/boot_tooling.py",
+    "scripts/build_boot_image.sh",
+    "tasks/todo.json",
+    "tests/test_boot_tooling.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -288,5 +303,5 @@
     "artifacts/runtime/boot_blocker_report.json",
     "artifacts/runtime/boot_image/package_metadata.json"
   ],
-  "generated_at": "2026-06-19T03:48:37Z"
+  "generated_at": "2026-06-19T04:24:48Z"
 }

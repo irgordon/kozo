@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.3.6`
+* Version: `v0.3.7`
 * Date: `2026-06-19`
-* Status: Bootable ISO generation blocked by missing local ISO tooling.
+* Status: CI ISO tooling install.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 36
 * Failed checks: 0
-* Run ID: `verify-20260619T034837Z`
-* Generated at: `2026-06-19T03:48:37Z`
+* Run ID: `verify-20260619T042448Z`
+* Generated at: `2026-06-19T04:24:48Z`
 
 ## Registered validators
 
