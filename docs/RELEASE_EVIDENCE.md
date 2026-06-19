@@ -107,7 +107,9 @@ Runtime evidence review is required for release review and is governed by `docs/
 
 The boot blocker report is required while v0.3.0 remains blocked and is governed by `docs/BOOT.md`, `docs/BOOT_BLOCKERS.md`, `scripts/boot_blocker_report.sh`, and `boot_blocker_report`.
 
-The current boot blocker category is `missing_iso_generation_tooling`.
+The current local boot blocker category is `missing_iso_generation_tooling`.
+
+When CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated boot blocker report may narrow to `missing_qemu_serial_evidence` for that run.
 
 The current packaging metadata records the missing ISO generation tooling blocker:
 

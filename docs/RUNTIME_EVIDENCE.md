@@ -28,7 +28,9 @@ v0.3.6 added the ISO generation command path, but local ISO generation is blocke
 
 v0.3.7 added full-CI installation of pinned Limine source tooling and xorriso so CI can attempt ISO generation and upload boot image artifacts.
 
-Current boot blocker: `missing_iso_generation_tooling`.
+Current local boot blocker: `missing_iso_generation_tooling`.
+
+When CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated blocker report may narrow to `missing_qemu_serial_evidence` for that run.
 
 ---
 

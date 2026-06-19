@@ -30,6 +30,12 @@ class BootBlockerReportValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
 
+    def test_passes_when_iso_exists_and_qemu_serial_evidence_is_missing(self):
+        result = self.validate_fixture(mutate_report_json=lambda _: qemu_serial_blocker_report())
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
     def test_fails_when_boot_blocker_report_is_missing(self):
         self.assertEqual("boot_blocker_report", BootBlockerReportValidator.name)
         result = self.validate_fixture(remove_report=True)
@@ -50,6 +56,13 @@ class BootBlockerReportValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "fail")
         self.assert_boot_failure(result, "field_mismatch", "boot_blocker.outcome")
+
+    def test_fails_when_boot_blocker_category_is_unknown(self):
+        self.assertEqual("boot_blocker_report", BootBlockerReportValidator.name)
+        result = self.validate_fixture(mutate_report_json=lambda report: report | {"blocker_category": "unknown"})
+
+        self.assertEqual(result.status, "fail")
+        self.assert_boot_failure(result, "field_mismatch", "boot_blocker.blocker_category")
 
     def test_fails_when_missing_component_is_absent(self):
         self.assertEqual("boot_blocker_report", BootBlockerReportValidator.name)
@@ -226,6 +239,27 @@ def valid_report() -> dict[str, object]:
     }
 
 
+def qemu_serial_blocker_report() -> dict[str, object]:
+    report = valid_report()
+    report.update(
+        {
+            "blocker_category": "missing_qemu_serial_evidence",
+            "missing_components": [
+                "validated QEMU serial smoke execution",
+            ],
+            "current_surfaces": [
+                value for value in report["current_surfaces"]
+                if value != "scripts/build_boot_image.sh writes package metadata for the blocked ISO tooling attempt"
+            ] + [
+                "scripts/build_boot_image.sh produced artifacts/runtime/boot_image/kozo.iso",
+                "artifacts/runtime/boot_image/package_metadata.json records packaged ISO metadata",
+            ],
+            "next_required_fix": "Run scripts/qemu_smoke.sh with QEMU available, capture serial output, and validate the expected KOZO marker before claiming QEMU boot evidence.",
+        }
+    )
+    return report
+
+
 def valid_doc_text() -> str:
     return "\n".join(
         (
@@ -237,6 +271,7 @@ def valid_doc_text() -> str:
             "boot_blocker_report",
             "docs/BOOT_TOOLING.md",
             "missing_iso_generation_tooling",
+            "missing_qemu_serial_evidence",
         )
     )
 

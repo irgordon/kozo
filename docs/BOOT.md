@@ -30,6 +30,10 @@ v0.3.7 added CI installation of pinned Limine tooling and xorriso so full CI can
 
 Remaining blocker: `missing_iso_generation_tooling`.
 
+The local blocker is `missing_iso_generation_tooling`.
+
+If CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated blocker report narrows to `missing_qemu_serial_evidence` for that run.
+
 ---
 
 # 2. Current Result
@@ -37,6 +41,10 @@ Remaining blocker: `missing_iso_generation_tooling`.
 Boot feasibility result: blocked.
 
 Blocker category: `missing_iso_generation_tooling`.
+
+The local blocker category is `missing_iso_generation_tooling`.
+
+CI packaged-image blocker category, when the ISO exists: `missing_qemu_serial_evidence`.
 
 Selected boot protocol: Limine.
 

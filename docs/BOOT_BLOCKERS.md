@@ -32,6 +32,10 @@ QEMU smoke command: present and fail-closed on missing ISO generation tooling.
 
 Blocker category: `missing_iso_generation_tooling`.
 
+The local blocker category is `missing_iso_generation_tooling`.
+
+CI packaged-image blocker category, when `artifacts/runtime/boot_image/kozo.iso` exists: `missing_qemu_serial_evidence`.
+
 The previous `missing_boot_protocol_and_image_packaging` blocker is reduced.
 
 The previous `missing_bootable_iso_packaging` blocker was refined to `missing_limine_iso_tooling`.
@@ -48,7 +52,9 @@ The current `_start` symbol is present in object evidence, Limine has been selec
 
 The blocker remains active for the local environment because it does not provide the Limine executable, Limine bootloader artifacts, or xorriso executable needed by that path.
 
-Even if CI produces `artifacts/runtime/boot_image/kozo.iso`, QEMU boot evidence remains blocked until serial output is captured and validated.
+If CI produces `artifacts/runtime/boot_image/kozo.iso`, `scripts/boot_blocker_report.sh` narrows the generated blocker report to `missing_qemu_serial_evidence`.
+
+Even then, QEMU boot evidence remains blocked until serial output is captured and validated.
 
 Therefore the repository cannot honestly claim QEMU boot execution.
 

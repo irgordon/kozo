@@ -14,17 +14,25 @@ _BOOT_BLOCKERS_PATH = _ROOT / "docs" / "BOOT_BLOCKERS.md"
 _RUNTIME_EVIDENCE_PATH = _ROOT / "docs" / "RUNTIME_EVIDENCE.md"
 _RELEASE_EVIDENCE_PATH = _ROOT / "docs" / "RELEASE_EVIDENCE.md"
 
-_EXPECTED_FIELDS = {
+_COMMON_FIELDS = {
     "phase": "v0.3.6",
     "outcome": "blocked",
     "evidence_type": "boot-blocker-report",
     "generated_by": "scripts/boot_blocker_report.sh",
     "validator": "boot_blocker_report",
+}
+
+_TOOLING_BLOCKER_FIELDS = {
     "blocker_category": "missing_iso_generation_tooling",
     "next_required_fix": "Install or provide the documented Limine executable, Limine bootloader artifacts, and xorriso executable so scripts/build_boot_image.sh can create artifacts/runtime/boot_image/kozo.iso, then run scripts/qemu_smoke.sh to capture serial output before claiming QEMU boot evidence.",
 }
 
-_REQUIRED_MISSING_COMPONENTS = (
+_QEMU_BLOCKER_FIELDS = {
+    "blocker_category": "missing_qemu_serial_evidence",
+    "next_required_fix": "Run scripts/qemu_smoke.sh with QEMU available, capture serial output, and validate the expected KOZO marker before claiming QEMU boot evidence.",
+}
+
+_TOOLING_MISSING_COMPONENTS = (
     "Limine executable",
     "xorriso executable",
     "Limine bootloader artifacts",
@@ -32,7 +40,11 @@ _REQUIRED_MISSING_COMPONENTS = (
     "validated QEMU serial smoke execution",
 )
 
-_REQUIRED_CURRENT_SURFACES = (
+_QEMU_MISSING_COMPONENTS = (
+    "validated QEMU serial smoke execution",
+)
+
+_COMMON_CURRENT_SURFACES = (
     "kernel/arch/x86_64/boot.asm defines a 64-bit _start symbol",
     "kernel/main.odin exports kernel_entry",
     "kernel/arch/x86_64/serial.odin initializes COM1 serial output",
@@ -41,9 +53,17 @@ _REQUIRED_CURRENT_SURFACES = (
     "scripts/build_boot_image.sh stages the boot image skeleton",
     "docs/BOOT_TOOLING.md documents Limine and xorriso acquisition paths",
     "scripts/build_boot_image.sh implements the Limine and xorriso ISO generation path",
-    "scripts/build_boot_image.sh writes package metadata for the blocked ISO tooling attempt",
     "scripts/qemu_smoke.sh fails closed until kozo.iso exists",
     "scripts/runtime_smoke.sh proves runtime-adjacent object and symbol evidence",
+)
+
+_TOOLING_CURRENT_SURFACES = (
+    "scripts/build_boot_image.sh writes package metadata for the blocked ISO tooling attempt",
+)
+
+_QEMU_CURRENT_SURFACES = (
+    "scripts/build_boot_image.sh produced artifacts/runtime/boot_image/kozo.iso",
+    "artifacts/runtime/boot_image/package_metadata.json records packaged ISO metadata",
 )
 
 _REQUIRED_NON_CLAIMS = (
@@ -69,6 +89,7 @@ _REQUIRED_DOC_REFERENCES = (
     "scripts/qemu_smoke.sh",
     "boot_blocker_report",
     "missing_iso_generation_tooling",
+    "missing_qemu_serial_evidence",
 )
 
 
@@ -105,8 +126,8 @@ def _boot_blocker_issue() -> BootBlockerIssue | None:
 
     return _first_issue(
         _field_contract_issue(report),
-        _list_contract_issue(report, "missing_components", _REQUIRED_MISSING_COMPONENTS, "missing_component"),
-        _list_contract_issue(report, "current_surfaces", _REQUIRED_CURRENT_SURFACES, "missing_current_surface"),
+        _list_contract_issue(report, "missing_components", _required_missing_components(report), "missing_component"),
+        _list_contract_issue(report, "current_surfaces", _required_current_surfaces(report), "missing_current_surface"),
         _list_contract_issue(report, "cannot_claim", _REQUIRED_NON_CLAIMS, "missing_non_claim"),
     )
 
@@ -135,10 +156,36 @@ def _documentation_issue() -> BootBlockerIssue | None:
 
 
 def _field_contract_issue(report: dict[str, object]) -> BootBlockerIssue | None:
-    for field, expected in _EXPECTED_FIELDS.items():
+    for field, expected in _COMMON_FIELDS.items():
+        if report.get(field) != expected:
+            return _issue("field_mismatch", f"boot_blocker.{field}", f"Boot blocker field {field} must be {expected}")
+    expected_fields = _expected_blocker_fields(report)
+    if expected_fields is None:
+        return _issue("field_mismatch", "boot_blocker.blocker_category", "Boot blocker category must be missing_iso_generation_tooling or missing_qemu_serial_evidence")
+    for field, expected in expected_fields.items():
         if report.get(field) != expected:
             return _issue("field_mismatch", f"boot_blocker.{field}", f"Boot blocker field {field} must be {expected}")
     return None
+
+
+def _expected_blocker_fields(report: dict[str, object]) -> dict[str, object] | None:
+    if report.get("blocker_category") == "missing_iso_generation_tooling":
+        return _TOOLING_BLOCKER_FIELDS
+    if report.get("blocker_category") == "missing_qemu_serial_evidence":
+        return _QEMU_BLOCKER_FIELDS
+    return None
+
+
+def _required_missing_components(report: dict[str, object]) -> tuple[str, ...]:
+    if report.get("blocker_category") == "missing_qemu_serial_evidence":
+        return _QEMU_MISSING_COMPONENTS
+    return _TOOLING_MISSING_COMPONENTS
+
+
+def _required_current_surfaces(report: dict[str, object]) -> tuple[str, ...]:
+    if report.get("blocker_category") == "missing_qemu_serial_evidence":
+        return _COMMON_CURRENT_SURFACES + _QEMU_CURRENT_SURFACES
+    return _COMMON_CURRENT_SURFACES + _TOOLING_CURRENT_SURFACES
 
 
 def _list_contract_issue(
