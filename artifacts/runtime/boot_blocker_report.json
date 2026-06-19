@@ -22,9 +22,9 @@
     "scripts/build_boot_image.sh stages the boot image skeleton",
     "docs/BOOT_TOOLING.md documents Limine and xorriso acquisition paths",
     "scripts/build_boot_image.sh implements the Limine and xorriso ISO generation path",
-    "scripts/build_boot_image.sh writes package metadata for the blocked ISO tooling attempt",
     "scripts/qemu_smoke.sh fails closed until kozo.iso exists",
-    "scripts/runtime_smoke.sh proves runtime-adjacent object and symbol evidence"
+    "scripts/runtime_smoke.sh proves runtime-adjacent object and symbol evidence",
+    "scripts/build_boot_image.sh writes package metadata for the blocked ISO tooling attempt"
   ],
   "cannot_claim": [
     "QEMU boot",

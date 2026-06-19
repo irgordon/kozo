@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260619T044622Z",
+  "run_id": "verify-20260619T045140Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -276,7 +276,15 @@
   ],
   "failed_checks": [],
   "changed_files": [
-    "scripts/verify.sh"
+    "artifacts/runtime/boot_blocker_report.json",
+    "docs/BOOT.md",
+    "docs/BOOT_BLOCKERS.md",
+    "docs/RELEASE_EVIDENCE.md",
+    "docs/RUNTIME_EVIDENCE.md",
+    "docs/generated/governance_index.md",
+    "harness/validators_impl/boot_blocker_report.py",
+    "scripts/boot_blocker_report.sh",
+    "tests/test_boot_blocker_report.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -288,5 +296,5 @@
     "artifacts/runtime/boot_blocker_report.json",
     "artifacts/runtime/boot_image/package_metadata.json"
   ],
-  "generated_at": "2026-06-19T04:46:22Z"
+  "generated_at": "2026-06-19T04:51:40Z"
 }
