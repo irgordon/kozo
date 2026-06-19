@@ -20,6 +20,13 @@ _REPORT_PATH = _ROOT / "artifacts" / "runtime" / "boot_blocker_report.json"
 _ALLOWED_BLOCKERS = (
     "missing_iso_generation_tooling",
     "missing_qemu_serial_evidence",
+    "missing_qemu_tooling",
+    "missing_boot_image",
+    "missing_serial_marker",
+    "qemu_launch_failed",
+    "qemu_timeout",
+    "limine_load_failed",
+    "kernel_entry_not_reached",
 )
 
 

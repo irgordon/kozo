@@ -30,9 +30,13 @@ v0.3.7 added full-CI installation of pinned Limine source tooling and xorriso so
 
 v0.3.8 added QEMU serial smoke metadata, `qemu_smoke_evidence`, and the kernel-emitted `KOZO_BOOT_SMOKE_OK` marker. Local QEMU smoke remains blocked by missing ISO generation tooling unless the ISO is supplied.
 
+v0.3.9 adds QEMU stderr log evidence at `artifacts/runtime/qemu_smoke.stderr.log` and records `qemu_timeout` as an exact blocked QEMU smoke outcome when the marker is absent after a bounded QEMU run.
+
 Current local boot blocker: `missing_iso_generation_tooling`.
 
 When CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated blocker report may narrow to `missing_qemu_serial_evidence` for that run.
+
+When CI runs QEMU against that ISO but does not capture `KOZO_BOOT_SMOKE_OK`, the generated blocker report may narrow further to `qemu_timeout`.
 
 ---
 

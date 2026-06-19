@@ -133,7 +133,7 @@ state = blocker_state()
 
 report = {
     "version": 0,
-    "phase": "v0.3.8",
+    "phase": "v0.3.9",
     "outcome": state["outcome"],
     "evidence_type": "boot-blocker-report",
     "generated_by": "scripts/boot_blocker_report.sh",
@@ -177,6 +177,7 @@ report = {
         "artifacts/runtime/boot_image/package_metadata.json",
         "artifacts/runtime/qemu_smoke.metadata.json",
         "artifacts/runtime/qemu_smoke.log",
+        "artifacts/runtime/qemu_smoke.stderr.log",
         "scripts/qemu_smoke.sh",
         "scripts/runtime_smoke.sh",
         "docs/RUNTIME_EVIDENCE.md"

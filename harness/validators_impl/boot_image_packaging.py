@@ -38,6 +38,18 @@ _PACKAGED_FIELDS = {
     "image_exists": True,
 }
 
+_ALLOWED_POST_PACKAGING_BLOCKERS = (
+    "missing_qemu_serial_evidence",
+    "missing_qemu_tooling",
+    "missing_boot_image",
+    "missing_serial_marker",
+    "qemu_launch_failed",
+    "qemu_timeout",
+    "limine_load_failed",
+    "kernel_entry_not_reached",
+    "none",
+)
+
 _REQUIRED_BLOCKED_COMPONENTS = (
     "Limine executable",
     "xorriso executable",
@@ -170,11 +182,18 @@ def _list_contract_issue(
 
 
 def _blocker_state_issue(metadata: dict[str, object], blocker_report: dict[str, object]) -> BootImagePackagingIssue | None:
-    if blocker_report.get("phase") != "v0.3.8":
-        return _issue("blocker_state_mismatch", "boot_blocker.phase", "Boot blocker report must be updated for v0.3.8")
-    if blocker_report.get("blocker_category") != metadata.get("blocker_category"):
-        return _issue("blocker_state_mismatch", "boot_blocker.blocker_category", "Boot blocker must match boot image packaging metadata")
-    return None
+    if blocker_report.get("phase") != "v0.3.9":
+        return _issue("blocker_state_mismatch", "boot_blocker.phase", "Boot blocker report must be updated for v0.3.9")
+    if _blocker_category_matches(metadata, blocker_report):
+        return None
+    return _issue("blocker_state_mismatch", "boot_blocker.blocker_category", "Boot blocker must match boot image packaging or later QEMU blocker state")
+
+
+def _blocker_category_matches(metadata: dict[str, object], blocker_report: dict[str, object]) -> bool:
+    blocker_category = blocker_report.get("blocker_category")
+    if metadata.get("outcome") == "packaged":
+        return blocker_category in _ALLOWED_POST_PACKAGING_BLOCKERS
+    return blocker_category == metadata.get("blocker_category")
 
 
 def _documentation_issue() -> BootImagePackagingIssue | None:

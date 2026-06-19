@@ -195,5 +195,5 @@ jobs:
             artifacts/runtime/boot_image/kozo.iso
             artifacts/runtime/qemu_smoke.log
             artifacts/runtime/qemu_smoke.metadata.json
-            artifacts/runtime/qemu_smoke.qemu.log
+            artifacts/runtime/qemu_smoke.stderr.log
           if-no-files-found: warn

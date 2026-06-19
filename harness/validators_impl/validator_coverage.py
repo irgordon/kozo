@@ -518,6 +518,7 @@ _VALIDATOR_TEST_CONTRACTS = {
         (
             "missing_metadata",
             "invalid_metadata",
+            "missing_stderr_log",
             "missing_serial_log",
             "marker_missing",
             "wrong_evidence_type",
@@ -525,6 +526,7 @@ _VALIDATOR_TEST_CONTRACTS = {
             "missing_non_goal",
             "unknown_blocker_category",
             "blocker_report_mismatch",
+            "marker_present_but_blocked",
             "missing_release_evidence_reference",
             "diagnostic_names_field",
         ),

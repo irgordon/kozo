@@ -32,6 +32,16 @@ class BootImagePackagingValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
 
+    def test_passes_when_packaged_iso_has_exact_qemu_blocker(self):
+        result = self.validate_fixture(
+            create_image=True,
+            mutate_metadata=packaged_metadata,
+            mutate_blocker=lambda blocker: blocker | {"blocker_category": "qemu_timeout"},
+        )
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
     def test_fails_when_success_metadata_has_no_image(self):
         self.assertEqual("boot_image_packaging", BootImagePackagingValidator.name)
         result = self.validate_fixture(
@@ -121,6 +131,7 @@ class BootImagePackagingValidatorTests(unittest.TestCase):
         mutate_metadata=None,
         mutate_metadata_text=None,
         mutate_blocker=None,
+        create_image: bool = False,
     ):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -137,6 +148,9 @@ class BootImagePackagingValidatorTests(unittest.TestCase):
             if mutate_blocker is not None:
                 blocker = json.loads(paths["blocker"].read_text())
                 paths["blocker"].write_text(json.dumps(mutate_blocker(blocker), indent=2) + "\n")
+
+            if create_image:
+                paths["image"].write_bytes(b"iso")
 
             old_paths = patch_validator_paths(paths)
             try:
@@ -210,9 +224,21 @@ def valid_metadata() -> dict[str, object]:
 
 def valid_blocker() -> dict[str, object]:
     return {
-        "phase": "v0.3.8",
+        "phase": "v0.3.9",
         "blocker_category": "missing_iso_generation_tooling",
     }
+
+
+def packaged_metadata(metadata: dict[str, object]) -> dict[str, object]:
+    metadata.update(
+        {
+            "outcome": "packaged",
+            "blocker_category": "missing_qemu_serial_evidence",
+            "image_exists": True,
+        }
+    )
+    metadata.pop("missing_components", None)
+    return metadata
 
 
 def valid_doc_text() -> str:

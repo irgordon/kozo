@@ -10,18 +10,20 @@ from harness.validator import BaseValidator, ValidationResult
 _ROOT = Path(__file__).resolve().parents[2]
 _METADATA_PATH = _ROOT / "artifacts" / "runtime" / "qemu_smoke.metadata.json"
 _SERIAL_LOG_PATH = _ROOT / "artifacts" / "runtime" / "qemu_smoke.log"
+_STDERR_LOG_PATH = _ROOT / "artifacts" / "runtime" / "qemu_smoke.stderr.log"
 _BOOT_BLOCKER_REPORT_PATH = _ROOT / "artifacts" / "runtime" / "boot_blocker_report.json"
 _BOOT_DOC_PATH = _ROOT / "docs" / "BOOT.md"
 _RUNTIME_EVIDENCE_PATH = _ROOT / "docs" / "RUNTIME_EVIDENCE.md"
 _RELEASE_EVIDENCE_PATH = _ROOT / "docs" / "RELEASE_EVIDENCE.md"
 
 _COMMON_FIELDS = {
-    "phase": "v0.3.8",
+    "phase": "v0.3.9",
     "evidence_type": "qemu-serial-smoke",
     "boot_protocol": "Limine",
     "architecture": "x86_64",
     "generated_by": "scripts/qemu_smoke.sh",
     "serial_log": "artifacts/runtime/qemu_smoke.log",
+    "stderr_log": "artifacts/runtime/qemu_smoke.stderr.log",
     "validator": "qemu_smoke_evidence",
 }
 
@@ -62,6 +64,7 @@ _ALLOWED_BLOCKERS = (
 
 _REQUIRED_DOC_REFERENCES = (
     "artifacts/runtime/qemu_smoke.log",
+    "artifacts/runtime/qemu_smoke.stderr.log",
     "artifacts/runtime/qemu_smoke.metadata.json",
     "qemu_smoke_evidence",
     "KOZO_BOOT_SMOKE_OK",
@@ -101,7 +104,9 @@ def _qemu_smoke_issue() -> QemuSmokeIssue | None:
 
     return _first_issue(
         _common_field_issue(metadata),
+        _stderr_log_issue(),
         _outcome_issue(metadata),
+        _blocked_marker_issue(metadata),
         _pass_evidence_issue(metadata),
         _list_contract_issue(metadata, "does_not_prove", _REQUIRED_NON_GOALS, "missing_non_goal"),
         _blocker_report_issue(metadata, blocker_report),
@@ -129,6 +134,18 @@ def _common_field_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
         return _issue("missing_expected_marker", "qemu_smoke.expected_marker", "QEMU smoke expected marker must be non-empty")
     if not metadata.get("boot_image"):
         return _issue("missing_boot_image_reference", "qemu_smoke.boot_image", "QEMU smoke boot image reference must be non-empty")
+    if not isinstance(metadata.get("qemu_exit_code"), int):
+        return _issue("field_mismatch", "qemu_smoke.qemu_exit_code", "QEMU smoke exit code must be recorded")
+    if not isinstance(metadata.get("qemu_timeout_seconds"), int):
+        return _issue("field_mismatch", "qemu_smoke.qemu_timeout_seconds", "QEMU smoke timeout seconds must be recorded")
+    if not isinstance(metadata.get("serial_log_byte_count"), int):
+        return _issue("field_mismatch", "qemu_smoke.serial_log_byte_count", "QEMU smoke serial log byte count must be recorded")
+    return None
+
+
+def _stderr_log_issue() -> QemuSmokeIssue | None:
+    if not _STDERR_LOG_PATH.is_file():
+        return _issue("missing_stderr_log", "qemu_smoke.stderr_log", "QEMU smoke metadata requires a QEMU stderr log")
     return None
 
 
@@ -145,6 +162,15 @@ def _blocked_outcome_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None
     if blocker not in _ALLOWED_BLOCKERS:
         return _issue("unknown_blocker_category", "qemu_smoke.blocker_category", "QEMU smoke blocker category is not allowed")
     return _list_contract_issue(metadata, "proves", _BLOCKED_PROVES, "missing_proves_claim")
+
+
+def _blocked_marker_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
+    if metadata.get("outcome") != "blocked":
+        return None
+    marker = metadata.get("expected_marker")
+    if isinstance(marker, str) and _SERIAL_LOG_PATH.is_file() and marker in _SERIAL_LOG_PATH.read_text(errors="replace"):
+        return _issue("marker_present_but_blocked", "qemu_smoke.outcome", "QEMU smoke cannot report blocked when the expected marker is present")
+    return None
 
 
 def _pass_evidence_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:

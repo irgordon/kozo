@@ -121,7 +121,9 @@ Required checklist:
 * Full CI uploaded `artifacts/runtime/runtime_smoke.metadata.json` when available.
 * Full CI uploaded `artifacts/runtime/boot_blocker_report.json` while boot is blocked.
 * `artifacts/runtime/qemu_smoke.log` is reviewed when the QEMU blocker is under direct review.
+* `artifacts/runtime/qemu_smoke.stderr.log` is reviewed when the QEMU blocker is under direct review.
 * `artifacts/runtime/qemu_smoke.metadata.json` is reviewed when the QEMU blocker is under direct review.
+* QEMU smoke metadata outcome may be `blocked` with `qemu_timeout` only as a no-boot-claim blocker.
 * QEMU smoke metadata outcome is `pass` before any QEMU boot claim is made.
 * Passing QEMU smoke metadata includes `KOZO_BOOT_SMOKE_OK` as the expected marker.
 * Release is blocked if runtime evidence is overclaimed or missing required non-goals.

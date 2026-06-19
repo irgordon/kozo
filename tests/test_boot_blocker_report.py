@@ -36,6 +36,12 @@ class BootBlockerReportValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
 
+    def test_passes_when_qemu_timeout_is_exact_blocker(self):
+        result = self.validate_fixture(mutate_report_json=lambda _: exact_qemu_blocker_report("qemu_timeout"))
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
     def test_fails_when_boot_blocker_report_is_missing(self):
         self.assertEqual("boot_blocker_report", BootBlockerReportValidator.name)
         result = self.validate_fixture(remove_report=True)
@@ -183,7 +189,7 @@ def write_fixture_files(root: Path) -> None:
 def valid_report() -> dict[str, object]:
     return {
         "version": 0,
-        "phase": "v0.3.8",
+        "phase": "v0.3.9",
         "outcome": "blocked",
         "evidence_type": "boot-blocker-report",
         "generated_by": "scripts/boot_blocker_report.sh",
@@ -257,6 +263,27 @@ def qemu_serial_blocker_report() -> dict[str, object]:
                 "artifacts/runtime/boot_image/package_metadata.json records packaged ISO metadata",
             ],
             "next_required_fix": "Run scripts/qemu_smoke.sh with QEMU available, capture serial output, and validate the expected KOZO marker before claiming QEMU boot evidence.",
+        }
+    )
+    return report
+
+
+def exact_qemu_blocker_report(category: str) -> dict[str, object]:
+    report = valid_report()
+    report.update(
+        {
+            "blocker_category": category,
+            "missing_components": [
+                "validated QEMU serial smoke execution",
+            ],
+            "current_surfaces": [
+                value for value in report["current_surfaces"]
+                if value != "scripts/build_boot_image.sh writes package metadata for the blocked ISO tooling attempt"
+            ] + [
+                "scripts/qemu_smoke.sh records exact QEMU serial smoke blocker metadata",
+                "artifacts/runtime/qemu_smoke.metadata.json records the current QEMU smoke blocker",
+            ],
+            "next_required_fix": "Resolve the exact QEMU smoke blocker recorded in artifacts/runtime/qemu_smoke.metadata.json before claiming QEMU boot evidence.",
         }
     )
     return report

@@ -1,5 +1,30 @@
 # Changelog
 
+## v0.3.9 - 2026-06-19
+
+**Status:** QEMU boot path blocker hardening.
+
+### Added
+
+* Added `artifacts/runtime/qemu_smoke.stderr.log` as QEMU smoke diagnostic evidence.
+* Added QEMU smoke metadata fields for QEMU exit code, timeout seconds, and serial log byte count.
+* Added focused QEMU smoke coverage for marker-present pass behavior after timeout, missing stderr logs, blocked metadata that already contains the marker, and exact timeout blocker handling.
+
+### Changed
+
+* Updated `scripts/qemu_smoke.sh` to write v0.3.9 metadata and preserve `qemu_timeout` as an exact blocked outcome when the marker is absent.
+* Updated `qemu_smoke_evidence` to reject blocked metadata if the serial log contains `KOZO_BOOT_SMOKE_OK`.
+* Updated boot blocker and packaging validators so a packaged ISO may legitimately narrow to an exact QEMU blocker such as `qemu_timeout`.
+* Updated CI artifact upload, boot docs, release evidence, required checks, phase map, and roadmap for QEMU stderr evidence and timeout blocker handling.
+
+### Notes
+
+* CI has produced `artifacts/runtime/boot_image/kozo.iso`, but QEMU serial smoke remains blocked by `qemu_timeout` until the kernel-emitted marker is captured.
+* This change does not claim QEMU boot.
+* This change does not claim hardware syscall/trap execution.
+* This change does not add Linux compatibility, POSIX compatibility, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+* This change does not change ABI contracts or syscall behavior.
+
 ## v0.3.8 - 2026-06-19
 
 **Status:** QEMU serial smoke evidence gate.

@@ -30,13 +30,15 @@ v0.3.7 added CI installation of pinned Limine tooling and xorriso so full CI can
 
 v0.3.8 added QEMU serial smoke metadata, the `qemu_smoke_evidence` validator, and a kernel-emitted `KOZO_BOOT_SMOKE_OK` marker for future QEMU serial validation.
 
+v0.3.9 records the CI-observed QEMU timeout path as an exact blocker, adds QEMU stderr log evidence at `artifacts/runtime/qemu_smoke.stderr.log`, and keeps the no-QEMU-boot claim unless the serial log contains `KOZO_BOOT_SMOKE_OK`.
+
 Remaining blocker: `missing_iso_generation_tooling`.
 
 The local blocker is `missing_iso_generation_tooling`.
 
 If CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated blocker report narrows to `missing_qemu_serial_evidence` for that run.
 
-If `scripts/qemu_smoke.sh` can run against a generated ISO, it writes `artifacts/runtime/qemu_smoke.log` and `artifacts/runtime/qemu_smoke.metadata.json`. Passing QEMU evidence requires the serial log to contain `KOZO_BOOT_SMOKE_OK`; blocked metadata preserves the no-QEMU-boot claim.
+If `scripts/qemu_smoke.sh` can run against a generated ISO, it writes `artifacts/runtime/qemu_smoke.log`, `artifacts/runtime/qemu_smoke.stderr.log`, and `artifacts/runtime/qemu_smoke.metadata.json`. Passing QEMU evidence requires the serial log to contain `KOZO_BOOT_SMOKE_OK`; blocked metadata preserves the no-QEMU-boot claim.
 
 ---
 
@@ -50,6 +52,8 @@ The local blocker category is `missing_iso_generation_tooling`.
 
 CI packaged-image blocker category, when the ISO exists: `missing_qemu_serial_evidence`.
 
+CI observed QEMU execution blocker category, when QEMU runs the ISO but no marker is captured before the bounded timeout: `qemu_timeout`.
+
 Selected boot protocol: Limine.
 
 The current repository has a 64-bit `_start` symbol, an exported `kernel_entry`, early serial initialization, and runtime-adjacent object/symbol smoke evidence.
@@ -58,7 +62,7 @@ The boot protocol decision, boot image skeleton, boot tooling acquisition policy
 
 `scripts/build_boot_image.sh` writes `artifacts/runtime/boot_image/package_metadata.json`.
 
-`scripts/qemu_smoke.sh` writes `artifacts/runtime/qemu_smoke.metadata.json` and `artifacts/runtime/qemu_smoke.log`.
+`scripts/qemu_smoke.sh` writes `artifacts/runtime/qemu_smoke.metadata.json`, `artifacts/runtime/qemu_smoke.log`, and `artifacts/runtime/qemu_smoke.stderr.log`.
 
 The expected ISO path is `artifacts/runtime/boot_image/kozo.iso`.
 

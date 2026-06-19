@@ -19,6 +19,13 @@ _BOOT_BLOCKER_REPORT_PATH = _ROOT / "artifacts" / "runtime" / "boot_blocker_repo
 _ALLOWED_BLOCKERS = (
     "missing_iso_generation_tooling",
     "missing_qemu_serial_evidence",
+    "missing_qemu_tooling",
+    "missing_boot_image",
+    "missing_serial_marker",
+    "qemu_launch_failed",
+    "qemu_timeout",
+    "limine_load_failed",
+    "kernel_entry_not_reached",
 )
 
 
@@ -125,7 +132,7 @@ def _blocker_report_issue() -> BootImageIssue | None:
 
 
 def _required_missing_component(report: dict[str, object]) -> str:
-    if report.get("blocker_category") == "missing_qemu_serial_evidence":
+    if report.get("blocker_category") != "missing_iso_generation_tooling":
         return "validated QEMU serial smoke execution"
     return "Limine executable"
 

@@ -101,6 +101,7 @@ Release review must include verification logs when generated:
 * `artifacts/runtime/boot_image/package_metadata.json`
 * `artifacts/runtime/boot_image/kozo.iso` when packaging succeeds
 * `artifacts/runtime/qemu_smoke.log` when generated during QEMU smoke blocker review
+* `artifacts/runtime/qemu_smoke.stderr.log` when generated during QEMU smoke blocker review
 * `artifacts/runtime/qemu_smoke.metadata.json` when generated during QEMU smoke blocker review
 
 Future runtime smoke phases must add their runtime logs to this list before using them as release evidence.
@@ -112,6 +113,8 @@ The boot blocker report is required while v0.3.0 remains blocked and is governed
 The current local boot blocker category is `missing_iso_generation_tooling`.
 
 When CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated boot blocker report may narrow to `missing_qemu_serial_evidence` for that run.
+
+When CI then runs QEMU against that ISO but the kernel marker is absent before timeout, the generated boot blocker report may narrow further to `qemu_timeout`.
 
 The current packaging metadata records the missing ISO generation tooling blocker:
 

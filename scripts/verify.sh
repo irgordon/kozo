@@ -20,6 +20,7 @@ RUNTIME_SMOKE_METADATA="$ARTIFACTS_DIR/runtime/runtime_smoke.metadata.json"
 BOOT_BLOCKER_REPORT="$ARTIFACTS_DIR/runtime/boot_blocker_report.json"
 BOOT_IMAGE_PACKAGE_METADATA="$ARTIFACTS_DIR/runtime/boot_image/package_metadata.json"
 QEMU_SMOKE_LOG="$ARTIFACTS_DIR/runtime/qemu_smoke.log"
+QEMU_SMOKE_STDERR_LOG="$ARTIFACTS_DIR/runtime/qemu_smoke.stderr.log"
 QEMU_SMOKE_METADATA="$ARTIFACTS_DIR/runtime/qemu_smoke.metadata.json"
 VERIFY_TMP=""
 
@@ -135,6 +136,7 @@ collect_evidence_files() {
     "$BOOT_BLOCKER_REPORT"
     "$BOOT_IMAGE_PACKAGE_METADATA"
     "$QEMU_SMOKE_LOG"
+    "$QEMU_SMOKE_STDERR_LOG"
     "$QEMU_SMOKE_METADATA"
   )
 
