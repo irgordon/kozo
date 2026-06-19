@@ -11,6 +11,8 @@
 ### Changed
 
 * Updated `docs/GOVERNANCE.md` to place the documentation standard in the governance authority order and define its ownership boundary.
+* Replaced a duplicated authority-order list in `docs/CODING_STYLE.md` with a pointer to `docs/GOVERNANCE.md`.
+* Updated `docs/GENERATED_ARTIFACTS.md` to name the governed generator and validator for `docs/generated/governance_index.md`.
 
 ### Notes
 

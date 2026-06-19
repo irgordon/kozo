@@ -36,21 +36,11 @@ It does not own:
 
 Those belong to higher or separate governance documents.
 
-Authority order:
+This document is subordinate to `docs/GOVERNANCE.md`, `docs/INVARIANTS.md`, `docs/ARCHITECTURE.md`, and `docs/CONTRACTS.md`.
 
-1. `docs/GOVERNANCE.md`
-2. `docs/INVARIANTS.md`
-3. `docs/ARCHITECTURE.md`
-4. `docs/CONTRACTS.md`
-5. `docs/CODING_STYLE.md`
-6. `docs/VALIDATION.md`
-7. `docs/GENERATED_ARTIFACTS.md`
-8. `docs/COMPATIBILITY.md`
-9. `docs/SECURITY_MODEL.md`
-10. `docs/ADR_POLICY.md`
-11. `docs/ARCHITECTURE_DIAGRAM.md`
+For the complete document precedence order, see `docs/GOVERNANCE.md`.
 
-If this document conflicts with invariants, architecture, or contract authority, the higher authority wins.
+If this document conflicts with invariants, architecture, contract authority, or document precedence, the higher authority wins.
 
 ---
 

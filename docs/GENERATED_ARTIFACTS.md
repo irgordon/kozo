@@ -43,7 +43,7 @@ This document does not claim production readiness.
 | `artifacts/latest_verify.json` | validators, task state, evidence logs | `scripts/verify.sh` | schema, harness aggregator, evidence validator | No | `scripts/verify.sh` |
 | `docs/generated/syscall_surface.md` | syscall catalog, table contract, class contract, ABI manifest | `harness.syscall_surface_report.write_report()` | `syscall_surface_report` | No | `python3 -c 'from harness.syscall_surface_report import write_report; write_report()'` |
 | `docs/generated/abi_surface.md` | ABI manifest | `harness.abi_surface_report.write_report()` | `abi_surface_report` | No | `python3 -c 'from harness.abi_surface_report import write_report; write_report()'` |
-| `docs/generated/governance_index.md` | governance documents | governed report generator when present | governance report drift validator when present | No | Use the governed generator when added |
+| `docs/generated/governance_index.md` | checked-in contracts, schemas, validator registry, latest verification artifact, generated reports, and `CHANGELOG.md` | `harness/governance_index_report.py` | `governance_index_report` | No | Regenerate through the governed report renderer and run `scripts/verify.sh` |
 | `bindings/rust/kozo_abi.rs` | `contracts/kozo_abi.h` and governed ABI generation flow | ABI binding generator | ABI and layout validators | No | Use the governed ABI generation command |
 | `bindings/odin/kozo_abi.odin` | `contracts/kozo_abi.h` and governed ABI generation flow | ABI binding generator | ABI and layout validators | No | Use the governed ABI generation command |
 
@@ -104,4 +104,3 @@ Generated proof-state changes should be committed separately from source changes
 `INVARIANTS.md` owns generated artifact invariants.
 
 `GOVERNANCE.md` owns precedence and conflict resolution.
-
