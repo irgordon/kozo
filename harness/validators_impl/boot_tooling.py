@@ -14,6 +14,8 @@ _BOOT_IMAGE_PATH = _ROOT / "docs" / "BOOT_IMAGE.md"
 _BOOT_BLOCKERS_PATH = _ROOT / "docs" / "BOOT_BLOCKERS.md"
 _RUNTIME_EVIDENCE_PATH = _ROOT / "docs" / "RUNTIME_EVIDENCE.md"
 _RELEASE_EVIDENCE_PATH = _ROOT / "docs" / "RELEASE_EVIDENCE.md"
+_CI_WORKFLOW_PATH = _ROOT / ".github" / "workflows" / "ci.yml"
+_BUILD_SCRIPT_PATH = _ROOT / "scripts" / "build_boot_image.sh"
 _REPORT_PATH = _ROOT / "artifacts" / "runtime" / "boot_blocker_report.json"
 
 
@@ -43,7 +45,7 @@ class BootToolingValidator(BaseValidator):
             return _failure(issue)
         return ValidationResult.pass_(
             code=OK,
-            detail="Boot tooling policy documents Limine and xorriso acquisition without claiming ISO generation",
+            detail="Boot tooling policy documents Limine and xorriso acquisition without claiming boot success",
         )
 
 
@@ -65,6 +67,8 @@ def _required_paths() -> tuple[Path, ...]:
         _BOOT_BLOCKERS_PATH,
         _RUNTIME_EVIDENCE_PATH,
         _RELEASE_EVIDENCE_PATH,
+        _CI_WORKFLOW_PATH,
+        _BUILD_SCRIPT_PATH,
         _REPORT_PATH,
     )
 
@@ -75,10 +79,23 @@ def _required_texts() -> tuple[RequiredText, ...]:
         RequiredText("xorriso_doc", _BOOT_TOOLING_PATH, "xorriso purpose:", "Boot tooling doc must document xorriso"),
         RequiredText("local_install_path", _BOOT_TOOLING_PATH, "Local development path:", "Boot tooling doc must document local installation"),
         RequiredText("ci_install_path", _BOOT_TOOLING_PATH, "CI installation path:", "Boot tooling doc must document CI installation"),
+        RequiredText("limine_pin", _BOOT_TOOLING_PATH, "v12.3.3", "Boot tooling doc must name pinned Limine version"),
+        RequiredText("limine_checksum", _BOOT_TOOLING_PATH, "9e97c9fedc714daa5d7fd2b66a32d85df6bcbf3452657fd26bebad7c8b423009", "Boot tooling doc must name pinned Limine checksum"),
+        RequiredText("ci_limine_source", _BOOT_TOOLING_PATH, "Download Limine v12.3.3 from the upstream GitHub release source tarball.", "Boot tooling doc must document CI Limine source acquisition"),
+        RequiredText("ci_xorriso_install", _BOOT_TOOLING_PATH, "Install xorriso through apt.", "Boot tooling doc must document CI xorriso installation"),
         RequiredText("provenance", _BOOT_TOOLING_PATH, "Tool Provenance", "Boot tooling doc must document provenance"),
         RequiredText("no_opaque_binaries", _BOOT_TOOLING_PATH, "Opaque vendored binaries are discouraged.", "Boot tooling doc must discourage opaque vendored binaries"),
         RequiredText("future_iso_path", _BOOT_TOOLING_PATH, "artifacts/runtime/boot_image/kozo.iso", "Boot tooling doc must name expected ISO path"),
         RequiredText("current_blocker", _BOOT_TOOLING_PATH, "missing_iso_generation_tooling", "Boot tooling doc must name current blocker"),
+        RequiredText("workflow_limine_pin", _CI_WORKFLOW_PATH, "LIMINE_VERSION: v12.3.3", "CI workflow must pin Limine version"),
+        RequiredText("workflow_limine_checksum", _CI_WORKFLOW_PATH, "LIMINE_TARBALL_SHA256: 9e97c9fedc714daa5d7fd2b66a32d85df6bcbf3452657fd26bebad7c8b423009", "CI workflow must verify Limine checksum"),
+        RequiredText("workflow_xorriso_install", _CI_WORKFLOW_PATH, "xorriso", "CI workflow must install xorriso"),
+        RequiredText("workflow_build_boot_image", _CI_WORKFLOW_PATH, "scripts/build_boot_image.sh", "CI workflow must run boot image build script"),
+        RequiredText("workflow_upload_iso", _CI_WORKFLOW_PATH, "artifacts/runtime/boot_image/kozo.iso", "CI workflow must upload boot ISO when produced"),
+        RequiredText("build_script_limine_dir", _BUILD_SCRIPT_PATH, "${LIMINE_DIR:-}", "Build script must support explicit Limine directory"),
+        RequiredText("build_script_limine_install", _BUILD_SCRIPT_PATH, "${LIMINE_INSTALL:-}", "Build script must support explicit Limine install directory"),
+        RequiredText("build_script_limine_path", _BUILD_SCRIPT_PATH, "${LIMINE:-}", "Build script must support explicit Limine executable"),
+        RequiredText("build_script_xorriso_path", _BUILD_SCRIPT_PATH, "${XORRISO:-}", "Build script must support explicit xorriso executable"),
         RequiredText("boot_doc_tooling", _BOOT_DOC_PATH, "docs/BOOT_TOOLING.md", "Boot doc must reference boot tooling doc"),
         RequiredText("boot_doc_blocker", _BOOT_DOC_PATH, "missing_iso_generation_tooling", "Boot doc must name current blocker"),
         RequiredText("image_doc_tooling", _BOOT_IMAGE_PATH, "docs/BOOT_TOOLING.md", "Boot image doc must reference boot tooling doc"),

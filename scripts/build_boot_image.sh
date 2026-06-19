@@ -35,6 +35,10 @@ find_cmd() {
 
 find_limine_cmd() {
   local cmd
+  if [[ -n "${LIMINE:-}" && -x "$LIMINE" ]]; then
+    printf "%s\n" "$LIMINE"
+    return
+  fi
   cmd="$(find_cmd limine)"
   if [[ -n "$cmd" ]]; then
     printf "%s\n" "$cmd"
@@ -46,6 +50,20 @@ find_limine_cmd() {
 find_limine_artifact() {
   local name="$1"
   local candidate
+  if [[ -n "${LIMINE_DIR:-}" ]]; then
+    candidate="$(find "$LIMINE_DIR" -maxdepth 5 -type f -name "$name" -print -quit 2>/dev/null || true)"
+    if [[ -n "$candidate" ]]; then
+      printf "%s\n" "$candidate"
+      return
+    fi
+  fi
+  if [[ -n "${LIMINE_INSTALL:-}" ]]; then
+    candidate="$(find "$LIMINE_INSTALL" -maxdepth 5 -type f -name "$name" -print -quit 2>/dev/null || true)"
+    if [[ -n "$candidate" ]]; then
+      printf "%s\n" "$candidate"
+      return
+    fi
+  fi
   for candidate in \
     "$ROOT/boot/limine/$name" \
     "/opt/homebrew/share/limine/$name" \
@@ -87,7 +105,11 @@ stage_limine_config() {
 
 detect_iso_tooling() {
   LIMINE_CMD="$(find_limine_cmd)"
-  XORRISO_CMD="$(find_cmd xorriso)"
+  if [[ -n "${XORRISO:-}" && -x "$XORRISO" ]]; then
+    XORRISO_CMD="$XORRISO"
+  else
+    XORRISO_CMD="$(find_cmd xorriso)"
+  fi
   MISSING_COMPONENTS=()
   local missing_limine_artifact=0
 

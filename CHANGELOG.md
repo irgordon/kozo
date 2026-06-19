@@ -1,5 +1,30 @@
 # Changelog
 
+## v0.3.7 - 2026-06-19
+
+**Status:** CI ISO tooling install.
+
+### Added
+
+* Added GitHub Actions installation of xorriso for the full verification workflow.
+* Added GitHub Actions acquisition of pinned Limine v12.3.3 source tooling with SHA256 verification before building Limine in CI.
+* Added CI execution of `scripts/build_boot_image.sh` before the verification harness so ISO tooling or image-generation failures surface directly.
+* Added CI upload coverage for `artifacts/runtime/boot_image/package_metadata.json` and `artifacts/runtime/boot_image/kozo.iso` when produced.
+
+### Changed
+
+* Updated `scripts/build_boot_image.sh` to honor explicit `LIMINE_DIR`, `LIMINE_INSTALL`, `LIMINE`, and `XORRISO` paths for CI and deterministic local tooling.
+* Updated boot tooling, boot image, boot blocker, runtime evidence, required checks, release evidence, phase map, and roadmap docs to record the CI ISO tooling path.
+
+### Notes
+
+* This change does not vendor opaque Limine binaries.
+* This change does not claim QEMU boot.
+* This change does not claim serial success.
+* This change does not claim hardware syscall/trap execution.
+* This change does not add Linux compatibility, POSIX compatibility, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+* This change does not change ABI contracts or syscall behavior.
+
 ## v0.3.6 - 2026-06-19
 
 **Status:** Bootable ISO generation blocked by missing local ISO tooling.

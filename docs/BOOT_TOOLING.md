@@ -12,7 +12,7 @@ This document defines the tooling required to turn the current Limine boot image
 
 It records the acquisition path for Limine and ISO generation tooling.
 
-This document does not claim that KOZO currently produces a bootable ISO in this environment.
+This document does not claim that KOZO currently produces a bootable ISO in every environment.
 
 ---
 
@@ -84,16 +84,23 @@ xorriso purpose:
 
 # 5. Required Versions
 
-Limine must be version-pinned before KOZO claims reproducible ISO generation.
+Limine tooling for CI is pinned to:
+
+```text
+v12.3.3
+```
+
+The pinned source tarball checksum is:
+
+```text
+9e97c9fedc714daa5d7fd2b66a32d85df6bcbf3452657fd26bebad7c8b423009
+```
 
 xorriso must be version-recorded before KOZO claims reproducible ISO generation.
 
-This phase does not pin a Limine release because Limine is not vendored and no ISO generation command is implemented yet.
+The CI path installs xorriso from the GitHub Actions Ubuntu package repository and records the tool version in CI output.
 
-The next ISO generation phase must either:
-
-* pin an externally installed Limine package version, or
-* pin a source release and build or acquire Limine artifacts through a documented reproducible process
+Local development environments may use the same Limine release, a platform package, or another reviewed source build, but release evidence must record the exact tool versions used.
 
 ---
 
@@ -106,6 +113,7 @@ Install Limine from the platform package manager or from a pinned upstream relea
 Install xorriso from the platform package manager.
 Confirm limine or limine-deploy is on PATH.
 Confirm xorriso is on PATH.
+Optionally set LIMINE_DIR, LIMINE_INSTALL, LIMINE, or XORRISO for explicit tool paths.
 Run scripts/build_boot_image.sh.
 ```
 
@@ -113,13 +121,18 @@ CI installation path:
 
 ```text
 Install xorriso through apt.
-Install Limine through a pinned package or pinned source release.
-Verify limine or limine-deploy is available before ISO generation.
-Verify xorriso is available before ISO generation.
+Download Limine v12.3.3 from the upstream GitHub release source tarball.
+Verify the Limine tarball with SHA256 before extraction.
+Build Limine from source in the CI workspace.
+Export LIMINE_DIR, LIMINE, and XORRISO for scripts/build_boot_image.sh.
 Run scripts/build_boot_image.sh.
 ```
 
-CI does not currently install Limine or xorriso because QEMU boot evidence is not yet required in CI.
+CI installs the ISO tooling and attempts `scripts/build_boot_image.sh`.
+
+CI may produce `artifacts/runtime/boot_image/kozo.iso` when the pinned toolchain and image command succeed.
+
+If ISO generation fails, CI must fail closed or produce blocker metadata without making a boot claim.
 
 ---
 
@@ -130,6 +143,10 @@ Boot tooling must be reproducible.
 Tooling source must be documented before it is used as release evidence.
 
 Opaque vendored binaries are discouraged.
+
+The CI path acquires Limine from a pinned upstream source release and builds it during the workflow.
+
+The CI path does not commit or vendor Limine binaries.
 
 If vendoring ever becomes necessary, the repository must record:
 
@@ -146,8 +163,8 @@ If vendoring ever becomes necessary, the repository must record:
 
 Before a future ISO generation phase may claim packaging success:
 
-* `limine` or `limine-deploy` must be found on PATH
-* `xorriso` must be found on PATH
+* `limine`, `limine-deploy`, or the explicit `LIMINE` path must resolve to an executable
+* `xorriso` or the explicit `XORRISO` path must resolve to an executable
 * tool versions must be logged or recorded
 * `scripts/build_boot_image.sh` must fail closed when required tooling is unavailable
 * `artifacts/runtime/boot_image/kozo.iso` must exist before ISO packaging can be marked complete
@@ -166,6 +183,8 @@ The future ISO generation path should:
 6. update `artifacts/runtime/boot_image/package_metadata.json`
 7. leave QEMU boot validation to `scripts/qemu_smoke.sh`
 
+CI now follows this path as a required full-verification step, but QEMU smoke evidence remains a later phase.
+
 ---
 
 # 10. Boot Blocker Relationship
@@ -180,10 +199,12 @@ The previous `missing_limine_iso_tooling` blocker is resolved at the policy leve
 
 The previous `missing_bootable_iso_generation` blocker is refined by the v0.3.6 ISO generation command path.
 
-KOZO still does not produce:
+KOZO may produce this artifact in CI when the pinned Limine source build and xorriso path succeed:
 
 ```text
 artifacts/runtime/boot_image/kozo.iso
 ```
 
-The next required fix is to provide the documented Limine executable, Limine bootloader artifacts, and xorriso executable so the ISO generation command can produce `artifacts/runtime/boot_image/kozo.iso`.
+The local environment may still report `missing_iso_generation_tooling` until it provides the documented Limine executable, Limine bootloader artifacts, and xorriso executable.
+
+The next release phase must use the produced ISO, when available, to attempt QEMU serial smoke evidence before any QEMU boot claim is made.

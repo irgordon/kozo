@@ -35,9 +35,39 @@ jobs:
           sudo apt-get install -y \
             binutils \
             build-essential \
+            curl \
+            mtools \
             nasm \
             python3 \
-            python3-pip
+            python3-pip \
+            xorriso
+
+      - name: Acquire pinned Limine tooling
+        env:
+          LIMINE_VERSION: v12.3.3
+          LIMINE_TARBALL_SHA256: 9e97c9fedc714daa5d7fd2b66a32d85df6bcbf3452657fd26bebad7c8b423009
+        run: |
+          set -euo pipefail
+          limine_release="${LIMINE_VERSION#v}"
+          limine_root="$RUNNER_TEMP/limine"
+          limine_tarball="$RUNNER_TEMP/limine-${limine_release}.tar.xz"
+          limine_url="https://github.com/Limine-Bootloader/limine/releases/download/${LIMINE_VERSION}/limine-${limine_release}.tar.xz"
+
+          mkdir -p "$limine_root"
+          curl -fsSL "$limine_url" -o "$limine_tarball"
+          printf "%s  %s\n" "$LIMINE_TARBALL_SHA256" "$limine_tarball" | sha256sum -c -
+          tar -xJf "$limine_tarball" -C "$limine_root" --strip-components=1
+          make -C "$limine_root"
+
+          limine_cmd="$(find "$limine_root" -maxdepth 5 -type f -name limine -perm -111 -print -quit)"
+          test -n "$limine_cmd"
+          test -f "$(find "$limine_root" -maxdepth 5 -type f -name limine-bios-cd.bin -print -quit)"
+          test -f "$(find "$limine_root" -maxdepth 5 -type f -name limine-bios.sys -print -quit)"
+          test -f "$(find "$limine_root" -maxdepth 5 -type f -name limine-uefi-cd.bin -print -quit)"
+
+          echo "LIMINE_DIR=$limine_root" >> "$GITHUB_ENV"
+          echo "LIMINE=$limine_cmd" >> "$GITHUB_ENV"
+          echo "XORRISO=$(command -v xorriso)" >> "$GITHUB_ENV"
 
       - name: Read pinned Rust toolchain
         id: rust-toolchain
@@ -74,6 +104,8 @@ jobs:
           "$(rustup which --toolchain "${{ steps.rust-toolchain.outputs.channel }}" rustc)" --version
           nm --version | head -n 1
           nasm -v
+          xorriso --version | head -n 1
+          "$LIMINE" --version || true
           odin version
 
       - name: Validate shell syntax
@@ -110,6 +142,11 @@ jobs:
         run: |
           odin check kernel
 
+      - name: Build boot image
+        run: |
+          scripts/build_boot_image.sh
+          python3 -m json.tool artifacts/runtime/boot_image/package_metadata.json >/dev/null
+
       - name: Run KOZO verification harness
         run: |
           scripts/verify.sh
@@ -137,4 +174,6 @@ jobs:
             artifacts/runtime/runtime_smoke.log
             artifacts/runtime/runtime_smoke.metadata.json
             artifacts/runtime/boot_blocker_report.json
+            artifacts/runtime/boot_image/package_metadata.json
+            artifacts/runtime/boot_image/kozo.iso
           if-no-files-found: warn

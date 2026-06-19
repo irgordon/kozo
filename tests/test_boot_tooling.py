@@ -50,6 +50,13 @@ class BootToolingValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
         self.assert_tooling_failure(result, "missing_ci_install_path", "docs/BOOT_TOOLING.md.ci_install_path")
 
+    def test_fails_when_ci_workflow_limine_pin_is_missing(self):
+        self.assertEqual("boot_tooling", BootToolingValidator.name)
+        result = self.validate_fixture(mutate_ci=lambda text: text.replace("LIMINE_VERSION: v12.3.3", "LIMINE_VERSION: v12.3.2"))
+
+        self.assertEqual(result.status, "fail")
+        self.assert_tooling_failure(result, "missing_workflow_limine_pin", "workflows/ci.yml.workflow_limine_pin")
+
     def test_fails_when_local_install_path_is_missing(self):
         self.assertEqual("boot_tooling", BootToolingValidator.name)
         result = self.validate_fixture(mutate_tooling=lambda text: text.replace("Local development path:", "Developer path:"))
@@ -80,7 +87,7 @@ class BootToolingValidatorTests(unittest.TestCase):
         self.assertEqual(result.meta["reason"], "missing_boot_doc_tooling")
         self.assertEqual(result.meta["contract_field"], "docs/BOOT.md.boot_doc_tooling")
 
-    def validate_fixture(self, *, mutate_tooling=None, mutate_report=None, mutate_boot=None):
+    def validate_fixture(self, *, mutate_tooling=None, mutate_report=None, mutate_boot=None, mutate_ci=None):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             paths = write_fixture_files(root)
@@ -92,6 +99,8 @@ class BootToolingValidatorTests(unittest.TestCase):
                 paths["report"].write_text(json.dumps(mutate_report(report), indent=2) + "\n")
             if mutate_boot is not None:
                 paths["boot"].write_text(mutate_boot(paths["boot"].read_text()))
+            if mutate_ci is not None:
+                paths["ci"].write_text(mutate_ci(paths["ci"].read_text()))
 
             old_paths = patch_validator_paths(paths)
             try:
@@ -113,6 +122,8 @@ def write_fixture_files(root: Path) -> dict[str, Path]:
         "blockers": root / "docs" / "BOOT_BLOCKERS.md",
         "runtime": root / "docs" / "RUNTIME_EVIDENCE.md",
         "release": root / "docs" / "RELEASE_EVIDENCE.md",
+        "ci": root / ".github" / "workflows" / "ci.yml",
+        "build": root / "scripts" / "build_boot_image.sh",
         "report": root / "artifacts" / "runtime" / "boot_blocker_report.json",
     }
     for path in paths.values():
@@ -121,6 +132,8 @@ def write_fixture_files(root: Path) -> dict[str, Path]:
     paths["tooling"].write_text(valid_tooling_text())
     for key in ("boot", "image", "blockers", "runtime", "release"):
         paths[key].write_text(valid_doc_text())
+    paths["ci"].write_text(valid_ci_text())
+    paths["build"].write_text(valid_build_script_text())
     paths["report"].write_text(json.dumps({"blocker_category": "missing_iso_generation_tooling"}, indent=2) + "\n")
     return paths
 
@@ -132,6 +145,10 @@ def valid_tooling_text() -> str:
             "xorriso purpose:",
             "Local development path:",
             "CI installation path:",
+            "v12.3.3",
+            "9e97c9fedc714daa5d7fd2b66a32d85df6bcbf3452657fd26bebad7c8b423009",
+            "Download Limine v12.3.3 from the upstream GitHub release source tarball.",
+            "Install xorriso through apt.",
             "Tool Provenance",
             "Opaque vendored binaries are discouraged.",
             "artifacts/runtime/boot_image/kozo.iso",
@@ -144,6 +161,22 @@ def valid_doc_text() -> str:
     return "docs/BOOT_TOOLING.md\nmissing_iso_generation_tooling\n"
 
 
+def valid_ci_text() -> str:
+    return "\n".join(
+        (
+            "LIMINE_VERSION: v12.3.3",
+            "LIMINE_TARBALL_SHA256: 9e97c9fedc714daa5d7fd2b66a32d85df6bcbf3452657fd26bebad7c8b423009",
+            "xorriso",
+            "scripts/build_boot_image.sh",
+            "artifacts/runtime/boot_image/kozo.iso",
+        )
+    )
+
+
+def valid_build_script_text() -> str:
+    return "${LIMINE_DIR:-}\n${LIMINE_INSTALL:-}\n${LIMINE:-}\n${XORRISO:-}\n"
+
+
 def patch_validator_paths(paths: dict[str, Path]):
     old_paths = (
         validator_module._BOOT_TOOLING_PATH,
@@ -152,6 +185,8 @@ def patch_validator_paths(paths: dict[str, Path]):
         validator_module._BOOT_BLOCKERS_PATH,
         validator_module._RUNTIME_EVIDENCE_PATH,
         validator_module._RELEASE_EVIDENCE_PATH,
+        validator_module._CI_WORKFLOW_PATH,
+        validator_module._BUILD_SCRIPT_PATH,
         validator_module._REPORT_PATH,
     )
     validator_module._BOOT_TOOLING_PATH = paths["tooling"]
@@ -160,6 +195,8 @@ def patch_validator_paths(paths: dict[str, Path]):
     validator_module._BOOT_BLOCKERS_PATH = paths["blockers"]
     validator_module._RUNTIME_EVIDENCE_PATH = paths["runtime"]
     validator_module._RELEASE_EVIDENCE_PATH = paths["release"]
+    validator_module._CI_WORKFLOW_PATH = paths["ci"]
+    validator_module._BUILD_SCRIPT_PATH = paths["build"]
     validator_module._REPORT_PATH = paths["report"]
     return old_paths
 
@@ -172,6 +209,8 @@ def restore_validator_paths(old_paths) -> None:
         validator_module._BOOT_BLOCKERS_PATH,
         validator_module._RUNTIME_EVIDENCE_PATH,
         validator_module._RELEASE_EVIDENCE_PATH,
+        validator_module._CI_WORKFLOW_PATH,
+        validator_module._BUILD_SCRIPT_PATH,
         validator_module._REPORT_PATH,
     ) = old_paths
 

@@ -151,10 +151,15 @@ The minimum release evidence must record:
 * runtime smoke log and metadata artifact availability from full CI when available
 * boot blocker report artifact availability from full CI while boot is blocked
 * CI run URL or status when available
+* ISO tooling acquisition status from full CI
+* boot image package metadata artifact availability from full CI
+* boot image ISO artifact availability from full CI when produced
 
 Full CI runs `scripts/verify.sh`, so runtime smoke evidence is required there through full verification and should be uploaded as CI artifacts.
 
 Full CI also runs the boot blocker report generator through `scripts/verify.sh` while boot remains blocked, and should upload `artifacts/runtime/boot_blocker_report.json`.
+
+Full CI installs xorriso, acquires pinned Limine source tooling, runs `scripts/build_boot_image.sh`, and should upload `artifacts/runtime/boot_image/package_metadata.json` plus `artifacts/runtime/boot_image/kozo.iso` when the image exists.
 
 The lint workflow is static-check only. It does not own runtime smoke evidence unless it is changed to run full verification.
 

@@ -26,6 +26,8 @@ v0.3.5 added `docs/BOOT_TOOLING.md` to define the Limine and xorriso acquisition
 
 v0.3.6 added the ISO generation command path to `scripts/build_boot_image.sh`, but local generation remains blocked because Limine artifacts and xorriso are unavailable.
 
+v0.3.7 added CI installation of pinned Limine tooling and xorriso so full CI can attempt `scripts/build_boot_image.sh` and upload boot image artifacts when produced.
+
 Remaining blocker: `missing_iso_generation_tooling`.
 
 ---
@@ -40,11 +42,17 @@ Selected boot protocol: Limine.
 
 The current repository has a 64-bit `_start` symbol, an exported `kernel_entry`, early serial initialization, and runtime-adjacent object/symbol smoke evidence.
 
-The boot protocol decision, boot image skeleton, boot tooling acquisition policy, and ISO generation command path are complete.
+The boot protocol decision, boot image skeleton, boot tooling acquisition policy, ISO generation command path, and CI ISO tooling install path are complete.
 
 `scripts/build_boot_image.sh` writes `artifacts/runtime/boot_image/package_metadata.json`.
 
-The expected ISO path is `artifacts/runtime/boot_image/kozo.iso`, but the current local tooling does not yet provide the Limine artifacts and xorriso executable required to produce that image, so KOZO does not have QEMU smoke execution or captured serial evidence.
+The expected ISO path is `artifacts/runtime/boot_image/kozo.iso`.
+
+GitHub Actions full CI installs xorriso, acquires Limine v12.3.3 from a pinned source release, builds Limine, and attempts ISO generation.
+
+The current local tooling does not yet provide the Limine artifacts and xorriso executable required to produce that image, so local verification continues to report blocked packaging metadata.
+
+KOZO does not have QEMU smoke execution or captured serial evidence.
 
 ---
 
@@ -52,10 +60,10 @@ The expected ISO path is `artifacts/runtime/boot_image/kozo.iso`, but the curren
 
 The concrete remaining missing components are:
 
-* Limine executable
-* xorriso executable
-* Limine bootloader artifacts
-* bootable ISO artifact
+* local Limine executable
+* local xorriso executable
+* local Limine bootloader artifacts
+* bootable ISO artifact when not produced by CI
 * validated QEMU serial smoke execution
 
 Until those exist, KOZO must not claim QEMU boot evidence.
@@ -88,7 +96,7 @@ The previous `missing_bootable_iso_packaging` blocker was refined to `missing_li
 
 The previous `missing_limine_iso_tooling` blocker is refined by `docs/BOOT_TOOLING.md`.
 
-The next boot-enabling fix must install or provide the documented Limine executable, Limine bootloader artifacts, and xorriso executable before QEMU smoke execution, serial evidence capture, and QEMU smoke validation can be claimed.
+The next boot-enabling fix must use the documented CI/local Limine and xorriso tooling path to produce a bootable ISO consistently before QEMU smoke execution, serial evidence capture, and QEMU smoke validation can be claimed.
 
 The existing QEMU smoke command writes blocked output to `artifacts/runtime/qemu_smoke.log` and stops when `artifacts/runtime/boot_image/package_metadata.json` reports missing ISO tooling or when `artifacts/runtime/boot_image/kozo.iso` is missing.
 

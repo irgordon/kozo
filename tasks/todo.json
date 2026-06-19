@@ -1201,6 +1201,38 @@
         "verification.tests_run[10]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 43,
+      "title": "Install ISO tooling in CI",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "PHASEMAP.md",
+        "ROADMAP.md",
+        "tasks/todo.json",
+        ".github/workflows/ci.yml",
+        "docs/BOOT.md",
+        "docs/BOOT_BLOCKERS.md",
+        "docs/BOOT_IMAGE.md",
+        "docs/BOOT_TOOLING.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/REQUIRED_CHECKS.md",
+        "docs/generated/governance_index.md",
+        "scripts/build_boot_image.sh",
+        "harness/validators_impl/boot_tooling.py",
+        "harness/validators_impl/validator_coverage.py",
+        "tests/test_boot_tooling.py",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[5]",
+        "verification.tests_run[9]",
+        "verification.tests_run[10]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -1245,7 +1277,8 @@
     "Boot image skeleton adds linker script, Limine config, boot image staging, a kernel ELF build path, and validation while reducing the active blocker to missing_qemu_execution_evidence without claiming QEMU boot",
     "QEMU serial smoke attempt adds a fail-closed QEMU command and refines the active blocker to missing_bootable_iso_packaging without claiming QEMU boot or serial evidence",
     "Bootable ISO packaging attempt generates deterministic package metadata and narrows the active blocker to missing_bootable_iso_generation without claiming a bootable ISO, QEMU boot, or serial evidence",
-    "Bootable ISO generation path attempts Limine/xorriso packaging, records missing_iso_generation_tooling when local tooling is unavailable, and preserves no-QEMU-boot and no-serial-success claims"
+    "Bootable ISO generation path attempts Limine/xorriso packaging, records missing_iso_generation_tooling when local tooling is unavailable, and preserves no-QEMU-boot and no-serial-success claims",
+    "CI ISO tooling install adds pinned Limine source acquisition, xorriso installation, CI boot image build attempts, and artifact upload coverage while preserving no-QEMU-boot and no-serial-success claims"
   ],
   "verification": {
     "tests_run": [
@@ -1406,7 +1439,8 @@
       "v0.3.3 adds scripts/qemu_smoke.sh and records the narrower missing_bootable_iso_packaging blocker because the repository stages an image root and kernel ELF but does not yet produce a bootable Limine ISO or disk image.",
       "v0.3.4 generates boot image package metadata and records missing_bootable_iso_generation because the repository still lacks Limine ISO packaging commands, bootloader installation artifacts, and an xorriso-compatible ISO builder.",
       "v0.3.5 documents Limine and xorriso acquisition, local and CI install paths, provenance rules, and narrows the active blocker to missing_bootable_iso_generation without adding a bootable ISO, QEMU boot, serial marker, hardware trap, compatibility, userspace, subsystem, or production-readiness claims.",
-      "v0.3.6 implements the Limine/xorriso ISO generation path in scripts/build_boot_image.sh and records missing_iso_generation_tooling because the local environment lacks Limine executables, Limine bootloader artifacts, and xorriso; no bootable ISO, QEMU boot, serial marker, hardware trap, compatibility, userspace, subsystem, or production-readiness claim is added."
+      "v0.3.6 implements the Limine/xorriso ISO generation path in scripts/build_boot_image.sh and records missing_iso_generation_tooling because the local environment lacks Limine executables, Limine bootloader artifacts, and xorriso; no bootable ISO, QEMU boot, serial marker, hardware trap, compatibility, userspace, subsystem, or production-readiness claim is added.",
+      "v0.3.7 installs xorriso and pinned Limine v12.3.3 source tooling in full CI, runs scripts/build_boot_image.sh before full verification, uploads boot image metadata and any generated ISO, and preserves no-QEMU-boot, no-serial-success, hardware-trap, compatibility, userspace, subsystem, and production-readiness non-claims."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -1454,6 +1488,7 @@
     "Added a fail-closed v0.3.3 QEMU smoke command and refined the active blocker to missing_bootable_iso_packaging without adding QEMU boot, serial marker, hardware trap, compatibility, userspace, subsystem, or production-readiness claims.",
     "Added v0.3.4 boot image packaging metadata and boot_image_packaging validation, narrowing the active blocker to missing_bootable_iso_generation without adding a bootable ISO, QEMU boot, serial marker, hardware trap, compatibility, userspace, subsystem, or production-readiness claims.",
     "Added v0.3.5 boot tooling acquisition policy and boot_tooling validation, narrowing the blocker from missing_limine_iso_tooling to missing_bootable_iso_generation while preserving all no-boot and non-compatibility claim boundaries.",
-    "Added v0.3.6 ISO generation command path and updated packaging validation to distinguish real ISO generation from a blocked missing_iso_generation_tooling result while preserving all no-boot and non-compatibility claim boundaries."
+    "Added v0.3.6 ISO generation command path and updated packaging validation to distinguish real ISO generation from a blocked missing_iso_generation_tooling result while preserving all no-boot and non-compatibility claim boundaries.",
+    "Added v0.3.7 CI ISO tooling install with pinned Limine source acquisition, xorriso installation, build-script env hooks, CI boot image build attempts, artifact upload coverage, and boot_tooling validation while preserving all no-boot and non-compatibility claim boundaries."
   ]
 }

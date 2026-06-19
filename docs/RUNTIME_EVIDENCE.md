@@ -26,6 +26,8 @@ v0.3.5 added `docs/BOOT_TOOLING.md` to define the Limine and xorriso acquisition
 
 v0.3.6 added the ISO generation command path, but local ISO generation is blocked by missing Limine artifacts and xorriso tooling.
 
+v0.3.7 added full-CI installation of pinned Limine source tooling and xorriso so CI can attempt ISO generation and upload boot image artifacts.
+
 Current boot blocker: `missing_iso_generation_tooling`.
 
 ---
@@ -87,7 +89,7 @@ runtime-adjacent-object-symbol-smoke
 
 The smoke path builds freestanding x86_64 Odin kernel objects, assembles the current x86_64 boot and syscall bridge objects, records `nm` and `strings` evidence, and verifies required entry, dispatcher, bridge, and serial marker surfaces.
 
-This remains the narrowest passing runtime evidence target because the repository does not yet generate `artifacts/runtime/boot_image/kozo.iso`.
+This remains the narrowest passing runtime evidence target until `artifacts/runtime/boot_image/kozo.iso` is generated and then booted with validated serial output.
 
 ---
 
@@ -188,6 +190,8 @@ The metadata is deterministic generated evidence. It identifies the evidence typ
 Full CI should upload both runtime smoke artifacts when full verification runs.
 
 Full CI should also upload the boot blocker report while v0.3.0 remains blocked.
+
+Full CI should upload boot image package metadata and `artifacts/runtime/boot_image/kozo.iso` when ISO generation succeeds.
 
 ---
 
