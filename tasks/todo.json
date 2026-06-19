@@ -35,7 +35,9 @@
     "harness/",
     "tests/",
     "schemas/",
-    "scripts/"
+    "scripts/",
+    "boot/",
+    "linker/"
   ],
   "steps": [
     {
@@ -1058,6 +1060,50 @@
         "verification.tests_run[5]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 40,
+      "title": "Add boot image skeleton",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "PHASEMAP.md",
+        "ROADMAP.md",
+        "tasks/todo.json",
+        ".gitignore",
+        "linker/kernel.ld",
+        "boot/limine.conf",
+        "kernel/arch/x86_64/memory.asm",
+        "scripts/build_boot_image.sh",
+        "scripts/boot_blocker_report.sh",
+        "docs/BOOT.md",
+        "docs/BOOT_BLOCKERS.md",
+        "docs/BOOT_PROTOCOL.md",
+        "docs/BOOT_IMAGE.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/generated/governance_index.md",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/boot_blocker_report.py",
+        "harness/validators_impl/boot_protocol_decision.py",
+        "harness/validators_impl/boot_image_skeleton.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/latest_verify.schema.json",
+        "schemas/agent_context.schema.json",
+        "tests/test_boot_blocker_report.py",
+        "tests/test_boot_protocol_decision.py",
+        "tests/test_boot_image_skeleton.py",
+        "artifacts/runtime/boot_blocker_report.json",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[4]",
+        "verification.tests_run[5]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -1098,7 +1144,8 @@
     "Runtime evidence review gate documents and validates the runtime-adjacent-object-symbol-smoke evidence type, live evidence paths, release bundle paths, validator ownership, release references, metadata non-goals, and overclaim blockers without adding QEMU boot, hardware trap, compatibility, userspace, or production-readiness claims",
     "CI/runtime evidence policy alignment documents that full CI requires runtime smoke through scripts/verify.sh, release review requires runtime smoke log and metadata, lint remains static unless it runs full verification, and CI uploads runtime smoke artifacts without adding QEMU boot, hardware trap, compatibility, userspace, or production-readiness claims",
     "Bootable runtime baseline records a verified v0.3.0 blocker report naming missing boot protocol, linker script, loader configuration, and boot image packaging instead of claiming QEMU boot evidence",
-    "Boot protocol selection records Limine as the initial x86_64 boot protocol and keeps missing_boot_protocol_and_image_packaging active until linker script, loader configuration, image packaging, and QEMU smoke execution exist"
+    "Boot protocol selection records Limine as the initial x86_64 boot protocol and keeps missing_boot_protocol_and_image_packaging active until linker script, loader configuration, image packaging, and QEMU smoke execution exist",
+    "Boot image skeleton adds linker script, Limine config, boot image staging, a kernel ELF build path, and validation while reducing the active blocker to missing_qemu_execution_evidence without claiming QEMU boot"
   ],
   "verification": {
     "tests_run": [
@@ -1204,7 +1251,8 @@
       "runtime_evidence_review fails if runtime evidence review documentation, release evidence references, release checklist gates, required checks references, or metadata non-goals are missing or drift from the current runtime-adjacent evidence scope",
       "CI/runtime evidence policy alignment preserves the runtime-adjacent-object-symbol-smoke scope while making full CI, lint, required checks, release checklist, and release evidence policy agree on runtime smoke evidence requirements",
       "boot_blocker_report validates that v0.3.0 cannot honestly claim QEMU boot until missing boot protocol and image packaging components are implemented",
-      "boot_protocol_decision validates the accepted Limine boot protocol decision, alternatives, non-goals, active blocker wording, and v0.3.2 Boot Image Skeleton references"
+      "boot_protocol_decision validates the accepted Limine boot protocol decision, alternatives, non-goals, active blocker wording, and v0.3.2 Boot Image Skeleton references",
+      "boot_image_skeleton validates linker script, Limine config, build script, boot image docs, memory support symbols, and blocker state without requiring QEMU execution"
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -1251,7 +1299,8 @@
       "runtime_evidence_review validates docs/RUNTIME_EVIDENCE_REVIEW.md, release evidence/checklist/check policy references, and runtime smoke metadata non-goals while keeping runtime evidence scoped to runtime-adjacent-object-symbol-smoke.",
       "Full CI runs scripts/verify.sh, uploads artifacts/runtime/runtime_smoke.log and artifacts/runtime/runtime_smoke.metadata.json, lint remains static-check only, and release review requires runtime smoke evidence without changing runtime behavior or evidence scope.",
       "v0.3.0 boot feasibility is blocked by missing_boot_protocol_and_image_packaging; scripts/boot_blocker_report.sh generates artifacts/runtime/boot_blocker_report.json and boot_blocker_report validates the report and documentation references.",
-      "v0.3.1 selects Limine as the initial x86_64 boot protocol for a future QEMU serial smoke path while preserving the active boot blocker and avoiding QEMU boot, hardware trap, compatibility, userspace, subsystem, or production-readiness claims."
+      "v0.3.1 selects Limine as the initial x86_64 boot protocol for a future QEMU serial smoke path while preserving the active boot blocker and avoiding QEMU boot, hardware trap, compatibility, userspace, subsystem, or production-readiness claims.",
+      "v0.3.2 stages a Limine boot image skeleton and kernel ELF build path under artifacts/runtime/boot_image while boot remains blocked on missing QEMU smoke execution and serial evidence capture."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -1294,6 +1343,7 @@
     "Added runtime evidence review gate for release claim discipline without changing runtime behavior, ABI contracts, syscall behavior, QEMU boot evidence, hardware trap evidence, compatibility claims, userspace execution claims, or production-readiness claims.",
     "Aligned CI/runtime evidence policy so full CI requires and uploads runtime smoke evidence through scripts/verify.sh, lint remains static unless it runs full verification, and release evidence/checklist docs require runtime smoke log and metadata without expanding runtime claims.",
     "Added the v0.3.0 bootable runtime baseline blocker path: boot is not yet honestly claimable, the missing boot protocol/linker/loader/image packaging components are reported and validated, and release evidence includes the blocker artifact without changing runtime, ABI, or syscall behavior.",
-    "Selected Limine as the initial x86_64 boot protocol, added an accepted ADR and boot protocol plan, registered boot_protocol_decision validation, and kept the v0.3.0 blocker active until implementation adds linker, loader, image packaging, and QEMU smoke evidence."
+    "Selected Limine as the initial x86_64 boot protocol, added an accepted ADR and boot protocol plan, registered boot_protocol_decision validation, and kept the v0.3.0 blocker active until implementation adds linker, loader, image packaging, and QEMU smoke evidence.",
+    "Added the v0.3.2 boot image skeleton with linker script, Limine config, boot image staging script, freestanding memory support, skeleton validation, and reduced blocker state while preserving the no-QEMU-boot claim boundary."
   ]
 }

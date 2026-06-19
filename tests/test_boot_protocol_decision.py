@@ -14,7 +14,7 @@ KOZO_NEGATIVE_COVERAGE = {
         "wrong_protocol": "test_fails_when_selected_protocol_is_not_limine",
         "missing_alternative": "test_fails_when_required_alternative_is_missing",
         "missing_non_goal": "test_fails_when_required_non_goal_is_missing",
-        "missing_boot_blocker_active_statement": "test_fails_when_boot_blocker_active_statement_is_missing",
+        "missing_boot_blocker_reduced_statement": "test_fails_when_boot_blocker_reduced_statement_is_missing",
         "missing_v032_next_phase": "test_fails_when_v032_next_phase_is_missing",
         "diagnostic_names_decision_field": "test_failure_diagnostic_names_decision_field",
     }
@@ -56,12 +56,12 @@ class BootProtocolDecisionValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
         self.assert_decision_failure(result, "missing_linux_non_goal", "docs/decisions/0001-boot-protocol.md.linux_non_goal")
 
-    def test_fails_when_boot_blocker_active_statement_is_missing(self):
+    def test_fails_when_boot_blocker_reduced_statement_is_missing(self):
         self.assertEqual("boot_protocol_decision", BootProtocolDecisionValidator.name)
-        result = self.validate_fixture(mutate_boot_blockers=lambda text: text.replace("The `missing_boot_protocol_and_image_packaging` blocker remains active.", ""))
+        result = self.validate_fixture(mutate_boot_blockers=lambda text: text.replace("The previous `missing_boot_protocol_and_image_packaging` blocker is reduced.", ""))
 
         self.assertEqual(result.status, "fail")
-        self.assert_decision_failure(result, "missing_boot_blockers_active", "docs/BOOT_BLOCKERS.md.boot_blockers_active")
+        self.assert_decision_failure(result, "missing_boot_blockers_reduced", "docs/BOOT_BLOCKERS.md.boot_blockers_reduced")
 
     def test_fails_when_v032_next_phase_is_missing(self):
         self.assertEqual("boot_protocol_decision", BootProtocolDecisionValidator.name)
@@ -128,8 +128,8 @@ def write_fixture_files(root: Path) -> dict[str, Path]:
 
     adr.write_text(valid_adr_text())
     boot_protocol.write_text(valid_boot_protocol_text())
-    boot.write_text("Selected boot protocol: Limine\nThe v0.3.0 blocker remains active.\n")
-    blockers.write_text("Boot protocol decision: complete.\nThe `missing_boot_protocol_and_image_packaging` blocker remains active.\n")
+    boot.write_text("Selected boot protocol: Limine\nRemaining blocker: `missing_qemu_execution_evidence`.\n")
+    blockers.write_text("Boot protocol decision: complete.\nThe previous `missing_boot_protocol_and_image_packaging` blocker is reduced.\n")
     phasemap.write_text("v0.3.2 Boot Image Skeleton\n")
     roadmap.write_text("v0.3.2 Boot Image Skeleton QEMU serial smoke\n")
     return {

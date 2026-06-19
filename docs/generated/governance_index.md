@@ -12,18 +12,18 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.3.1`
+* Version: `v0.3.2`
 * Date: `2026-06-19`
-* Status: Boot protocol selection.
+* Status: Boot image skeleton.
 
 ## Verification status
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 33
+* Total checks: 34
 * Failed checks: 0
-* Run ID: `verify-20260619T023004Z`
-* Generated at: `2026-06-19T02:30:04Z`
+* Run ID: `verify-20260619T024639Z`
+* Generated at: `2026-06-19T02:46:39Z`
 
 ## Registered validators
 
@@ -58,10 +58,11 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 27 | `runtime_evidence_review` |
 | 28 | `boot_blocker_report` |
 | 29 | `boot_protocol_decision` |
-| 30 | `return_path_proof` |
-| 31 | `execution_proof` |
-| 32 | `validator_coverage` |
-| 33 | `evidence` |
+| 30 | `boot_image_skeleton` |
+| 31 | `return_path_proof` |
+| 32 | `execution_proof` |
+| 33 | `validator_coverage` |
+| 34 | `evidence` |
 
 ## Active contracts
 
@@ -99,7 +100,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 33
+* Check count: 34
 * Failure count: 0
 
 ## Non-goals

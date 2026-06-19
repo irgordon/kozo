@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.3.2 - 2026-06-19
+
+**Status:** Boot image skeleton.
+
+### Added
+
+* Added `linker/kernel.ld` as the minimal x86_64 kernel linker script with `_start` entry and text, rodata, data, and bss layout.
+* Added `boot/limine.conf` as the initial Limine configuration for the future QEMU serial smoke path.
+* Added `scripts/build_boot_image.sh` to build and stage the boot image skeleton under `artifacts/runtime/boot_image/`.
+* Added `docs/BOOT_IMAGE.md` as the authoritative boot image skeleton document.
+* Added `boot_image_skeleton` validation and focused negative coverage for the linker script, Limine config, build script, boot image docs, blocker state, and diagnostic quality.
+
+### Changed
+
+* Reduced the active boot blocker from `missing_boot_protocol_and_image_packaging` to `missing_qemu_execution_evidence`.
+* Updated boot, runtime evidence, release evidence, phase map, and roadmap docs for the boot image skeleton.
+
+### Notes
+
+* This change does not add QEMU boot evidence.
+* This change does not add hardware syscall/trap execution evidence.
+* This change does not add Linux compatibility, POSIX compatibility, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+* This change does not change ABI contracts or syscall behavior.
+
 ## v0.3.1 - 2026-06-19
 
 **Status:** Boot protocol selection.

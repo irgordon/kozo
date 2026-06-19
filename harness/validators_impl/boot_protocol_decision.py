@@ -41,7 +41,7 @@ class BootProtocolDecisionValidator(BaseValidator):
             return _failure(issue)
         return ValidationResult.pass_(
             code=OK,
-            detail="Boot protocol decision selects Limine and keeps the boot blocker active until implementation",
+            detail="Boot protocol decision selects Limine and stays aligned with the current boot blocker state",
         )
 
 
@@ -79,9 +79,9 @@ def _required_texts() -> tuple[RequiredText, ...]:
         RequiredText("boot_protocol_doc_selects_limine", _BOOT_PROTOCOL_PATH, "Selected protocol: Limine", "Boot protocol doc must select Limine"),
         RequiredText("boot_protocol_doc_next_phase", _BOOT_PROTOCOL_PATH, "v0.3.2 Boot Image Skeleton", "Boot protocol doc must name next phase"),
         RequiredText("boot_doc_references_protocol", _BOOT_DOC_PATH, "Selected boot protocol: Limine", "Boot doc must reference selected protocol"),
-        RequiredText("boot_doc_blocker_active", _BOOT_DOC_PATH, "The v0.3.0 blocker remains active.", "Boot doc must keep blocker active"),
+        RequiredText("boot_doc_remaining_blocker", _BOOT_DOC_PATH, "Remaining blocker: `missing_qemu_execution_evidence`.", "Boot doc must name remaining blocker"),
         RequiredText("boot_blockers_decision_complete", _BOOT_BLOCKERS_PATH, "Boot protocol decision: complete.", "Boot blockers doc must record decision completion"),
-        RequiredText("boot_blockers_active", _BOOT_BLOCKERS_PATH, "The `missing_boot_protocol_and_image_packaging` blocker remains active.", "Boot blockers doc must keep blocker active"),
+        RequiredText("boot_blockers_reduced", _BOOT_BLOCKERS_PATH, "The previous `missing_boot_protocol_and_image_packaging` blocker is reduced.", "Boot blockers doc must record reduced blocker"),
         RequiredText("phasemap_next_phase", _PHASEMAP_PATH, "v0.3.2", "Phase map must include v0.3.2"),
         RequiredText("phasemap_boot_image_skeleton", _PHASEMAP_PATH, "Boot Image Skeleton", "Phase map must include Boot Image Skeleton"),
         RequiredText("roadmap_next_phase", _ROADMAP_PATH, "v0.3.2", "Roadmap must include v0.3.2"),

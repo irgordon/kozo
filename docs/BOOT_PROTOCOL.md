@@ -87,12 +87,15 @@ Limine is a better initial fit than Multiboot2 because KOZO does not currently h
 
 # 6. Required Implementation Components
 
-The boot blocker remains active until these components exist:
+The boot image skeleton now provides:
 
 * linker script
 * kernel entry contract
 * Limine configuration
 * boot image assembly script
+
+The boot blocker remains active until these components exist:
+
 * QEMU smoke script
 * serial output marker
 * runtime evidence validator for QEMU smoke, in a later phase
@@ -101,32 +104,30 @@ The boot blocker remains active until these components exist:
 
 # 7. Required Files For Next Phase
 
-v0.3.2 Boot Image Skeleton should add:
+v0.3.2 Boot Image Skeleton added:
 
 * linker script
 * Limine config
-* minimal ISO or image packaging script
-* QEMU invocation script if feasible
-* serial marker definition for boot evidence
+* minimal boot image staging script
+* freestanding kernel ELF link path
 
-The phase must not claim boot success until serial evidence is captured.
+The phase does not claim boot success because serial evidence has not been captured.
 
 ---
 
 # 8. Boot Blocker Relationship
 
-The v0.3.0 blocker remains active.
+The v0.3.0 blocker is reduced.
 
-Current blocker: `missing_boot_protocol_and_image_packaging`
+Current blocker: `missing_qemu_execution_evidence`
 
-The boot protocol decision resolves only the protocol selection part of the blocker.
+The boot protocol decision resolved the protocol selection part of the blocker.
 
 Remaining blocker components:
 
-* linker script
-* loader configuration
-* image packaging
 * QEMU smoke execution
+* serial evidence capture
+* QEMU smoke validator
 
 ---
 

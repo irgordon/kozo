@@ -462,9 +462,22 @@ _VALIDATOR_TEST_CONTRACTS = {
             "wrong_protocol",
             "missing_alternative",
             "missing_non_goal",
-            "missing_boot_blocker_active_statement",
+            "missing_boot_blocker_reduced_statement",
             "missing_v032_next_phase",
             "diagnostic_names_decision_field",
+        ),
+    ),
+    "boot_image_skeleton": ValidatorTestContract(
+        "boot_image_skeleton",
+        _TESTS_DIR / "test_boot_image_skeleton.py",
+        "BootImageSkeletonValidator",
+        (
+            "missing_linker_script",
+            "missing_limine_config",
+            "missing_build_script",
+            "missing_boot_image_doc",
+            "blocker_state_mismatch",
+            "diagnostic_names_field",
         ),
     ),
     "return_path_proof": ValidatorTestContract(

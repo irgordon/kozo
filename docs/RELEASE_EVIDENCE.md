@@ -53,6 +53,7 @@ Every release review must include:
 * `artifacts/runtime/runtime_smoke.metadata.json`
 * `artifacts/runtime/boot_blocker_report.json`
 * `docs/BOOT_PROTOCOL.md`
+* `docs/BOOT_IMAGE.md`
 * `docs/decisions/0001-boot-protocol.md`
 * `CHANGELOG.md`
 * `PHASEMAP.md`
@@ -99,9 +100,9 @@ Runtime evidence review is required for release review and is governed by `docs/
 
 The boot blocker report is required while v0.3.0 remains blocked and is governed by `docs/BOOT.md`, `docs/BOOT_BLOCKERS.md`, `scripts/boot_blocker_report.sh`, and `boot_blocker_report`.
 
-The current boot blocker category is `missing_boot_protocol_and_image_packaging`.
+The current boot blocker category is `missing_qemu_execution_evidence`.
 
-The boot protocol decision is release context only. It does not require QEMU evidence and does not create a QEMU boot claim.
+The boot protocol decision and boot image skeleton are release context only. They do not require QEMU evidence and do not create a QEMU boot claim.
 
 ---
 

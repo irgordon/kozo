@@ -54,11 +54,11 @@ class BootBlockerReportValidatorTests(unittest.TestCase):
     def test_fails_when_missing_component_is_absent(self):
         self.assertEqual("boot_blocker_report", BootBlockerReportValidator.name)
         result = self.validate_fixture(
-            mutate_report_json=lambda report: remove_list_value(report, "missing_components", "linker script")
+            mutate_report_json=lambda report: remove_list_value(report, "missing_components", "QEMU smoke execution")
         )
 
         self.assertEqual(result.status, "fail")
-        self.assert_boot_failure(result, "missing_component", "boot_blocker.missing_components.linker script")
+        self.assert_boot_failure(result, "missing_component", "boot_blocker.missing_components.QEMU smoke execution")
 
     def test_fails_when_current_surface_is_absent(self):
         self.assertEqual("boot_blocker_report", BootBlockerReportValidator.name)
@@ -89,14 +89,14 @@ class BootBlockerReportValidatorTests(unittest.TestCase):
     def test_fails_when_documentation_reference_is_absent(self):
         self.assertEqual("boot_blocker_report", BootBlockerReportValidator.name)
         result = self.validate_fixture(
-            mutate_boot_doc=lambda text: text.replace("missing_boot_protocol_and_image_packaging", "missing")
+            mutate_boot_doc=lambda text: text.replace("missing_qemu_execution_evidence", "missing")
         )
 
         self.assertEqual(result.status, "fail")
         self.assert_boot_failure(
             result,
             "missing_documentation_reference",
-            "docs/BOOT.md.missing_boot_protocol_and_image_packaging",
+            "docs/BOOT.md.missing_qemu_execution_evidence",
         )
 
     def test_failure_diagnostic_names_boot_blocker_field(self):
@@ -170,22 +170,24 @@ def write_fixture_files(root: Path) -> None:
 def valid_report() -> dict[str, object]:
     return {
         "version": 0,
-        "phase": "v0.3.0",
+        "phase": "v0.3.2",
         "outcome": "blocked",
         "evidence_type": "boot-blocker-report",
         "generated_by": "scripts/boot_blocker_report.sh",
         "validator": "boot_blocker_report",
-        "blocker_category": "missing_boot_protocol_and_image_packaging",
+        "blocker_category": "missing_qemu_execution_evidence",
         "missing_components": [
-            "linker script",
-            "boot protocol",
-            "loader configuration",
-            "boot image packaging",
+            "QEMU smoke execution",
+            "serial evidence capture",
+            "QEMU smoke validator",
         ],
         "current_surfaces": [
             "kernel/arch/x86_64/boot.asm defines a 64-bit _start symbol",
             "kernel/main.odin exports kernel_entry",
             "kernel/arch/x86_64/serial.odin initializes COM1 serial output",
+            "linker/kernel.ld defines the kernel ELF layout",
+            "boot/limine.conf defines the Limine boot entry",
+            "scripts/build_boot_image.sh stages the boot image skeleton",
             "scripts/runtime_smoke.sh proves runtime-adjacent object and symbol evidence",
         ],
         "cannot_claim": [
@@ -201,11 +203,14 @@ def valid_report() -> dict[str, object]:
             "file descriptor behavior",
             "production readiness",
         ],
-        "next_required_fix": "Add a governed boot protocol, linker script, loader configuration, and boot image packaging before claiming QEMU boot evidence.",
+        "next_required_fix": "Add a bounded QEMU smoke command, capture serial output, and validate an expected kernel marker before claiming QEMU boot evidence.",
         "inspected_paths": [
             "kernel/arch/x86_64/boot.asm",
             "kernel/main.odin",
             "kernel/arch/x86_64/serial.odin",
+            "linker/kernel.ld",
+            "boot/limine.conf",
+            "scripts/build_boot_image.sh",
             "scripts/runtime_smoke.sh",
             "docs/RUNTIME_EVIDENCE.md",
         ],
@@ -218,7 +223,7 @@ def valid_doc_text() -> str:
             "artifacts/runtime/boot_blocker_report.json",
             "scripts/boot_blocker_report.sh",
             "boot_blocker_report",
-            "missing_boot_protocol_and_image_packaging",
+            "missing_qemu_execution_evidence",
         )
     )
 

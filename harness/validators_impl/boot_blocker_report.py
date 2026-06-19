@@ -15,26 +15,28 @@ _RUNTIME_EVIDENCE_PATH = _ROOT / "docs" / "RUNTIME_EVIDENCE.md"
 _RELEASE_EVIDENCE_PATH = _ROOT / "docs" / "RELEASE_EVIDENCE.md"
 
 _EXPECTED_FIELDS = {
-    "phase": "v0.3.0",
+    "phase": "v0.3.2",
     "outcome": "blocked",
     "evidence_type": "boot-blocker-report",
     "generated_by": "scripts/boot_blocker_report.sh",
     "validator": "boot_blocker_report",
-    "blocker_category": "missing_boot_protocol_and_image_packaging",
-    "next_required_fix": "Add a governed boot protocol, linker script, loader configuration, and boot image packaging before claiming QEMU boot evidence.",
+    "blocker_category": "missing_qemu_execution_evidence",
+    "next_required_fix": "Add a bounded QEMU smoke command, capture serial output, and validate an expected kernel marker before claiming QEMU boot evidence.",
 }
 
 _REQUIRED_MISSING_COMPONENTS = (
-    "linker script",
-    "boot protocol",
-    "loader configuration",
-    "boot image packaging",
+    "QEMU smoke execution",
+    "serial evidence capture",
+    "QEMU smoke validator",
 )
 
 _REQUIRED_CURRENT_SURFACES = (
     "kernel/arch/x86_64/boot.asm defines a 64-bit _start symbol",
     "kernel/main.odin exports kernel_entry",
     "kernel/arch/x86_64/serial.odin initializes COM1 serial output",
+    "linker/kernel.ld defines the kernel ELF layout",
+    "boot/limine.conf defines the Limine boot entry",
+    "scripts/build_boot_image.sh stages the boot image skeleton",
     "scripts/runtime_smoke.sh proves runtime-adjacent object and symbol evidence",
 )
 
@@ -56,7 +58,7 @@ _REQUIRED_DOC_REFERENCES = (
     "artifacts/runtime/boot_blocker_report.json",
     "scripts/boot_blocker_report.sh",
     "boot_blocker_report",
-    "missing_boot_protocol_and_image_packaging",
+    "missing_qemu_execution_evidence",
 )
 
 

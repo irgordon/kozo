@@ -41,6 +41,7 @@ RUNTIME_SMOKE_EVIDENCE_INVALID = "RUNTIME_SMOKE_EVIDENCE_INVALID"
 RUNTIME_EVIDENCE_REVIEW_INVALID = "RUNTIME_EVIDENCE_REVIEW_INVALID"
 BOOT_BLOCKER_REPORT_INVALID = "BOOT_BLOCKER_REPORT_INVALID"
 BOOT_PROTOCOL_DECISION_INVALID = "BOOT_PROTOCOL_DECISION_INVALID"
+BOOT_IMAGE_SKELETON_INVALID = "BOOT_IMAGE_SKELETON_INVALID"
 RETURN_PATH_PROOF_INVALID = "RETURN_PATH_PROOF_INVALID"
 EXECUTION_PROOF_INVALID = "EXECUTION_PROOF_INVALID"
 VALIDATOR_COVERAGE_INVALID = "VALIDATOR_COVERAGE_INVALID"
@@ -87,6 +88,7 @@ CODES = MappingProxyType(
         RUNTIME_EVIDENCE_REVIEW_INVALID: "Runtime evidence review policy is missing, incomplete, or overclaim-prone",
         BOOT_BLOCKER_REPORT_INVALID: "Boot blocker report is missing, malformed, or inconsistent with boot baseline policy",
         BOOT_PROTOCOL_DECISION_INVALID: "Boot protocol decision is missing, incomplete, or inconsistent with boot blocker policy",
+        BOOT_IMAGE_SKELETON_INVALID: "Boot image skeleton is missing, incomplete, or inconsistent with boot blocker state",
         RETURN_PATH_PROOF_INVALID: "Rust does not prove that post-call payload mutations are observed after the trap bridge returns",
         EXECUTION_PROOF_INVALID: "Syscall execution behavior proof is missing or misordered in source",
         VALIDATOR_COVERAGE_INVALID: "Registered validators do not have focused negative-path test coverage",

@@ -16,6 +16,10 @@ The v0.3.0 boot baseline attempted to move beyond runtime-adjacent evidence. It 
 
 v0.3.1 selected Limine as the planned x86_64 boot protocol, but QEMU smoke is planned and not yet proven.
 
+v0.3.2 added a boot image skeleton, but QEMU smoke is still planned and not yet proven.
+
+Current boot blocker: `missing_qemu_execution_evidence`.
+
 ---
 
 # 2. Authority
@@ -60,6 +64,8 @@ This evidence does not prove QEMU boot execution, hardware syscall execution, in
 The current boot blocker report also does not prove QEMU boot.
 
 The boot protocol decision also does not prove QEMU boot.
+
+The boot image skeleton also does not prove QEMU boot.
 
 ---
 
@@ -133,6 +139,12 @@ The selected boot protocol is documented in:
 ```text
 docs/BOOT_PROTOCOL.md
 docs/decisions/0001-boot-protocol.md
+```
+
+The boot image skeleton is documented in:
+
+```text
+docs/BOOT_IMAGE.md
 ```
 
 The log is generated evidence. It must be reproduced by the smoke script before it is used in release review.

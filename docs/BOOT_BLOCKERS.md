@@ -16,17 +16,21 @@ Boot protocol decision: complete.
 
 Selected protocol: Limine.
 
+Boot image skeleton: complete.
+
 ---
 
 # 2. Verified Blocker
 
-Blocker category: `missing_boot_protocol_and_image_packaging`.
+Blocker category: `missing_qemu_execution_evidence`.
 
-The `missing_boot_protocol_and_image_packaging` blocker remains active.
+The previous `missing_boot_protocol_and_image_packaging` blocker is reduced.
 
-The current `_start` symbol is present in object evidence, and Limine has been selected as the initial boot protocol.
+The remaining blocker is `missing_qemu_execution_evidence`.
 
-The blocker remains active because no linker script, loader configuration, boot image packaging, or QEMU smoke execution exists.
+The current `_start` symbol is present in object evidence, Limine has been selected as the initial boot protocol, and the boot image skeleton exists.
+
+The blocker remains active because no QEMU smoke execution, serial evidence capture, or QEMU smoke validator exists.
 
 Therefore the repository cannot honestly claim QEMU boot execution.
 
@@ -36,10 +40,9 @@ Therefore the repository cannot honestly claim QEMU boot execution.
 
 The current boot blocker report must name these missing components:
 
-* linker script
-* loader configuration
-* boot image packaging
 * QEMU smoke execution
+* serial evidence capture
+* QEMU smoke validator
 
 ---
 
@@ -69,10 +72,8 @@ boot_blocker_report
 
 Resolve this blocker by adding:
 
-* a linker script
-* Limine loader configuration
-* boot image packaging
 * a bounded QEMU smoke command
 * serial marker validation for the booted kernel path
+* a QEMU smoke evidence validator
 
 Only after that work passes verification may KOZO claim QEMU boot evidence.

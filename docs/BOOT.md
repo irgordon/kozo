@@ -16,7 +16,9 @@ The result is blocked.
 
 v0.3.1 selected Limine as the initial x86_64 boot protocol.
 
-The blocker remains active until implementation adds a linker script, loader configuration, image packaging, and QEMU smoke execution.
+v0.3.2 added the boot image skeleton.
+
+Remaining blocker: `missing_qemu_execution_evidence`.
 
 ---
 
@@ -24,24 +26,23 @@ The blocker remains active until implementation adds a linker script, loader con
 
 Boot feasibility result: blocked.
 
-Blocker category: `missing_boot_protocol_and_image_packaging`.
+Blocker category: `missing_qemu_execution_evidence`.
 
 Selected boot protocol: Limine.
 
 The current repository has a 64-bit `_start` symbol, an exported `kernel_entry`, early serial initialization, and runtime-adjacent object/symbol smoke evidence.
 
-The boot protocol decision is complete, but the current repository does not yet have enough linker, loader, image packaging, and QEMU smoke machinery to claim QEMU boot execution.
+The boot protocol decision and boot image skeleton are complete, but the current repository does not yet have QEMU smoke execution or captured serial evidence.
 
 ---
 
 # 3. Missing Components
 
-The concrete missing components are:
+The concrete remaining missing components are:
 
-* linker script
-* loader configuration
-* boot image packaging
 * QEMU smoke execution
+* serial evidence capture
+* QEMU smoke validator
 
 Until those exist, KOZO must not claim QEMU boot evidence.
 
@@ -66,13 +67,15 @@ The current source surfaces relevant to future boot work are:
 
 # 5. Required Next Fix
 
-The v0.3.0 blocker remains active.
+The previous `missing_boot_protocol_and_image_packaging` blocker is reduced.
 
-The next boot-enabling fix must add a linker script, Limine configuration, boot image packaging, and QEMU smoke execution before any QEMU boot evidence can be claimed.
+The next boot-enabling fix must add QEMU smoke execution, serial evidence capture, and a QEMU smoke validator before any QEMU boot evidence can be claimed.
 
 The implementation should then add a QEMU smoke command that writes serial output to `artifacts/runtime/qemu_smoke.log` and validates an expected KOZO kernel marker.
 
 The selected protocol and implementation plan are owned by `docs/BOOT_PROTOCOL.md`.
+
+The boot image skeleton is owned by `docs/BOOT_IMAGE.md`.
 
 ---
 

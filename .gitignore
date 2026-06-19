@@ -71,3 +71,6 @@ dist/
 build/
 .env
 .env.*
+
+# KOZO generated runtime skeletons
+/artifacts/runtime/boot_image/
