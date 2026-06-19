@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260619T021026Z",
+  "run_id": "verify-20260619T022007Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 31,
+    "total_checks": 32,
     "failed_check_count": 0
   },
   "checks": [
@@ -199,6 +199,13 @@
       "detail": "Runtime evidence review policy names the evidence scope, limits, release gates, and protected metadata"
     },
     {
+      "name": "boot_blocker_report",
+      "subsystem": "boot_blocker_report",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Boot blocker report identifies why QEMU boot cannot yet be claimed"
+    },
+    {
       "name": "return_path_proof",
       "subsystem": "return_path_proof",
       "status": "pass",
@@ -245,13 +252,25 @@
     "CHANGELOG.md",
     "PHASEMAP.md",
     "ROADMAP.md",
+    "artifacts/runtime/boot_blocker_report.json",
+    "docs/BOOT.md",
+    "docs/BOOT_BLOCKERS.md",
     "docs/RELEASE_CHECKLIST.md",
     "docs/RELEASE_EVIDENCE.md",
     "docs/REQUIRED_CHECKS.md",
     "docs/RUNTIME_EVIDENCE.md",
-    "docs/RUNTIME_EVIDENCE_REVIEW.md",
     "docs/generated/governance_index.md",
-    "tasks/todo.json"
+    "harness/codes.py",
+    "harness/registry.py",
+    "harness/validators.py",
+    "harness/validators_impl/boot_blocker_report.py",
+    "harness/validators_impl/validator_coverage.py",
+    "schemas/agent_context.schema.json",
+    "schemas/latest_verify.schema.json",
+    "scripts/boot_blocker_report.sh",
+    "scripts/verify.sh",
+    "tasks/todo.json",
+    "tests/test_boot_blocker_report.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -259,7 +278,8 @@
     "artifacts/logs/cargo-check.log",
     "artifacts/logs/nm-kernel.log",
     "artifacts/runtime/runtime_smoke.log",
-    "artifacts/runtime/runtime_smoke.metadata.json"
+    "artifacts/runtime/runtime_smoke.metadata.json",
+    "artifacts/runtime/boot_blocker_report.json"
   ],
-  "generated_at": "2026-06-19T02:10:26Z"
+  "generated_at": "2026-06-19T02:20:07Z"
 }
