@@ -1,6 +1,6 @@
 {
   "version": 0,
-  "phase": "v0.3.9",
+  "phase": "v0.4.0",
   "evidence_type": "qemu-serial-smoke",
   "outcome": "blocked",
   "boot_protocol": "Limine",
@@ -10,9 +10,19 @@
   "serial_log": "artifacts/runtime/qemu_smoke.log",
   "stderr_log": "artifacts/runtime/qemu_smoke.stderr.log",
   "expected_marker": "KOZO_BOOT_SMOKE_OK",
+  "early_markers": [
+    "KOZO_EARLY_0_ENTRY",
+    "KOZO_EARLY_1_SERIAL_INIT_START",
+    "KOZO_EARLY_2_SERIAL_INIT_OK",
+    "KOZO_BOOT_SMOKE_OK"
+  ],
+  "observed_markers": [],
+  "earliest_observed_marker": "",
   "qemu_exit_code": 0,
-  "qemu_timeout_seconds": 20,
-  "serial_log_byte_count": 0,
+  "timed_out": false,
+  "timeout_seconds": 20,
+  "serial_log_bytes": 0,
+  "stderr_log_bytes": 0,
   "validator": "qemu_smoke_evidence",
   "proves": [
     "QEMU serial smoke was attempted or checked",

@@ -123,7 +123,8 @@ Required checklist:
 * `artifacts/runtime/qemu_smoke.log` is reviewed when the QEMU blocker is under direct review.
 * `artifacts/runtime/qemu_smoke.stderr.log` is reviewed when the QEMU blocker is under direct review.
 * `artifacts/runtime/qemu_smoke.metadata.json` is reviewed when the QEMU blocker is under direct review.
-* QEMU smoke metadata outcome may be `blocked` with `qemu_timeout` only as a no-boot-claim blocker.
+* QEMU smoke metadata outcome may be `blocked` with `limine_not_reached`, `kernel_not_loaded`, `kernel_entry_not_reached`, `serial_not_initialized`, `marker_not_emitted`, or `qemu_timeout` only as a no-boot-claim blocker.
+* QEMU smoke metadata early markers, observed markers, earliest marker, timeout state, and byte counts are reviewed when the QEMU blocker is under direct review.
 * QEMU smoke metadata outcome is `pass` before any QEMU boot claim is made.
 * Passing QEMU smoke metadata includes `KOZO_BOOT_SMOKE_OK` as the expected marker.
 * Release is blocked if runtime evidence is overclaimed or missing required non-goals.

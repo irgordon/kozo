@@ -32,6 +32,8 @@ v0.3.8 added QEMU serial smoke metadata, the `qemu_smoke_evidence` validator, an
 
 v0.3.9 records the CI-observed QEMU timeout path as an exact blocker, adds QEMU stderr log evidence at `artifacts/runtime/qemu_smoke.stderr.log`, and keeps the no-QEMU-boot claim unless the serial log contains `KOZO_BOOT_SMOKE_OK`.
 
+v0.4.0 adds documented Limine serial and verbose diagnostics, early KOZO serial markers, and a reachability taxonomy that distinguishes `limine_not_reached`, `kernel_not_loaded`, `kernel_entry_not_reached`, `serial_not_initialized`, `marker_not_emitted`, and fallback `qemu_timeout`.
+
 Remaining blocker: `missing_iso_generation_tooling`.
 
 The local blocker is `missing_iso_generation_tooling`.
@@ -54,11 +56,13 @@ CI packaged-image blocker category, when the ISO exists: `missing_qemu_serial_ev
 
 CI observed QEMU execution blocker category, when QEMU runs the ISO but no marker is captured before the bounded timeout: `qemu_timeout`.
 
+Latest inspected CI artifact diagnosis: `limine_not_reached`. QEMU launched the ISO, but the captured serial log was empty and stderr contained only QEMU termination/blocker text, with no Limine or KOZO marker output.
+
 Selected boot protocol: Limine.
 
-The current repository has a 64-bit `_start` symbol, an exported `kernel_entry`, early serial initialization, and runtime-adjacent object/symbol smoke evidence.
+The current repository has a 64-bit `_start` symbol, an exported `kernel_entry`, early serial initialization, early KOZO marker strings, and runtime-adjacent object/symbol smoke evidence.
 
-The boot protocol decision, boot image skeleton, boot tooling acquisition policy, ISO generation command path, and CI ISO tooling install path are complete.
+The boot protocol decision, boot image skeleton, boot tooling acquisition policy, ISO generation command path, CI ISO tooling install path, and kernel entry reachability diagnostic path are complete.
 
 `scripts/build_boot_image.sh` writes `artifacts/runtime/boot_image/package_metadata.json`.
 
@@ -72,6 +76,15 @@ The current local tooling does not yet provide the Limine artifacts and xorriso 
 
 KOZO has QEMU smoke evidence metadata, but local execution currently records `missing_iso_generation_tooling`. A QEMU boot claim remains unavailable unless `qemu_smoke_evidence` validates a passing serial log with `KOZO_BOOT_SMOKE_OK`.
 
+The early marker sequence is:
+
+```text
+KOZO_EARLY_0_ENTRY
+KOZO_EARLY_1_SERIAL_INIT_START
+KOZO_EARLY_2_SERIAL_INIT_OK
+KOZO_BOOT_SMOKE_OK
+```
+
 ---
 
 # 3. Missing Components
@@ -83,6 +96,7 @@ The concrete remaining missing components are:
 * local Limine bootloader artifacts
 * bootable ISO artifact when not produced by CI
 * validated QEMU serial smoke execution
+* Limine or KOZO serial output in the inspected CI QEMU run
 
 Until those exist, KOZO must not claim QEMU boot evidence.
 
@@ -107,6 +121,8 @@ The current source surfaces relevant to future boot work are:
 `kernel/main.odin` exports `kernel_entry` and emits `KOZO_BOOT_SMOKE_OK` after serial initialization, but no local bootable ISO transfers control to it through a proven loader path.
 
 `kernel/arch/x86_64/serial.odin` initializes COM1 serial output and owns the boot smoke marker output. That marker is not a QEMU boot claim until captured from QEMU serial output.
+
+`kernel/arch/x86_64/serial.odin` also owns the v0.4.0 early markers. Those markers are diagnostic evidence only; they do not prove hardware trap execution, userspace execution, or subsystem maturity.
 
 ---
 

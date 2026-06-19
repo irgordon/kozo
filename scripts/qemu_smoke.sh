@@ -11,6 +11,12 @@ QEMU_LOG="$RUNTIME_DIR/qemu_smoke.log"
 QEMU_METADATA="$RUNTIME_DIR/qemu_smoke.metadata.json"
 QEMU_STDERR_LOG="$RUNTIME_DIR/qemu_smoke.stderr.log"
 EXPECTED_MARKER="KOZO_BOOT_SMOKE_OK"
+EARLY_MARKERS=(
+  "KOZO_EARLY_0_ENTRY"
+  "KOZO_EARLY_1_SERIAL_INIT_START"
+  "KOZO_EARLY_2_SERIAL_INIT_OK"
+  "$EXPECTED_MARKER"
+)
 QEMU_TIMEOUT_SECONDS="${KOZO_QEMU_TIMEOUT_SECONDS:-20}"
 QEMU_EXIT_CODE=0
 
@@ -142,24 +148,71 @@ record_qemu_blocker() {
   local qemu_status=$1
   local blocker
 
-  blocker="$(qemu_blocker_for_status "$qemu_status")"
+  blocker="$(qemu_blocker_for_status "$qemu_status" "$QEMU_LOG" "$QEMU_STDERR_LOG")"
   write_blocked_metadata "$blocker"
   print_blocker "$blocker" "Expected marker not found: $EXPECTED_MARKER"
 }
 
 qemu_blocker_for_status() {
   local qemu_status=$1
+  local serial_log=$2
+  local stderr_log=$3
 
-  if [[ "$qemu_status" -eq 124 ]]; then
-    printf "qemu_timeout\n"
-    return
-  fi
   if [[ "$qemu_status" -ne 0 ]]; then
+    if [[ "$qemu_status" -eq 124 ]]; then
+      classify_boot_blocker "$serial_log" "$stderr_log"
+      return
+    fi
     printf "qemu_launch_failed\n"
     return
   fi
 
-  printf "missing_serial_marker\n"
+  classify_boot_blocker "$serial_log" "$stderr_log"
+}
+
+classify_boot_blocker() {
+  local serial_log=$1
+  local stderr_log=$2
+
+  python3 - "$serial_log" "$stderr_log" "${EARLY_MARKERS[@]}" <<'PY'
+import sys
+from pathlib import Path
+
+serial_log = Path(sys.argv[1])
+stderr_log = Path(sys.argv[2])
+markers = sys.argv[3:]
+serial_text = serial_log.read_text(errors="replace") if serial_log.is_file() else ""
+stderr_text = stderr_log.read_text(errors="replace") if stderr_log.is_file() else ""
+combined = f"{serial_text}\n{stderr_text}"
+combined_lower = combined.lower()
+observed = [marker for marker in markers if marker in combined]
+
+
+def _kernel_load_token(token: str, text: str) -> bool:
+    return token in text
+
+
+def _has_kernel_load_evidence(text: str, observed_markers: list[str]) -> bool:
+    return bool(observed_markers) or "kozo-kernel.elf" in text or "kernel" in text or "entry point" in text
+
+
+if not combined.strip():
+    print("limine_not_reached")
+elif "limine" not in combined_lower and not observed:
+    print("limine_not_reached")
+elif "limine" in combined_lower and not any(_kernel_load_token(token, combined_lower) for token in ("kernel", "kozo-kernel.elf", "entry point")) and not observed:
+    print("kernel_not_loaded")
+elif observed and observed[0] != markers[0]:
+    print("qemu_timeout")
+elif _has_kernel_load_evidence(combined_lower, observed) and markers[0] not in observed:
+    print("kernel_entry_not_reached")
+elif markers[0] in observed and markers[2] not in observed:
+    print("serial_not_initialized")
+elif markers[2] in observed and markers[3] not in observed:
+    print("marker_not_emitted")
+else:
+    print("qemu_timeout")
+PY
 }
 
 write_pass_metadata() {
@@ -183,7 +236,9 @@ write_metadata() {
     "${BOOT_ISO#"$ROOT/"}" \
     "$QEMU_EXIT_CODE" \
     "$QEMU_TIMEOUT_SECONDS" \
-    "$QEMU_LOG" <<'PY'
+    "$QEMU_LOG" \
+    "$QEMU_STDERR_LOG" \
+    "${EARLY_MARKERS[@]}" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -196,7 +251,14 @@ boot_image = sys.argv[5]
 qemu_exit_code = int(sys.argv[6])
 qemu_timeout_seconds = int(float(sys.argv[7]))
 serial_log_file = Path(sys.argv[8])
+stderr_log_file = Path(sys.argv[9])
+early_markers = sys.argv[10:]
 serial_log_path = Path("artifacts/runtime/qemu_smoke.log")
+stderr_log_path = Path("artifacts/runtime/qemu_smoke.stderr.log")
+serial_text = serial_log_file.read_text(errors="replace") if serial_log_file.is_file() else ""
+stderr_text = stderr_log_file.read_text(errors="replace") if stderr_log_file.is_file() else ""
+combined_text = f"{serial_text}\n{stderr_text}"
+observed_markers = [marker for marker in early_markers if marker in combined_text]
 
 
 def _proves(outcome: str) -> list[str]:
@@ -214,7 +276,7 @@ def _proves(outcome: str) -> list[str]:
 
 metadata = {
     "version": 0,
-    "phase": "v0.3.9",
+    "phase": "v0.4.0",
     "evidence_type": "qemu-serial-smoke",
     "outcome": outcome,
     "boot_protocol": "Limine",
@@ -222,11 +284,16 @@ metadata = {
     "generated_by": "scripts/qemu_smoke.sh",
     "boot_image": boot_image,
     "serial_log": str(serial_log_path),
-    "stderr_log": "artifacts/runtime/qemu_smoke.stderr.log",
+    "stderr_log": str(stderr_log_path),
     "expected_marker": expected_marker,
+    "early_markers": early_markers,
+    "observed_markers": observed_markers,
+    "earliest_observed_marker": observed_markers[0] if observed_markers else "",
     "qemu_exit_code": qemu_exit_code,
-    "qemu_timeout_seconds": qemu_timeout_seconds,
-    "serial_log_byte_count": serial_log_file.stat().st_size if serial_log_file.is_file() else 0,
+    "timed_out": qemu_exit_code == 124,
+    "timeout_seconds": qemu_timeout_seconds,
+    "serial_log_bytes": serial_log_file.stat().st_size if serial_log_file.is_file() else 0,
+    "stderr_log_bytes": stderr_log_file.stat().st_size if stderr_log_file.is_file() else 0,
     "validator": "qemu_smoke_evidence",
     "proves": _proves(outcome),
     "does_not_prove": [
@@ -255,7 +322,6 @@ print_blocker() {
   local detail=$2
 
   printf "BLOCKED: %s\n%s\n" "$blocker" "$detail" >&2
-  printf "BLOCKED: %s\n%s\n" "$blocker" "$detail" >>"$QEMU_STDERR_LOG"
   exit 0
 }
 

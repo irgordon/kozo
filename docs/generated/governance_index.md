@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.3.9`
+* Version: `v0.4.0`
 * Date: `2026-06-19`
-* Status: QEMU boot path blocker hardening.
+* Status: Kernel entry reachability diagnostics.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 37
 * Failed checks: 0
-* Run ID: `verify-20260619T120141Z`
-* Generated at: `2026-06-19T12:01:41Z`
+* Run ID: `verify-20260619T172051Z`
+* Generated at: `2026-06-19T17:20:51Z`
 
 ## Registered validators
 

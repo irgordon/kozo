@@ -17,7 +17,7 @@ _RUNTIME_EVIDENCE_PATH = _ROOT / "docs" / "RUNTIME_EVIDENCE.md"
 _RELEASE_EVIDENCE_PATH = _ROOT / "docs" / "RELEASE_EVIDENCE.md"
 
 _COMMON_FIELDS = {
-    "phase": "v0.3.9",
+    "phase": "v0.4.0",
     "evidence_type": "qemu-serial-smoke",
     "boot_protocol": "Limine",
     "architecture": "x86_64",
@@ -52,14 +52,23 @@ _REQUIRED_NON_GOALS = (
 )
 
 _ALLOWED_BLOCKERS = (
-    "missing_iso_generation_tooling",
+    "limine_not_reached",
+    "kernel_not_loaded",
+    "kernel_entry_not_reached",
+    "serial_not_initialized",
+    "marker_not_emitted",
+    "qemu_timeout",
     "missing_qemu_tooling",
     "missing_boot_image",
-    "missing_serial_marker",
     "qemu_launch_failed",
-    "qemu_timeout",
-    "limine_load_failed",
-    "kernel_entry_not_reached",
+    "missing_iso_generation_tooling",
+)
+
+_EARLY_MARKERS = (
+    "KOZO_EARLY_0_ENTRY",
+    "KOZO_EARLY_1_SERIAL_INIT_START",
+    "KOZO_EARLY_2_SERIAL_INIT_OK",
+    "KOZO_BOOT_SMOKE_OK",
 )
 
 _REQUIRED_DOC_REFERENCES = (
@@ -108,6 +117,9 @@ def _qemu_smoke_issue() -> QemuSmokeIssue | None:
         _outcome_issue(metadata),
         _blocked_marker_issue(metadata),
         _pass_evidence_issue(metadata),
+        _diagnostic_field_issue(metadata),
+        _observed_marker_issue(metadata),
+        _blocker_taxonomy_issue(metadata),
         _list_contract_issue(metadata, "does_not_prove", _REQUIRED_NON_GOALS, "missing_non_goal"),
         _blocker_report_issue(metadata, blocker_report),
         _documentation_issue(),
@@ -136,10 +148,6 @@ def _common_field_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
         return _issue("missing_boot_image_reference", "qemu_smoke.boot_image", "QEMU smoke boot image reference must be non-empty")
     if not isinstance(metadata.get("qemu_exit_code"), int):
         return _issue("field_mismatch", "qemu_smoke.qemu_exit_code", "QEMU smoke exit code must be recorded")
-    if not isinstance(metadata.get("qemu_timeout_seconds"), int):
-        return _issue("field_mismatch", "qemu_smoke.qemu_timeout_seconds", "QEMU smoke timeout seconds must be recorded")
-    if not isinstance(metadata.get("serial_log_byte_count"), int):
-        return _issue("field_mismatch", "qemu_smoke.serial_log_byte_count", "QEMU smoke serial log byte count must be recorded")
     return None
 
 
@@ -147,6 +155,51 @@ def _stderr_log_issue() -> QemuSmokeIssue | None:
     if not _STDERR_LOG_PATH.is_file():
         return _issue("missing_stderr_log", "qemu_smoke.stderr_log", "QEMU smoke metadata requires a QEMU stderr log")
     return None
+
+
+def _diagnostic_field_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
+    if metadata.get("early_markers") != list(_EARLY_MARKERS):
+        return _issue("field_mismatch", "qemu_smoke.early_markers", "QEMU smoke early marker list must match the boot marker contract")
+    if not isinstance(metadata.get("observed_markers"), list):
+        return _issue("field_mismatch", "qemu_smoke.observed_markers", "QEMU smoke observed markers must be recorded")
+    if not isinstance(metadata.get("earliest_observed_marker"), str):
+        return _issue("field_mismatch", "qemu_smoke.earliest_observed_marker", "QEMU smoke earliest observed marker must be recorded")
+    if not isinstance(metadata.get("timed_out"), bool):
+        return _issue("field_mismatch", "qemu_smoke.timed_out", "QEMU smoke timeout status must be recorded")
+    if not isinstance(metadata.get("timeout_seconds"), int):
+        return _issue("field_mismatch", "qemu_smoke.timeout_seconds", "QEMU smoke timeout seconds must be recorded")
+    if not isinstance(metadata.get("serial_log_bytes"), int):
+        return _issue("field_mismatch", "qemu_smoke.serial_log_bytes", "QEMU smoke serial byte count must be recorded")
+    if not isinstance(metadata.get("stderr_log_bytes"), int):
+        return _issue("field_mismatch", "qemu_smoke.stderr_log_bytes", "QEMU smoke stderr byte count must be recorded")
+    if _SERIAL_LOG_PATH.is_file() and metadata.get("serial_log_bytes") != _SERIAL_LOG_PATH.stat().st_size:
+        return _issue("byte_count_mismatch", "qemu_smoke.serial_log_bytes", "QEMU smoke serial byte count must match the serial log")
+    if _STDERR_LOG_PATH.is_file() and metadata.get("stderr_log_bytes") != _STDERR_LOG_PATH.stat().st_size:
+        return _issue("byte_count_mismatch", "qemu_smoke.stderr_log_bytes", "QEMU smoke stderr byte count must match the stderr log")
+    return None
+
+
+def _observed_marker_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
+    observed = metadata.get("observed_markers")
+    if not isinstance(observed, list):
+        return None
+    if any(marker not in _EARLY_MARKERS for marker in observed):
+        return _issue("marker_consistency", "qemu_smoke.observed_markers", "QEMU smoke observed markers must be known early markers")
+    actual_observed = _observed_markers_from_logs()
+    if observed != actual_observed:
+        return _issue("marker_consistency", "qemu_smoke.observed_markers", "QEMU smoke observed markers must match serial and stderr logs")
+    earliest = metadata.get("earliest_observed_marker")
+    expected_earliest = actual_observed[0] if actual_observed else ""
+    if earliest != expected_earliest:
+        return _issue("marker_consistency", "qemu_smoke.earliest_observed_marker", "QEMU smoke earliest observed marker must match observed markers")
+    return None
+
+
+def _observed_markers_from_logs() -> list[str]:
+    serial_text = _SERIAL_LOG_PATH.read_text(errors="replace") if _SERIAL_LOG_PATH.is_file() else ""
+    stderr_text = _STDERR_LOG_PATH.read_text(errors="replace") if _STDERR_LOG_PATH.is_file() else ""
+    combined = f"{serial_text}\n{stderr_text}"
+    return [marker for marker in _EARLY_MARKERS if marker in combined]
 
 
 def _outcome_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
@@ -162,6 +215,47 @@ def _blocked_outcome_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None
     if blocker not in _ALLOWED_BLOCKERS:
         return _issue("unknown_blocker_category", "qemu_smoke.blocker_category", "QEMU smoke blocker category is not allowed")
     return _list_contract_issue(metadata, "proves", _BLOCKED_PROVES, "missing_proves_claim")
+
+
+def _blocker_taxonomy_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
+    if metadata.get("outcome") != "blocked":
+        return None
+    expected = _expected_blocker_from_logs(metadata)
+    if expected is None:
+        return None
+    if metadata.get("blocker_category") != expected:
+        return _issue("blocker_taxonomy_mismatch", "qemu_smoke.blocker_category", "QEMU smoke blocker must match observed diagnostic markers")
+    return None
+
+
+def _expected_blocker_from_logs(metadata: dict[str, object]) -> str | None:
+    blocker = metadata.get("blocker_category")
+    if blocker in ("missing_iso_generation_tooling", "missing_qemu_tooling", "missing_boot_image", "qemu_launch_failed"):
+        return None
+    serial_text = _SERIAL_LOG_PATH.read_text(errors="replace") if _SERIAL_LOG_PATH.is_file() else ""
+    stderr_text = _STDERR_LOG_PATH.read_text(errors="replace") if _STDERR_LOG_PATH.is_file() else ""
+    combined = f"{serial_text}\n{stderr_text}"
+    observed = _observed_markers_from_logs()
+    if not combined.strip():
+        return "limine_not_reached"
+    if "limine" not in combined.lower() and not observed:
+        return "limine_not_reached"
+    if "limine" in combined.lower() and not _has_kernel_load_evidence(combined, observed):
+        return "kernel_not_loaded"
+    if observed and observed[0] != _EARLY_MARKERS[0]:
+        return "qemu_timeout"
+    if _has_kernel_load_evidence(combined, observed) and _EARLY_MARKERS[0] not in observed:
+        return "kernel_entry_not_reached"
+    if _EARLY_MARKERS[0] in observed and _EARLY_MARKERS[2] not in observed:
+        return "serial_not_initialized"
+    if _EARLY_MARKERS[2] in observed and _EARLY_MARKERS[3] not in observed:
+        return "marker_not_emitted"
+    return "qemu_timeout"
+
+
+def _has_kernel_load_evidence(text: str, observed: list[str]) -> bool:
+    lowered = text.lower()
+    return bool(observed) or "kozo-kernel.elf" in lowered or "kernel" in lowered or "entry point" in lowered
 
 
 def _blocked_marker_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:

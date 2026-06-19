@@ -30,6 +30,8 @@ QEMU smoke evidence validator: `qemu_smoke_evidence`.
 
 v0.3.9 records the CI-observed `qemu_timeout` state as an exact QEMU smoke blocker when QEMU runs the packaged ISO but the serial log does not contain `KOZO_BOOT_SMOKE_OK` before the bounded timeout.
 
+v0.4.0 narrows that diagnostic model with Limine serial/verbose configuration, early KOZO marker instrumentation, and exact reachability blockers.
+
 ---
 
 # 2. Verified Blocker
@@ -60,11 +62,23 @@ If CI produces `artifacts/runtime/boot_image/kozo.iso`, `scripts/boot_blocker_re
 
 If CI then runs `scripts/qemu_smoke.sh` and the kernel marker is still absent at timeout, the generated blocker report narrows further to `qemu_timeout`.
 
+If the run captures no Limine output and no KOZO marker output, the generated blocker report narrows to `limine_not_reached`.
+
+If Limine output appears without kernel load evidence, the generated blocker report narrows to `kernel_not_loaded`.
+
+If kernel load or handoff evidence appears without `KOZO_EARLY_0_ENTRY`, the generated blocker report narrows to `kernel_entry_not_reached`.
+
+If `KOZO_EARLY_0_ENTRY` appears without `KOZO_EARLY_2_SERIAL_INIT_OK`, the generated blocker report narrows to `serial_not_initialized`.
+
+If `KOZO_EARLY_2_SERIAL_INIT_OK` appears without `KOZO_BOOT_SMOKE_OK`, the generated blocker report narrows to `marker_not_emitted`.
+
 Even then, QEMU boot evidence remains blocked until serial output is captured and validated.
 
 `scripts/qemu_smoke.sh` writes `artifacts/runtime/qemu_smoke.metadata.json`, `artifacts/runtime/qemu_smoke.log`, and `artifacts/runtime/qemu_smoke.stderr.log`. The expected kernel-emitted serial marker is `KOZO_BOOT_SMOKE_OK`.
 
 Therefore the repository cannot honestly claim QEMU boot execution.
+
+The latest inspected CI artifact contained no Limine or KOZO marker output, so its narrowed diagnostic blocker is `limine_not_reached`.
 
 ---
 

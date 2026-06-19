@@ -1,5 +1,31 @@
 # Changelog
 
+## v0.4.0 - 2026-06-19
+
+**Status:** Kernel entry reachability diagnostics.
+
+### Added
+
+* Added documented Limine serial and verbose bootloader diagnostics in `boot/limine.conf`.
+* Added early KOZO serial markers: `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, and `KOZO_BOOT_SMOKE_OK`.
+* Added v0.4.0 QEMU smoke metadata fields for early markers, observed markers, earliest marker, timeout state, serial byte count, and stderr byte count.
+* Added focused validator coverage for reachability blockers: `limine_not_reached`, `kernel_not_loaded`, `kernel_entry_not_reached`, `serial_not_initialized`, `marker_not_emitted`, and fallback `qemu_timeout`.
+
+### Changed
+
+* Updated QEMU smoke blocker classification so a run with no Limine or KOZO output narrows from `qemu_timeout` to `limine_not_reached`.
+* Updated QEMU smoke validation to require marker/log consistency, byte-count consistency, and blocker taxonomy agreement.
+* Updated boot blocker, boot image, and boot tooling validators to accept the v0.4.0 reachability blocker taxonomy.
+* Updated boot, runtime evidence, release evidence, release checklist, required checks, phase map, and roadmap docs for kernel entry reachability diagnostics.
+
+### Notes
+
+* The latest inspected CI artifact launched QEMU but captured no Limine or KOZO serial output, so the diagnostic blocker is `limine_not_reached`.
+* This change does not claim QEMU boot.
+* This change does not claim kernel entry, serial initialization, or hardware syscall/trap execution unless the corresponding marker is captured.
+* This change does not add Linux compatibility, POSIX compatibility, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading beyond the kernel load path, file descriptor behavior, or production readiness claims.
+* This change does not change ABI contracts or syscall behavior.
+
 ## v0.3.9 - 2026-06-19
 
 **Status:** QEMU boot path blocker hardening.

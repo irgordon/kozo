@@ -16,10 +16,12 @@ heartbeat_payload_from_handle :: proc(handle: abi.K_HANDLE) -> ^abi.Heartbeat_Pa
 
 // Bootstrap-only self-check; this is not the user-to-kernel trap path.
 signal_kernel_heartbeat :: proc() -> abi.K_STATUS {
+	x86_64.serial_log_serial_init_start()
 	status := x86_64.bootstrap()
 	if status != abi.K_OK {
 		return status
 	}
+	x86_64.serial_log_serial_init_ok()
 	x86_64.serial_log_boot_smoke()
 	payload := abi.Heartbeat_Payload{
 		sequence = 0xCAFEFEED,
@@ -67,6 +69,7 @@ park_cpu_forever :: proc() {
 @(export)
 kernel_entry :: proc "c" () {
 	context = runtime.default_context()
+	x86_64.serial_log_entry_marker()
 	status := signal_kernel_heartbeat()
 	if status != abi.K_OK {
 		park_cpu_forever()

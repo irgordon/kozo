@@ -19,13 +19,15 @@ _BOOT_BLOCKER_REPORT_PATH = _ROOT / "artifacts" / "runtime" / "boot_blocker_repo
 _ALLOWED_BLOCKERS = (
     "missing_iso_generation_tooling",
     "missing_qemu_serial_evidence",
+    "limine_not_reached",
+    "kernel_not_loaded",
+    "kernel_entry_not_reached",
+    "serial_not_initialized",
+    "marker_not_emitted",
+    "qemu_timeout",
     "missing_qemu_tooling",
     "missing_boot_image",
-    "missing_serial_marker",
     "qemu_launch_failed",
-    "qemu_timeout",
-    "limine_load_failed",
-    "kernel_entry_not_reached",
 )
 
 
@@ -89,8 +91,10 @@ def _required_texts() -> tuple[RequiredText, ...]:
         RequiredText("rodata_section", _LINKER_PATH, ".rodata", "Linker script must define rodata layout"),
         RequiredText("data_section", _LINKER_PATH, ".data", "Linker script must define data layout"),
         RequiredText("bss_section", _LINKER_PATH, ".bss", "Linker script must define bss layout"),
-        RequiredText("limine_protocol", _LIMINE_CONFIG_PATH, "PROTOCOL=limine", "Limine config must select Limine protocol"),
-        RequiredText("kernel_path", _LIMINE_CONFIG_PATH, "KERNEL_PATH=boot:///boot/kozo/kozo-kernel.elf", "Limine config must name staged kernel ELF"),
+        RequiredText("limine_serial", _LIMINE_CONFIG_PATH, "serial: yes", "Limine config must enable serial diagnostics"),
+        RequiredText("limine_verbose", _LIMINE_CONFIG_PATH, "verbose: yes", "Limine config must enable verbose diagnostics"),
+        RequiredText("limine_protocol", _LIMINE_CONFIG_PATH, "protocol: limine", "Limine config must select Limine protocol"),
+        RequiredText("kernel_path", _LIMINE_CONFIG_PATH, "path: boot:///boot/kozo/kozo-kernel.elf", "Limine config must name staged kernel ELF"),
         RequiredText("build_script_linker", _BUILD_SCRIPT_PATH, "linker/kernel.ld", "Build script must use the linker script"),
         RequiredText("build_script_limine", _BUILD_SCRIPT_PATH, "boot/limine.conf", "Build script must stage Limine config"),
         RequiredText("build_script_output", _BUILD_SCRIPT_PATH, "artifacts/runtime/boot_image", "Build script must use documented output path"),

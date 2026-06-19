@@ -17,6 +17,9 @@ line_control_8n1  :: u8(0x03)
 fifo_enable_clear :: u8(0xC7)
 modem_ready       :: u8(0x03)
 transmit_ready    :: u8(0x20)
+early_entry_marker :: "KOZO_EARLY_0_ENTRY"
+early_serial_init_start_marker :: "KOZO_EARLY_1_SERIAL_INIT_START"
+early_serial_init_ok_marker :: "KOZO_EARLY_2_SERIAL_INIT_OK"
 boot_smoke_marker :: "KOZO_BOOT_SMOKE_OK"
 
 outb :: proc "contextless" (port: u16, value: u8) {
@@ -80,6 +83,10 @@ write_serial_byte :: proc(value: u8) {
 	outb(COM1, value)
 }
 
+write_serial_byte_unchecked :: proc(value: u8) {
+	outb(COM1, value)
+}
+
 serial_write :: proc(s: string) -> abi.K_STATUS {
 	for i in 0..<len(s) {
 		write_serial_byte(s[i])
@@ -87,10 +94,40 @@ serial_write :: proc(s: string) -> abi.K_STATUS {
 	return abi.K_OK
 }
 
+serial_write_unchecked :: proc(s: string) -> abi.K_STATUS {
+	for i in 0..<len(s) {
+		write_serial_byte_unchecked(s[i])
+	}
+	return abi.K_OK
+}
+
+serial_log_entry_marker :: proc() -> abi.K_STATUS {
+	serial_write_unchecked(early_entry_marker)
+	write_serial_newline_unchecked()
+	return abi.K_OK
+}
+
+serial_log_serial_init_start :: proc() -> abi.K_STATUS {
+	serial_write_unchecked(early_serial_init_start_marker)
+	write_serial_newline_unchecked()
+	return abi.K_OK
+}
+
+serial_log_serial_init_ok :: proc() -> abi.K_STATUS {
+	serial_write(early_serial_init_ok_marker)
+	write_serial_newline()
+	return abi.K_OK
+}
+
 serial_log_boot_smoke :: proc() -> abi.K_STATUS {
 	serial_write(boot_smoke_marker)
 	write_serial_newline()
 	return abi.K_OK
+}
+
+write_serial_newline_unchecked :: proc() {
+	write_serial_byte_unchecked('\r')
+	write_serial_byte_unchecked('\n')
 }
 
 write_serial_newline :: proc() {

@@ -15,7 +15,7 @@ _RUNTIME_EVIDENCE_PATH = _ROOT / "docs" / "RUNTIME_EVIDENCE.md"
 _RELEASE_EVIDENCE_PATH = _ROOT / "docs" / "RELEASE_EVIDENCE.md"
 
 _COMMON_FIELDS = {
-    "phase": "v0.3.9",
+    "phase": "v0.4.0",
     "evidence_type": "boot-blocker-report",
     "generated_by": "scripts/boot_blocker_report.sh",
     "validator": "boot_blocker_report",
@@ -117,14 +117,16 @@ _REQUIRED_DOC_REFERENCES = (
 )
 
 _ALLOWED_EXACT_QEMU_BLOCKERS = (
-    "missing_iso_generation_tooling",
+    "limine_not_reached",
+    "kernel_not_loaded",
+    "kernel_entry_not_reached",
+    "serial_not_initialized",
+    "marker_not_emitted",
+    "qemu_timeout",
     "missing_qemu_tooling",
     "missing_boot_image",
-    "missing_serial_marker",
     "qemu_launch_failed",
-    "qemu_timeout",
-    "limine_load_failed",
-    "kernel_entry_not_reached",
+    "missing_iso_generation_tooling",
 )
 
 

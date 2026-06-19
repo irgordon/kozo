@@ -40,13 +40,15 @@ _PACKAGED_FIELDS = {
 
 _ALLOWED_POST_PACKAGING_BLOCKERS = (
     "missing_qemu_serial_evidence",
+    "limine_not_reached",
+    "kernel_not_loaded",
+    "kernel_entry_not_reached",
+    "serial_not_initialized",
+    "marker_not_emitted",
+    "qemu_timeout",
     "missing_qemu_tooling",
     "missing_boot_image",
-    "missing_serial_marker",
     "qemu_launch_failed",
-    "qemu_timeout",
-    "limine_load_failed",
-    "kernel_entry_not_reached",
     "none",
 )
 
@@ -182,8 +184,8 @@ def _list_contract_issue(
 
 
 def _blocker_state_issue(metadata: dict[str, object], blocker_report: dict[str, object]) -> BootImagePackagingIssue | None:
-    if blocker_report.get("phase") != "v0.3.9":
-        return _issue("blocker_state_mismatch", "boot_blocker.phase", "Boot blocker report must be updated for v0.3.9")
+    if blocker_report.get("phase") != "v0.4.0":
+        return _issue("blocker_state_mismatch", "boot_blocker.phase", "Boot blocker report must be updated for v0.4.0")
     if _blocker_category_matches(metadata, blocker_report):
         return None
     return _issue("blocker_state_mismatch", "boot_blocker.blocker_category", "Boot blocker must match boot image packaging or later QEMU blocker state")

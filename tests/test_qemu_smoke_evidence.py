@@ -19,6 +19,9 @@ KOZO_NEGATIVE_COVERAGE = {
         "wrong_evidence_type": "test_fails_when_evidence_type_is_wrong",
         "wrong_boot_protocol": "test_fails_when_boot_protocol_is_wrong",
         "missing_non_goal": "test_fails_when_non_goal_is_missing",
+        "missing_byte_count": "test_fails_when_byte_count_is_missing",
+        "marker_consistency": "test_fails_when_observed_markers_do_not_match_log",
+        "blocker_taxonomy_mismatch": "test_fails_when_blocker_does_not_match_log_taxonomy",
         "unknown_blocker_category": "test_fails_when_blocker_category_is_unknown",
         "blocker_report_mismatch": "test_fails_when_blocker_report_mismatches_metadata",
         "marker_present_but_blocked": "test_fails_when_blocked_metadata_has_marker_in_serial_log",
@@ -37,6 +40,45 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
 
     def test_passes_when_marker_is_present_after_qemu_timeout(self):
         result = self.validate_fixture(mutate_metadata=lambda metadata: metadata | {"qemu_exit_code": 124})
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
+    def test_accepts_limine_not_reached_blocker(self):
+        result = self.validate_blocked_fixture("limine_not_reached", "")
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
+    def test_accepts_kernel_not_loaded_blocker(self):
+        result = self.validate_blocked_fixture("kernel_not_loaded", "Limine bootloader\n")
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
+    def test_accepts_kernel_entry_not_reached_blocker(self):
+        result = self.validate_blocked_fixture("kernel_entry_not_reached", "Limine\nkozo-kernel.elf\n")
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
+    def test_accepts_serial_not_initialized_blocker(self):
+        result = self.validate_blocked_fixture("serial_not_initialized", "KOZO_EARLY_0_ENTRY\n")
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
+    def test_accepts_marker_not_emitted_blocker(self):
+        result = self.validate_blocked_fixture(
+            "marker_not_emitted",
+            "KOZO_EARLY_0_ENTRY\nKOZO_EARLY_1_SERIAL_INIT_START\nKOZO_EARLY_2_SERIAL_INIT_OK\n",
+        )
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
+    def test_accepts_qemu_timeout_fallback_blocker(self):
+        result = self.validate_blocked_fixture("qemu_timeout", "KOZO_EARLY_1_SERIAL_INIT_START\n")
 
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
@@ -99,10 +141,35 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
         self.assert_qemu_failure(result, "missing_non_goal", "qemu_smoke.does_not_prove.production readiness")
 
+    def test_fails_when_byte_count_is_missing(self):
+        self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
+        result = self.validate_fixture(mutate_metadata=lambda metadata: metadata | {"serial_log_bytes": None})
+
+        self.assertEqual(result.status, "fail")
+        self.assert_qemu_failure(result, "field_mismatch", "qemu_smoke.serial_log_bytes")
+
+    def test_fails_when_observed_markers_do_not_match_log(self):
+        self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
+        result = self.validate_fixture(mutate_metadata=lambda metadata: metadata | {"observed_markers": []})
+
+        self.assertEqual(result.status, "fail")
+        self.assert_qemu_failure(result, "marker_consistency", "qemu_smoke.observed_markers")
+
+    def test_fails_when_blocker_does_not_match_log_taxonomy(self):
+        self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
+        result = self.validate_fixture(
+            metadata_factory=lambda: valid_blocked_metadata("kernel_not_loaded", ""),
+            blocker_factory=lambda: valid_blocker("kernel_not_loaded"),
+            mutate_serial_log=lambda _: "",
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_qemu_failure(result, "blocker_taxonomy_mismatch", "qemu_smoke.blocker_category")
+
     def test_fails_when_blocker_category_is_unknown(self):
         self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
         result = self.validate_fixture(
-            metadata_factory=valid_blocked_metadata,
+            metadata_factory=lambda: valid_blocked_metadata("mystery_blocker", ""),
             blocker_factory=lambda: valid_blocker("mystery_blocker"),
             mutate_metadata=lambda metadata: metadata | {"blocker_category": "mystery_blocker"},
             mutate_serial_log=lambda _: "",
@@ -114,7 +181,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_fails_when_blocker_report_mismatches_metadata(self):
         self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
         result = self.validate_fixture(
-            metadata_factory=valid_blocked_metadata,
+            metadata_factory=lambda: valid_blocked_metadata("qemu_timeout", ""),
             blocker_factory=lambda: valid_blocker("qemu_timeout"),
             mutate_metadata=lambda metadata: metadata | {"blocker_category": "missing_qemu_tooling"},
             mutate_serial_log=lambda _: "",
@@ -126,7 +193,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_fails_when_blocked_metadata_has_marker_in_serial_log(self):
         self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
         result = self.validate_fixture(
-            metadata_factory=valid_blocked_metadata,
+            metadata_factory=lambda: valid_blocked_metadata("qemu_timeout", default_serial_log_text()),
             blocker_factory=lambda: valid_blocker("qemu_timeout"),
         )
 
@@ -152,6 +219,13 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "fail")
         self.assert_qemu_failure(result, "field_mismatch", "qemu_smoke.validator")
+
+    def validate_blocked_fixture(self, blocker: str, serial_text: str):
+        return self.validate_fixture(
+            metadata_factory=lambda: valid_blocked_metadata(blocker, serial_text),
+            blocker_factory=lambda: valid_blocker(blocker),
+            mutate_serial_log=lambda _: serial_text,
+        )
 
     def validate_fixture(
         self,
@@ -221,8 +295,8 @@ def write_fixture_files(root: Path, metadata_factory, blocker_factory) -> dict[s
     metadata["boot_image"] = str(paths["boot_image"])
 
     paths["metadata"].write_text(json.dumps(metadata, indent=2) + "\n")
-    paths["serial_log"].write_text("Limine\nKOZO_BOOT_SMOKE_OK\n")
-    paths["stderr_log"].write_text("qemu stderr\n")
+    paths["serial_log"].write_text(default_serial_log_text())
+    paths["stderr_log"].write_text(default_stderr_log_text())
     paths["blocker"].write_text(json.dumps(blocker, indent=2) + "\n")
     paths["boot_image"].write_bytes(b"iso")
     paths["boot_doc"].write_text(valid_doc_text())
@@ -235,9 +309,11 @@ def valid_pass_metadata() -> dict[str, object]:
     return valid_metadata("pass")
 
 
-def valid_blocked_metadata() -> dict[str, object]:
-    metadata = valid_metadata("blocked")
-    metadata["blocker_category"] = "qemu_timeout"
+def valid_blocked_metadata(blocker: str, serial_text: str) -> dict[str, object]:
+    metadata = valid_metadata("blocked", serial_text=serial_text)
+    metadata["blocker_category"] = blocker
+    metadata["qemu_exit_code"] = 124
+    metadata["timed_out"] = True
     metadata["proves"] = [
         "QEMU serial smoke was attempted or checked",
         "QEMU boot evidence remains unclaimed",
@@ -245,10 +321,13 @@ def valid_blocked_metadata() -> dict[str, object]:
     return metadata
 
 
-def valid_metadata(outcome: str) -> dict[str, object]:
+def valid_metadata(outcome: str, *, serial_text: str | None = None, stderr_text: str | None = None) -> dict[str, object]:
+    serial_text = default_serial_log_text() if serial_text is None else serial_text
+    stderr_text = default_stderr_log_text() if stderr_text is None else stderr_text
+    observed = observed_markers(serial_text, stderr_text)
     return {
         "version": 0,
-        "phase": "v0.3.9",
+        "phase": "v0.4.0",
         "evidence_type": "qemu-serial-smoke",
         "outcome": outcome,
         "boot_protocol": "Limine",
@@ -258,9 +337,14 @@ def valid_metadata(outcome: str) -> dict[str, object]:
         "serial_log": "artifacts/runtime/qemu_smoke.log",
         "stderr_log": "artifacts/runtime/qemu_smoke.stderr.log",
         "expected_marker": "KOZO_BOOT_SMOKE_OK",
+        "early_markers": list(early_markers()),
+        "observed_markers": observed,
+        "earliest_observed_marker": observed[0] if observed else "",
         "qemu_exit_code": 0,
-        "qemu_timeout_seconds": 20,
-        "serial_log_byte_count": 27,
+        "timed_out": False,
+        "timeout_seconds": 20,
+        "serial_log_bytes": len(serial_text.encode()),
+        "stderr_log_bytes": len(stderr_text.encode()),
         "validator": "qemu_smoke_evidence",
         "proves": [
             "QEMU launched the KOZO ISO",
@@ -284,7 +368,7 @@ def valid_metadata(outcome: str) -> dict[str, object]:
 
 def valid_blocker(category: str) -> dict[str, object]:
     return {
-        "phase": "v0.3.9",
+        "phase": "v0.4.0",
         "outcome": "pass" if category == "none" else "blocked",
         "blocker_category": category,
     }
@@ -305,6 +389,28 @@ def valid_doc_text() -> str:
 def remove_list_value(metadata: dict[str, object], key: str, value: str) -> dict[str, object]:
     metadata[key] = [item for item in metadata[key] if item != value]
     return metadata
+
+
+def default_serial_log_text() -> str:
+    return "Limine\nKOZO_BOOT_SMOKE_OK\n"
+
+
+def default_stderr_log_text() -> str:
+    return "qemu stderr\n"
+
+
+def early_markers() -> tuple[str, ...]:
+    return (
+        "KOZO_EARLY_0_ENTRY",
+        "KOZO_EARLY_1_SERIAL_INIT_START",
+        "KOZO_EARLY_2_SERIAL_INIT_OK",
+        "KOZO_BOOT_SMOKE_OK",
+    )
+
+
+def observed_markers(serial_text: str, stderr_text: str) -> list[str]:
+    combined = f"{serial_text}\n{stderr_text}"
+    return [marker for marker in early_markers() if marker in combined]
 
 
 def patch_validator_paths(paths: dict[str, Path]):

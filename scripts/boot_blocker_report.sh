@@ -20,14 +20,16 @@ package_metadata_path = Path(sys.argv[3])
 qemu_metadata_path = Path(sys.argv[4])
 
 allowed_qemu_blockers = {
-    "missing_iso_generation_tooling",
+    "limine_not_reached",
+    "kernel_not_loaded",
+    "kernel_entry_not_reached",
+    "serial_not_initialized",
+    "marker_not_emitted",
+    "qemu_timeout",
     "missing_qemu_tooling",
     "missing_boot_image",
-    "missing_serial_marker",
     "qemu_launch_failed",
-    "qemu_timeout",
-    "limine_load_failed",
-    "kernel_entry_not_reached",
+    "missing_iso_generation_tooling",
 }
 
 
@@ -133,7 +135,7 @@ state = blocker_state()
 
 report = {
     "version": 0,
-    "phase": "v0.3.9",
+    "phase": "v0.4.0",
     "outcome": state["outcome"],
     "evidence_type": "boot-blocker-report",
     "generated_by": "scripts/boot_blocker_report.sh",
