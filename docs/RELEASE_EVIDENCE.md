@@ -52,6 +52,7 @@ Every release review must include:
 * `artifacts/runtime/runtime_smoke.log`
 * `artifacts/runtime/runtime_smoke.metadata.json`
 * `artifacts/runtime/boot_blocker_report.json`
+* `artifacts/runtime/qemu_smoke.log` when a QEMU smoke blocker or QEMU serial evidence is under review
 * `docs/BOOT_PROTOCOL.md`
 * `docs/BOOT_IMAGE.md`
 * `docs/decisions/0001-boot-protocol.md`
@@ -93,6 +94,7 @@ Release review must include verification logs when generated:
 * `artifacts/runtime/runtime_smoke.log`
 * `artifacts/runtime/runtime_smoke.metadata.json`
 * `artifacts/runtime/boot_blocker_report.json`
+* `artifacts/runtime/qemu_smoke.log` when generated during QEMU smoke blocker review
 
 Future runtime smoke phases must add their runtime logs to this list before using them as release evidence.
 
@@ -100,9 +102,15 @@ Runtime evidence review is required for release review and is governed by `docs/
 
 The boot blocker report is required while v0.3.0 remains blocked and is governed by `docs/BOOT.md`, `docs/BOOT_BLOCKERS.md`, `scripts/boot_blocker_report.sh`, and `boot_blocker_report`.
 
-The current boot blocker category is `missing_qemu_execution_evidence`.
+The current boot blocker category is `missing_bootable_iso_packaging`.
 
-The boot protocol decision and boot image skeleton are release context only. They do not require QEMU evidence and do not create a QEMU boot claim.
+The blocked QEMU smoke command is:
+
+```text
+scripts/qemu_smoke.sh
+```
+
+The boot protocol decision, boot image skeleton, and blocked QEMU smoke command are release context only. They do not create a QEMU boot claim.
 
 ---
 
@@ -175,6 +183,7 @@ release-evidence/
     runtime_smoke.log
     runtime_smoke.metadata.json
     boot_blocker_report.json
+    qemu_smoke.log
   logs/
     odin-check.log
     odin-build.log

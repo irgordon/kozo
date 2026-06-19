@@ -18,7 +18,9 @@ v0.3.1 selected Limine as the initial x86_64 boot protocol.
 
 v0.3.2 added the boot image skeleton.
 
-Remaining blocker: `missing_qemu_execution_evidence`.
+v0.3.3 added a bounded QEMU smoke command and attempted the first QEMU serial path.
+
+Remaining blocker: `missing_bootable_iso_packaging`.
 
 ---
 
@@ -26,13 +28,15 @@ Remaining blocker: `missing_qemu_execution_evidence`.
 
 Boot feasibility result: blocked.
 
-Blocker category: `missing_qemu_execution_evidence`.
+Blocker category: `missing_bootable_iso_packaging`.
 
 Selected boot protocol: Limine.
 
 The current repository has a 64-bit `_start` symbol, an exported `kernel_entry`, early serial initialization, and runtime-adjacent object/symbol smoke evidence.
 
-The boot protocol decision and boot image skeleton are complete, but the current repository does not yet have QEMU smoke execution or captured serial evidence.
+The boot protocol decision and boot image skeleton are complete, and the QEMU smoke command now fails closed when a bootable image is missing.
+
+The current repository does not yet produce a bootable Limine ISO or disk image, so it does not have QEMU smoke execution or captured serial evidence.
 
 ---
 
@@ -40,9 +44,10 @@ The boot protocol decision and boot image skeleton are complete, but the current
 
 The concrete remaining missing components are:
 
-* QEMU smoke execution
-* serial evidence capture
-* QEMU smoke validator
+* bootable Limine ISO or disk image
+* Limine bootloader artifacts for image installation
+* ISO tooling such as `xorriso` or an equivalent image builder
+* validated QEMU serial smoke execution
 
 Until those exist, KOZO must not claim QEMU boot evidence.
 
@@ -56,10 +61,12 @@ The current source surfaces relevant to future boot work are:
 * `kernel/main.odin`
 * `kernel/arch/x86_64/serial.odin`
 * `scripts/runtime_smoke.sh`
+* `scripts/build_boot_image.sh`
+* `scripts/qemu_smoke.sh`
 
-`kernel/arch/x86_64/boot.asm` defines `_start`, but it is a 64-bit entry symbol for object evidence. It is not currently tied to a boot protocol, loader, or image format.
+`kernel/arch/x86_64/boot.asm` defines `_start`, and `scripts/build_boot_image.sh` links a kernel ELF for the Limine image skeleton.
 
-`kernel/main.odin` exports `kernel_entry`, but no boot image currently transfers control to it through a proven loader path.
+`kernel/main.odin` exports `kernel_entry`, but no bootable ISO or disk image currently transfers control to it through a proven loader path.
 
 `kernel/arch/x86_64/serial.odin` initializes COM1 serial output after entry, but no QEMU boot path reaches that initialization yet.
 
@@ -67,11 +74,11 @@ The current source surfaces relevant to future boot work are:
 
 # 5. Required Next Fix
 
-The previous `missing_boot_protocol_and_image_packaging` blocker is reduced.
+The previous `missing_qemu_execution_evidence` blocker is refined.
 
-The next boot-enabling fix must add QEMU smoke execution, serial evidence capture, and a QEMU smoke validator before any QEMU boot evidence can be claimed.
+The next boot-enabling fix must add bootable Limine ISO or disk packaging before QEMU smoke execution, serial evidence capture, and QEMU smoke validation can be claimed.
 
-The implementation should then add a QEMU smoke command that writes serial output to `artifacts/runtime/qemu_smoke.log` and validates an expected KOZO kernel marker.
+The existing QEMU smoke command writes blocked output to `artifacts/runtime/qemu_smoke.log` and stops when `artifacts/runtime/boot_image/kozo.iso` is missing.
 
 The selected protocol and implementation plan are owned by `docs/BOOT_PROTOCOL.md`.
 

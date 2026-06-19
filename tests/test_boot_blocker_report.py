@@ -54,11 +54,11 @@ class BootBlockerReportValidatorTests(unittest.TestCase):
     def test_fails_when_missing_component_is_absent(self):
         self.assertEqual("boot_blocker_report", BootBlockerReportValidator.name)
         result = self.validate_fixture(
-            mutate_report_json=lambda report: remove_list_value(report, "missing_components", "QEMU smoke execution")
+            mutate_report_json=lambda report: remove_list_value(report, "missing_components", "bootable Limine ISO or disk image")
         )
 
         self.assertEqual(result.status, "fail")
-        self.assert_boot_failure(result, "missing_component", "boot_blocker.missing_components.QEMU smoke execution")
+        self.assert_boot_failure(result, "missing_component", "boot_blocker.missing_components.bootable Limine ISO or disk image")
 
     def test_fails_when_current_surface_is_absent(self):
         self.assertEqual("boot_blocker_report", BootBlockerReportValidator.name)
@@ -89,14 +89,14 @@ class BootBlockerReportValidatorTests(unittest.TestCase):
     def test_fails_when_documentation_reference_is_absent(self):
         self.assertEqual("boot_blocker_report", BootBlockerReportValidator.name)
         result = self.validate_fixture(
-            mutate_boot_doc=lambda text: text.replace("missing_qemu_execution_evidence", "missing")
+            mutate_boot_doc=lambda text: text.replace("missing_bootable_iso_packaging", "missing")
         )
 
         self.assertEqual(result.status, "fail")
         self.assert_boot_failure(
             result,
             "missing_documentation_reference",
-            "docs/BOOT.md.missing_qemu_execution_evidence",
+            "docs/BOOT.md.missing_bootable_iso_packaging",
         )
 
     def test_failure_diagnostic_names_boot_blocker_field(self):
@@ -170,16 +170,17 @@ def write_fixture_files(root: Path) -> None:
 def valid_report() -> dict[str, object]:
     return {
         "version": 0,
-        "phase": "v0.3.2",
+        "phase": "v0.3.3",
         "outcome": "blocked",
         "evidence_type": "boot-blocker-report",
         "generated_by": "scripts/boot_blocker_report.sh",
         "validator": "boot_blocker_report",
-        "blocker_category": "missing_qemu_execution_evidence",
+        "blocker_category": "missing_bootable_iso_packaging",
         "missing_components": [
-            "QEMU smoke execution",
-            "serial evidence capture",
-            "QEMU smoke validator",
+            "bootable Limine ISO or disk image",
+            "Limine bootloader artifacts for image installation",
+            "ISO tooling such as xorriso or an equivalent image builder",
+            "validated QEMU serial smoke execution",
         ],
         "current_surfaces": [
             "kernel/arch/x86_64/boot.asm defines a 64-bit _start symbol",
@@ -188,6 +189,7 @@ def valid_report() -> dict[str, object]:
             "linker/kernel.ld defines the kernel ELF layout",
             "boot/limine.conf defines the Limine boot entry",
             "scripts/build_boot_image.sh stages the boot image skeleton",
+            "scripts/qemu_smoke.sh fails closed when no bootable ISO is present",
             "scripts/runtime_smoke.sh proves runtime-adjacent object and symbol evidence",
         ],
         "cannot_claim": [
@@ -203,7 +205,7 @@ def valid_report() -> dict[str, object]:
             "file descriptor behavior",
             "production readiness",
         ],
-        "next_required_fix": "Add a bounded QEMU smoke command, capture serial output, and validate an expected kernel marker before claiming QEMU boot evidence.",
+        "next_required_fix": "Add bootable Limine ISO or disk packaging, then run scripts/qemu_smoke.sh to capture serial output and validate an expected kernel marker before claiming QEMU boot evidence.",
         "inspected_paths": [
             "kernel/arch/x86_64/boot.asm",
             "kernel/main.odin",
@@ -211,6 +213,7 @@ def valid_report() -> dict[str, object]:
             "linker/kernel.ld",
             "boot/limine.conf",
             "scripts/build_boot_image.sh",
+            "scripts/qemu_smoke.sh",
             "scripts/runtime_smoke.sh",
             "docs/RUNTIME_EVIDENCE.md",
         ],
@@ -222,8 +225,9 @@ def valid_doc_text() -> str:
         (
             "artifacts/runtime/boot_blocker_report.json",
             "scripts/boot_blocker_report.sh",
+            "scripts/qemu_smoke.sh",
             "boot_blocker_report",
-            "missing_qemu_execution_evidence",
+            "missing_bootable_iso_packaging",
         )
     )
 

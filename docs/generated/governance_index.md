@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.3.2`
+* Version: `v0.3.3`
 * Date: `2026-06-19`
-* Status: Boot image skeleton.
+* Status: QEMU serial smoke blocked by missing bootable image packaging.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 34
 * Failed checks: 0
-* Run ID: `verify-20260619T024639Z`
-* Generated at: `2026-06-19T02:46:39Z`
+* Run ID: `verify-20260619T030555Z`
+* Generated at: `2026-06-19T03:05:55Z`
 
 ## Registered validators
 

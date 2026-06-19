@@ -18,19 +18,23 @@ Selected protocol: Limine.
 
 Boot image skeleton: complete.
 
+QEMU smoke command: present and fail-closed on missing bootable image packaging.
+
 ---
 
 # 2. Verified Blocker
 
-Blocker category: `missing_qemu_execution_evidence`.
+Blocker category: `missing_bootable_iso_packaging`.
 
 The previous `missing_boot_protocol_and_image_packaging` blocker is reduced.
 
-The remaining blocker is `missing_qemu_execution_evidence`.
+The previous `missing_qemu_execution_evidence` blocker is refined.
+
+The remaining blocker is `missing_bootable_iso_packaging`.
 
 The current `_start` symbol is present in object evidence, Limine has been selected as the initial boot protocol, and the boot image skeleton exists.
 
-The blocker remains active because no QEMU smoke execution, serial evidence capture, or QEMU smoke validator exists.
+The blocker remains active because the repository does not yet produce a bootable Limine ISO or disk image for QEMU.
 
 Therefore the repository cannot honestly claim QEMU boot execution.
 
@@ -40,9 +44,10 @@ Therefore the repository cannot honestly claim QEMU boot execution.
 
 The current boot blocker report must name these missing components:
 
-* QEMU smoke execution
-* serial evidence capture
-* QEMU smoke validator
+* bootable Limine ISO or disk image
+* Limine bootloader artifacts for image installation
+* ISO tooling such as `xorriso` or an equivalent image builder
+* validated QEMU serial smoke execution
 
 ---
 
@@ -60,6 +65,12 @@ The generator is:
 scripts/boot_blocker_report.sh
 ```
 
+The QEMU blocker review command is:
+
+```text
+scripts/qemu_smoke.sh
+```
+
 The validator is:
 
 ```text
@@ -72,7 +83,9 @@ boot_blocker_report
 
 Resolve this blocker by adding:
 
-* a bounded QEMU smoke command
+* bootable Limine ISO or disk packaging
+* Limine bootloader artifact installation
+* deterministic image tooling such as `xorriso` or an equivalent image builder
 * serial marker validation for the booted kernel path
 * a QEMU smoke evidence validator
 

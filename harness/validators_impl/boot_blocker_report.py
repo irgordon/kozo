@@ -15,19 +15,20 @@ _RUNTIME_EVIDENCE_PATH = _ROOT / "docs" / "RUNTIME_EVIDENCE.md"
 _RELEASE_EVIDENCE_PATH = _ROOT / "docs" / "RELEASE_EVIDENCE.md"
 
 _EXPECTED_FIELDS = {
-    "phase": "v0.3.2",
+    "phase": "v0.3.3",
     "outcome": "blocked",
     "evidence_type": "boot-blocker-report",
     "generated_by": "scripts/boot_blocker_report.sh",
     "validator": "boot_blocker_report",
-    "blocker_category": "missing_qemu_execution_evidence",
-    "next_required_fix": "Add a bounded QEMU smoke command, capture serial output, and validate an expected kernel marker before claiming QEMU boot evidence.",
+    "blocker_category": "missing_bootable_iso_packaging",
+    "next_required_fix": "Add bootable Limine ISO or disk packaging, then run scripts/qemu_smoke.sh to capture serial output and validate an expected kernel marker before claiming QEMU boot evidence.",
 }
 
 _REQUIRED_MISSING_COMPONENTS = (
-    "QEMU smoke execution",
-    "serial evidence capture",
-    "QEMU smoke validator",
+    "bootable Limine ISO or disk image",
+    "Limine bootloader artifacts for image installation",
+    "ISO tooling such as xorriso or an equivalent image builder",
+    "validated QEMU serial smoke execution",
 )
 
 _REQUIRED_CURRENT_SURFACES = (
@@ -37,6 +38,7 @@ _REQUIRED_CURRENT_SURFACES = (
     "linker/kernel.ld defines the kernel ELF layout",
     "boot/limine.conf defines the Limine boot entry",
     "scripts/build_boot_image.sh stages the boot image skeleton",
+    "scripts/qemu_smoke.sh fails closed when no bootable ISO is present",
     "scripts/runtime_smoke.sh proves runtime-adjacent object and symbol evidence",
 )
 
@@ -57,8 +59,9 @@ _REQUIRED_NON_CLAIMS = (
 _REQUIRED_DOC_REFERENCES = (
     "artifacts/runtime/boot_blocker_report.json",
     "scripts/boot_blocker_report.sh",
+    "scripts/qemu_smoke.sh",
     "boot_blocker_report",
-    "missing_qemu_execution_evidence",
+    "missing_bootable_iso_packaging",
 )
 
 

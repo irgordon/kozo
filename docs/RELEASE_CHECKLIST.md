@@ -117,6 +117,7 @@ Required checklist:
 * Full CI uploaded `artifacts/runtime/runtime_smoke.log` when available.
 * Full CI uploaded `artifacts/runtime/runtime_smoke.metadata.json` when available.
 * Full CI uploaded `artifacts/runtime/boot_blocker_report.json` while boot is blocked.
+* `artifacts/runtime/qemu_smoke.log` is reviewed when the QEMU blocker is under direct review.
 * Release is blocked if runtime evidence is overclaimed or missing required non-goals.
 * No QEMU or boot claim is made unless separately implemented and proven.
 * Python unit tests pass.

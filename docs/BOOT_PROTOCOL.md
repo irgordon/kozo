@@ -96,7 +96,9 @@ The boot image skeleton now provides:
 
 The boot blocker remains active until these components exist:
 
-* QEMU smoke script
+* bootable Limine ISO or disk image
+* Limine bootloader artifacts for image installation
+* ISO tooling such as `xorriso` or an equivalent image builder
 * serial output marker
 * runtime evidence validator for QEMU smoke, in a later phase
 
@@ -119,15 +121,16 @@ The phase does not claim boot success because serial evidence has not been captu
 
 The v0.3.0 blocker is reduced.
 
-Current blocker: `missing_qemu_execution_evidence`
+Current blocker: `missing_bootable_iso_packaging`
 
 The boot protocol decision resolved the protocol selection part of the blocker.
 
 Remaining blocker components:
 
-* QEMU smoke execution
-* serial evidence capture
-* QEMU smoke validator
+* bootable Limine ISO or disk image
+* Limine bootloader artifacts for image installation
+* ISO tooling such as `xorriso` or an equivalent image builder
+* validated QEMU serial smoke execution
 
 ---
 

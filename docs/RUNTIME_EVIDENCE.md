@@ -18,7 +18,9 @@ v0.3.1 selected Limine as the planned x86_64 boot protocol, but QEMU smoke is pl
 
 v0.3.2 added a boot image skeleton, but QEMU smoke is still planned and not yet proven.
 
-Current boot blocker: `missing_qemu_execution_evidence`.
+v0.3.3 added a bounded QEMU smoke command, but it currently fails closed because no bootable Limine ISO or disk image is produced.
+
+Current boot blocker: `missing_bootable_iso_packaging`.
 
 ---
 
@@ -79,7 +81,7 @@ runtime-adjacent-object-symbol-smoke
 
 The smoke path builds freestanding x86_64 Odin kernel objects, assembles the current x86_64 boot and syscall bridge objects, records `nm` and `strings` evidence, and verifies required entry, dispatcher, bridge, and serial marker surfaces.
 
-This is the narrowest honest evidence target because the repository does not yet include a boot image, linker script, loader configuration, or QEMU boot packaging.
+This remains the narrowest passing runtime evidence target because the repository does not yet include bootable Limine ISO or disk packaging.
 
 ---
 
@@ -133,6 +135,14 @@ The boot blocker artifact is:
 ```text
 artifacts/runtime/boot_blocker_report.json
 ```
+
+The QEMU smoke log path is:
+
+```text
+artifacts/runtime/qemu_smoke.log
+```
+
+The QEMU smoke log is currently blocker evidence only. It is not passing QEMU serial smoke evidence.
 
 The selected boot protocol is documented in:
 
@@ -189,6 +199,7 @@ Before release review:
 
 * Run `scripts/runtime_smoke.sh`.
 * Run `scripts/boot_blocker_report.sh` while v0.3.0 remains blocked.
+* Run `scripts/qemu_smoke.sh` only when reviewing the current QEMU blocker directly; it is expected to fail closed until bootable image packaging exists.
 * Confirm `artifacts/runtime/runtime_smoke.log` exists and is non-empty.
 * Confirm `artifacts/runtime/runtime_smoke.metadata.json` is valid JSON.
 * Confirm `artifacts/runtime/boot_blocker_report.json` is valid JSON while boot is blocked.
@@ -224,6 +235,7 @@ Runtime evidence is invalidated by:
 * changes to `docs/RUNTIME_EVIDENCE.md`
 * changes to `harness/validators_impl/runtime_smoke_evidence.py`
 * changes to `scripts/boot_blocker_report.sh`
+* changes to `scripts/qemu_smoke.sh`
 * changes to `harness/validators_impl/boot_blocker_report.py`
 * stale, missing, malformed, or failed runtime smoke artifacts
 * stale, missing, malformed, or failed boot blocker artifacts while boot is blocked

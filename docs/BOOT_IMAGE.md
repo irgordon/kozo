@@ -119,13 +119,15 @@ The skeleton does not include serial output capture.
 
 The skeleton does not include a `qemu_smoke` validator.
 
+The skeleton does not produce a bootable Limine ISO or disk image.
+
 ---
 
 # 7. Boot Blocker Relationship
 
 The previous `missing_boot_protocol_and_image_packaging` blocker is reduced by this phase because the boot protocol, linker script, Limine configuration, and boot image staging path now exist.
 
-The remaining blocker is `missing_qemu_execution_evidence`.
+The remaining blocker is `missing_bootable_iso_packaging`.
 
 QEMU boot may not be claimed until a later phase captures and validates serial output.
 
@@ -135,7 +137,8 @@ QEMU boot may not be claimed until a later phase captures and validates serial o
 
 The future QEMU smoke path should:
 
-* boot the staged image or ISO under QEMU
+* build a bootable Limine ISO or disk image from the staged image root
+* boot the image under QEMU
 * capture serial output to `artifacts/runtime/qemu_smoke.log`
 * validate an early serial marker from the kernel entry path
 * add a runtime evidence validator for the QEMU smoke artifact

@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.3.3 - 2026-06-19
+
+**Status:** QEMU serial smoke blocked by missing bootable image packaging.
+
+### Added
+
+* Added `scripts/qemu_smoke.sh` as a bounded QEMU smoke command that fails closed when no bootable image exists.
+* Added QEMU smoke blocker documentation across boot, runtime evidence, release evidence, release checklist, required checks, phase map, and roadmap documents.
+
+### Changed
+
+* Refined the active boot blocker from `missing_qemu_execution_evidence` to `missing_bootable_iso_packaging`.
+* Updated `boot_blocker_report`, `boot_image_skeleton`, and `boot_protocol_decision` validation expectations to require the refined blocker state.
+
+### Notes
+
+* This change does not add QEMU boot evidence.
+* This change does not add serial marker evidence.
+* This change does not add hardware syscall/trap execution evidence.
+* This change does not add Linux compatibility, POSIX compatibility, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness claims.
+* This change does not change ABI contracts or syscall behavior.
+
 ## v0.3.2 - 2026-06-19
 
 **Status:** Boot image skeleton.
