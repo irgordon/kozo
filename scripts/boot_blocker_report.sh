@@ -135,7 +135,7 @@ state = blocker_state()
 
 report = {
     "version": 0,
-    "phase": "v0.4.0",
+    "phase": "v0.4.1",
     "outcome": state["outcome"],
     "evidence_type": "boot-blocker-report",
     "generated_by": "scripts/boot_blocker_report.sh",

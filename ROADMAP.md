@@ -103,7 +103,8 @@ The roadmap does not add or imply:
 | `v0.3.9` | Fix QEMU Boot Path | Preserve the CI-observed `qemu_timeout` result as an exact blocker, add stderr log evidence, and reject any blocked record that already contains the kernel marker. | QEMU boot claim without captured marker, hardware trap execution claim, compatibility claims, runtime subsystem expansion. |
 | `v0.3.10` | Security boundary foundation | Back pointer/null and authority-boundary rules with implementation evidence and negative tests. | Full formal verification, complete capability system. |
 | `v0.4.0` | Kernel Entry Reachability | Add QEMU/Limine/kernel-entry diagnostics, early KOZO serial markers, and exact reachability blockers before making any QEMU boot claim. | QEMU boot claim without captured marker, hardware trap execution claim, compatibility claims, runtime subsystem expansion. |
-| `v0.4.1` | ABI and syscall maturity | Define ABI versioning, syscall expansion process, generated binding compatibility expectations, and regression evidence. | New syscall expansion without governed process. |
+| `v0.4.1` | Fix Limine Kernel Load | Fix the Limine kernel path or ISO layout and keep QEMU smoke blocker classification aligned with Limine load evidence. | QEMU boot claim without captured marker, kernel entry claim without `KOZO_EARLY_0_ENTRY`, compatibility claims, runtime subsystem expansion. |
+| `v0.4.2` | ABI and syscall maturity | Define ABI versioning, syscall expansion process, generated binding compatibility expectations, and regression evidence. | New syscall expansion without governed process. |
 | `v0.5.0-rc.1` | Release candidate hardening | Freeze scope, freeze gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | New feature scope after RC. |
 | `v1.0.0` | Scoped release | Release only evidence-backed behavior with explicit non-goals. | Any unimplemented compatibility or runtime subsystem claim. |
 

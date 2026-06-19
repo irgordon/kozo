@@ -32,6 +32,8 @@ v0.3.9 records the CI-observed `qemu_timeout` state as an exact QEMU smoke block
 
 v0.4.0 narrows that diagnostic model with Limine serial/verbose configuration, early KOZO marker instrumentation, and exact reachability blockers.
 
+v0.4.1 fixes the Limine kernel executable path and tightens QEMU smoke classification so Limine executable-open failures remain `kernel_not_loaded`.
+
 ---
 
 # 2. Verified Blocker
@@ -64,7 +66,7 @@ If CI then runs `scripts/qemu_smoke.sh` and the kernel marker is still absent at
 
 If the run captures no Limine output and no KOZO marker output, the generated blocker report narrows to `limine_not_reached`.
 
-If Limine output appears without kernel load evidence, the generated blocker report narrows to `kernel_not_loaded`.
+If Limine output appears without kernel load evidence, or if Limine fails to open or load the configured executable, the generated blocker report narrows to `kernel_not_loaded`.
 
 If kernel load or handoff evidence appears without `KOZO_EARLY_0_ENTRY`, the generated blocker report narrows to `kernel_entry_not_reached`.
 
@@ -78,7 +80,9 @@ Even then, QEMU boot evidence remains blocked until serial output is captured an
 
 Therefore the repository cannot honestly claim QEMU boot execution.
 
-The latest inspected CI artifact contained no Limine or KOZO marker output, so its narrowed diagnostic blocker is `limine_not_reached`.
+The latest inspected v0.4.0 CI artifact reached Limine and failed to open `boot:///boot/kozo/kozo-kernel.elf`, so its evidence-backed diagnostic blocker is `kernel_not_loaded`.
+
+The v0.4.1 Limine config uses `/boot/kozo/kozo-kernel.elf`, matching the staged ISO path `boot/kozo/kozo-kernel.elf`.
 
 ---
 

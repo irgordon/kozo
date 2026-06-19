@@ -123,7 +123,7 @@ def write_fixture_files(root: Path) -> dict[str, Path]:
         path.parent.mkdir(parents=True, exist_ok=True)
 
     paths["linker"].write_text("ENTRY(_start)\n.text\n.rodata\n.data\n.bss\n")
-    paths["limine"].write_text("serial: yes\nverbose: yes\nprotocol: limine\npath: boot:///boot/kozo/kozo-kernel.elf\n")
+    paths["limine"].write_text("serial: yes\nverbose: yes\nprotocol: limine\npath: /boot/kozo/kozo-kernel.elf\n")
     paths["script"].write_text("linker/kernel.ld\nboot/limine.conf\nartifacts/runtime/boot_image\n")
     paths["memory"].write_text("global memset\nglobal memmove\n")
     paths["doc"].write_text("This phase does not prove boot success.\nThis phase does not prove QEMU execution.\nartifacts/runtime/boot_image/\n")

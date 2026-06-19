@@ -17,7 +17,7 @@ _RUNTIME_EVIDENCE_PATH = _ROOT / "docs" / "RUNTIME_EVIDENCE.md"
 _RELEASE_EVIDENCE_PATH = _ROOT / "docs" / "RELEASE_EVIDENCE.md"
 
 _COMMON_FIELDS = {
-    "phase": "v0.4.0",
+    "phase": "v0.4.1",
     "evidence_type": "qemu-serial-smoke",
     "boot_protocol": "Limine",
     "architecture": "x86_64",
@@ -240,6 +240,8 @@ def _expected_blocker_from_logs(metadata: dict[str, object]) -> str | None:
         return "limine_not_reached"
     if "limine" not in combined.lower() and not observed:
         return "limine_not_reached"
+    if "limine" in combined.lower() and _has_kernel_open_failure(combined):
+        return "kernel_not_loaded"
     if "limine" in combined.lower() and not _has_kernel_load_evidence(combined, observed):
         return "kernel_not_loaded"
     if observed and observed[0] != _EARLY_MARKERS[0]:
@@ -255,7 +257,12 @@ def _expected_blocker_from_logs(metadata: dict[str, object]) -> str | None:
 
 def _has_kernel_load_evidence(text: str, observed: list[str]) -> bool:
     lowered = text.lower()
-    return bool(observed) or "kozo-kernel.elf" in lowered or "kernel" in lowered or "entry point" in lowered
+    return bool(observed) or "entry point" in lowered or "handoff" in lowered or "starting kernel" in lowered
+
+
+def _has_kernel_open_failure(text: str) -> bool:
+    lowered = text.lower()
+    return "failed to open executable" in lowered or "failed to load executable" in lowered
 
 
 def _blocked_marker_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:

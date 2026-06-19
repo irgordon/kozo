@@ -51,13 +51,17 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
         self.assertEqual(result.code, OK)
 
     def test_accepts_kernel_not_loaded_blocker(self):
-        result = self.validate_blocked_fixture("kernel_not_loaded", "Limine bootloader\n")
+        result = self.validate_blocked_fixture(
+            "kernel_not_loaded",
+            "limine: Loading executable `/boot/kozo/kozo-kernel.elf`\n"
+            "PANIC: limine: Failed to open executable with path `/boot/kozo/kozo-kernel.elf`\n",
+        )
 
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
 
     def test_accepts_kernel_entry_not_reached_blocker(self):
-        result = self.validate_blocked_fixture("kernel_entry_not_reached", "Limine\nkozo-kernel.elf\n")
+        result = self.validate_blocked_fixture("kernel_entry_not_reached", "Limine\nentry point: 0x200000\n")
 
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
@@ -161,6 +165,21 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
             metadata_factory=lambda: valid_blocked_metadata("kernel_not_loaded", ""),
             blocker_factory=lambda: valid_blocker("kernel_not_loaded"),
             mutate_serial_log=lambda _: "",
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_qemu_failure(result, "blocker_taxonomy_mismatch", "qemu_smoke.blocker_category")
+
+    def test_fails_when_limine_open_failure_is_marked_as_kernel_entry(self):
+        self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
+        limine_open_failure = (
+            "limine: Loading executable `/boot/kozo/kozo-kernel.elf`\n"
+            "PANIC: limine: Failed to open executable with path `/boot/kozo/kozo-kernel.elf`\n"
+        )
+        result = self.validate_fixture(
+            metadata_factory=lambda: valid_blocked_metadata("kernel_entry_not_reached", limine_open_failure),
+            blocker_factory=lambda: valid_blocker("kernel_entry_not_reached"),
+            mutate_serial_log=lambda _: limine_open_failure,
         )
 
         self.assertEqual(result.status, "fail")
@@ -327,7 +346,7 @@ def valid_metadata(outcome: str, *, serial_text: str | None = None, stderr_text:
     observed = observed_markers(serial_text, stderr_text)
     return {
         "version": 0,
-        "phase": "v0.4.0",
+        "phase": "v0.4.1",
         "evidence_type": "qemu-serial-smoke",
         "outcome": outcome,
         "boot_protocol": "Limine",
@@ -368,7 +387,7 @@ def valid_metadata(outcome: str, *, serial_text: str | None = None, stderr_text:
 
 def valid_blocker(category: str) -> dict[str, object]:
     return {
-        "phase": "v0.4.0",
+        "phase": "v0.4.1",
         "outcome": "pass" if category == "none" else "blocked",
         "blocker_category": category,
     }

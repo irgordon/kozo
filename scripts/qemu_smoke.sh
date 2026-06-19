@@ -188,19 +188,21 @@ combined_lower = combined.lower()
 observed = [marker for marker in markers if marker in combined]
 
 
-def _kernel_load_token(token: str, text: str) -> bool:
-    return token in text
-
-
 def _has_kernel_load_evidence(text: str, observed_markers: list[str]) -> bool:
-    return bool(observed_markers) or "kozo-kernel.elf" in text or "kernel" in text or "entry point" in text
+    return bool(observed_markers) or "entry point" in text or "handoff" in text or "starting kernel" in text
+
+
+def _has_kernel_open_failure(text: str) -> bool:
+    return "failed to open executable" in text or "failed to load executable" in text
 
 
 if not combined.strip():
     print("limine_not_reached")
 elif "limine" not in combined_lower and not observed:
     print("limine_not_reached")
-elif "limine" in combined_lower and not any(_kernel_load_token(token, combined_lower) for token in ("kernel", "kozo-kernel.elf", "entry point")) and not observed:
+elif "limine" in combined_lower and _has_kernel_open_failure(combined_lower):
+    print("kernel_not_loaded")
+elif "limine" in combined_lower and not _has_kernel_load_evidence(combined_lower, observed):
     print("kernel_not_loaded")
 elif observed and observed[0] != markers[0]:
     print("qemu_timeout")
@@ -276,7 +278,7 @@ def _proves(outcome: str) -> list[str]:
 
 metadata = {
     "version": 0,
-    "phase": "v0.4.0",
+    "phase": "v0.4.1",
     "evidence_type": "qemu-serial-smoke",
     "outcome": outcome,
     "boot_protocol": "Limine",

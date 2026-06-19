@@ -184,8 +184,8 @@ def _list_contract_issue(
 
 
 def _blocker_state_issue(metadata: dict[str, object], blocker_report: dict[str, object]) -> BootImagePackagingIssue | None:
-    if blocker_report.get("phase") != "v0.4.0":
-        return _issue("blocker_state_mismatch", "boot_blocker.phase", "Boot blocker report must be updated for v0.4.0")
+    if blocker_report.get("phase") != "v0.4.1":
+        return _issue("blocker_state_mismatch", "boot_blocker.phase", "Boot blocker report must be updated for v0.4.1")
     if _blocker_category_matches(metadata, blocker_report):
         return None
     return _issue("blocker_state_mismatch", "boot_blocker.blocker_category", "Boot blocker must match boot image packaging or later QEMU blocker state")

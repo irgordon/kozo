@@ -189,7 +189,7 @@ def write_fixture_files(root: Path) -> None:
 def valid_report() -> dict[str, object]:
     return {
         "version": 0,
-        "phase": "v0.4.0",
+        "phase": "v0.4.1",
         "outcome": "blocked",
         "evidence_type": "boot-blocker-report",
         "generated_by": "scripts/boot_blocker_report.sh",

@@ -34,13 +34,15 @@ v0.3.9 adds QEMU stderr log evidence at `artifacts/runtime/qemu_smoke.stderr.log
 
 v0.4.0 adds Limine serial/verbose diagnostics and early KOZO marker taxonomy so QEMU smoke can narrow timeout into `limine_not_reached`, `kernel_not_loaded`, `kernel_entry_not_reached`, `serial_not_initialized`, `marker_not_emitted`, or fallback `qemu_timeout`.
 
+v0.4.1 fixes the Limine kernel executable path and classifies Limine executable-open failures as `kernel_not_loaded`.
+
 Current local boot blocker: `missing_iso_generation_tooling`.
 
 When CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated blocker report may narrow to `missing_qemu_serial_evidence` for that run.
 
 When CI runs QEMU against that ISO but does not capture `KOZO_BOOT_SMOKE_OK`, the generated blocker report may narrow further to `qemu_timeout`.
 
-The latest inspected CI artifact captured no Limine output and no KOZO marker output, so the diagnostic blocker is `limine_not_reached`.
+The latest inspected v0.4.0 CI artifact reached Limine and failed to open the configured kernel executable path, so the evidence-backed diagnostic blocker is `kernel_not_loaded`.
 
 ---
 

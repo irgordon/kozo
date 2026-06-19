@@ -34,6 +34,8 @@ v0.3.9 records the CI-observed QEMU timeout path as an exact blocker, adds QEMU 
 
 v0.4.0 adds documented Limine serial and verbose diagnostics, early KOZO serial markers, and a reachability taxonomy that distinguishes `limine_not_reached`, `kernel_not_loaded`, `kernel_entry_not_reached`, `serial_not_initialized`, `marker_not_emitted`, and fallback `qemu_timeout`.
 
+v0.4.1 updates the Limine kernel path to match the staged ISO layout and classifies Limine executable-open failures as `kernel_not_loaded`.
+
 Remaining blocker: `missing_iso_generation_tooling`.
 
 The local blocker is `missing_iso_generation_tooling`.
@@ -56,7 +58,7 @@ CI packaged-image blocker category, when the ISO exists: `missing_qemu_serial_ev
 
 CI observed QEMU execution blocker category, when QEMU runs the ISO but no marker is captured before the bounded timeout: `qemu_timeout`.
 
-Latest inspected CI artifact diagnosis: `limine_not_reached`. QEMU launched the ISO, but the captured serial log was empty and stderr contained only QEMU termination/blocker text, with no Limine or KOZO marker output.
+Latest inspected v0.4.0 CI artifact diagnosis: `kernel_not_loaded`. QEMU launched the ISO, Limine was reached, and Limine failed to open the configured kernel executable path before any KOZO marker appeared.
 
 Selected boot protocol: Limine.
 
@@ -69,6 +71,8 @@ The boot protocol decision, boot image skeleton, boot tooling acquisition policy
 `scripts/qemu_smoke.sh` writes `artifacts/runtime/qemu_smoke.metadata.json`, `artifacts/runtime/qemu_smoke.log`, and `artifacts/runtime/qemu_smoke.stderr.log`.
 
 The expected ISO path is `artifacts/runtime/boot_image/kozo.iso`.
+
+The configured Limine kernel path is `/boot/kozo/kozo-kernel.elf`, matching the staged ISO path `boot/kozo/kozo-kernel.elf`.
 
 GitHub Actions full CI installs xorriso, acquires Limine v12.3.3 from a pinned source release, builds Limine, and attempts ISO generation.
 
@@ -96,7 +100,7 @@ The concrete remaining missing components are:
 * local Limine bootloader artifacts
 * bootable ISO artifact when not produced by CI
 * validated QEMU serial smoke execution
-* Limine or KOZO serial output in the inspected CI QEMU run
+* a post-v0.4.1 CI QEMU run that proves Limine can load the kernel executable path
 
 Until those exist, KOZO must not claim QEMU boot evidence.
 

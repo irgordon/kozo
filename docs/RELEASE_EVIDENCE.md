@@ -116,6 +116,8 @@ When CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated boot blo
 
 When CI then runs QEMU against that ISO but the kernel marker is absent before timeout, the generated boot blocker report may narrow further to `qemu_timeout`.
 
+If Limine reaches the boot entry but fails to open or load the configured kernel executable, QEMU smoke evidence must report `kernel_not_loaded`.
+
 For v0.4.0 and later, QEMU smoke metadata must also include early marker diagnostics and may narrow timeout to one of:
 
 * `limine_not_reached`
@@ -125,7 +127,7 @@ For v0.4.0 and later, QEMU smoke metadata must also include early marker diagnos
 * `marker_not_emitted`
 * `qemu_timeout`
 
-The latest inspected CI artifact narrowed to `limine_not_reached` because it contained no Limine or KOZO marker output.
+The latest inspected v0.4.0 CI artifact narrowed to `kernel_not_loaded` because Limine reached the boot entry and failed to open the configured kernel executable before any KOZO marker appeared.
 
 The current packaging metadata records the missing ISO generation tooling blocker:
 

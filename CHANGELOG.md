@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.4.1 - 2026-06-19
+
+**Status:** Limine kernel load path fix.
+
+### Changed
+
+* Updated `boot/limine.conf` to reference the staged kernel ELF with `/boot/kozo/kozo-kernel.elf` instead of the `boot:///` URI that Limine reached but failed to open in CI.
+* Updated QEMU smoke blocker classification so Limine executable-open failures classify as `kernel_not_loaded`, not `kernel_entry_not_reached`.
+* Updated QEMU smoke validation and focused tests to reject metadata/log mismatches for Limine kernel-load failures.
+* Updated boot, runtime evidence, release evidence, phase map, and roadmap docs to record the v0.4.1 kernel-load fix attempt.
+
+### Notes
+
+* The inspected v0.4.0 CI artifact reached Limine and failed to open the configured kernel path, so the evidence-backed blocker was `kernel_not_loaded`.
+* This change does not claim QEMU boot.
+* This change does not claim kernel entry, serial initialization, or hardware syscall/trap execution unless the corresponding marker is captured.
+* This change does not add Linux compatibility, POSIX compatibility, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading beyond the kernel load path, file descriptor behavior, or production readiness claims.
+* This change does not change ABI contracts or syscall behavior.
+
 ## v0.4.0 - 2026-06-19
 
 **Status:** Kernel entry reachability diagnostics.
