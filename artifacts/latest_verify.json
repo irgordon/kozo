@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260619T024639Z",
+  "run_id": "verify-20260619T030707Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -70,7 +70,7 @@
       "subsystem": "odin",
       "status": "pass",
       "code": "OK",
-      "detail": "Odin changes are backed by declared odin check evidence"
+      "detail": "No Odin kernel changes require validation in this bootstrap loop"
     },
     {
       "name": "abi",
@@ -261,38 +261,7 @@
     }
   ],
   "failed_checks": [],
-  "changed_files": [
-    ".gitignore",
-    "CHANGELOG.md",
-    "PHASEMAP.md",
-    "ROADMAP.md",
-    "artifacts/runtime/boot_blocker_report.json",
-    "boot/limine.conf",
-    "docs/BOOT.md",
-    "docs/BOOT_BLOCKERS.md",
-    "docs/BOOT_IMAGE.md",
-    "docs/BOOT_PROTOCOL.md",
-    "docs/RELEASE_EVIDENCE.md",
-    "docs/RUNTIME_EVIDENCE.md",
-    "docs/generated/governance_index.md",
-    "harness/codes.py",
-    "harness/registry.py",
-    "harness/validators.py",
-    "harness/validators_impl/boot_blocker_report.py",
-    "harness/validators_impl/boot_image_skeleton.py",
-    "harness/validators_impl/boot_protocol_decision.py",
-    "harness/validators_impl/validator_coverage.py",
-    "kernel/arch/x86_64/memory.asm",
-    "linker/kernel.ld",
-    "schemas/agent_context.schema.json",
-    "schemas/latest_verify.schema.json",
-    "scripts/boot_blocker_report.sh",
-    "scripts/build_boot_image.sh",
-    "tasks/todo.json",
-    "tests/test_boot_blocker_report.py",
-    "tests/test_boot_image_skeleton.py",
-    "tests/test_boot_protocol_decision.py"
-  ],
+  "changed_files": [],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
     "artifacts/logs/odin-build.log",
@@ -302,5 +271,5 @@
     "artifacts/runtime/runtime_smoke.metadata.json",
     "artifacts/runtime/boot_blocker_report.json"
   ],
-  "generated_at": "2026-06-19T02:46:39Z"
+  "generated_at": "2026-06-19T03:07:07Z"
 }
