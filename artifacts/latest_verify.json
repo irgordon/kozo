@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260619T042448Z",
+  "run_id": "verify-20260619T044622Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -276,22 +276,7 @@
   ],
   "failed_checks": [],
   "changed_files": [
-    ".github/workflows/ci.yml",
-    "CHANGELOG.md",
-    "PHASEMAP.md",
-    "ROADMAP.md",
-    "docs/BOOT.md",
-    "docs/BOOT_BLOCKERS.md",
-    "docs/BOOT_IMAGE.md",
-    "docs/BOOT_TOOLING.md",
-    "docs/RELEASE_EVIDENCE.md",
-    "docs/REQUIRED_CHECKS.md",
-    "docs/RUNTIME_EVIDENCE.md",
-    "docs/generated/governance_index.md",
-    "harness/validators_impl/boot_tooling.py",
-    "scripts/build_boot_image.sh",
-    "tasks/todo.json",
-    "tests/test_boot_tooling.py"
+    "scripts/verify.sh"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -303,5 +288,5 @@
     "artifacts/runtime/boot_blocker_report.json",
     "artifacts/runtime/boot_image/package_metadata.json"
   ],
-  "generated_at": "2026-06-19T04:24:48Z"
+  "generated_at": "2026-06-19T04:46:22Z"
 }
