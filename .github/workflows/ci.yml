@@ -57,6 +57,14 @@ jobs:
           curl -fsSL "$limine_url" -o "$limine_tarball"
           printf "%s  %s\n" "$LIMINE_TARBALL_SHA256" "$limine_tarball" | sha256sum -c -
           tar -xJf "$limine_tarball" -C "$limine_root" --strip-components=1
+          (
+            cd "$limine_root"
+            ./configure \
+              --enable-bios \
+              --enable-bios-cd \
+              --enable-uefi-x86-64 \
+              --enable-uefi-cd
+          )
           make -C "$limine_root"
 
           limine_cmd="$(find "$limine_root" -maxdepth 5 -type f -name limine -perm -111 -print -quit)"
