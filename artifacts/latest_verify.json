@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260619T030707Z",
+  "run_id": "verify-20260619T032016Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 34,
+    "total_checks": 35,
     "failed_check_count": 0
   },
   "checks": [
@@ -220,6 +220,13 @@
       "detail": "Boot image skeleton has linker, Limine config, build script, docs, and matching blocker state"
     },
     {
+      "name": "boot_image_packaging",
+      "subsystem": "boot_image_packaging",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Boot image packaging metadata records the current Limine ISO tooling blocker without claiming boot success"
+    },
+    {
       "name": "return_path_proof",
       "subsystem": "return_path_proof",
       "status": "pass",
@@ -261,7 +268,9 @@
     }
   ],
   "failed_checks": [],
-  "changed_files": [],
+  "changed_files": [
+    "docs/generated/governance_index.md"
+  ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
     "artifacts/logs/odin-build.log",
@@ -269,7 +278,8 @@
     "artifacts/logs/nm-kernel.log",
     "artifacts/runtime/runtime_smoke.log",
     "artifacts/runtime/runtime_smoke.metadata.json",
-    "artifacts/runtime/boot_blocker_report.json"
+    "artifacts/runtime/boot_blocker_report.json",
+    "artifacts/runtime/boot_image/package_metadata.json"
   ],
-  "generated_at": "2026-06-19T03:07:07Z"
+  "generated_at": "2026-06-19T03:20:16Z"
 }

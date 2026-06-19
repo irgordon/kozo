@@ -12,18 +12,18 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.3.3`
+* Version: `v0.3.4`
 * Date: `2026-06-19`
-* Status: QEMU serial smoke blocked by missing bootable image packaging.
+* Status: Bootable ISO packaging blocked by missing Limine ISO tooling.
 
 ## Verification status
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 34
+* Total checks: 35
 * Failed checks: 0
-* Run ID: `verify-20260619T030707Z`
-* Generated at: `2026-06-19T03:07:07Z`
+* Run ID: `verify-20260619T032016Z`
+* Generated at: `2026-06-19T03:20:16Z`
 
 ## Registered validators
 
@@ -59,10 +59,11 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 28 | `boot_blocker_report` |
 | 29 | `boot_protocol_decision` |
 | 30 | `boot_image_skeleton` |
-| 31 | `return_path_proof` |
-| 32 | `execution_proof` |
-| 33 | `validator_coverage` |
-| 34 | `evidence` |
+| 31 | `boot_image_packaging` |
+| 32 | `return_path_proof` |
+| 33 | `execution_proof` |
+| 34 | `validator_coverage` |
+| 35 | `evidence` |
 
 ## Active contracts
 
@@ -100,7 +101,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 34
+* Check count: 35
 * Failure count: 0
 
 ## Non-goals
