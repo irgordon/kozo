@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260620T191658Z",
+  "run_id": "verify-20260620T213347Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -70,7 +70,7 @@
       "subsystem": "odin",
       "status": "pass",
       "code": "OK",
-      "detail": "Odin changes are backed by declared odin check evidence"
+      "detail": "No Odin kernel changes require validation in this bootstrap loop"
     },
     {
       "name": "abi",
@@ -298,19 +298,11 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
-    "artifacts/runtime/kernel_elf_report.json",
-    "docs/BOOT.md",
-    "docs/BOOT_BLOCKERS.md",
+    "docs/CODEBASE_AUDIT.md",
     "docs/PHASEMAP.md",
-    "docs/RELEASE_EVIDENCE.md",
     "docs/ROADMAP.md",
-    "docs/RUNTIME_EVIDENCE.md",
     "docs/generated/governance_index.md",
-    "harness/validators_impl/qemu_smoke_evidence.py",
-    "kernel/arch/x86_64/boot.asm",
-    "scripts/qemu_smoke.sh",
-    "tasks/todo.json",
-    "tests/test_qemu_smoke_evidence.py"
+    "tasks/todo.json"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -326,5 +318,5 @@
     "artifacts/runtime/qemu_smoke.stderr.log",
     "artifacts/runtime/qemu_smoke.metadata.json"
   ],
-  "generated_at": "2026-06-20T19:16:58Z"
+  "generated_at": "2026-06-20T21:33:47Z"
 }
