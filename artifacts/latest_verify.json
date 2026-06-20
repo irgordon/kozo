@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260620T013503Z",
+  "run_id": "verify-20260620T015115Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 38,
+    "total_checks": 39,
     "failed_check_count": 0
   },
   "checks": [
@@ -241,6 +241,13 @@
       "detail": "Kernel ELF loadability report proves entry, architecture, and PT_LOAD structure without claiming boot"
     },
     {
+      "name": "host_dependency_portability",
+      "subsystem": "host_dependency_portability",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Host dependency portability gate rejects local path assumptions and verifies declared CI tooling"
+    },
+    {
       "name": "qemu_smoke_evidence",
       "subsystem": "qemu_smoke_evidence",
       "status": "pass",
@@ -291,32 +298,23 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
-    "artifacts/runtime/boot_blocker_report.json",
-    "artifacts/runtime/kernel_elf_report.json",
-    "docs/BOOT.md",
-    "docs/BOOT_BLOCKERS.md",
+    "docs/BOOT_TOOLING.md",
+    "docs/COMPATIBILITY.md",
     "docs/PHASEMAP.md",
     "docs/RELEASE_EVIDENCE.md",
+    "docs/REQUIRED_CHECKS.md",
     "docs/ROADMAP.md",
-    "docs/RUNTIME_EVIDENCE.md",
     "docs/generated/governance_index.md",
     "harness/codes.py",
     "harness/registry.py",
     "harness/validators.py",
-    "harness/validators_impl/boot_blocker_report.py",
-    "harness/validators_impl/boot_image_packaging.py",
-    "harness/validators_impl/kernel_loadability.py",
+    "harness/validators_impl/host_dependency_portability.py",
     "harness/validators_impl/validator_coverage.py",
     "schemas/agent_context.schema.json",
     "schemas/latest_verify.schema.json",
-    "scripts/boot_blocker_report.sh",
     "scripts/build_boot_image.sh",
-    "scripts/kernel_elf_report.py",
-    "scripts/verify.sh",
     "tasks/todo.json",
-    "tests/test_boot_blocker_report.py",
-    "tests/test_boot_image_packaging.py",
-    "tests/test_kernel_loadability.py"
+    "tests/test_host_dependency_portability.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -332,5 +330,5 @@
     "artifacts/runtime/qemu_smoke.stderr.log",
     "artifacts/runtime/qemu_smoke.metadata.json"
   ],
-  "generated_at": "2026-06-20T01:35:03Z"
+  "generated_at": "2026-06-20T01:51:15Z"
 }
