@@ -269,6 +269,23 @@ combined_text = f"{serial_text}\n{stderr_text}"
 observed_markers = [marker for marker in early_markers if marker in combined_text]
 
 
+def _limine_entry_point_observed(text: str) -> bool:
+    return "elf entry point:" in text.lower()
+
+
+def _entry_fault_signal(text: str) -> str:
+    lowered = text.lower()
+    if "triple fault" in lowered:
+        return "triple_fault"
+    if "page fault" in lowered:
+        return "page_fault"
+    if "general protection" in lowered:
+        return "general_protection_fault"
+    if "exception" in lowered:
+        return "exception"
+    return ""
+
+
 def _proves(outcome: str) -> list[str]:
     if outcome == "pass":
         return [
@@ -297,6 +314,11 @@ metadata = {
     "early_markers": early_markers,
     "observed_markers": observed_markers,
     "earliest_observed_marker": observed_markers[0] if observed_markers else "",
+    "limine_entry_point_observed": _limine_entry_point_observed(combined_text),
+    "expected_entry_symbol": "_start",
+    "entry_marker_expected": early_markers[0],
+    "entry_marker_observed": early_markers[0] in observed_markers,
+    "entry_fault_signal": _entry_fault_signal(combined_text),
     "qemu_exit_code": qemu_exit_code,
     "timed_out": qemu_exit_code == 124,
     "timeout_seconds": qemu_timeout_seconds,

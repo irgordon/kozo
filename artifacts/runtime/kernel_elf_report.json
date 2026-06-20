@@ -24,8 +24,8 @@
       "offset": "0x1000",
       "virtual_address": "0xffffffff80200000",
       "physical_address": "0x200000",
-      "file_size": "0x2f82",
-      "memory_size": "0x2f82",
+      "file_size": "0x2fd2",
+      "memory_size": "0x2fd2",
       "alignment": "0x1000"
     },
     {
@@ -34,8 +34,8 @@
       "offset": "0x4000",
       "virtual_address": "0xffffffff80203000",
       "physical_address": "0x203000",
-      "file_size": "0xd2c",
-      "memory_size": "0xd2c",
+      "file_size": "0xd4c",
+      "memory_size": "0xd4c",
       "alignment": "0x1000"
     },
     {

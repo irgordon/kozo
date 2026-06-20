@@ -42,6 +42,8 @@ v0.4.5 classifies Limine's lower-half program-header rejection as `limine_lower_
 
 v0.4.7 moves the kernel ELF PT_LOAD virtual addresses to the higher half and preserves low physical load addresses through linker `AT(...)` placement. Local ELF loadability evidence no longer reports `limine_lower_half_phdr`; the next CI QEMU artifact must determine the next observed blocker or marker state.
 
+v0.4.8 adds the `KOZO_EARLY_0_ENTRY` marker directly in `_start` before stack setup and before Odin code, so the next CI QEMU artifact can distinguish entry handoff from later serial initialization.
+
 ---
 
 # 2. Verified Blocker
@@ -103,6 +105,10 @@ The v0.4.2 kernel ELF report records the staged kernel ELF as an x86_64 executab
 The latest inspected pre-v0.4.5 CI artifact reached Limine, opened `boot():/boot/kozo/kozo-kernel.elf`, and failed with `PANIC: elf: Lower half PHDRs are not allowed`. The current evidence-backed load-layout blocker is `limine_lower_half_phdr`; kernel entry has not been reached.
 
 The v0.4.7 local kernel ELF report records `_start` at `0xffffffff80200000`, PT_LOAD virtual addresses starting at `0xffffffff80200000`, low physical load addresses starting at `0x200000`, and `load_layout_blocker` as `none`. This does not prove Limine loaded or entered the kernel; it only clears the local lower-half PHDR evidence.
+
+The latest inspected v0.4.7 CI artifact loaded the higher-half ELF and reported `ELF entry point: 0xffffffff80200000`, but no KOZO marker appeared. The evidence-backed blocker for that artifact is `kernel_entry_not_reached`.
+
+The v0.4.8 entry handoff path emits `KOZO_EARLY_0_ENTRY` from assembly before stack setup. If CI captures that marker without `KOZO_EARLY_2_SERIAL_INIT_OK`, the blocker must narrow to `serial_not_initialized`; until that marker is captured, kernel entry remains unclaimed.
 
 ---
 

@@ -22,6 +22,7 @@ KOZO_NEGATIVE_COVERAGE = {
         "missing_byte_count": "test_fails_when_byte_count_is_missing",
         "marker_consistency": "test_fails_when_observed_markers_do_not_match_log",
         "limine_lower_half_phdr": "test_fails_when_lower_half_phdr_is_marked_as_kernel_not_loaded",
+        "entry_handoff_mismatch": "test_fails_when_entry_marker_metadata_mismatches_log",
         "blocker_taxonomy_mismatch": "test_fails_when_blocker_does_not_match_log_taxonomy",
         "unknown_blocker_category": "test_fails_when_blocker_category_is_unknown",
         "blocker_report_mismatch": "test_fails_when_blocker_report_mismatches_metadata",
@@ -73,6 +74,16 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
 
     def test_accepts_kernel_entry_not_reached_blocker(self):
         result = self.validate_blocked_fixture("kernel_entry_not_reached", "Limine\nentry point: 0x200000\n")
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
+    def test_accepts_limine_entry_point_without_entry_marker_as_kernel_entry_not_reached(self):
+        serial_text = (
+            "limine: Loading executable `boot():/boot/kozo/kozo-kernel.elf`...\n"
+            "limine: ELF entry point: 0xffffffff80200000\n"
+        )
+        result = self.validate_blocked_fixture("kernel_entry_not_reached", serial_text)
 
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
@@ -210,6 +221,39 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "fail")
         self.assert_qemu_failure(result, "blocker_taxonomy_mismatch", "qemu_smoke.blocker_category")
+
+    def test_fails_when_entry_marker_is_marked_as_kernel_entry_not_reached(self):
+        self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
+        entry_reached = (
+            "limine: Loading executable `boot():/boot/kozo/kozo-kernel.elf`...\n"
+            "limine: ELF entry point: 0xffffffff80200000\n"
+            "KOZO_EARLY_0_ENTRY\n"
+        )
+        result = self.validate_fixture(
+            metadata_factory=lambda: valid_blocked_metadata("kernel_entry_not_reached", entry_reached),
+            blocker_factory=lambda: valid_blocker("kernel_entry_not_reached"),
+            mutate_serial_log=lambda _: entry_reached,
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_qemu_failure(result, "blocker_taxonomy_mismatch", "qemu_smoke.blocker_category")
+
+    def test_fails_when_entry_marker_metadata_mismatches_log(self):
+        self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
+        entry_reached = (
+            "limine: Loading executable `boot():/boot/kozo/kozo-kernel.elf`...\n"
+            "limine: ELF entry point: 0xffffffff80200000\n"
+            "KOZO_EARLY_0_ENTRY\n"
+        )
+        result = self.validate_fixture(
+            metadata_factory=lambda: valid_blocked_metadata("serial_not_initialized", entry_reached),
+            blocker_factory=lambda: valid_blocker("serial_not_initialized"),
+            mutate_metadata=lambda metadata: metadata | {"entry_marker_observed": False},
+            mutate_serial_log=lambda _: entry_reached,
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_qemu_failure(result, "entry_handoff_mismatch", "qemu_smoke.entry_marker_observed")
 
     def test_fails_when_blocker_category_is_unknown(self):
         self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
@@ -370,6 +414,7 @@ def valid_metadata(outcome: str, *, serial_text: str | None = None, stderr_text:
     serial_text = default_serial_log_text() if serial_text is None else serial_text
     stderr_text = default_stderr_log_text() if stderr_text is None else stderr_text
     observed = observed_markers(serial_text, stderr_text)
+    combined = f"{serial_text}\n{stderr_text}"
     return {
         "version": 0,
         "phase": "v0.4.1",
@@ -385,6 +430,11 @@ def valid_metadata(outcome: str, *, serial_text: str | None = None, stderr_text:
         "early_markers": list(early_markers()),
         "observed_markers": observed,
         "earliest_observed_marker": observed[0] if observed else "",
+        "limine_entry_point_observed": "elf entry point:" in combined.lower(),
+        "expected_entry_symbol": "_start",
+        "entry_marker_expected": early_markers()[0],
+        "entry_marker_observed": early_markers()[0] in observed,
+        "entry_fault_signal": "",
         "qemu_exit_code": 0,
         "timed_out": False,
         "timeout_seconds": 20,

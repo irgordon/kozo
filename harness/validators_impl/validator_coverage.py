@@ -562,6 +562,7 @@ _VALIDATOR_TEST_CONTRACTS = {
             "missing_byte_count",
             "marker_consistency",
             "limine_lower_half_phdr",
+            "entry_handoff_mismatch",
             "blocker_taxonomy_mismatch",
             "unknown_blocker_category",
             "blocker_report_mismatch",

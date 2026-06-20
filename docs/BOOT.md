@@ -44,6 +44,8 @@ v0.4.5 records the next CI-observed Limine blocker: the configured kernel path i
 
 v0.4.7 moves the kernel ELF virtual load layout to the higher half while preserving low physical load addresses in the linker script. Local ELF evidence no longer reports lower-half PT_LOAD segments, but CI QEMU evidence must still prove whether Limine advances beyond the previous `limine_lower_half_phdr` blocker.
 
+v0.4.8 adds an assembly-level `KOZO_EARLY_0_ENTRY` emission path at `_start`, before stack setup and before calling Odin code. Kernel entry remains unclaimed until CI QEMU serial output captures that marker.
+
 Remaining blocker: `missing_iso_generation_tooling`.
 
 The local blocker is `missing_iso_generation_tooling`.
@@ -70,7 +72,11 @@ Latest inspected post-v0.4.3 CI artifact diagnosis: `kernel_not_loaded`. QEMU la
 
 Latest inspected pre-v0.4.5 CI artifact diagnosis: `limine_lower_half_phdr`. QEMU launched the ISO, Limine was reached, Limine opened the configured kernel path, and Limine rejected the kernel ELF with `PANIC: elf: Lower half PHDRs are not allowed` before any KOZO marker appeared.
 
+Latest inspected v0.4.7 CI artifact diagnosis: `kernel_entry_not_reached`. QEMU launched the ISO, Limine loaded the higher-half ELF, and Limine reported `ELF entry point: 0xffffffff80200000`, but no KOZO marker appeared.
+
 Current v0.4.7 kernel ELF diagnosis: structurally parseable by local ELF inspection, with `_start` and all PT_LOAD virtual addresses in the higher half. The staged kernel ELF is an x86_64 executable, `_start` matches the ELF entry point, PT_LOAD segments are present, and physical load addresses remain low through linker `AT(...)` placement. This does not prove Limine loaded or executed the kernel.
+
+Current v0.4.8 entry handoff change: `_start` writes `KOZO_EARLY_0_ENTRY` directly to COM1 before stack setup, before `kernel_entry`, and before any Odin runtime dependency. This does not prove kernel entry until captured in QEMU serial output.
 
 Selected boot protocol: Limine.
 

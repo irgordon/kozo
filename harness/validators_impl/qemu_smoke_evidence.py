@@ -119,6 +119,7 @@ def _qemu_smoke_issue() -> QemuSmokeIssue | None:
         _blocked_marker_issue(metadata),
         _pass_evidence_issue(metadata),
         _diagnostic_field_issue(metadata),
+        _entry_handoff_field_issue(metadata),
         _observed_marker_issue(metadata),
         _blocker_taxonomy_issue(metadata),
         _list_contract_issue(metadata, "does_not_prove", _REQUIRED_NON_GOALS, "missing_non_goal"),
@@ -203,6 +204,30 @@ def _observed_markers_from_logs() -> list[str]:
     return [marker for marker in _EARLY_MARKERS if marker in combined]
 
 
+def _log_text() -> str:
+    serial_text = _SERIAL_LOG_PATH.read_text(errors="replace") if _SERIAL_LOG_PATH.is_file() else ""
+    stderr_text = _STDERR_LOG_PATH.read_text(errors="replace") if _STDERR_LOG_PATH.is_file() else ""
+    return f"{serial_text}\n{stderr_text}"
+
+
+def _entry_handoff_field_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
+    if not isinstance(metadata.get("limine_entry_point_observed"), bool):
+        return _issue("field_mismatch", "qemu_smoke.limine_entry_point_observed", "QEMU smoke metadata must record Limine entry-point evidence")
+    if metadata.get("expected_entry_symbol") != "_start":
+        return _issue("field_mismatch", "qemu_smoke.expected_entry_symbol", "QEMU smoke metadata must name _start as the expected entry symbol")
+    if metadata.get("entry_marker_expected") != _EARLY_MARKERS[0]:
+        return _issue("field_mismatch", "qemu_smoke.entry_marker_expected", "QEMU smoke metadata must name the first entry marker")
+    if not isinstance(metadata.get("entry_marker_observed"), bool):
+        return _issue("field_mismatch", "qemu_smoke.entry_marker_observed", "QEMU smoke metadata must record whether the entry marker was observed")
+    if not isinstance(metadata.get("entry_fault_signal"), str):
+        return _issue("field_mismatch", "qemu_smoke.entry_fault_signal", "QEMU smoke metadata must record the entry fault signal")
+    if metadata.get("limine_entry_point_observed") != _has_limine_entry_point_evidence(_log_text()):
+        return _issue("entry_handoff_mismatch", "qemu_smoke.limine_entry_point_observed", "QEMU smoke Limine entry-point metadata must match logs")
+    if metadata.get("entry_marker_observed") != (_EARLY_MARKERS[0] in _observed_markers_from_logs()):
+        return _issue("entry_handoff_mismatch", "qemu_smoke.entry_marker_observed", "QEMU smoke entry-marker metadata must match logs")
+    return None
+
+
 def _outcome_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
     if metadata.get("outcome") == "pass":
         return _list_contract_issue(metadata, "proves", _PASS_PROVES, "missing_proves_claim")
@@ -261,6 +286,10 @@ def _expected_blocker_from_logs(metadata: dict[str, object]) -> str | None:
 def _has_kernel_load_evidence(text: str, observed: list[str]) -> bool:
     lowered = text.lower()
     return bool(observed) or "entry point" in lowered or "handoff" in lowered or "starting kernel" in lowered
+
+
+def _has_limine_entry_point_evidence(text: str) -> bool:
+    return "elf entry point:" in text.lower()
 
 
 def _has_kernel_open_failure(text: str) -> bool:

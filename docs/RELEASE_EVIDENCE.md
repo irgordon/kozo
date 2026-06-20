@@ -162,6 +162,8 @@ limine_lower_half_phdr
 
 The v0.4.7 kernel ELF loadability report is expected to show higher-half PT_LOAD virtual addresses and `load_layout_blocker` as `none` before CI QEMU evidence is interpreted as a later entry, serial, marker, or timeout blocker.
 
+For v0.4.8 and later, QEMU smoke metadata must record Limine entry-point observation, expected entry symbol, expected entry marker, entry-marker observation, and entry fault signal. `kernel_entry_not_reached` remains valid only when Limine entry evidence exists and `KOZO_EARLY_0_ENTRY` is absent from captured QEMU serial output.
+
 The current packaging metadata records the missing ISO generation tooling blocker:
 
 ```text

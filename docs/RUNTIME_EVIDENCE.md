@@ -44,6 +44,8 @@ v0.4.5 adds Limine ELF load-layout classification. The latest inspected CI QEMU 
 
 v0.4.7 adds the higher-half linker transition. Local kernel ELF evidence now records `_start` at `0xffffffff80200000`, higher-half PT_LOAD virtual addresses, low physical load addresses, and no lower-half PT_LOAD blocker. CI QEMU evidence must still prove whether Limine advances beyond the previous `limine_lower_half_phdr` blocker.
 
+v0.4.8 adds the first entry marker emission directly to `_start`. The marker is written through assembly COM1 output before stack setup and before Odin code so QEMU smoke evidence can distinguish entry handoff from later serial initialization.
+
 Current local boot blocker: `missing_iso_generation_tooling`.
 
 When CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated blocker report may narrow to `missing_qemu_serial_evidence` for that run.
@@ -53,6 +55,8 @@ When CI runs QEMU against that ISO but does not capture `KOZO_BOOT_SMOKE_OK`, th
 The latest inspected pre-v0.4.5 CI artifact reached Limine and opened the configured kernel executable path, but Limine rejected the kernel ELF lower-half program headers, so the evidence-backed diagnostic blocker is `limine_lower_half_phdr`.
 
 The v0.4.7 kernel ELF report records PT_LOAD virtual addresses, physical load addresses, virtual base, physical load base, higher-half segment summary, entry address class, and the load-layout blocker. This does not prove QEMU boot, Limine ELF loading, kernel entry, or serial initialization.
+
+The v0.4.8 QEMU smoke metadata records Limine entry-point evidence, expected entry symbol, expected entry marker, entry-marker observation, and entry fault signal. These fields do not prove kernel entry unless `KOZO_EARLY_0_ENTRY` is present in captured QEMU serial output.
 
 The v0.4.4 ISO path metadata may prove that the configured Limine path is present in packaged ISO contents. It does not prove Limine loaded the ELF, entered the kernel, initialized serial output, or reached `KOZO_BOOT_SMOKE_OK`.
 

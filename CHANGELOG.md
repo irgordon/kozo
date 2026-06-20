@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.4.8 - 2026-06-20
+
+**Status:** Kernel entry handoff.
+
+### Changed
+
+* Updated `_start` in `kernel/arch/x86_64/boot.asm` to emit `KOZO_EARLY_0_ENTRY` directly through COM1 before stack setup, Odin calls, memory initialization, syscall setup, or later serial bootstrap.
+* Updated `scripts/qemu_smoke.sh` metadata to record Limine entry-point evidence, expected entry symbol, expected entry marker, entry-marker observation, and entry fault signal.
+* Updated `qemu_smoke_evidence` validation and focused tests so `kernel_entry_not_reached` is rejected once `KOZO_EARLY_0_ENTRY` appears and entry-handoff metadata must match captured logs.
+* Updated boot, runtime evidence, release evidence, phase map, and roadmap docs for the kernel entry handoff evidence boundary.
+
+### Notes
+
+* The latest inspected v0.4.7 CI artifact showed Limine loading the higher-half ELF and reporting `ELF entry point: 0xffffffff80200000`, but no KOZO marker appeared.
+* This phase adds the earliest assembly-level entry marker path; it does not claim kernel entry until CI QEMU serial output captures `KOZO_EARLY_0_ENTRY`.
+* This change does not claim serial initialization.
+* This change does not claim QEMU boot.
+* This change does not claim hardware trap execution.
+* This change does not alter ABI contracts or syscall behavior.
+* This change does not claim Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, general ELF loading, file descriptor behavior, or production readiness.
+
 ## v0.4.7 - 2026-06-20
 
 **Status:** Higher-half linker transition.
