@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260620T115910Z",
+  "run_id": "verify-20260620T120713Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -297,9 +297,14 @@
   ],
   "failed_checks": [],
   "changed_files": [
-    "docs/CODEBASE_AUDIT.md",
-    "docs/generated/governance_index.md",
-    "schemas/latest_verify.schema.json"
+    "harness/validators_impl/boot_blocker_report.py",
+    "harness/validators_impl/boot_image_packaging.py",
+    "harness/validators_impl/boot_image_skeleton.py",
+    "harness/validators_impl/boot_tooling.py",
+    "tests/test_boot_blocker_report.py",
+    "tests/test_boot_image_packaging.py",
+    "tests/test_boot_image_skeleton.py",
+    "tests/test_boot_tooling.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -315,5 +320,5 @@
     "artifacts/runtime/qemu_smoke.stderr.log",
     "artifacts/runtime/qemu_smoke.metadata.json"
   ],
-  "generated_at": "2026-06-20T11:59:10Z"
+  "generated_at": "2026-06-20T12:07:13Z"
 }
