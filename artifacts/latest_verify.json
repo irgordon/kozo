@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260620T011834Z",
+  "run_id": "verify-20260620T013503Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 37,
+    "total_checks": 38,
     "failed_check_count": 0
   },
   "checks": [
@@ -234,6 +234,13 @@
       "detail": "Boot tooling policy documents Limine and xorriso acquisition without claiming boot success"
     },
     {
+      "name": "kernel_loadability",
+      "subsystem": "kernel_loadability",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Kernel ELF loadability report proves entry, architecture, and PT_LOAD structure without claiming boot"
+    },
+    {
       "name": "qemu_smoke_evidence",
       "subsystem": "qemu_smoke_evidence",
       "status": "pass",
@@ -283,14 +290,33 @@
   ],
   "failed_checks": [],
   "changed_files": [
+    "CHANGELOG.md",
+    "artifacts/runtime/boot_blocker_report.json",
+    "artifacts/runtime/kernel_elf_report.json",
+    "docs/BOOT.md",
+    "docs/BOOT_BLOCKERS.md",
     "docs/PHASEMAP.md",
-    "docs/RELEASE_CHECKLIST.md",
     "docs/RELEASE_EVIDENCE.md",
     "docs/ROADMAP.md",
+    "docs/RUNTIME_EVIDENCE.md",
     "docs/generated/governance_index.md",
-    "harness/validators_impl/boot_protocol_decision.py",
+    "harness/codes.py",
+    "harness/registry.py",
+    "harness/validators.py",
+    "harness/validators_impl/boot_blocker_report.py",
+    "harness/validators_impl/boot_image_packaging.py",
+    "harness/validators_impl/kernel_loadability.py",
+    "harness/validators_impl/validator_coverage.py",
+    "schemas/agent_context.schema.json",
+    "schemas/latest_verify.schema.json",
+    "scripts/boot_blocker_report.sh",
+    "scripts/build_boot_image.sh",
+    "scripts/kernel_elf_report.py",
+    "scripts/verify.sh",
     "tasks/todo.json",
-    "tests/test_boot_protocol_decision.py"
+    "tests/test_boot_blocker_report.py",
+    "tests/test_boot_image_packaging.py",
+    "tests/test_kernel_loadability.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -300,10 +326,11 @@
     "artifacts/runtime/runtime_smoke.log",
     "artifacts/runtime/runtime_smoke.metadata.json",
     "artifacts/runtime/boot_blocker_report.json",
+    "artifacts/runtime/kernel_elf_report.json",
     "artifacts/runtime/boot_image/package_metadata.json",
     "artifacts/runtime/qemu_smoke.log",
     "artifacts/runtime/qemu_smoke.stderr.log",
     "artifacts/runtime/qemu_smoke.metadata.json"
   ],
-  "generated_at": "2026-06-20T01:18:34Z"
+  "generated_at": "2026-06-20T01:35:03Z"
 }
