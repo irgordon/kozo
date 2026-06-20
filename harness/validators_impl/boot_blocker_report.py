@@ -240,10 +240,10 @@ def _expected_blocker_fields(report: dict[str, object]) -> dict[str, object] | N
         return _TOOLING_BLOCKER_FIELDS
     if report.get("blocker_category") == "missing_qemu_serial_evidence":
         return _QEMU_BLOCKER_FIELDS
-    if report.get("blocker_category") in _KERNEL_ELF_BLOCKERS:
-        return _KERNEL_ELF_BLOCKER_FIELDS | {"blocker_category": report.get("blocker_category")}
     if report.get("blocker_category") in _ALLOWED_EXACT_QEMU_BLOCKERS:
         return _EXACT_QEMU_BLOCKER_FIELDS | {"blocker_category": report.get("blocker_category")}
+    if report.get("blocker_category") in _KERNEL_ELF_BLOCKERS:
+        return _KERNEL_ELF_BLOCKER_FIELDS | {"blocker_category": report.get("blocker_category")}
     return None
 
 
@@ -254,10 +254,10 @@ def _required_missing_components(report: dict[str, object]) -> tuple[str, ...]:
         return _TOOLING_MISSING_COMPONENTS
     if report.get("blocker_category") == "missing_qemu_serial_evidence":
         return _QEMU_MISSING_COMPONENTS
-    if report.get("blocker_category") in _KERNEL_ELF_BLOCKERS:
-        return ("loadable kernel ELF image",)
     if report.get("blocker_category") in _ALLOWED_EXACT_QEMU_BLOCKERS:
         return _QEMU_MISSING_COMPONENTS
+    if report.get("blocker_category") in _KERNEL_ELF_BLOCKERS:
+        return ("loadable kernel ELF image",)
     return _TOOLING_MISSING_COMPONENTS
 
 
@@ -268,10 +268,10 @@ def _required_current_surfaces(report: dict[str, object]) -> tuple[str, ...]:
         return _COMMON_CURRENT_SURFACES + _TOOLING_CURRENT_SURFACES
     if report.get("blocker_category") == "missing_qemu_serial_evidence":
         return _COMMON_CURRENT_SURFACES + _QEMU_CURRENT_SURFACES
-    if report.get("blocker_category") in _KERNEL_ELF_BLOCKERS:
-        return _COMMON_CURRENT_SURFACES + _KERNEL_ELF_CURRENT_SURFACES
     if report.get("blocker_category") in _ALLOWED_EXACT_QEMU_BLOCKERS:
         return _COMMON_CURRENT_SURFACES + _EXACT_QEMU_CURRENT_SURFACES
+    if report.get("blocker_category") in _KERNEL_ELF_BLOCKERS:
+        return _COMMON_CURRENT_SURFACES + _KERNEL_ELF_CURRENT_SURFACES
     return _COMMON_CURRENT_SURFACES + _TOOLING_CURRENT_SURFACES
 
 

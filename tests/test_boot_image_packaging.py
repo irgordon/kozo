@@ -45,6 +45,16 @@ class BootImagePackagingValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
 
+    def test_passes_when_packaged_iso_has_limine_lower_half_phdr_blocker(self):
+        result = self.validate_fixture(
+            create_image=True,
+            mutate_metadata=packaged_metadata,
+            mutate_blocker=lambda blocker: blocker | {"blocker_category": "limine_lower_half_phdr"},
+        )
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
     def test_passes_when_configured_path_without_leading_slash_normalizes_to_iso_path(self):
         result = self.validate_fixture(
             create_image=True,

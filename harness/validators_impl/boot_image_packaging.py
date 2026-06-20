@@ -51,6 +51,7 @@ _ALLOWED_POST_PACKAGING_BLOCKERS = (
     "missing_qemu_tooling",
     "missing_boot_image",
     "qemu_launch_failed",
+    "limine_lower_half_phdr",
     "none",
 )
 

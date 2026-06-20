@@ -42,8 +42,8 @@ class BootBlockerReportValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
 
-    def test_passes_when_limine_lower_half_phdr_is_kernel_elf_blocker(self):
-        result = self.validate_fixture(mutate_report_json=lambda _: kernel_elf_blocker_report("limine_lower_half_phdr"))
+    def test_passes_when_limine_lower_half_phdr_is_exact_qemu_blocker(self):
+        result = self.validate_fixture(mutate_report_json=lambda _: exact_qemu_blocker_report("limine_lower_half_phdr"))
 
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)

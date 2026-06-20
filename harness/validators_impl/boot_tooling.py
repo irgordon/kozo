@@ -29,6 +29,7 @@ _ALLOWED_BLOCKERS = (
     "missing_qemu_tooling",
     "missing_boot_image",
     "qemu_launch_failed",
+    "limine_lower_half_phdr",
 )
 
 
