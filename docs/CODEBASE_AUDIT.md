@@ -210,3 +210,119 @@ Minimum expected evidence for the higher-half phase:
 No cleanup was applied in this phase.
 
 The audit intentionally avoids broad refactoring before the higher-half transition.
+
+---
+
+# 13. v0.4.95 Code Quality and Style Audit
+
+## 13.1 Date
+
+2026-06-20
+
+## 13.2 Scope
+
+This audit reviewed:
+
+* `harness/validators_impl/`
+* `harness/validators.py`
+* `harness/registry.py`
+* `harness/codes.py`
+* `scripts/`
+* `tests/`
+* `kernel/`
+* `userspace/core_service/`
+* `contracts/`
+* `schemas/`
+* `docs/`
+
+The audit focused on stale code, dead code, brittle functions, god files, duplicated logic, and deviations from `docs/CODING_STYLE.md`.
+
+## 13.3 Commands Run
+
+```text
+git status --short --branch
+find harness scripts tests kernel userspace contracts schemas docs -type f | sort
+python3 -m compileall harness scripts tests
+python3 -m unittest discover -s tests
+rg "TODO|FIXME|HACK|XXX|stub|placeholder|temporary|dead|unused|legacy|compat|shim|pass #|NotImplemented|raise NotImplementedError" harness scripts tests kernel userspace docs contracts schemas
+rg "def .*\\(" harness scripts tests
+rg "class .*" harness tests
+rg "subprocess|shell=True|os.system|eval\\(|exec\\(" harness scripts tests
+rg host-specific absolute paths, local user names, local package-manager paths, and platform-specific toolchain tokens
+git ls-files "*__pycache__*" "userspace/core_service/target/*"
+wc -l harness/validators_impl/validator_coverage.py scripts/qemu_smoke.sh scripts/build_boot_image.sh harness/validators_impl/qemu_smoke_evidence.py
+```
+
+## 13.4 Summary
+
+The latest CI evidence before this audit captured:
+
+* `KOZO_EARLY_0_ENTRY`
+* `KOZO_EARLY_1_SERIAL_INIT_START`
+* `KOZO_EARLY_2_SERIAL_INIT_OK`
+
+It did not capture `KOZO_BOOT_SMOKE_OK`.
+
+The current evidence-backed blocker is `marker_not_emitted`.
+
+The audit did not find a P0 or P1 issue that blocks v0.5.0.
+
+The audit found P2 maintainability risks that should be addressed after the final boot smoke marker phase, unless one directly blocks v0.5.0 implementation.
+
+No safe cleanup was applied.
+
+## 13.5 Findings
+
+| ID | Priority | Area | File(s) | Finding | Evidence | Risk | Recommendation | Fix now |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| AUDIT-095-001 | P2 | Boot marker taxonomy | `scripts/qemu_smoke.sh`, `harness/validators_impl/qemu_smoke_evidence.py`, `tests/test_qemu_smoke_evidence.py`, boot evidence docs | The ordered boot marker list is duplicated across script, validator, tests, and docs. | `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, and `KOZO_BOOT_SMOKE_OK` appear in multiple proof surfaces. | v0.5.0 marker emission work may require synchronized updates in several files. | Keep v0.5.0 narrowly scoped. After the marker is proven or a narrower blocker is found, centralize marker taxonomy in a small shared source or contract. | No |
+| AUDIT-095-002 | P2 | Boot blocker taxonomy | `scripts/qemu_smoke.sh`, `scripts/boot_blocker_report.sh`, `harness/validators_impl/qemu_smoke_evidence.py`, `harness/validators_impl/boot_blocker_report.py`, tests, docs | Exact blocker categories remain duplicated between metadata generation, validation, tests, and release language. | Current categories include `marker_not_emitted`, `serial_not_initialized`, `kernel_entry_not_reached`, `kernel_not_loaded`, and `missing_iso_generation_tooling`. | A future blocker could pass locally but fail in CI or release review if one surface is missed. | Defer taxonomy centralization until after v0.5.0 unless v0.5.0 requires a new blocker category. | No |
+| AUDIT-095-003 | P2 | Script size and mixed concerns | `scripts/qemu_smoke.sh`, `scripts/build_boot_image.sh` | Boot evidence scripts mix orchestration, tool checks, embedded Python classification, metadata rendering, and output writing. | `scripts/qemu_smoke.sh` is 360 lines; `scripts/build_boot_image.sh` is 366 lines. | The scripts are readable enough for current work but make future boot evidence changes more error-prone. | After v0.5.0, consider moving classification and metadata rendering into Python helpers while keeping shell scripts as orchestration layers. | No |
+| AUDIT-095-004 | P2 | Validator size and abstraction | `harness/validators_impl/validator_coverage.py` | Validator coverage remains a god validator by size and responsibility. | File is 1086 lines and owns contracts, AST parsing, negative test behavior checks, marker metadata, and diagnostics. | Future coverage-governance edits carry high cognitive load and risk of abstraction mixing. | Split into coverage contracts, AST inspection, negative behavior rules, and diagnostics after runtime marker work stabilizes. | No |
+| AUDIT-095-005 | P2 | QEMU validator/script policy duplication | `scripts/qemu_smoke.sh`, `harness/validators_impl/qemu_smoke_evidence.py` | Script-generated classification and validator-expected classification are separate implementations. | Both files encode marker/blocker ordering for `serial_not_initialized`, `marker_not_emitted`, and pass outcomes. | Script and validator drift could produce generated metadata that fails verification or, worse, misses a stale blocker. | Keep focused tests around each marker transition for v0.5.0. Extract a shared classifier only after the current marker path is proven. | No |
+| AUDIT-095-006 | P2 | Fixture duplication | `tests/test_*contract*.py`, `tests/test_qemu_smoke_evidence.py`, `tests/test_kernel_loadability.py` | Large fixture builders duplicate manifest, contract, blocker, and metadata shapes. | Function scan shows many fixture factories and repeated JSON metadata construction. | ABI/syscall or boot metadata evolution requires multiple synchronized test fixture edits. | Do not refactor fixtures before v0.5.0. Add shared fixtures only when the next contract or marker change forces repeated edits. | No |
+| AUDIT-095-007 | P3 | Scan noise | local ignored files | Local structural scans include ignored `__pycache__` and Cargo `target` files, but they are not tracked. | `find` sees generated local byproducts; `git ls-files "*__pycache__*" "userspace/core_service/target/*"` returns no tracked paths. | Audit output is noisy if future scans use raw `find` instead of source or tracked-file scopes. | Prefer `git ls-files` plus selected source roots for future stale/dead-code audits. | No |
+| AUDIT-095-008 | P3 | Historical host/path references | `CHANGELOG.md`, `tests/test_host_dependency_portability.py`, `harness/validators_impl/host_dependency_portability.py` | Host-specific tokens remain in historical changelog text and negative tests by design. | The host-specific token scan reports only allowed historical or test-policy references. | Reviewers may mistake historical/test strings for active host dependencies. | Keep host dependency portability validator as the enforcement boundary; no cleanup needed. | No |
+
+## 13.6 Safe Cleanup Applied
+
+No safe cleanup was applied.
+
+The audit found structural issues, not isolated unused imports or trivially removable dead helpers.
+
+## 13.7 Deferred Fixes
+
+Deferred intentionally:
+
+* boot marker taxonomy centralization
+* boot blocker taxonomy centralization
+* QEMU smoke script split
+* boot image script split
+* `validator_coverage.py` module split
+* shared test fixture extraction
+* broad validator refactors
+
+These are deferred because v0.5.0 should focus on the observed `marker_not_emitted` blocker.
+
+## 13.8 v0.5.0 Risk Notes
+
+v0.5.0 should start from the CI-proven marker sequence:
+
+```text
+KOZO_EARLY_0_ENTRY
+KOZO_EARLY_1_SERIAL_INIT_START
+KOZO_EARLY_2_SERIAL_INIT_OK
+```
+
+The next runtime question is why `KOZO_BOOT_SMOKE_OK` is absent.
+
+Risk areas for v0.5.0:
+
+* stack setup after early serial initialization
+* call from `_start` into `kernel_entry`
+* Odin runtime assumptions after higher-half entry
+* final marker emission location and dependency chain
+* QEMU timeout hiding a fault after serial initialization
+* duplicated marker/blocker taxonomy while updating tests and docs
+
+v0.5.0 must not claim QEMU boot unless `KOZO_BOOT_SMOKE_OK` appears in captured QEMU serial output.

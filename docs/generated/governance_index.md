@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.4.9`
+* Version: `v0.4.95`
 * Date: `2026-06-20`
-* Status: Early serial initialization.
+* Status: Code quality and style audit.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 39
 * Failed checks: 0
-* Run ID: `verify-20260620T184626Z`
-* Generated at: `2026-06-20T18:46:26Z`
+* Run ID: `verify-20260620T213347Z`
+* Generated at: `2026-06-20T21:33:47Z`
 
 ## Registered validators
 

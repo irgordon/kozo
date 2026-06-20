@@ -1632,6 +1632,26 @@
         "verification.tests_run[5]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 56,
+      "title": "Record v0.4.95 code quality and style audit",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "docs/CODEBASE_AUDIT.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/generated/governance_index.md",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[4]",
+        "verification.tests_run[5]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -1806,7 +1826,8 @@
       "host_dependency_portability validates v0.4.3 host portability policy, rejects user-specific absolute paths and Apple-specific toolchain assumptions, verifies CI/Linux tooling declarations, and preserves local macOS as a convenience path only",
       "All active release planning references resolve to docs/PHASEMAP.md and docs/ROADMAP.md, with historical changelog references preserved as history",
       "kernel_loadability validates v0.4.5 Limine ELF load-layout evidence by requiring PT_LOAD virtual-address metadata, lower-half segment detection, and limine_lower_half_phdr blocker alignment without claiming QEMU boot or kernel entry",
-      "Codebase structural audit records stale/dead/brittle/god-file risks, duplicated boot taxonomy, boundary issues, and higher-half transition hazards without changing runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU boot claims, or compatibility claims"
+      "Codebase structural audit records stale/dead/brittle/god-file risks, duplicated boot taxonomy, boundary issues, and higher-half transition hazards without changing runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU boot claims, or compatibility claims",
+      "v0.4.95 code quality and style audit records duplicated boot marker taxonomy, duplicated blocker taxonomy, QEMU script size, validator coverage size, fixture duplication, and v0.5.0 marker-emission risks without changing runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU marker semantics, or compatibility claims"
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -1869,7 +1890,8 @@
       "v0.4.4 changes Limine config to boot():/boot/kozo/kozo-kernel.elf, records configured and normalized kernel path metadata plus ISO contents visibility, and preserves no-QEMU-boot, no-kernel-entry, no-serial-init, compatibility, and production-readiness non-claims",
       "Moved release planning documents under docs/, updated active release evidence/checklist and boot protocol validator references, and preserved runtime and compatibility non-goals",
       "v0.4.5 classifies Limine lower-half PHDR rejection as limine_lower_half_phdr in kernel ELF reports, QEMU smoke metadata, boot blocker reporting, focused tests, and boot evidence docs while preserving no-QEMU-boot and non-compatibility claim boundaries",
-      "v0.4.6 adds docs/CODEBASE_AUDIT.md, updates phase and roadmap sequencing so v0.4.7 is the higher-half linker/entry transition, and records that no cleanup was applied during the audit phase"
+      "v0.4.6 adds docs/CODEBASE_AUDIT.md, updates phase and roadmap sequencing so v0.4.7 is the higher-half linker/entry transition, and records that no cleanup was applied during the audit phase",
+      "v0.4.95 adds a code quality and style audit section before v0.5.0, updates phase and roadmap sequencing so v0.5.0 is Fix Boot Smoke Marker Emission, and records that no safe cleanup was applied during the audit phase"
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -1931,6 +1953,7 @@
     "Added v0.4.6 codebase structural audit documentation before the higher-half linker/entry transition, documenting duplicated boot taxonomy, stale release/check blocker wording, and transition coupling risks without changing runtime, ABI, syscall, linker, or compatibility behavior.",
     "Added v0.4.7 higher-half linker transition so the kernel ELF records higher-half PT_LOAD virtual addresses with low physical load addresses, clears the local limine_lower_half_phdr loadability report, and preserves no-QEMU-boot, no-kernel-entry, ABI, syscall, and compatibility claim boundaries until CI QEMU evidence advances.",
     "Added v0.4.8 kernel entry handoff instrumentation so _start emits KOZO_EARLY_0_ENTRY through assembly COM1 output before stack setup or Odin code, QEMU smoke metadata records entry handoff fields, and validators reject stale kernel_entry_not_reached classifications once the entry marker appears.",
-    "Added v0.4.9 early serial initialization instrumentation so _start emits KOZO_EARLY_1_SERIAL_INIT_START and KOZO_EARLY_2_SERIAL_INIT_OK before stack setup or Odin code, while QEMU smoke validation advances serial-init OK evidence to marker_not_emitted unless the final boot smoke marker appears."
+    "Added v0.4.9 early serial initialization instrumentation so _start emits KOZO_EARLY_1_SERIAL_INIT_START and KOZO_EARLY_2_SERIAL_INIT_OK before stack setup or Odin code, while QEMU smoke validation advances serial-init OK evidence to marker_not_emitted unless the final boot smoke marker appears.",
+    "Added v0.4.95 code quality and style audit documentation before v0.5.0, documenting duplicated boot marker taxonomy, duplicated blocker taxonomy, QEMU script and validator coverage size, fixture duplication, and marker-emission risks without changing runtime, ABI, syscall, linker, QEMU marker semantics, or compatibility behavior."
   ]
 }

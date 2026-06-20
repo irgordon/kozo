@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.4.95 - 2026-06-20
+
+**Status:** Code quality and style audit.
+
+### Added
+
+* Added a v0.4.95 audit section to `docs/CODEBASE_AUDIT.md` covering stale-code, dead-code, brittle-function, god-file, duplicated-logic, and coding-style risks before v0.5.0.
+* Recorded the current CI evidence boundary: kernel entry and early serial initialization markers are present, while `KOZO_BOOT_SMOKE_OK` is absent and the exact blocker is `marker_not_emitted`.
+
+### Changed
+
+* Updated `docs/PHASEMAP.md` and `docs/ROADMAP.md` so v0.4.95 is the code quality audit checkpoint and v0.5.0 remains the next runtime phase: Fix Boot Smoke Marker Emission.
+
+### Notes
+
+* No safe cleanup was applied in this phase.
+* This change does not alter runtime behavior.
+* This change does not alter ABI contracts or syscall behavior.
+* This change does not alter linker layout or QEMU smoke marker semantics.
+* This change does not attempt `KOZO_BOOT_SMOKE_OK` emission.
+* This change does not claim QEMU boot, hardware trap execution, Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, file descriptor behavior, or production readiness.
+
 ## v0.4.9 - 2026-06-20
 
 **Status:** Early serial initialization.
