@@ -128,6 +128,8 @@ If Limine reaches the boot entry but fails to open or load the configured kernel
 
 For v0.4.2 and later, release review must include `artifacts/runtime/kernel_elf_report.json` when kernel loadability is under review. That report may prove ELF structure, entry, and PT_LOAD segment presence, but it does not prove Limine loaded the ELF or executed kernel code.
 
+For v0.4.4 and later, release review must include `artifacts/runtime/boot_image/iso_contents.txt` when ISO packaging succeeds so reviewers can confirm the configured Limine path normalizes to a file visible in the ISO contents.
+
 For v0.4.0 and later, QEMU smoke metadata must also include early marker diagnostics and may narrow timeout to one of:
 
 * `limine_not_reached`
@@ -138,6 +140,8 @@ For v0.4.0 and later, QEMU smoke metadata must also include early marker diagnos
 * `qemu_timeout`
 
 The latest inspected post-v0.4.1 CI artifact narrowed to `kernel_not_loaded` because Limine reached the boot entry and failed to open the configured kernel executable before any KOZO marker appeared.
+
+The v0.4.4 configured Limine kernel path is `boot():/boot/kozo/kozo-kernel.elf`, which normalizes to `boot/kozo/kozo-kernel.elf` in the ISO contents report.
 
 The v0.4.2 kernel ELF loadability validator is:
 
@@ -155,6 +159,12 @@ The expected future ISO path is:
 
 ```text
 artifacts/runtime/boot_image/kozo.iso
+```
+
+The ISO contents report is:
+
+```text
+artifacts/runtime/boot_image/iso_contents.txt
 ```
 
 The boot tooling acquisition policy is:

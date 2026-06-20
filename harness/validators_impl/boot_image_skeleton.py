@@ -94,7 +94,7 @@ def _required_texts() -> tuple[RequiredText, ...]:
         RequiredText("limine_serial", _LIMINE_CONFIG_PATH, "serial: yes", "Limine config must enable serial diagnostics"),
         RequiredText("limine_verbose", _LIMINE_CONFIG_PATH, "verbose: yes", "Limine config must enable verbose diagnostics"),
         RequiredText("limine_protocol", _LIMINE_CONFIG_PATH, "protocol: limine", "Limine config must select Limine protocol"),
-        RequiredText("kernel_path", _LIMINE_CONFIG_PATH, "path: /boot/kozo/kozo-kernel.elf", "Limine config must name staged kernel ELF"),
+        RequiredText("kernel_path", _LIMINE_CONFIG_PATH, "path: boot():/boot/kozo/kozo-kernel.elf", "Limine config must name staged kernel ELF with explicit boot-resource semantics"),
         RequiredText("build_script_linker", _BUILD_SCRIPT_PATH, "linker/kernel.ld", "Build script must use the linker script"),
         RequiredText("build_script_limine", _BUILD_SCRIPT_PATH, "boot/limine.conf", "Build script must stage Limine config"),
         RequiredText("build_script_output", _BUILD_SCRIPT_PATH, "artifacts/runtime/boot_image", "Build script must use documented output path"),

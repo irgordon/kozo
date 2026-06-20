@@ -38,6 +38,8 @@ v0.4.1 updates the Limine kernel path to match the staged ISO layout and classif
 
 v0.4.2 adds deterministic kernel ELF loadability evidence at `artifacts/runtime/kernel_elf_report.json`, validates the staged kernel ELF architecture, entry point, `_start` alignment, program headers, and PT_LOAD segments, and keeps the no-QEMU-boot claim until serial evidence proves execution.
 
+v0.4.4 updates the Limine kernel path to use explicit `boot():` resource semantics and records ISO path visibility metadata so the configured path can be checked against the staged ISO contents.
+
 Remaining blocker: `missing_iso_generation_tooling`.
 
 The local blocker is `missing_iso_generation_tooling`.
@@ -60,7 +62,7 @@ CI packaged-image blocker category, when the ISO exists: `missing_qemu_serial_ev
 
 CI observed QEMU execution blocker category, when QEMU runs the ISO but no marker is captured before the bounded timeout: `qemu_timeout`.
 
-Latest inspected post-v0.4.1 CI artifact diagnosis: `kernel_not_loaded`. QEMU launched the ISO, Limine was reached, and Limine failed to open the configured kernel executable path before any KOZO marker appeared.
+Latest inspected post-v0.4.3 CI artifact diagnosis: `kernel_not_loaded`. QEMU launched the ISO, Limine was reached, and Limine failed to open the configured kernel executable path before any KOZO marker appeared.
 
 Current v0.4.2 kernel ELF diagnosis: structurally loadable by local ELF inspection. The staged kernel ELF is an x86_64 executable, `_start` matches the ELF entry point, and PT_LOAD segments are present. This does not prove Limine loaded or executed the kernel.
 
@@ -78,7 +80,11 @@ The boot protocol decision, boot image skeleton, boot tooling acquisition policy
 
 The expected ISO path is `artifacts/runtime/boot_image/kozo.iso`.
 
-The configured Limine kernel path is `/boot/kozo/kozo-kernel.elf`, matching the staged ISO path `boot/kozo/kozo-kernel.elf`.
+The configured Limine kernel path is `boot():/boot/kozo/kozo-kernel.elf`, using Limine's boot-resource path semantics for the boot drive partition containing the configuration file.
+
+The normalized ISO path is `boot/kozo/kozo-kernel.elf`.
+
+`scripts/build_boot_image.sh` writes `artifacts/runtime/boot_image/iso_contents.txt` when an ISO is produced so packaging validation can confirm the configured Limine path is visible in the image.
 
 The ISO generation command includes Rock Ridge and Joliet metadata so the lower-case Limine path remains visible to the loader when ISO tooling is available.
 

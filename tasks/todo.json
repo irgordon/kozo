@@ -1491,6 +1491,35 @@
         "verification.tests_run[5]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 51,
+      "title": "Fix Limine ISO kernel load semantics",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "boot/limine.conf",
+        "docs/BOOT.md",
+        "docs/BOOT_IMAGE.md",
+        "docs/BOOT_BLOCKERS.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/generated/governance_index.md",
+        "tasks/todo.json",
+        "scripts/build_boot_image.sh",
+        "harness/validators_impl/boot_image_packaging.py",
+        "harness/validators_impl/validator_coverage.py",
+        "tests/test_boot_image_packaging.py",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[4]",
+        "verification.tests_run[5]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -1541,6 +1570,7 @@
     "QEMU timeout blocker handling records the CI-observed qemu_timeout state, adds QEMU stderr evidence, and rejects blocked metadata if the kernel marker is already present",
     "Kernel entry reachability diagnostics add documented Limine serial output, early KOZO markers, v0.4.0 QEMU metadata, and exact blocker taxonomy without claiming QEMU boot unless the boot smoke marker is captured",
     "Limine kernel load path fix uses /boot/kozo/kozo-kernel.elf and classifies Limine executable-open failures as kernel_not_loaded without claiming QEMU boot",
+    "Limine ISO kernel load semantics now use boot():/boot/kozo/kozo-kernel.elf, record normalized ISO path visibility metadata, and keep kernel_not_loaded active until CI serial evidence proves otherwise",
     "docs/PHASEMAP.md and docs/ROADMAP.md own release phase sequencing and roadmap direction from the governance document directory without changing runtime behavior, ABI contracts, syscall behavior, boot behavior, or compatibility claims"
   ],
   "verification": {
@@ -1651,6 +1681,7 @@
       "boot_image_skeleton validates linker script, Limine config, build script, boot image docs, memory support symbols, and blocker state without requiring QEMU execution",
       "boot_tooling validates the Limine and xorriso tooling acquisition policy, local and CI install path documentation, provenance requirements, and narrowed boot blocker state without requiring ISO generation",
       "boot_image_packaging validates v0.3.6 package metadata for either a real packaged ISO or a blocked missing_iso_generation_tooling result without requiring QEMU execution",
+      "boot_image_packaging validates v0.4.4 Limine configured-kernel-path semantics, normalized ISO path metadata, and packaged ISO path visibility without claiming QEMU boot",
       "qemu_smoke_evidence validates v0.3.9 QEMU smoke metadata for either a passing serial marker capture or an exact blocked outcome without requiring broad runtime or compatibility claims",
       "qemu_smoke_evidence rejects blocked QEMU metadata if artifacts/runtime/qemu_smoke.log already contains KOZO_BOOT_SMOKE_OK",
       "qemu_smoke_evidence validates v0.4.0 QEMU smoke metadata with early marker, observed marker, timeout, and byte-count diagnostics",
@@ -1719,6 +1750,7 @@
       "v0.4.1 updates the Limine kernel path and QEMU smoke taxonomy; full verification must refresh local blocked metadata separately from source changes",
       "v0.4.2 adds deterministic kernel ELF loadability reporting, validates the staged kernel ELF structure, and adds ISO filename metadata for Limine path visibility while preserving no-QEMU-boot, no-kernel-entry, no-serial-init, and non-compatibility claim boundaries",
       "v0.4.3 adds a host dependency portability gate, removes local Homebrew-style Limine fallback paths, documents CI/Linux as authoritative portability proof, and preserves local macOS as convenience-only without changing runtime, ABI, syscall, QEMU boot, compatibility, or production-readiness claims",
+      "v0.4.4 changes Limine config to boot():/boot/kozo/kozo-kernel.elf, records configured and normalized kernel path metadata plus ISO contents visibility, and preserves no-QEMU-boot, no-kernel-entry, no-serial-init, compatibility, and production-readiness non-claims",
       "Moved release planning documents under docs/, updated active release evidence/checklist and boot protocol validator references, and preserved runtime and compatibility non-goals"
     ],
     "baseline_reference": "kozo-trap-path-v1"
@@ -1775,6 +1807,7 @@
     "Added v0.4.1 Limine kernel load path fix so the configured kernel path matches the staged ISO layout and Limine open failures no longer masquerade as kernel entry failures.",
     "Added v0.4.2 kernel ELF loadability evidence so kernel_not_loaded can be separated from invalid ELF shape, missing PT_LOAD segments, invalid entry point, or linker output failures without claiming QEMU boot.",
     "Added v0.4.3 host dependency portability gate so build, verification, ISO, ELF, and QEMU smoke tooling depend on declared CI/Linux tooling, controlled environment variables, command discovery, or repository-relative paths instead of local host state.",
+    "Added v0.4.4 Limine ISO/kernel load semantics so the configured boot(): path, normalized ISO path, and ISO contents visibility are recorded and validated without claiming QEMU boot or kernel entry.",
     "Moved release planning documents under docs/ and updated active references so governance planning documents live with the rest of the governance document set."
   ]
 }

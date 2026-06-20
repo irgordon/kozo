@@ -121,6 +121,12 @@ The boot image packaging metadata is:
 artifacts/runtime/boot_image/package_metadata.json
 ```
 
+The ISO contents report is:
+
+```text
+artifacts/runtime/boot_image/iso_contents.txt
+```
+
 The expected ISO path is:
 
 ```text
@@ -140,6 +146,16 @@ The skeleton does not include serial output capture.
 The skeleton does not include a `qemu_smoke` validator.
 
 The package metadata records either successful ISO packaging or `missing_iso_generation_tooling`.
+
+For packaged images, the metadata records:
+
+```text
+configured_kernel_path
+normalized_kernel_path
+kernel_path_present_in_iso
+```
+
+The configured Limine kernel path must use `boot():/boot/kozo/kozo-kernel.elf`; the normalized ISO path is `boot/kozo/kozo-kernel.elf`.
 
 The current local environment does not produce `artifacts/runtime/boot_image/kozo.iso` because the Limine executable, Limine bootloader artifacts, and xorriso executable are unavailable.
 

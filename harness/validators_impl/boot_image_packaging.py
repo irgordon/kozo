@@ -10,6 +10,7 @@ from harness.validator import BaseValidator, ValidationResult
 _ROOT = Path(__file__).resolve().parents[2]
 _METADATA_PATH = _ROOT / "artifacts" / "runtime" / "boot_image" / "package_metadata.json"
 _BOOT_BLOCKER_REPORT_PATH = _ROOT / "artifacts" / "runtime" / "boot_blocker_report.json"
+_ISO_CONTENTS_PATH = _ROOT / "artifacts" / "runtime" / "boot_image" / "iso_contents.txt"
 _BOOT_DOC_PATH = _ROOT / "docs" / "BOOT.md"
 _BOOT_IMAGE_DOC_PATH = _ROOT / "docs" / "BOOT_IMAGE.md"
 _BOOT_BLOCKERS_PATH = _ROOT / "docs" / "BOOT_BLOCKERS.md"
@@ -18,11 +19,12 @@ _RELEASE_EVIDENCE_PATH = _ROOT / "docs" / "RELEASE_EVIDENCE.md"
 _IMAGE_PATH = _ROOT / "artifacts" / "runtime" / "boot_image" / "kozo.iso"
 
 _COMMON_FIELDS = {
-    "phase": "v0.3.6",
+    "phase": "v0.4.4",
     "image_type": "iso",
     "boot_protocol": "Limine",
     "architecture": "x86_64",
     "image_path": "artifacts/runtime/boot_image/kozo.iso",
+    "iso_contents": "artifacts/runtime/boot_image/iso_contents.txt",
     "generated_by": "scripts/build_boot_image.sh",
 }
 
@@ -76,6 +78,7 @@ _REQUIRED_NON_GOALS = (
 _REQUIRED_DOC_REFERENCES = (
     "artifacts/runtime/boot_image/package_metadata.json",
     "artifacts/runtime/boot_image/kozo.iso",
+    "artifacts/runtime/boot_image/iso_contents.txt",
     "missing_iso_generation_tooling",
 )
 
@@ -113,7 +116,9 @@ def _boot_image_packaging_issue() -> BootImagePackagingIssue | None:
 
     return _first_issue(
         _metadata_contract_issue(metadata),
+        _limine_path_contract_issue(metadata),
         _image_state_issue(metadata),
+        _iso_path_semantics_issue(metadata),
         _blocked_component_issue(metadata),
         _list_contract_issue(metadata, "does_not_prove", _REQUIRED_NON_GOALS, "missing_non_goal"),
         _blocker_state_issue(metadata, blocker_report),
@@ -146,6 +151,25 @@ def _metadata_contract_issue(metadata: dict[str, object]) -> BootImagePackagingI
     return None
 
 
+def _limine_path_contract_issue(metadata: dict[str, object]) -> BootImagePackagingIssue | None:
+    configured = metadata.get("configured_kernel_path")
+    if not isinstance(configured, str) or not configured:
+        return _issue("missing_configured_kernel_path", "boot_image_packaging.configured_kernel_path", "Boot image metadata must record the configured Limine kernel path")
+    if not configured.startswith("boot():"):
+        return _issue("limine_config_syntax_mismatch", "boot_image_packaging.configured_kernel_path", "Limine kernel path must use boot(): resource semantics")
+    if metadata.get("normalized_kernel_path") != _normalize_limine_path(configured):
+        return _issue("config_path_mismatch", "boot_image_packaging.normalized_kernel_path", "Normalized Limine kernel path must match the configured kernel path")
+    if metadata.get("normalized_kernel_path") != "boot/kozo/kozo-kernel.elf":
+        return _issue("config_path_mismatch", "boot_image_packaging.normalized_kernel_path", "Normalized Limine kernel path must target the packaged KOZO kernel ELF")
+    return None
+
+
+def _normalize_limine_path(configured: str) -> str:
+    if "):" in configured:
+        configured = configured.split("):", 1)[1]
+    return configured.lstrip("/")
+
+
 def _expected_outcome_fields(metadata: dict[str, object]) -> dict[str, object] | None:
     if metadata.get("outcome") == "blocked":
         return _BLOCKED_FIELDS
@@ -159,6 +183,19 @@ def _image_state_issue(metadata: dict[str, object]) -> BootImagePackagingIssue |
         return _issue("missing_image", "boot_image_packaging.image_path", "Boot image metadata claims packaging succeeded but kozo.iso is missing")
     if _IMAGE_PATH.is_file() and metadata.get("outcome") == "blocked":
         return _issue("blocker_state_mismatch", "boot_image_packaging.outcome", "Boot image exists but metadata still reports blocked packaging")
+    return None
+
+
+def _iso_path_semantics_issue(metadata: dict[str, object]) -> BootImagePackagingIssue | None:
+    if metadata.get("outcome") != "packaged":
+        return None
+    if metadata.get("kernel_path_present_in_iso") is not True:
+        return _issue("missing_configured_kernel_path", "boot_image_packaging.kernel_path_present_in_iso", "Configured Limine kernel path must resolve to a file in the ISO contents")
+    if not _ISO_CONTENTS_PATH.is_file():
+        return _issue("missing_iso_contents", "boot_image_packaging.iso_contents", "Packaged ISO metadata requires an ISO contents report")
+    contents = _ISO_CONTENTS_PATH.read_text(errors="replace").splitlines()
+    if metadata.get("normalized_kernel_path") not in contents:
+        return _issue("missing_configured_kernel_path", "boot_image_packaging.normalized_kernel_path", "Normalized Limine kernel path is missing from ISO contents")
     return None
 
 

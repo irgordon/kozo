@@ -36,6 +36,8 @@ v0.4.1 fixes the Limine kernel executable path and tightens QEMU smoke classific
 
 v0.4.2 adds kernel ELF loadability evidence and validation so `kernel_not_loaded` can be separated from malformed ELF, missing PT_LOAD segments, invalid entry point, or linker-output failures.
 
+v0.4.4 fixes the Limine path semantics from a bare `/boot/kozo/kozo-kernel.elf` path to `boot():/boot/kozo/kozo-kernel.elf` and records ISO contents metadata to prove the normalized configured path is present in packaged images.
+
 ---
 
 # 2. Verified Blocker
@@ -86,7 +88,9 @@ Therefore the repository cannot honestly claim QEMU boot execution.
 
 The latest inspected v0.4.0 CI artifact reached Limine and failed to open `boot:///boot/kozo/kozo-kernel.elf`, so its evidence-backed diagnostic blocker is `kernel_not_loaded`.
 
-The v0.4.1 Limine config uses `/boot/kozo/kozo-kernel.elf`, matching the staged ISO path `boot/kozo/kozo-kernel.elf`.
+The v0.4.4 Limine config uses `boot():/boot/kozo/kozo-kernel.elf`, which explicitly names the boot drive partition containing the Limine configuration file.
+
+The normalized configured path is `boot/kozo/kozo-kernel.elf`, and packaged image metadata records whether that path appears in `artifacts/runtime/boot_image/iso_contents.txt`.
 
 The v0.4.2 kernel ELF report records the staged kernel ELF as an x86_64 executable with `_start` matching the ELF entry point and PT_LOAD segments present. This does not prove Limine loaded or executed the kernel.
 
@@ -176,6 +180,12 @@ The kernel ELF loadability validator is:
 
 ```text
 kernel_loadability
+```
+
+The ISO contents report is:
+
+```text
+artifacts/runtime/boot_image/iso_contents.txt
 ```
 
 The validator is:

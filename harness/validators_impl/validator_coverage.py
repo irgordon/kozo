@@ -474,6 +474,7 @@ _VALIDATOR_TEST_CONTRACTS = {
         (
             "missing_linker_script",
             "missing_limine_config",
+            "wrong_limine_kernel_path",
             "missing_build_script",
             "missing_boot_image_doc",
             "blocker_state_mismatch",
@@ -492,6 +493,9 @@ _VALIDATOR_TEST_CONTRACTS = {
             "wrong_image_type",
             "wrong_architecture",
             "image_path_mismatch",
+            "limine_config_syntax_mismatch",
+            "config_path_mismatch",
+            "missing_configured_kernel_path",
             "missing_non_goal",
             "blocker_state_mismatch",
             "diagnostic_names_field",

@@ -18,6 +18,9 @@ KOZO_NEGATIVE_COVERAGE = {
         "wrong_architecture": "test_fails_when_architecture_is_wrong",
         "image_path_mismatch": "test_fails_when_image_path_mismatches_contract",
         "wrong_image_type": "test_fails_when_image_type_is_wrong",
+        "limine_config_syntax_mismatch": "test_fails_when_configured_path_omits_limine_boot_resource",
+        "config_path_mismatch": "test_fails_when_normalized_path_does_not_match_configured_path",
+        "missing_configured_kernel_path": "test_fails_when_configured_kernel_path_is_missing_from_iso_contents",
         "missing_non_goal": "test_fails_when_non_goal_is_missing",
         "blocker_state_mismatch": "test_fails_when_blocker_state_mismatches_metadata",
         "diagnostic_names_field": "test_failure_diagnostic_names_field",
@@ -37,6 +40,19 @@ class BootImagePackagingValidatorTests(unittest.TestCase):
             create_image=True,
             mutate_metadata=packaged_metadata,
             mutate_blocker=lambda blocker: blocker | {"blocker_category": "qemu_timeout"},
+        )
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
+    def test_passes_when_configured_path_without_leading_slash_normalizes_to_iso_path(self):
+        result = self.validate_fixture(
+            create_image=True,
+            mutate_metadata=lambda metadata: packaged_metadata(metadata) | {
+                "configured_kernel_path": "boot():boot/kozo/kozo-kernel.elf",
+                "normalized_kernel_path": "boot/kozo/kozo-kernel.elf",
+            },
+            mutate_blocker=lambda blocker: blocker | {"blocker_category": "kernel_not_loaded"},
         )
 
         self.assertEqual(result.status, "pass")
@@ -82,6 +98,42 @@ class BootImagePackagingValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "fail")
         self.assert_packaging_failure(result, "field_mismatch", "boot_image_packaging.image_type")
+
+    def test_fails_when_configured_path_omits_limine_boot_resource(self):
+        self.assertEqual("boot_image_packaging", BootImagePackagingValidator.name)
+        result = self.validate_fixture(
+            create_image=True,
+            mutate_metadata=lambda metadata: packaged_metadata(metadata) | {"configured_kernel_path": "/boot/kozo/kozo-kernel.elf"},
+            mutate_blocker=lambda blocker: blocker | {"blocker_category": "kernel_not_loaded"},
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_packaging_failure(result, "limine_config_syntax_mismatch", "boot_image_packaging.configured_kernel_path")
+
+    def test_fails_when_normalized_path_does_not_match_configured_path(self):
+        self.assertEqual("boot_image_packaging", BootImagePackagingValidator.name)
+        result = self.validate_fixture(
+            create_image=True,
+            mutate_metadata=lambda metadata: packaged_metadata(metadata) | {
+                "configured_kernel_path": "boot():/boot/kozo/kozo-kernel.elf",
+                "normalized_kernel_path": "boot/kozo/other.elf",
+            },
+            mutate_blocker=lambda blocker: blocker | {"blocker_category": "kernel_not_loaded"},
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_packaging_failure(result, "config_path_mismatch", "boot_image_packaging.normalized_kernel_path")
+
+    def test_fails_when_configured_kernel_path_is_missing_from_iso_contents(self):
+        self.assertEqual("boot_image_packaging", BootImagePackagingValidator.name)
+        result = self.validate_fixture(
+            create_image=True,
+            mutate_metadata=lambda metadata: packaged_metadata(metadata) | {"kernel_path_present_in_iso": False},
+            mutate_blocker=lambda blocker: blocker | {"blocker_category": "kernel_not_loaded"},
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_packaging_failure(result, "missing_configured_kernel_path", "boot_image_packaging.kernel_path_present_in_iso")
 
     def test_fails_when_architecture_is_wrong(self):
         self.assertEqual("boot_image_packaging", BootImagePackagingValidator.name)
@@ -131,6 +183,7 @@ class BootImagePackagingValidatorTests(unittest.TestCase):
         mutate_metadata=None,
         mutate_metadata_text=None,
         mutate_blocker=None,
+        mutate_iso_contents=None,
         create_image: bool = False,
     ):
         with tempfile.TemporaryDirectory() as tmp:
@@ -148,6 +201,9 @@ class BootImagePackagingValidatorTests(unittest.TestCase):
             if mutate_blocker is not None:
                 blocker = json.loads(paths["blocker"].read_text())
                 paths["blocker"].write_text(json.dumps(mutate_blocker(blocker), indent=2) + "\n")
+
+            if mutate_iso_contents is not None:
+                paths["iso_contents"].write_text(mutate_iso_contents(paths["iso_contents"].read_text()))
 
             if create_image:
                 paths["image"].write_bytes(b"iso")
@@ -167,6 +223,7 @@ class BootImagePackagingValidatorTests(unittest.TestCase):
 def write_fixture_files(root: Path) -> dict[str, Path]:
     paths = {
         "metadata": root / "artifacts" / "runtime" / "boot_image" / "package_metadata.json",
+        "iso_contents": root / "artifacts" / "runtime" / "boot_image" / "iso_contents.txt",
         "blocker": root / "artifacts" / "runtime" / "boot_blocker_report.json",
         "image": root / "artifacts" / "runtime" / "boot_image" / "kozo.iso",
         "boot": root / "docs" / "BOOT.md",
@@ -179,6 +236,7 @@ def write_fixture_files(root: Path) -> dict[str, Path]:
         path.parent.mkdir(parents=True, exist_ok=True)
 
     paths["metadata"].write_text(json.dumps(valid_metadata(), indent=2) + "\n")
+    paths["iso_contents"].write_text("boot/kozo/kozo-kernel.elf\nboot/limine/limine.conf\n")
     paths["blocker"].write_text(json.dumps(valid_blocker(), indent=2) + "\n")
     for key in ("boot", "image_doc", "blockers", "runtime", "release"):
         paths[key].write_text(valid_doc_text())
@@ -188,7 +246,7 @@ def write_fixture_files(root: Path) -> dict[str, Path]:
 def valid_metadata() -> dict[str, object]:
     return {
         "version": 0,
-        "phase": "v0.3.6",
+        "phase": "v0.4.4",
         "outcome": "blocked",
         "blocker_category": "missing_iso_generation_tooling",
         "image_type": "iso",
@@ -196,6 +254,10 @@ def valid_metadata() -> dict[str, object]:
         "architecture": "x86_64",
         "image_path": "artifacts/runtime/boot_image/kozo.iso",
         "image_exists": False,
+        "iso_contents": "artifacts/runtime/boot_image/iso_contents.txt",
+        "configured_kernel_path": "boot():/boot/kozo/kozo-kernel.elf",
+        "normalized_kernel_path": "boot/kozo/kozo-kernel.elf",
+        "kernel_path_present_in_iso": False,
         "generated_by": "scripts/build_boot_image.sh",
         "missing_components": [
             "Limine executable",
@@ -235,6 +297,7 @@ def packaged_metadata(metadata: dict[str, object]) -> dict[str, object]:
             "outcome": "packaged",
             "blocker_category": "missing_qemu_serial_evidence",
             "image_exists": True,
+            "kernel_path_present_in_iso": True,
         }
     )
     metadata.pop("missing_components", None)
@@ -246,6 +309,7 @@ def valid_doc_text() -> str:
         (
             "artifacts/runtime/boot_image/package_metadata.json",
             "artifacts/runtime/boot_image/kozo.iso",
+            "artifacts/runtime/boot_image/iso_contents.txt",
             "missing_iso_generation_tooling",
         )
     )
@@ -260,6 +324,7 @@ def patch_validator_paths(paths: dict[str, Path]):
     old_paths = (
         validator_module._METADATA_PATH,
         validator_module._BOOT_BLOCKER_REPORT_PATH,
+        validator_module._ISO_CONTENTS_PATH,
         validator_module._BOOT_DOC_PATH,
         validator_module._BOOT_IMAGE_DOC_PATH,
         validator_module._BOOT_BLOCKERS_PATH,
@@ -269,6 +334,7 @@ def patch_validator_paths(paths: dict[str, Path]):
     )
     validator_module._METADATA_PATH = paths["metadata"]
     validator_module._BOOT_BLOCKER_REPORT_PATH = paths["blocker"]
+    validator_module._ISO_CONTENTS_PATH = paths["iso_contents"]
     validator_module._BOOT_DOC_PATH = paths["boot"]
     validator_module._BOOT_IMAGE_DOC_PATH = paths["image_doc"]
     validator_module._BOOT_BLOCKERS_PATH = paths["blockers"]
@@ -282,6 +348,7 @@ def restore_validator_paths(old_paths) -> None:
     (
         validator_module._METADATA_PATH,
         validator_module._BOOT_BLOCKER_REPORT_PATH,
+        validator_module._ISO_CONTENTS_PATH,
         validator_module._BOOT_DOC_PATH,
         validator_module._BOOT_IMAGE_DOC_PATH,
         validator_module._BOOT_BLOCKERS_PATH,

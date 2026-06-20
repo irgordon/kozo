@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.4.4 - 2026-06-20
+
+**Status:** Limine ISO/kernel load semantics fix.
+
+### Changed
+
+* Updated `boot/limine.conf` to use Limine's explicit boot-resource path syntax: `boot():/boot/kozo/kozo-kernel.elf`.
+* Updated `scripts/build_boot_image.sh` to write `artifacts/runtime/boot_image/iso_contents.txt` when an ISO is produced and to record configured/normalized kernel path metadata in `package_metadata.json`.
+* Updated `boot_image_packaging` validation to require packaged ISO metadata to prove the normalized configured Limine path is present in ISO contents.
+* Added focused negative coverage for bare Limine paths, configured/normalized path mismatch, missing configured kernel path visibility, and diagnostic field naming.
+* Updated boot, runtime evidence, release evidence, phase map, and roadmap docs to record the v0.4.4 Limine load-semantics fix.
+
+### Notes
+
+* The latest inspected pre-v0.4.4 CI artifact reached Limine and failed to open `/boot/kozo/kozo-kernel.elf`, so the evidence-backed blocker remains `kernel_not_loaded`.
+* This change does not claim QEMU boot.
+* This change does not claim kernel entry.
+* This change does not claim serial initialization.
+* This change does not claim hardware trap execution.
+* This change does not claim Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, ELF loading, file descriptor behavior, or production readiness.
+* This change does not alter ABI contracts or syscall behavior.
+
 ## v0.4.3 - 2026-06-20
 
 **Status:** Host dependency portability gate.

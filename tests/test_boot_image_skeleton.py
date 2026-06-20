@@ -13,6 +13,7 @@ KOZO_NEGATIVE_COVERAGE = {
     "boot_image_skeleton": {
         "missing_linker_script": "test_fails_when_linker_script_is_missing",
         "missing_limine_config": "test_fails_when_limine_config_is_missing",
+        "wrong_limine_kernel_path": "test_fails_when_limine_kernel_path_uses_bare_iso_path",
         "missing_build_script": "test_fails_when_build_script_is_missing",
         "missing_boot_image_doc": "test_fails_when_boot_image_doc_is_missing",
         "blocker_state_mismatch": "test_fails_when_blocker_state_is_not_qemu_evidence",
@@ -51,6 +52,13 @@ class BootImageSkeletonValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
         self.assert_skeleton_failure(result, "missing_file", "boot/limine.conf")
 
+    def test_fails_when_limine_kernel_path_uses_bare_iso_path(self):
+        self.assertEqual("boot_image_skeleton", BootImageSkeletonValidator.name)
+        result = self.validate_fixture(mutate_limine=lambda text: text.replace("boot():/boot/kozo/kozo-kernel.elf", "/boot/kozo/kozo-kernel.elf"))
+
+        self.assertEqual(result.status, "fail")
+        self.assert_skeleton_failure(result, "missing_kernel_path", "boot/limine.conf.kernel_path")
+
     def test_fails_when_build_script_is_missing(self):
         self.assertEqual("boot_image_skeleton", BootImageSkeletonValidator.name)
         result = self.validate_fixture(remove="script")
@@ -83,7 +91,7 @@ class BootImageSkeletonValidatorTests(unittest.TestCase):
         self.assertEqual(result.meta["reason"], "missing_entry_symbol")
         self.assertEqual(result.meta["contract_field"], "linker/kernel.ld.entry_symbol")
 
-    def validate_fixture(self, *, remove: str | None = None, mutate_report=None, mutate_linker=None):
+    def validate_fixture(self, *, remove: str | None = None, mutate_report=None, mutate_linker=None, mutate_limine=None):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             paths = write_fixture_files(root)
@@ -95,6 +103,8 @@ class BootImageSkeletonValidatorTests(unittest.TestCase):
                 paths["report"].write_text(json.dumps(mutate_report(report), indent=2) + "\n")
             if mutate_linker is not None:
                 paths["linker"].write_text(mutate_linker(paths["linker"].read_text()))
+            if mutate_limine is not None:
+                paths["limine"].write_text(mutate_limine(paths["limine"].read_text()))
 
             old_paths = patch_validator_paths(paths)
             try:
@@ -123,7 +133,7 @@ def write_fixture_files(root: Path) -> dict[str, Path]:
         path.parent.mkdir(parents=True, exist_ok=True)
 
     paths["linker"].write_text("ENTRY(_start)\n.text\n.rodata\n.data\n.bss\n")
-    paths["limine"].write_text("serial: yes\nverbose: yes\nprotocol: limine\npath: /boot/kozo/kozo-kernel.elf\n")
+    paths["limine"].write_text("serial: yes\nverbose: yes\nprotocol: limine\npath: boot():/boot/kozo/kozo-kernel.elf\n")
     paths["script"].write_text("linker/kernel.ld\nboot/limine.conf\nartifacts/runtime/boot_image\n")
     paths["memory"].write_text("global memset\nglobal memmove\n")
     paths["doc"].write_text("This phase does not prove boot success.\nThis phase does not prove QEMU execution.\nartifacts/runtime/boot_image/\n")

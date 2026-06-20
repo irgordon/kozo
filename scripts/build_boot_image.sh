@@ -10,6 +10,7 @@ KERNEL_ELF="$IMAGE_ROOT/boot/kozo/kozo-kernel.elf"
 MANIFEST="$BOOT_IMAGE_DIR/manifest.json"
 PACKAGE_METADATA="$BOOT_IMAGE_DIR/package_metadata.json"
 BOOT_ISO="$BOOT_IMAGE_DIR/kozo.iso"
+ISO_CONTENTS="$BOOT_IMAGE_DIR/iso_contents.txt"
 KERNEL_ELF_REPORT="$RUNTIME_DIR/kernel_elf_report.json"
 BRIDGE_TARGET="freestanding_amd64_sysv"
 LIMINE_CMD=""
@@ -163,6 +164,23 @@ create_bootable_iso() {
     "$IMAGE_ROOT"
 }
 
+write_iso_contents() {
+  if [[ ! -f "$BOOT_ISO" ]]; then
+    : >"$ISO_CONTENTS"
+    return
+  fi
+
+  if command -v bsdtar >/dev/null 2>&1; then
+    bsdtar -tf "$BOOT_ISO" | sort >"$ISO_CONTENTS"
+    return
+  fi
+
+  (
+    cd "$IMAGE_ROOT"
+    find . -type f -print | sed 's#^\./##' | sort
+  ) >"$ISO_CONTENTS"
+}
+
 write_kernel_elf_report() {
   (
     cd "$ROOT"
@@ -215,7 +233,7 @@ PY
 }
 
 write_package_metadata() {
-  python3 - "$PACKAGE_METADATA" "$BLOCKER_CATEGORY" "$BOOT_ISO" "${MISSING_COMPONENTS[@]}" <<'PY'
+  python3 - "$PACKAGE_METADATA" "$BLOCKER_CATEGORY" "$BOOT_ISO" "$ROOT/boot/limine.conf" "$ISO_CONTENTS" "${MISSING_COMPONENTS[@]}" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -223,17 +241,51 @@ from pathlib import Path
 metadata_path = Path(sys.argv[1])
 blocker_category = sys.argv[2]
 image_path = Path(sys.argv[3])
-missing_components = sys.argv[4:]
+limine_config_path = Path(sys.argv[4])
+iso_contents_path = Path(sys.argv[5])
+missing_components = sys.argv[6:]
 relative_image_path = "artifacts/runtime/boot_image/kozo.iso"
+relative_iso_contents_path = "artifacts/runtime/boot_image/iso_contents.txt"
+
+
+def configured_kernel_path(path: Path) -> str:
+    for line in path.read_text().splitlines():
+        stripped = line.strip()
+        if stripped.startswith("path:"):
+            return stripped.split(":", 1)[1].strip()
+        if stripped.startswith("kernel_path:"):
+            return stripped.split(":", 1)[1].strip()
+    return ""
+
+
+def normalized_kernel_path(path: str) -> str:
+    if "):" in path:
+        path = path.split("):", 1)[1]
+    return path.lstrip("/")
+
+
+def iso_contents(path: Path) -> list[str]:
+    if not path.is_file():
+        return []
+    return [line.strip() for line in path.read_text().splitlines() if line.strip()]
+
+
+configured_path = configured_kernel_path(limine_config_path)
+normalized_path = normalized_kernel_path(configured_path)
+contents = iso_contents(iso_contents_path)
 
 metadata = {
     "version": 0,
-    "phase": "v0.3.6",
+    "phase": "v0.4.4",
     "image_type": "iso",
     "boot_protocol": "Limine",
     "architecture": "x86_64",
     "image_path": relative_image_path,
     "image_exists": image_path.is_file(),
+    "iso_contents": relative_iso_contents_path,
+    "configured_kernel_path": configured_path,
+    "normalized_kernel_path": normalized_path,
+    "kernel_path_present_in_iso": normalized_path in contents,
     "generated_by": "scripts/build_boot_image.sh",
     "does_not_prove": [
         "QEMU boot",
@@ -297,6 +349,7 @@ if [[ -z "$BLOCKER_CATEGORY" ]]; then
   install_limine_bootloader
   need_file "$BOOT_ISO"
 fi
+write_iso_contents
 write_manifest
 write_package_metadata
 
