@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260620T015115Z",
+  "run_id": "verify-20260620T020935Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -298,23 +298,22 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
-    "docs/BOOT_TOOLING.md",
-    "docs/COMPATIBILITY.md",
+    "boot/limine.conf",
+    "docs/BOOT.md",
+    "docs/BOOT_BLOCKERS.md",
+    "docs/BOOT_IMAGE.md",
     "docs/PHASEMAP.md",
     "docs/RELEASE_EVIDENCE.md",
-    "docs/REQUIRED_CHECKS.md",
     "docs/ROADMAP.md",
+    "docs/RUNTIME_EVIDENCE.md",
     "docs/generated/governance_index.md",
-    "harness/codes.py",
-    "harness/registry.py",
-    "harness/validators.py",
-    "harness/validators_impl/host_dependency_portability.py",
+    "harness/validators_impl/boot_image_packaging.py",
+    "harness/validators_impl/boot_image_skeleton.py",
     "harness/validators_impl/validator_coverage.py",
-    "schemas/agent_context.schema.json",
-    "schemas/latest_verify.schema.json",
     "scripts/build_boot_image.sh",
     "tasks/todo.json",
-    "tests/test_host_dependency_portability.py"
+    "tests/test_boot_image_packaging.py",
+    "tests/test_boot_image_skeleton.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -330,5 +329,5 @@
     "artifacts/runtime/qemu_smoke.stderr.log",
     "artifacts/runtime/qemu_smoke.metadata.json"
   ],
-  "generated_at": "2026-06-20T01:51:15Z"
+  "generated_at": "2026-06-20T02:09:35Z"
 }
