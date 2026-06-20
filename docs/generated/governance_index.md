@@ -12,18 +12,18 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.4.2`
+* Version: `v0.4.3`
 * Date: `2026-06-20`
-* Status: Kernel binary loadability diagnosis.
+* Status: Host dependency portability gate.
 
 ## Verification status
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 38
+* Total checks: 39
 * Failed checks: 0
-* Run ID: `verify-20260620T013415Z`
-* Generated at: `2026-06-20T01:34:15Z`
+* Run ID: `verify-20260620T015105Z`
+* Generated at: `2026-06-20T01:51:05Z`
 
 ## Registered validators
 
@@ -62,11 +62,12 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 31 | `boot_image_packaging` |
 | 32 | `boot_tooling` |
 | 33 | `kernel_loadability` |
-| 34 | `qemu_smoke_evidence` |
-| 35 | `return_path_proof` |
-| 36 | `execution_proof` |
-| 37 | `validator_coverage` |
-| 38 | `evidence` |
+| 34 | `host_dependency_portability` |
+| 35 | `qemu_smoke_evidence` |
+| 36 | `return_path_proof` |
+| 37 | `execution_proof` |
+| 38 | `validator_coverage` |
+| 39 | `evidence` |
 
 ## Active contracts
 
@@ -104,7 +105,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 38
+* Check count: 39
 * Failure count: 0
 
 ## Non-goals

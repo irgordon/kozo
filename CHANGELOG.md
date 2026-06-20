@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.4.3 - 2026-06-20
+
+**Status:** Host dependency portability gate.
+
+### Added
+
+* Added `host_dependency_portability` validation for host-specific path assumptions, pinned Rust toolchain selection, CI/Linux tooling declarations, boot tooling environment-variable support, QEMU fail-closed behavior, and portability documentation.
+* Added focused negative coverage for hardcoded `/Users/` paths, hardcoded local user names, hardcoded Apple Rust toolchain paths, missing CI xorriso install, missing CI Limine acquisition, missing CI QEMU install, missing Rust toolchain selection, allowed historical changelog references, and named diagnostics.
+
+### Changed
+
+* Removed local Homebrew-style Limine artifact fallback paths from `scripts/build_boot_image.sh`; boot tooling now uses repository-relative artifacts, command discovery, or explicit `LIMINE_DIR`, `LIMINE_INSTALL`, `LIMINE`, and `XORRISO` environment variables.
+* Documented CI/Linux as the authoritative portability proof and local macOS development as a convenience path only.
+* Updated required checks, release evidence, boot tooling, compatibility, phase map, and roadmap docs for the host dependency portability gate.
+
+### Notes
+
+* This change does not require Apple Silicon.
+* This change does not depend on user-specific absolute paths.
+* This change does not change runtime behavior, ABI contracts, or syscall behavior.
+* This change does not claim QEMU boot, kernel entry, hardware trap execution, Linux compatibility, POSIX compatibility, general userspace execution, process model behavior, VFS behavior, scheduler behavior, ELF loading, file descriptor behavior, or production readiness.
+
 ## v0.4.2 - 2026-06-20
 
 **Status:** Kernel binary loadability diagnosis.

@@ -525,6 +525,21 @@ _VALIDATOR_TEST_CONTRACTS = {
             "diagnostic_names_field",
         ),
     ),
+    "host_dependency_portability": ValidatorTestContract(
+        "host_dependency_portability",
+        _TESTS_DIR / "test_host_dependency_portability.py",
+        "HostDependencyPortabilityValidator",
+        (
+            "hardcoded_users_path",
+            "hardcoded_user_name",
+            "hardcoded_apple_toolchain",
+            "missing_ci_xorriso_install",
+            "missing_ci_limine_acquisition",
+            "missing_ci_qemu_install",
+            "missing_rust_toolchain_selection",
+            "diagnostic_names_field",
+        ),
+    ),
     "qemu_smoke_evidence": ValidatorTestContract(
         "qemu_smoke_evidence",
         _TESTS_DIR / "test_qemu_smoke_evidence.py",

@@ -66,10 +66,7 @@ find_limine_artifact() {
     fi
   fi
   for candidate in \
-    "$ROOT/boot/limine/$name" \
-    "/opt/homebrew/share/limine/$name" \
-    "/usr/local/share/limine/$name" \
-    "/usr/share/limine/$name"; do
+    "$ROOT/boot/limine/$name"; do
     if [[ -f "$candidate" ]]; then
       printf "%s\n" "$candidate"
       return

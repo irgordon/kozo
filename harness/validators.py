@@ -37,6 +37,7 @@ from harness.validators_impl.boot_image_skeleton import BootImageSkeletonValidat
 from harness.validators_impl.boot_image_packaging import BootImagePackagingValidator
 from harness.validators_impl.boot_tooling import BootToolingValidator
 from harness.validators_impl.kernel_loadability import KernelLoadabilityValidator
+from harness.validators_impl.host_dependency_portability import HostDependencyPortabilityValidator
 from harness.validators_impl.qemu_smoke_evidence import QemuSmokeEvidenceValidator
 from harness.validators_impl.return_path_proof import ReturnPathProofValidator
 from harness.validators_impl.execution_proof import ExecutionProofValidator
@@ -77,6 +78,7 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "boot_image_packaging": BootImagePackagingValidator,
     "boot_tooling": BootToolingValidator,
     "kernel_loadability": KernelLoadabilityValidator,
+    "host_dependency_portability": HostDependencyPortabilityValidator,
     "qemu_smoke_evidence": QemuSmokeEvidenceValidator,
     "return_path_proof": ReturnPathProofValidator,
     "execution_proof": ExecutionProofValidator,

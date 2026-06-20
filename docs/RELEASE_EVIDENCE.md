@@ -42,6 +42,12 @@ This document does not claim process model, VFS, scheduler, ELF loading, or file
 
 This document does not make generated reports authoritative.
 
+CI/Linux is the authoritative portability proof.
+
+Local macOS development is a convenience path.
+
+No build or verification script may depend on user-specific absolute paths.
+
 ---
 
 # 4. Required Release Artifacts
@@ -205,6 +211,10 @@ Full CI also runs the boot blocker report generator through `scripts/verify.sh` 
 Full CI installs xorriso, acquires pinned Limine source tooling, runs `scripts/build_boot_image.sh`, and should upload `artifacts/runtime/boot_image/package_metadata.json` plus `artifacts/runtime/boot_image/kozo.iso` when the image exists.
 
 Full CI installs QEMU, runs `scripts/qemu_smoke.sh`, and should upload `artifacts/runtime/qemu_smoke.log` plus `artifacts/runtime/qemu_smoke.metadata.json` whether the result is pass or an exact blocker.
+
+Release review must treat CI/Linux as the authoritative portability proof for declared build and verification dependencies. Local macOS development may provide convenience evidence, but local host state must not replace CI dependency declarations or CI artifact review.
+
+Release evidence must not depend on user-specific absolute paths. Required tools must be declared in documentation and supplied by CI, controlled environment variables, command discovery, or repository-relative paths.
 
 The lint workflow is static-check only. It does not own runtime smoke evidence unless it is changed to run full verification.
 

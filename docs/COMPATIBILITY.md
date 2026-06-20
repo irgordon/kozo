@@ -64,6 +64,12 @@ Generated reports alone are not compatibility evidence.
 
 Verification passing is not production readiness.
 
+CI/Linux is the authoritative portability proof for declared build and verification dependencies.
+
+Local macOS development is a convenience path and does not create a compatibility claim.
+
+No build or verification script may depend on user-specific absolute paths.
+
 Forbidden broad claims must not appear in authoritative docs, generated reports, README text, changelog entries, or release summaries.
 
 ---
@@ -97,6 +103,8 @@ Evidence must be tied to checked-in tests, validators, artifacts, or documented 
 Evidence must not rely on marketing language or generated reports alone.
 
 Verification passing is not production readiness.
+
+Host portability evidence proves only that declared tools and controlled paths can build or verify the scoped repository surface. It does not prove Linux compatibility, POSIX completeness, general userspace execution, or production readiness.
 
 ---
 

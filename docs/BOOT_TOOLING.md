@@ -14,6 +14,12 @@ It records the acquisition path for Limine and ISO generation tooling.
 
 This document does not claim that KOZO currently produces a bootable ISO in every environment.
 
+CI/Linux is the authoritative portability proof for boot image tooling.
+
+Local macOS development is a convenience path, not a release authority.
+
+No build or verification script may depend on user-specific absolute paths.
+
 ---
 
 # 2. Authority
@@ -102,6 +108,8 @@ The CI path installs xorriso from the GitHub Actions Ubuntu package repository a
 
 Local development environments may use the same Limine release, a platform package, or another reviewed source build, but release evidence must record the exact tool versions used.
 
+Local development may use macOS, Linux, or another host only as a convenience path. Missing local Limine, xorriso, or QEMU tooling must fail closed and must not redefine the release blocker when CI/Linux provides the declared tooling.
+
 ---
 
 # 6. Installation Methods
@@ -134,6 +142,8 @@ CI may produce `artifacts/runtime/boot_image/kozo.iso` when the pinned toolchain
 
 If ISO generation fails, CI must fail closed or produce blocker metadata without making a boot claim.
 
+CI/Linux is the authoritative portability proof because it installs the declared system packages, acquires pinned Limine source tooling, exports controlled `LIMINE_DIR`, `LIMINE`, and `XORRISO` paths, and runs the governed scripts from repository-relative paths.
+
 ---
 
 # 7. Tool Provenance
@@ -147,6 +157,8 @@ Opaque vendored binaries are discouraged.
 The CI path acquires Limine from a pinned upstream source release and builds it during the workflow.
 
 The CI path does not commit or vendor Limine binaries.
+
+No build or verification script may depend on user-specific absolute paths. Tool discovery must use declared environment variables, command discovery, repository-relative paths, or CI-provided paths.
 
 If vendoring ever becomes necessary, the repository must record:
 
