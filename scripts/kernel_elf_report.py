@@ -67,8 +67,11 @@ class ProgramHeader:
 @dataclass(frozen=True)
 class LoadLayout:
     minimum_load_virtual_address: int | None
+    minimum_load_physical_address: int | None
     has_lower_half_load_segment: bool
+    all_load_segments_higher_half: bool
     entry_is_lower_half: bool
+    entry_address_class: str
     blocker_category: str
 
 
@@ -115,13 +118,24 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "entry_symbol_address": _hex(symbol_address) if symbol_address is not None else "",
         "entry_symbol_matches_entry": symbol_address == header.entry,
         "entry_is_lower_half": layout.entry_is_lower_half,
+        "entry_address_class": layout.entry_address_class,
         "program_header_count": header.program_header_count,
         "section_count": header.section_header_count,
         "load_segments": [segment_record(segment) for segment in load_segments],
+        "virtual_base": _hex(layout.minimum_load_virtual_address)
+        if layout.minimum_load_virtual_address is not None
+        else "",
+        "physical_load_base": _hex(layout.minimum_load_physical_address)
+        if layout.minimum_load_physical_address is not None
+        else "",
         "minimum_load_virtual_address": _hex(layout.minimum_load_virtual_address)
         if layout.minimum_load_virtual_address is not None
         else "",
+        "minimum_load_physical_address": _hex(layout.minimum_load_physical_address)
+        if layout.minimum_load_physical_address is not None
+        else "",
         "has_lower_half_load_segment": layout.has_lower_half_load_segment,
+        "all_load_segments_higher_half": layout.all_load_segments_higher_half,
         "load_layout_blocker": layout.blocker_category,
         "detected_issues": issues,
         "blocker_category": blocker_category(issues),
@@ -215,13 +229,18 @@ def parse_symbol_address(nm_output: str, symbol_name: str) -> int | None:
 
 def load_layout(header: ElfHeader, load_segments: list[ProgramHeader]) -> LoadLayout:
     minimum_vaddr = minimum_load_virtual_address(load_segments)
+    minimum_paddr = minimum_load_physical_address(load_segments)
     has_lower_load = any(is_lower_half(segment.virtual_address) for segment in load_segments)
+    all_higher_load = bool(load_segments) and not has_lower_load
     entry_is_lower = is_lower_half(header.entry)
     blocker = LOWER_HALF_PHDR_BLOCKER if has_lower_load else "none"
     return LoadLayout(
         minimum_load_virtual_address=minimum_vaddr,
+        minimum_load_physical_address=minimum_paddr,
         has_lower_half_load_segment=has_lower_load,
+        all_load_segments_higher_half=all_higher_load,
         entry_is_lower_half=entry_is_lower,
+        entry_address_class=address_class(header.entry),
         blocker_category=blocker,
     )
 
@@ -230,6 +249,20 @@ def minimum_load_virtual_address(load_segments: list[ProgramHeader]) -> int | No
     if not load_segments:
         return None
     return min(segment.virtual_address for segment in load_segments)
+
+
+def minimum_load_physical_address(load_segments: list[ProgramHeader]) -> int | None:
+    if not load_segments:
+        return None
+    return min(segment.physical_address for segment in load_segments)
+
+
+def address_class(address: int) -> str:
+    if address == 0:
+        return "zero"
+    if is_lower_half(address):
+        return "lower-half"
+    return "higher-half"
 
 
 def is_lower_half(address: int) -> bool:
@@ -300,11 +333,16 @@ def malformed_report(kernel_elf: Path, linker_script: Path, issue: str) -> dict[
         "entry_symbol_address": "",
         "entry_symbol_matches_entry": False,
         "entry_is_lower_half": False,
+        "entry_address_class": "zero",
         "program_header_count": 0,
         "section_count": 0,
         "load_segments": [],
+        "virtual_base": "",
+        "physical_load_base": "",
         "minimum_load_virtual_address": "",
+        "minimum_load_physical_address": "",
         "has_lower_half_load_segment": False,
+        "all_load_segments_higher_half": False,
         "load_layout_blocker": "invalid_kernel_elf",
         "detected_issues": ["invalid_kernel_elf"],
         "blocker_category": "invalid_kernel_elf",

@@ -40,6 +40,8 @@ v0.4.4 fixes the Limine path semantics from a bare `/boot/kozo/kozo-kernel.elf` 
 
 v0.4.5 classifies Limine's lower-half program-header rejection as `limine_lower_half_phdr` after CI evidence showed Limine could open the configured kernel path but rejected the ELF load layout.
 
+v0.4.7 moves the kernel ELF PT_LOAD virtual addresses to the higher half and preserves low physical load addresses through linker `AT(...)` placement. Local ELF loadability evidence no longer reports `limine_lower_half_phdr`; the next CI QEMU artifact must determine the next observed blocker or marker state.
+
 ---
 
 # 2. Verified Blocker
@@ -99,6 +101,8 @@ The normalized configured path is `boot/kozo/kozo-kernel.elf`, and packaged imag
 The v0.4.2 kernel ELF report records the staged kernel ELF as an x86_64 executable with `_start` matching the ELF entry point and PT_LOAD segments present. This does not prove Limine loaded or executed the kernel.
 
 The latest inspected pre-v0.4.5 CI artifact reached Limine, opened `boot():/boot/kozo/kozo-kernel.elf`, and failed with `PANIC: elf: Lower half PHDRs are not allowed`. The current evidence-backed load-layout blocker is `limine_lower_half_phdr`; kernel entry has not been reached.
+
+The v0.4.7 local kernel ELF report records `_start` at `0xffffffff80200000`, PT_LOAD virtual addresses starting at `0xffffffff80200000`, low physical load addresses starting at `0x200000`, and `load_layout_blocker` as `none`. This does not prove Limine loaded or entered the kernel; it only clears the local lower-half PHDR evidence.
 
 ---
 

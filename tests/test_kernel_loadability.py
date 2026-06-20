@@ -100,6 +100,41 @@ class KernelLoadabilityValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
         self.assert_kernel_failure(result, "blocker_mismatch", "boot_blocker.blocker_category")
 
+    def test_fails_when_mixed_load_layout_has_no_blocker(self):
+        self.assertEqual("kernel_loadability", KernelLoadabilityValidator.name)
+        result = self.validate_fixture(
+            mutate_report=lambda report: mixed_load_layout_report(report) | {
+                "all_load_segments_higher_half": True,
+                "load_layout_blocker": "none",
+            },
+            mutate_blocker=lambda blocker: blocker | {"blocker_category": "limine_lower_half_phdr"},
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_kernel_failure(
+            result,
+            "load_layout_mismatch",
+            "kernel_loadability.all_load_segments_higher_half",
+        )
+
+    def test_fails_when_vma_lma_summary_is_missing(self):
+        self.assertEqual("kernel_loadability", KernelLoadabilityValidator.name)
+        result = self.validate_fixture(mutate_report=lambda report: report | {"virtual_base": ""})
+
+        self.assertEqual(result.status, "fail")
+        self.assert_kernel_failure(result, "missing_load_layout", "kernel_loadability.virtual_base")
+
+    def test_fails_when_higher_half_summary_mismatches(self):
+        self.assertEqual("kernel_loadability", KernelLoadabilityValidator.name)
+        result = self.validate_fixture(mutate_report=lambda report: report | {"all_load_segments_higher_half": False})
+
+        self.assertEqual(result.status, "fail")
+        self.assert_kernel_failure(
+            result,
+            "load_layout_mismatch",
+            "kernel_loadability.all_load_segments_higher_half",
+        )
+
     def test_fails_when_boot_blocker_does_not_match_elf_issue(self):
         self.assertEqual("kernel_loadability", KernelLoadabilityValidator.name)
         result = self.validate_fixture(
@@ -112,9 +147,16 @@ class KernelLoadabilityValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
         self.assert_kernel_failure(result, "blocker_mismatch", "boot_blocker.blocker_category")
 
-    def test_fails_when_clean_elf_has_wrong_boot_blocker(self):
+    def test_accepts_clean_elf_with_next_qemu_blocker(self):
         self.assertEqual("kernel_loadability", KernelLoadabilityValidator.name)
         result = self.validate_fixture(mutate_blocker=lambda blocker: blocker | {"blocker_category": "serial_not_initialized"})
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
+    def test_fails_when_clean_elf_has_stale_lower_half_blocker(self):
+        self.assertEqual("kernel_loadability", KernelLoadabilityValidator.name)
+        result = self.validate_fixture(mutate_blocker=lambda blocker: blocker | {"blocker_category": "limine_lower_half_phdr"})
 
         self.assertEqual(result.status, "fail")
         self.assert_kernel_failure(result, "blocker_mismatch", "boot_blocker.blocker_category")
@@ -194,6 +236,7 @@ def valid_report() -> dict[str, object]:
         "entry_symbol_address": "0xffffffff80200000",
         "entry_symbol_matches_entry": True,
         "entry_is_lower_half": False,
+        "entry_address_class": "higher-half",
         "program_header_count": 6,
         "section_count": 13,
         "load_segments": [
@@ -208,8 +251,12 @@ def valid_report() -> dict[str, object]:
                 "alignment": "0x1000",
             },
         ],
+        "virtual_base": "0xffffffff80200000",
+        "physical_load_base": "0x200000",
         "minimum_load_virtual_address": "0xffffffff80200000",
+        "minimum_load_physical_address": "0x200000",
         "has_lower_half_load_segment": False,
+        "all_load_segments_higher_half": True,
         "load_layout_blocker": "none",
         "detected_issues": [],
         "blocker_category": "none",
@@ -244,6 +291,7 @@ def lower_half_phdr_report() -> dict[str, object]:
             "entry_address": "0x200000",
             "entry_symbol_address": "0x200000",
             "entry_is_lower_half": True,
+            "entry_address_class": "lower-half",
             "load_segments": [
                 {
                     "type": "PT_LOAD",
@@ -256,8 +304,12 @@ def lower_half_phdr_report() -> dict[str, object]:
                     "alignment": "0x1000",
                 },
             ],
+            "virtual_base": "0x200000",
+            "physical_load_base": "0x200000",
             "minimum_load_virtual_address": "0x200000",
+            "minimum_load_physical_address": "0x200000",
             "has_lower_half_load_segment": True,
+            "all_load_segments_higher_half": False,
             "load_layout_blocker": "limine_lower_half_phdr",
             "detected_issues": ["limine_lower_half_phdr"],
             "blocker_category": "limine_lower_half_phdr",
@@ -265,6 +317,43 @@ def lower_half_phdr_report() -> dict[str, object]:
         }
     )
     return report
+
+
+def mixed_load_layout_report(report: dict[str, object]) -> dict[str, object]:
+    segments = [
+        {
+            "type": "PT_LOAD",
+            "flags": "r-x",
+            "offset": "0x1000",
+            "virtual_address": "0xffffffff80200000",
+            "physical_address": "0x200000",
+            "file_size": "0x2f82",
+            "memory_size": "0x2f82",
+            "alignment": "0x1000",
+        },
+        {
+            "type": "PT_LOAD",
+            "flags": "rw-",
+            "offset": "0x4000",
+            "virtual_address": "0x204000",
+            "physical_address": "0x204000",
+            "file_size": "0x1000",
+            "memory_size": "0x1000",
+            "alignment": "0x1000",
+        },
+    ]
+    return report | {
+        "load_segments": segments,
+        "virtual_base": "0x204000",
+        "physical_load_base": "0x200000",
+        "minimum_load_virtual_address": "0x204000",
+        "minimum_load_physical_address": "0x200000",
+        "has_lower_half_load_segment": True,
+        "all_load_segments_higher_half": False,
+        "load_layout_blocker": "limine_lower_half_phdr",
+        "detected_issues": ["limine_lower_half_phdr"],
+        "blocker_category": "limine_lower_half_phdr",
+    }
 
 
 def valid_blocker() -> dict[str, object]:

@@ -42,6 +42,8 @@ v0.4.4 updates the Limine kernel path to use explicit `boot():` resource semanti
 
 v0.4.5 records the next CI-observed Limine blocker: the configured kernel path is opened, but Limine rejects the current lower-half ELF program-header layout with `limine_lower_half_phdr`.
 
+v0.4.7 moves the kernel ELF virtual load layout to the higher half while preserving low physical load addresses in the linker script. Local ELF evidence no longer reports lower-half PT_LOAD segments, but CI QEMU evidence must still prove whether Limine advances beyond the previous `limine_lower_half_phdr` blocker.
+
 Remaining blocker: `missing_iso_generation_tooling`.
 
 The local blocker is `missing_iso_generation_tooling`.
@@ -68,7 +70,7 @@ Latest inspected post-v0.4.3 CI artifact diagnosis: `kernel_not_loaded`. QEMU la
 
 Latest inspected pre-v0.4.5 CI artifact diagnosis: `limine_lower_half_phdr`. QEMU launched the ISO, Limine was reached, Limine opened the configured kernel path, and Limine rejected the kernel ELF with `PANIC: elf: Lower half PHDRs are not allowed` before any KOZO marker appeared.
 
-Current v0.4.5 kernel ELF diagnosis: structurally parseable by local ELF inspection but Limine-incompatible because PT_LOAD virtual addresses are in the lower half. The staged kernel ELF is an x86_64 executable, `_start` matches the ELF entry point, and PT_LOAD segments are present. This does not prove Limine loaded or executed the kernel.
+Current v0.4.7 kernel ELF diagnosis: structurally parseable by local ELF inspection, with `_start` and all PT_LOAD virtual addresses in the higher half. The staged kernel ELF is an x86_64 executable, `_start` matches the ELF entry point, PT_LOAD segments are present, and physical load addresses remain low through linker `AT(...)` placement. This does not prove Limine loaded or executed the kernel.
 
 Selected boot protocol: Limine.
 
@@ -118,7 +120,6 @@ The concrete remaining missing components are:
 * local Limine bootloader artifacts
 * bootable ISO artifact when not produced by CI
 * validated QEMU serial smoke execution
-* a higher-half or otherwise Limine-compatible kernel ELF load layout
 * a future CI QEMU run that proves Limine can load and enter the kernel executable path
 
 Until those exist, KOZO must not claim QEMU boot evidence.
@@ -143,7 +144,7 @@ The current source surfaces relevant to future boot work are:
 
 `kernel/arch/x86_64/boot.asm` defines `_start`, and `scripts/build_boot_image.sh` links a kernel ELF for the Limine image skeleton.
 
-`artifacts/runtime/kernel_elf_report.json` records that the staged kernel ELF has an x86_64 executable format, `_start` entry alignment, PT_LOAD segments, PT_LOAD virtual addresses, lower-half layout detection, and the current `limine_lower_half_phdr` blocker. That report does not prove Limine has loaded the ELF or transferred control to `_start`.
+`artifacts/runtime/kernel_elf_report.json` records that the staged kernel ELF has an x86_64 executable format, `_start` entry alignment, PT_LOAD segments, PT_LOAD virtual and physical addresses, higher-half layout summary, and the current load-layout blocker. That report does not prove Limine has loaded the ELF or transferred control to `_start`.
 
 `kernel/main.odin` exports `kernel_entry` and emits `KOZO_BOOT_SMOKE_OK` after serial initialization, but no local bootable ISO transfers control to it through a proven loader path.
 

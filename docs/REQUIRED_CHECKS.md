@@ -134,7 +134,7 @@ The lint workflow does not require runtime smoke evidence because `.github/workf
 
 QEMU smoke evidence is required in full CI through `scripts/qemu_smoke.sh` and `qemu_smoke_evidence`. A blocked QEMU smoke result is acceptable only when metadata records an exact blocker and preserves no-QEMU-boot claims. A QEMU boot claim requires passing metadata and `KOZO_BOOT_SMOKE_OK` in `artifacts/runtime/qemu_smoke.log`.
 
-The CI-observed timeout state must be narrowed when possible. v0.4.0 QEMU smoke metadata may report `limine_not_reached`, `kernel_not_loaded`, `kernel_entry_not_reached`, `serial_not_initialized`, `marker_not_emitted`, or fallback `qemu_timeout`; all remain blockers and do not authorize a QEMU boot claim.
+The CI-observed timeout or loader state must be narrowed when possible. QEMU smoke metadata may report `limine_not_reached`, `kernel_not_loaded`, `kernel_entry_not_reached`, `serial_not_initialized`, `marker_not_emitted`, `limine_lower_half_phdr`, or fallback `qemu_timeout`; all remain blockers and do not authorize a QEMU boot claim.
 
 Full verification runs `scripts/build_boot_image.sh` to produce `artifacts/runtime/boot_image/package_metadata.json`; while packaging is blocked, that metadata is blocker evidence rather than boot evidence.
 

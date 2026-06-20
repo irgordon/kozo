@@ -48,6 +48,26 @@ _ISSUE_BLOCKERS = {
     "limine_lower_half_phdr",
 }
 
+_BUILD_EXTERNAL_BLOCKERS = {
+    "missing_iso_generation_tooling",
+    "missing_qemu_tooling",
+    "missing_boot_image",
+    "qemu_launch_failed",
+}
+
+_POST_LOADABILITY_BLOCKERS = {
+    "none",
+    "kernel_not_loaded",
+    "kernel_entry_not_reached",
+    "serial_not_initialized",
+    "marker_not_emitted",
+    "qemu_timeout",
+    "missing_qemu_serial_evidence",
+    *_BUILD_EXTERNAL_BLOCKERS,
+}
+
+_ENTRY_ADDRESS_CLASSES = {"zero", "lower-half", "higher-half"}
+
 
 @dataclass(frozen=True)
 class KernelLoadabilityIssue:
@@ -147,17 +167,77 @@ def _load_layout_issue(report: dict[str, object]) -> KernelLoadabilityIssue | No
             "kernel_loadability.minimum_load_virtual_address",
             "Kernel ELF report must record the minimum PT_LOAD virtual address",
         )
+    if not _nonzero_hex_string(report.get("virtual_base")):
+        return _issue(
+            "missing_load_layout",
+            "kernel_loadability.virtual_base",
+            "Kernel ELF report must record the kernel virtual base",
+        )
+    if report.get("virtual_base") != minimum_vaddr:
+        return _issue(
+            "load_layout_mismatch",
+            "kernel_loadability.virtual_base",
+            "Kernel ELF virtual base must match the minimum PT_LOAD virtual address",
+        )
+    if not _nonzero_hex_string(report.get("physical_load_base")):
+        return _issue(
+            "missing_load_layout",
+            "kernel_loadability.physical_load_base",
+            "Kernel ELF report must record the physical load base",
+        )
+    if not _nonzero_hex_string(report.get("minimum_load_physical_address")):
+        return _issue(
+            "missing_load_layout",
+            "kernel_loadability.minimum_load_physical_address",
+            "Kernel ELF report must record the minimum PT_LOAD physical address",
+        )
+    if report.get("physical_load_base") != report.get("minimum_load_physical_address"):
+        return _issue(
+            "load_layout_mismatch",
+            "kernel_loadability.physical_load_base",
+            "Kernel ELF physical load base must match the minimum PT_LOAD physical address",
+        )
     if not isinstance(report.get("has_lower_half_load_segment"), bool):
         return _issue(
             "missing_load_layout",
             "kernel_loadability.has_lower_half_load_segment",
             "Kernel ELF report must record whether PT_LOAD segments are lower-half",
         )
+    if not isinstance(report.get("all_load_segments_higher_half"), bool):
+        return _issue(
+            "missing_load_layout",
+            "kernel_loadability.all_load_segments_higher_half",
+            "Kernel ELF report must record whether all PT_LOAD segments are higher-half",
+        )
+    if report.get("all_load_segments_higher_half") == report.get("has_lower_half_load_segment"):
+        return _issue(
+            "load_layout_mismatch",
+            "kernel_loadability.all_load_segments_higher_half",
+            "Kernel ELF higher-half summary must be the inverse of lower-half PT_LOAD detection",
+        )
     if not isinstance(report.get("entry_is_lower_half"), bool):
         return _issue(
             "missing_load_layout",
             "kernel_loadability.entry_is_lower_half",
             "Kernel ELF report must record whether the entry point is lower-half",
+        )
+    if report.get("entry_address_class") not in _ENTRY_ADDRESS_CLASSES:
+        return _issue(
+            "missing_load_layout",
+            "kernel_loadability.entry_address_class",
+            "Kernel ELF report must classify the entry address as zero, lower-half, or higher-half",
+        )
+    if report.get("entry_is_lower_half") is True and report.get("entry_address_class") != "lower-half":
+        return _issue(
+            "load_layout_mismatch",
+            "kernel_loadability.entry_address_class",
+            "Kernel ELF entry address class must match lower-half entry detection",
+        )
+    if report.get("entry_is_lower_half") is False and report.get("entry_address_class") == "lower-half":
+        return _issue(
+            "load_layout_mismatch",
+            "kernel_loadability.entry_address_class",
+            "Kernel ELF entry address class must match lower-half entry detection",
         )
     expected_blocker = "limine_lower_half_phdr" if report.get("has_lower_half_load_segment") is True else "none"
     if report.get("load_layout_blocker") != expected_blocker:
@@ -191,12 +271,11 @@ def _blocker_category_issue(report: dict[str, object]) -> KernelLoadabilityIssue
 def _blocker_report_issue(report: dict[str, object], blocker_report: dict[str, object]) -> KernelLoadabilityIssue | None:
     report_blocker = report.get("blocker_category")
     boot_blocker = blocker_report.get("blocker_category")
-    external_blockers = {"missing_iso_generation_tooling", "missing_qemu_tooling", "missing_boot_image", "qemu_launch_failed"}
-    if report_blocker in _ISSUE_BLOCKERS and boot_blocker in external_blockers:
+    if report_blocker in _ISSUE_BLOCKERS and boot_blocker in _BUILD_EXTERNAL_BLOCKERS:
         return None
     if report_blocker in _ISSUE_BLOCKERS and boot_blocker != report_blocker:
         return _issue("blocker_mismatch", "boot_blocker.blocker_category", "Boot blocker report must narrow to the kernel ELF issue when the ELF report detects one")
-    if report_blocker == "none" and boot_blocker not in {"kernel_not_loaded", "missing_iso_generation_tooling"}:
+    if report_blocker == "none" and boot_blocker not in _POST_LOADABILITY_BLOCKERS:
         return _issue("blocker_mismatch", "boot_blocker.blocker_category", "Boot blocker report must preserve the external load blocker when the kernel ELF itself is structurally loadable")
     return None
 

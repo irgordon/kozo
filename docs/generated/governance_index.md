@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.4.6`
+* Version: `v0.4.7`
 * Date: `2026-06-20`
-* Status: Codebase structural audit.
+* Status: Higher-half linker transition.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 39
 * Failed checks: 0
-* Run ID: `verify-20260620T115900Z`
-* Generated at: `2026-06-20T11:59:00Z`
+* Run ID: `verify-20260620T123752Z`
+* Generated at: `2026-06-20T12:37:52Z`
 
 ## Registered validators
 

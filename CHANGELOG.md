@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.4.7 - 2026-06-20
+
+**Status:** Higher-half linker transition.
+
+### Changed
+
+* Updated `linker/kernel.ld` so the kernel ELF uses higher-half virtual addresses while preserving low physical load addresses through explicit `AT(...)` section placement.
+* Updated `scripts/kernel_elf_report.py` to record virtual base, physical load base, minimum PT_LOAD physical address, higher-half PT_LOAD summary, and entry address class.
+* Updated `kernel_loadability` validation and focused tests so lower-half PT_LOAD layouts remain rejected while clean higher-half ELF loadability evidence may hand off to later QEMU smoke blockers.
+* Regenerated `artifacts/runtime/kernel_elf_report.json` so local ELF evidence records `_start` and all PT_LOAD virtual addresses in the higher half.
+
+### Notes
+
+* Local ELF inspection no longer reports `limine_lower_half_phdr`; CI QEMU evidence must still prove whether Limine advances beyond that blocker.
+* This change does not claim QEMU boot.
+* This change does not claim kernel entry.
+* This change does not claim serial initialization.
+* This change does not claim hardware trap execution.
+* This change does not alter ABI contracts or syscall behavior.
+* This change does not claim Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, general ELF loading, file descriptor behavior, or production readiness.
+
 ## v0.4.6 - 2026-06-20
 
 **Status:** Codebase structural audit.

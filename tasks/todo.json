@@ -1869,6 +1869,7 @@
     "Added v0.4.4 Limine ISO/kernel load semantics so the configured boot(): path, normalized ISO path, and ISO contents visibility are recorded and validated without claiming QEMU boot or kernel entry.",
     "Moved release planning documents under docs/ and updated active references so governance planning documents live with the rest of the governance document set.",
     "Added v0.4.5 Limine ELF load layout classification so Limine lower-half PHDR rejection narrows to limine_lower_half_phdr without changing linker layout, runtime behavior, ABI contracts, syscall behavior, or compatibility claims.",
-    "Added v0.4.6 codebase structural audit documentation before the higher-half linker/entry transition, documenting duplicated boot taxonomy, stale release/check blocker wording, and transition coupling risks without changing runtime, ABI, syscall, linker, or compatibility behavior."
+    "Added v0.4.6 codebase structural audit documentation before the higher-half linker/entry transition, documenting duplicated boot taxonomy, stale release/check blocker wording, and transition coupling risks without changing runtime, ABI, syscall, linker, or compatibility behavior.",
+    "Added v0.4.7 higher-half linker transition so the kernel ELF records higher-half PT_LOAD virtual addresses with low physical load addresses, clears the local limine_lower_half_phdr loadability report, and preserves no-QEMU-boot, no-kernel-entry, ABI, syscall, and compatibility claim boundaries until CI QEMU evidence advances."
   ]
 }

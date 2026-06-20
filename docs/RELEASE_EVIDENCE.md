@@ -128,6 +128,8 @@ If Limine reaches the boot entry but fails to open or load the configured kernel
 
 If Limine opens the configured kernel executable but reports `Lower half PHDRs are not allowed`, QEMU smoke evidence must report `limine_lower_half_phdr`.
 
+The kernel ELF loadability report must record virtual base, physical load base, PT_LOAD virtual and physical addresses, entry address class, and the load-layout blocker. A report with no lower-half PT_LOAD blocker does not by itself prove QEMU boot, Limine handoff, kernel entry, serial initialization, hardware trap execution, compatibility, userspace behavior, or production readiness.
+
 For v0.4.2 and later, release review must include `artifacts/runtime/kernel_elf_report.json` when kernel loadability is under review. That report may prove ELF structure, entry, PT_LOAD segment presence, and v0.4.5 load-layout classification, but it does not prove Limine loaded the ELF or executed kernel code.
 
 For v0.4.4 and later, release review must include `artifacts/runtime/boot_image/iso_contents.txt` when ISO packaging succeeds so reviewers can confirm the configured Limine path normalizes to a file visible in the ISO contents.
@@ -157,6 +159,8 @@ The v0.4.5 Limine lower-half PHDR blocker is:
 ```text
 limine_lower_half_phdr
 ```
+
+The v0.4.7 kernel ELF loadability report is expected to show higher-half PT_LOAD virtual addresses and `load_layout_blocker` as `none` before CI QEMU evidence is interpreted as a later entry, serial, marker, or timeout blocker.
 
 The current packaging metadata records the missing ISO generation tooling blocker:
 
