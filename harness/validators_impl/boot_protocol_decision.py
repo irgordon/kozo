@@ -11,8 +11,8 @@ _ADR_PATH = _ROOT / "docs" / "decisions" / "0001-boot-protocol.md"
 _BOOT_PROTOCOL_PATH = _ROOT / "docs" / "BOOT_PROTOCOL.md"
 _BOOT_DOC_PATH = _ROOT / "docs" / "BOOT.md"
 _BOOT_BLOCKERS_PATH = _ROOT / "docs" / "BOOT_BLOCKERS.md"
-_PHASEMAP_PATH = _ROOT / "PHASEMAP.md"
-_ROADMAP_PATH = _ROOT / "ROADMAP.md"
+_PHASEMAP_PATH = _ROOT / "docs" / "PHASEMAP.md"
+_ROADMAP_PATH = _ROOT / "docs" / "ROADMAP.md"
 
 
 @dataclass(frozen=True)
@@ -129,7 +129,7 @@ def _failure(issue: BootProtocolIssue) -> ValidationResult:
     return ValidationResult.fail(
         code=BOOT_PROTOCOL_DECISION_INVALID,
         detail=issue.detail,
-        action="Keep docs/decisions/0001-boot-protocol.md, docs/BOOT_PROTOCOL.md, boot docs, PHASEMAP.md, and ROADMAP.md aligned",
+        action="Keep docs/decisions/0001-boot-protocol.md, docs/BOOT_PROTOCOL.md, boot docs, docs/PHASEMAP.md, and docs/ROADMAP.md aligned",
         meta={
             "reason": issue.reason,
             "contract_field": issue.contract_field,

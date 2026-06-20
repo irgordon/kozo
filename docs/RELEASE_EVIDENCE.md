@@ -61,8 +61,8 @@ Every release review must include:
 * `docs/BOOT_TOOLING.md`
 * `docs/decisions/0001-boot-protocol.md`
 * `CHANGELOG.md`
-* `PHASEMAP.md`
-* `ROADMAP.md`
+* `docs/PHASEMAP.md`
+* `docs/ROADMAP.md`
 * `docs/RELEASE_CHECKLIST.md`
 * `docs/REQUIRED_CHECKS.md`
 * `docs/RUNTIME_EVIDENCE_REVIEW.md`

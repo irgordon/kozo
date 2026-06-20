@@ -21,8 +21,8 @@
     ".gitignore",
     "rust-toolchain.toml",
     "CHANGELOG.md",
-    "PHASEMAP.md",
-    "ROADMAP.md",
+    "docs/PHASEMAP.md",
+    "docs/ROADMAP.md",
     "README.md",
     "tasks/",
     "artifacts/",
@@ -813,8 +813,8 @@
       "kind": "docs",
       "files_expected": [
         "CHANGELOG.md",
-        "PHASEMAP.md",
-        "ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
         "docs/RELEASE_EVIDENCE.md",
         "docs/generated/governance_index.md",
         "tasks/todo.json"
@@ -834,8 +834,8 @@
       "kind": "docs",
       "files_expected": [
         "CHANGELOG.md",
-        "PHASEMAP.md",
-        "ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
         "docs/RELEASE_CHECKLIST.md",
         "docs/RELEASE_EVIDENCE.md",
         "docs/REQUIRED_CHECKS.md",
@@ -857,8 +857,8 @@
       "kind": "edit",
       "files_expected": [
         "CHANGELOG.md",
-        "PHASEMAP.md",
-        "ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
         "docs/RUNTIME_EVIDENCE.md",
         "docs/RELEASE_CHECKLIST.md",
         "docs/RELEASE_EVIDENCE.md",
@@ -891,8 +891,8 @@
       "kind": "edit",
       "files_expected": [
         "CHANGELOG.md",
-        "PHASEMAP.md",
-        "ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
         "artifacts/runtime/runtime_smoke.metadata.json",
         "docs/RUNTIME_EVIDENCE.md",
         "docs/RELEASE_CHECKLIST.md",
@@ -942,8 +942,8 @@
       "kind": "edit",
       "files_expected": [
         "CHANGELOG.md",
-        "PHASEMAP.md",
-        "ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
         "tasks/todo.json",
         "docs/RUNTIME_EVIDENCE_REVIEW.md",
         "docs/RELEASE_EVIDENCE.md",
@@ -973,8 +973,8 @@
       "kind": "edit",
       "files_expected": [
         "CHANGELOG.md",
-        "PHASEMAP.md",
-        "ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
         "tasks/todo.json",
         ".github/workflows/ci.yml",
         "docs/REQUIRED_CHECKS.md",
@@ -998,8 +998,8 @@
       "kind": "edit",
       "files_expected": [
         "CHANGELOG.md",
-        "PHASEMAP.md",
-        "ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
         "tasks/todo.json",
         ".github/workflows/ci.yml",
         "scripts/verify.sh",
@@ -1035,8 +1035,8 @@
       "kind": "edit",
       "files_expected": [
         "CHANGELOG.md",
-        "PHASEMAP.md",
-        "ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
         "tasks/todo.json",
         "docs/decisions/0001-boot-protocol.md",
         "docs/BOOT_PROTOCOL.md",
@@ -1068,8 +1068,8 @@
       "kind": "edit",
       "files_expected": [
         "CHANGELOG.md",
-        "PHASEMAP.md",
-        "ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
         "tasks/todo.json",
         ".gitignore",
         "linker/kernel.ld",
@@ -1118,8 +1118,8 @@
       "kind": "edit",
       "files_expected": [
         "CHANGELOG.md",
-        "PHASEMAP.md",
-        "ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
         "tasks/todo.json",
         "docs/BOOT.md",
         "docs/BOOT_BLOCKERS.md",
@@ -1166,8 +1166,8 @@
       "kind": "edit",
       "files_expected": [
         "CHANGELOG.md",
-        "PHASEMAP.md",
-        "ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
         "tasks/todo.json",
         "docs/BOOT.md",
         "docs/BOOT_BLOCKERS.md",
@@ -1209,8 +1209,8 @@
       "kind": "edit",
       "files_expected": [
         "CHANGELOG.md",
-        "PHASEMAP.md",
-        "ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
         "tasks/todo.json",
         ".github/workflows/ci.yml",
         "docs/BOOT.md",
@@ -1241,8 +1241,8 @@
       "kind": "edit",
       "files_expected": [
         "CHANGELOG.md",
-        "PHASEMAP.md",
-        "ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
         "tasks/todo.json",
         ".github/workflows/ci.yml",
         "docs/BOOT.md",
@@ -1286,8 +1286,8 @@
       "kind": "edit",
       "files_expected": [
         "CHANGELOG.md",
-        "PHASEMAP.md",
-        "ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
         "tasks/todo.json",
         ".github/workflows/ci.yml",
         "docs/BOOT.md",
@@ -1325,8 +1325,8 @@
       "kind": "edit",
       "files_expected": [
         "CHANGELOG.md",
-        "PHASEMAP.md",
-        "ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
         "tasks/todo.json",
         "boot/limine.conf",
         "kernel/main.odin",
@@ -1368,8 +1368,8 @@
       "kind": "edit",
       "files_expected": [
         "CHANGELOG.md",
-        "PHASEMAP.md",
-        "ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
         "tasks/todo.json",
         "boot/limine.conf",
         "scripts/qemu_smoke.sh",
@@ -1389,6 +1389,28 @@
         "tests/test_qemu_smoke_evidence.py",
         "artifacts/runtime/boot_blocker_report.json",
         "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[4]",
+        "verification.tests_run[5]"
+      ],
+      "failure_count": 0
+    },
+    {
+      "id": 48,
+      "title": "Move roadmap documents under docs",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/generated/governance_index.md",
+        "harness/validators_impl/boot_protocol_decision.py",
+        "tests/test_boot_protocol_decision.py",
+        "tasks/todo.json",
         "artifacts/latest_verify.json"
       ],
       "verification_refs": [
@@ -1445,7 +1467,8 @@
     "QEMU serial smoke evidence adds deterministic QEMU smoke metadata, qemu_smoke_evidence validation, CI QEMU smoke attempts, and the kernel-emitted KOZO_BOOT_SMOKE_OK marker while preserving no-QEMU-boot claims unless serial evidence validates",
     "QEMU timeout blocker handling records the CI-observed qemu_timeout state, adds QEMU stderr evidence, and rejects blocked metadata if the kernel marker is already present",
     "Kernel entry reachability diagnostics add documented Limine serial output, early KOZO markers, v0.4.0 QEMU metadata, and exact blocker taxonomy without claiming QEMU boot unless the boot smoke marker is captured",
-    "Limine kernel load path fix uses /boot/kozo/kozo-kernel.elf and classifies Limine executable-open failures as kernel_not_loaded without claiming QEMU boot"
+    "Limine kernel load path fix uses /boot/kozo/kozo-kernel.elf and classifies Limine executable-open failures as kernel_not_loaded without claiming QEMU boot",
+    "docs/PHASEMAP.md and docs/ROADMAP.md own release phase sequencing and roadmap direction from the governance document directory without changing runtime behavior, ABI contracts, syscall behavior, boot behavior, or compatibility claims"
   ],
   "verification": {
     "tests_run": [
@@ -1560,7 +1583,8 @@
       "qemu_smoke_evidence validates v0.4.0 QEMU smoke metadata with early marker, observed marker, timeout, and byte-count diagnostics",
       "QEMU smoke metadata narrows missing Limine or KOZO output to limine_not_reached rather than a broad qemu_timeout blocker",
       "Blocked QEMU metadata fails if the observed marker list does not match the serial and stderr logs",
-      "QEMU smoke evidence treats Limine executable-open failures as kernel_not_loaded and preserves no-boot claims unless KOZO_BOOT_SMOKE_OK is captured"
+      "QEMU smoke evidence treats Limine executable-open failures as kernel_not_loaded and preserves no-boot claims unless KOZO_BOOT_SMOKE_OK is captured",
+      "All active release planning references resolve to docs/PHASEMAP.md and docs/ROADMAP.md, with historical changelog references preserved as history"
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -1598,8 +1622,8 @@
       "rust-toolchain.toml pins Rust 1.96.0 and scripts/verify.sh resolves and invokes cargo and rustc from the pinned toolchain directly.",
       "governance_index_report validates that docs/generated/governance_index.md matches the deterministic renderer output for active contracts, schemas, validators, generated reports, latest verification artifact, current version, and non-goals.",
       "harness/validators_impl/abi.py remains a documented compatibility shim for the registered abi validator while unused ABI generator helpers are pruned.",
-      "PHASEMAP.md, ROADMAP.md, and docs/RELEASE_EVIDENCE.md define release sequencing, direction, gates, evidence, and blocker categories without changing runtime behavior, ABI contracts, syscall behavior, or compatibility claims.",
-      "docs/RELEASE_CHECKLIST.md and docs/REQUIRED_CHECKS.md define release approval and required-check policy while docs/RELEASE_EVIDENCE.md, PHASEMAP.md, and ROADMAP.md link to those policies without changing runtime behavior, ABI contracts, syscall behavior, or compatibility claims.",
+      "docs/PHASEMAP.md, docs/ROADMAP.md, and docs/RELEASE_EVIDENCE.md define release sequencing, direction, gates, evidence, and blocker categories without changing runtime behavior, ABI contracts, syscall behavior, or compatibility claims.",
+      "docs/RELEASE_CHECKLIST.md and docs/REQUIRED_CHECKS.md define release approval and required-check policy while docs/RELEASE_EVIDENCE.md, docs/PHASEMAP.md, and docs/ROADMAP.md link to those policies without changing runtime behavior, ABI contracts, syscall behavior, or compatibility claims.",
       "scripts/runtime_smoke.sh generates artifacts/runtime/runtime_smoke.log from freestanding kernel and assembly object evidence, and runtime_smoke_evidence validates the artifact while explicitly documenting that it is not QEMU boot or hardware trap evidence.",
       "scripts/runtime_smoke.sh generates deterministic artifacts/runtime/runtime_smoke.metadata.json, runtime_smoke_evidence validates metadata claims and non-goals, and release evidence docs define live and packaged runtime evidence paths.",
       "docs/DOCUMENTATION_STANDARD.md defines documentation construction and review standards while docs/GOVERNANCE.md records its authority boundary below higher technical governance documents and above descriptive documents.",
@@ -1617,7 +1641,8 @@
       "v0.3.8 adds QEMU smoke metadata, qemu_smoke_evidence validation, a bounded QEMU execution path, CI QEMU smoke artifact upload, and the kernel-emitted KOZO_BOOT_SMOKE_OK marker; local evidence remains blocked by missing_iso_generation_tooling unless ISO tooling or a packaged ISO is available.",
       "v0.3.9 records the CI-observed qemu_timeout blocker, adds artifacts/runtime/qemu_smoke.stderr.log evidence, and preserves the no-QEMU-boot claim unless KOZO_BOOT_SMOKE_OK appears in captured serial output.",
       "v0.4.0 adds Limine serial/verbose config, KOZO early marker instrumentation, diagnostic QEMU metadata, and narrowed reachability blockers while preserving no-QEMU-boot and non-compatibility claim boundaries.",
-      "v0.4.1 updates the Limine kernel path and QEMU smoke taxonomy; full verification must refresh local blocked metadata separately from source changes"
+      "v0.4.1 updates the Limine kernel path and QEMU smoke taxonomy; full verification must refresh local blocked metadata separately from source changes",
+      "Moved release planning documents under docs/, updated active release evidence/checklist and boot protocol validator references, and preserved runtime and compatibility non-goals"
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -1670,6 +1695,7 @@
     "Added v0.3.8 QEMU serial smoke evidence gate with deterministic pass/blocked metadata, qemu_smoke_evidence validation, CI QEMU smoke attempts, and a kernel-emitted boot marker while preserving no-boot and non-compatibility claim boundaries.",
     "Hardened v0.3.9 QEMU timeout blocker handling with stderr evidence, phase-aligned boot blocker reporting, post-packaging exact QEMU blockers, and marker-present blocked-metadata rejection while preserving no-boot and non-compatibility claim boundaries.",
     "Added v0.4.0 kernel entry reachability diagnostics so QEMU smoke can distinguish Limine reachability, kernel load, kernel entry, serial initialization, marker emission, and fallback timeout without claiming QEMU boot.",
-    "Added v0.4.1 Limine kernel load path fix so the configured kernel path matches the staged ISO layout and Limine open failures no longer masquerade as kernel entry failures."
+    "Added v0.4.1 Limine kernel load path fix so the configured kernel path matches the staged ISO layout and Limine open failures no longer masquerade as kernel entry failures.",
+    "Moved release planning documents under docs/ and updated active references so governance planning documents live with the rest of the governance document set."
   ]
 }

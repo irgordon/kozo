@@ -87,15 +87,15 @@ Required checklist:
 * Tag candidate is identified.
 * `CHANGELOG.md` is current.
 * Release notes are present when required by the phase.
-* `PHASEMAP.md` and `ROADMAP.md` match the intended release scope.
+* `docs/PHASEMAP.md` and `docs/ROADMAP.md` match the intended release scope.
 
 Evidence references:
 
 * `git status --short --branch`
 * `git log --oneline --decorate -n 5`
 * `CHANGELOG.md`
-* `PHASEMAP.md`
-* `ROADMAP.md`
+* `docs/PHASEMAP.md`
+* `docs/ROADMAP.md`
 
 ---
 

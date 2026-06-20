@@ -68,7 +68,7 @@ class BootProtocolDecisionValidatorTests(unittest.TestCase):
         result = self.validate_fixture(mutate_phasemap=lambda text: text.replace("v0.3.2", "v0.3.x"))
 
         self.assertEqual(result.status, "fail")
-        self.assert_decision_failure(result, "missing_phasemap_next_phase", "PHASEMAP.md.phasemap_next_phase")
+        self.assert_decision_failure(result, "missing_phasemap_next_phase", "docs/PHASEMAP.md.phasemap_next_phase")
 
     def test_failure_diagnostic_names_decision_field(self):
         self.assertEqual("boot_protocol_decision", BootProtocolDecisionValidator.name)
@@ -123,8 +123,8 @@ def write_fixture_files(root: Path) -> dict[str, Path]:
     boot_protocol = docs / "BOOT_PROTOCOL.md"
     boot = docs / "BOOT.md"
     blockers = docs / "BOOT_BLOCKERS.md"
-    phasemap = root / "PHASEMAP.md"
-    roadmap = root / "ROADMAP.md"
+    phasemap = docs / "PHASEMAP.md"
+    roadmap = docs / "ROADMAP.md"
 
     adr.write_text(valid_adr_text())
     boot_protocol.write_text(valid_boot_protocol_text())

@@ -16,7 +16,7 @@ It defines direction, goals, deferred work, and release expectations.
 
 # 2. Authority
 
-`ROADMAP.md` owns product direction and release goals.
+`docs/ROADMAP.md` owns product direction and release goals.
 
 It does not override:
 
