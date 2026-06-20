@@ -80,11 +80,11 @@ rg "TODO|FIXME|HACK|XXX|stub|placeholder|temporary|dead|unused|legacy|compat|shi
 rg "def .*\\(" harness scripts tests
 rg "class .*" harness tests
 rg "subprocess|shell=True|os.system|eval\\(|exec\\(" harness scripts tests
-rg "/Users/|godzilla|/opt/homebrew|stable-aarch64|Darwin|Apple Silicon" .
+rg host-specific absolute paths, local user names, local package-manager paths, and platform-specific toolchain tokens
 rg "\\bPHASEMAP.md\\b|\\bROADMAP.md\\b" .
 rg "missing_boot_protocol_and_image_packaging|missing_bootable_iso_packaging|missing_limine_iso_tooling|missing_bootable_iso_generation|kernel_not_loaded|limine_lower_half_phdr|qemu_timeout" docs harness scripts tests tasks CHANGELOG.md
 odin check kernel
-RUSTC=/Users/godzilla/.rustup/toolchains/1.96.0-aarch64-apple-darwin/bin/rustc /Users/godzilla/.rustup/toolchains/1.96.0-aarch64-apple-darwin/bin/cargo check --manifest-path userspace/core_service/Cargo.toml --target x86_64-unknown-none
+pinned Rust cargo check for userspace/core_service against x86_64-unknown-none
 python3 -m json.tool tasks/todo.json
 git diff --check
 scripts/verify.sh
