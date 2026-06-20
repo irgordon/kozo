@@ -126,7 +126,9 @@ When CI then runs QEMU against that ISO but the kernel marker is absent before t
 
 If Limine reaches the boot entry but fails to open or load the configured kernel executable, QEMU smoke evidence must report `kernel_not_loaded`.
 
-For v0.4.2 and later, release review must include `artifacts/runtime/kernel_elf_report.json` when kernel loadability is under review. That report may prove ELF structure, entry, and PT_LOAD segment presence, but it does not prove Limine loaded the ELF or executed kernel code.
+If Limine opens the configured kernel executable but reports `Lower half PHDRs are not allowed`, QEMU smoke evidence must report `limine_lower_half_phdr`.
+
+For v0.4.2 and later, release review must include `artifacts/runtime/kernel_elf_report.json` when kernel loadability is under review. That report may prove ELF structure, entry, PT_LOAD segment presence, and v0.4.5 load-layout classification, but it does not prove Limine loaded the ELF or executed kernel code.
 
 For v0.4.4 and later, release review must include `artifacts/runtime/boot_image/iso_contents.txt` when ISO packaging succeeds so reviewers can confirm the configured Limine path normalizes to a file visible in the ISO contents.
 
@@ -138,8 +140,9 @@ For v0.4.0 and later, QEMU smoke metadata must also include early marker diagnos
 * `serial_not_initialized`
 * `marker_not_emitted`
 * `qemu_timeout`
+* `limine_lower_half_phdr`
 
-The latest inspected post-v0.4.1 CI artifact narrowed to `kernel_not_loaded` because Limine reached the boot entry and failed to open the configured kernel executable before any KOZO marker appeared.
+The latest inspected pre-v0.4.5 CI artifact narrowed to `limine_lower_half_phdr` because Limine reached the boot entry, opened the configured kernel executable, and rejected the lower-half program-header layout before any KOZO marker appeared.
 
 The v0.4.4 configured Limine kernel path is `boot():/boot/kozo/kozo-kernel.elf`, which normalizes to `boot/kozo/kozo-kernel.elf` in the ISO contents report.
 
@@ -147,6 +150,12 @@ The v0.4.2 kernel ELF loadability validator is:
 
 ```text
 kernel_loadability
+```
+
+The v0.4.5 Limine lower-half PHDR blocker is:
+
+```text
+limine_lower_half_phdr
 ```
 
 The current packaging metadata records the missing ISO generation tooling blocker:

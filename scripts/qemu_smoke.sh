@@ -196,10 +196,16 @@ def _has_kernel_open_failure(text: str) -> bool:
     return "failed to open executable" in text or "failed to load executable" in text
 
 
+def _has_lower_half_phdr_failure(text: str) -> bool:
+    return "lower half phdrs are not allowed" in text
+
+
 if not combined.strip():
     print("limine_not_reached")
 elif "limine" not in combined_lower and not observed:
     print("limine_not_reached")
+elif _has_lower_half_phdr_failure(combined_lower):
+    print("limine_lower_half_phdr")
 elif "limine" in combined_lower and _has_kernel_open_failure(combined_lower):
     print("kernel_not_loaded")
 elif "limine" in combined_lower and not _has_kernel_load_evidence(combined_lower, observed):

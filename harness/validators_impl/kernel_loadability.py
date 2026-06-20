@@ -45,6 +45,7 @@ _ISSUE_BLOCKERS = {
     "missing_load_segments",
     "invalid_kernel_entry",
     "linker_output_invalid",
+    "limine_lower_half_phdr",
 }
 
 
@@ -84,6 +85,7 @@ def _kernel_loadability_issue() -> KernelLoadabilityIssue | None:
         _entry_issue(report),
         _program_header_issue(report),
         _load_segment_issue(report),
+        _load_layout_issue(report),
         _blocker_category_issue(report),
         _list_contract_issue(report, "does_not_prove", _REQUIRED_NON_CLAIMS, "missing_non_goal"),
         _blocker_report_issue(report, blocker_report),
@@ -137,11 +139,48 @@ def _load_segment_issue(report: dict[str, object]) -> KernelLoadabilityIssue | N
     return None
 
 
+def _load_layout_issue(report: dict[str, object]) -> KernelLoadabilityIssue | None:
+    minimum_vaddr = report.get("minimum_load_virtual_address")
+    if not _nonzero_hex_string(minimum_vaddr):
+        return _issue(
+            "missing_load_layout",
+            "kernel_loadability.minimum_load_virtual_address",
+            "Kernel ELF report must record the minimum PT_LOAD virtual address",
+        )
+    if not isinstance(report.get("has_lower_half_load_segment"), bool):
+        return _issue(
+            "missing_load_layout",
+            "kernel_loadability.has_lower_half_load_segment",
+            "Kernel ELF report must record whether PT_LOAD segments are lower-half",
+        )
+    if not isinstance(report.get("entry_is_lower_half"), bool):
+        return _issue(
+            "missing_load_layout",
+            "kernel_loadability.entry_is_lower_half",
+            "Kernel ELF report must record whether the entry point is lower-half",
+        )
+    expected_blocker = "limine_lower_half_phdr" if report.get("has_lower_half_load_segment") is True else "none"
+    if report.get("load_layout_blocker") != expected_blocker:
+        return _issue(
+            "load_layout_mismatch",
+            "kernel_loadability.load_layout_blocker",
+            "Kernel ELF load-layout blocker must match lower-half PT_LOAD detection",
+        )
+    return None
+
+
 def _blocker_category_issue(report: dict[str, object]) -> KernelLoadabilityIssue | None:
     issues = report.get("detected_issues")
     blocker = report.get("blocker_category")
     if not isinstance(issues, list):
         return _issue("field_mismatch", "kernel_loadability.detected_issues", "Kernel ELF report must record detected issues")
+    layout_blocker = report.get("load_layout_blocker")
+    if layout_blocker == "limine_lower_half_phdr" and "limine_lower_half_phdr" not in issues:
+        return _issue(
+            "load_layout_mismatch",
+            "kernel_loadability.detected_issues",
+            "Kernel ELF report must include limine_lower_half_phdr when lower-half PT_LOAD segments are detected",
+        )
     if issues and blocker not in _ISSUE_BLOCKERS:
         return _issue("blocker_mismatch", "kernel_loadability.blocker_category", "Kernel ELF report blocker must match detected ELF issues")
     if not issues and blocker != "none":
@@ -152,6 +191,9 @@ def _blocker_category_issue(report: dict[str, object]) -> KernelLoadabilityIssue
 def _blocker_report_issue(report: dict[str, object], blocker_report: dict[str, object]) -> KernelLoadabilityIssue | None:
     report_blocker = report.get("blocker_category")
     boot_blocker = blocker_report.get("blocker_category")
+    external_blockers = {"missing_iso_generation_tooling", "missing_qemu_tooling", "missing_boot_image", "qemu_launch_failed"}
+    if report_blocker in _ISSUE_BLOCKERS and boot_blocker in external_blockers:
+        return None
     if report_blocker in _ISSUE_BLOCKERS and boot_blocker != report_blocker:
         return _issue("blocker_mismatch", "boot_blocker.blocker_category", "Boot blocker report must narrow to the kernel ELF issue when the ELF report detects one")
     if report_blocker == "none" and boot_blocker not in {"kernel_not_loaded", "missing_iso_generation_tooling"}:

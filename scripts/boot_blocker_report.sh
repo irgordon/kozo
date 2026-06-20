@@ -36,6 +36,7 @@ allowed_qemu_blockers = {
     "missing_load_segments",
     "invalid_kernel_entry",
     "linker_output_invalid",
+    "limine_lower_half_phdr",
 }
 
 elf_issue_blockers = {
@@ -43,6 +44,7 @@ elf_issue_blockers = {
     "missing_load_segments",
     "invalid_kernel_entry",
     "linker_output_invalid",
+    "limine_lower_half_phdr",
 }
 
 

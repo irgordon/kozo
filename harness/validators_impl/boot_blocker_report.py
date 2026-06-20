@@ -128,6 +128,7 @@ _REQUIRED_DOC_REFERENCES = (
     "missing_iso_generation_tooling",
     "missing_qemu_serial_evidence",
     "kernel_not_loaded",
+    "limine_lower_half_phdr",
 )
 
 _ALLOWED_EXACT_QEMU_BLOCKERS = (
@@ -145,6 +146,7 @@ _ALLOWED_EXACT_QEMU_BLOCKERS = (
     "missing_load_segments",
     "invalid_kernel_entry",
     "linker_output_invalid",
+    "limine_lower_half_phdr",
 )
 
 _KERNEL_ELF_BLOCKERS = (
@@ -152,6 +154,7 @@ _KERNEL_ELF_BLOCKERS = (
     "missing_load_segments",
     "invalid_kernel_entry",
     "linker_output_invalid",
+    "limine_lower_half_phdr",
 )
 
 

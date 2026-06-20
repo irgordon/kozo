@@ -21,6 +21,7 @@ KOZO_NEGATIVE_COVERAGE = {
         "missing_non_goal": "test_fails_when_non_goal_is_missing",
         "missing_byte_count": "test_fails_when_byte_count_is_missing",
         "marker_consistency": "test_fails_when_observed_markers_do_not_match_log",
+        "limine_lower_half_phdr": "test_fails_when_lower_half_phdr_is_marked_as_kernel_not_loaded",
         "blocker_taxonomy_mismatch": "test_fails_when_blocker_does_not_match_log_taxonomy",
         "unknown_blocker_category": "test_fails_when_blocker_category_is_unknown",
         "blocker_report_mismatch": "test_fails_when_blocker_report_mismatches_metadata",
@@ -55,6 +56,16 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
             "kernel_not_loaded",
             "limine: Loading executable `/boot/kozo/kozo-kernel.elf`\n"
             "PANIC: limine: Failed to open executable with path `/boot/kozo/kozo-kernel.elf`\n",
+        )
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
+    def test_accepts_lower_half_phdr_blocker(self):
+        result = self.validate_blocked_fixture(
+            "limine_lower_half_phdr",
+            "limine: Loading executable `boot():/boot/kozo/kozo-kernel.elf`...\n"
+            "PANIC: elf: Lower half PHDRs are not allowed\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -180,6 +191,21 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
             metadata_factory=lambda: valid_blocked_metadata("kernel_entry_not_reached", limine_open_failure),
             blocker_factory=lambda: valid_blocker("kernel_entry_not_reached"),
             mutate_serial_log=lambda _: limine_open_failure,
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_qemu_failure(result, "blocker_taxonomy_mismatch", "qemu_smoke.blocker_category")
+
+    def test_fails_when_lower_half_phdr_is_marked_as_kernel_not_loaded(self):
+        self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
+        lower_half_phdr = (
+            "limine: Loading executable `boot():/boot/kozo/kozo-kernel.elf`...\n"
+            "PANIC: elf: Lower half PHDRs are not allowed\n"
+        )
+        result = self.validate_fixture(
+            metadata_factory=lambda: valid_blocked_metadata("kernel_not_loaded", lower_half_phdr),
+            blocker_factory=lambda: valid_blocker("kernel_not_loaded"),
+            mutate_serial_log=lambda _: lower_half_phdr,
         )
 
         self.assertEqual(result.status, "fail")

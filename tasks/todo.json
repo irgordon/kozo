@@ -1520,6 +1520,39 @@
         "verification.tests_run[5]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 52,
+      "title": "Classify Limine lower-half PHDR blocker",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "docs/BOOT.md",
+        "docs/BOOT_BLOCKERS.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/generated/governance_index.md",
+        "tasks/todo.json",
+        "scripts/kernel_elf_report.py",
+        "scripts/qemu_smoke.sh",
+        "scripts/boot_blocker_report.sh",
+        "harness/validators_impl/kernel_loadability.py",
+        "harness/validators_impl/qemu_smoke_evidence.py",
+        "harness/validators_impl/boot_blocker_report.py",
+        "harness/validators_impl/validator_coverage.py",
+        "tests/test_kernel_loadability.py",
+        "tests/test_qemu_smoke_evidence.py",
+        "tests/test_boot_blocker_report.py",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[4]",
+        "verification.tests_run[5]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -1571,7 +1604,8 @@
     "Kernel entry reachability diagnostics add documented Limine serial output, early KOZO markers, v0.4.0 QEMU metadata, and exact blocker taxonomy without claiming QEMU boot unless the boot smoke marker is captured",
     "Limine kernel load path fix uses /boot/kozo/kozo-kernel.elf and classifies Limine executable-open failures as kernel_not_loaded without claiming QEMU boot",
     "Limine ISO kernel load semantics now use boot():/boot/kozo/kozo-kernel.elf, record normalized ISO path visibility metadata, and keep kernel_not_loaded active until CI serial evidence proves otherwise",
-    "docs/PHASEMAP.md and docs/ROADMAP.md own release phase sequencing and roadmap direction from the governance document directory without changing runtime behavior, ABI contracts, syscall behavior, boot behavior, or compatibility claims"
+    "docs/PHASEMAP.md and docs/ROADMAP.md own release phase sequencing and roadmap direction from the governance document directory without changing runtime behavior, ABI contracts, syscall behavior, boot behavior, or compatibility claims",
+    "v0.4.5 classifies Limine lower-half PHDR rejection as limine_lower_half_phdr in kernel ELF reports, QEMU smoke metadata, boot blocker reporting, focused tests, and boot evidence docs while preserving no-QEMU-boot and non-compatibility claim boundaries"
   ],
   "verification": {
     "tests_run": [
@@ -1690,7 +1724,8 @@
       "QEMU smoke evidence treats Limine executable-open failures as kernel_not_loaded and preserves no-boot claims unless KOZO_BOOT_SMOKE_OK is captured",
       "kernel_loadability validates v0.4.2 kernel ELF loadability evidence for x86_64 executable format, entry point, _start alignment, program headers, PT_LOAD segments, blocker alignment, and non-claim boundaries",
       "host_dependency_portability validates v0.4.3 host portability policy, rejects user-specific absolute paths and Apple-specific toolchain assumptions, verifies CI/Linux tooling declarations, and preserves local macOS as a convenience path only",
-      "All active release planning references resolve to docs/PHASEMAP.md and docs/ROADMAP.md, with historical changelog references preserved as history"
+      "All active release planning references resolve to docs/PHASEMAP.md and docs/ROADMAP.md, with historical changelog references preserved as history",
+      "kernel_loadability validates v0.4.5 Limine ELF load-layout evidence by requiring PT_LOAD virtual-address metadata, lower-half segment detection, and limine_lower_half_phdr blocker alignment without claiming QEMU boot or kernel entry"
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -1751,7 +1786,8 @@
       "v0.4.2 adds deterministic kernel ELF loadability reporting, validates the staged kernel ELF structure, and adds ISO filename metadata for Limine path visibility while preserving no-QEMU-boot, no-kernel-entry, no-serial-init, and non-compatibility claim boundaries",
       "v0.4.3 adds a host dependency portability gate, removes local Homebrew-style Limine fallback paths, documents CI/Linux as authoritative portability proof, and preserves local macOS as convenience-only without changing runtime, ABI, syscall, QEMU boot, compatibility, or production-readiness claims",
       "v0.4.4 changes Limine config to boot():/boot/kozo/kozo-kernel.elf, records configured and normalized kernel path metadata plus ISO contents visibility, and preserves no-QEMU-boot, no-kernel-entry, no-serial-init, compatibility, and production-readiness non-claims",
-      "Moved release planning documents under docs/, updated active release evidence/checklist and boot protocol validator references, and preserved runtime and compatibility non-goals"
+      "Moved release planning documents under docs/, updated active release evidence/checklist and boot protocol validator references, and preserved runtime and compatibility non-goals",
+      "v0.4.5 classifies Limine lower-half PHDR rejection as limine_lower_half_phdr in kernel ELF reports, QEMU smoke metadata, boot blocker reporting, focused tests, and boot evidence docs while preserving no-QEMU-boot and non-compatibility claim boundaries"
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -1808,6 +1844,7 @@
     "Added v0.4.2 kernel ELF loadability evidence so kernel_not_loaded can be separated from invalid ELF shape, missing PT_LOAD segments, invalid entry point, or linker output failures without claiming QEMU boot.",
     "Added v0.4.3 host dependency portability gate so build, verification, ISO, ELF, and QEMU smoke tooling depend on declared CI/Linux tooling, controlled environment variables, command discovery, or repository-relative paths instead of local host state.",
     "Added v0.4.4 Limine ISO/kernel load semantics so the configured boot(): path, normalized ISO path, and ISO contents visibility are recorded and validated without claiming QEMU boot or kernel entry.",
-    "Moved release planning documents under docs/ and updated active references so governance planning documents live with the rest of the governance document set."
+    "Moved release planning documents under docs/ and updated active references so governance planning documents live with the rest of the governance document set.",
+    "Added v0.4.5 Limine ELF load layout classification so Limine lower-half PHDR rejection narrows to limine_lower_half_phdr without changing linker layout, runtime behavior, ABI contracts, syscall behavior, or compatibility claims."
   ]
 }

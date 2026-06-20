@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.4.5 - 2026-06-20
+
+**Status:** Limine ELF load layout classification.
+
+### Changed
+
+* Updated `scripts/kernel_elf_report.py` to record PT_LOAD virtual addresses, the minimum PT_LOAD virtual address, lower-half PT_LOAD detection, lower-half entry detection, and the load-layout blocker classification.
+* Updated `kernel_loadability` validation so Limine-incompatible lower-half PT_LOAD segments are reported as `limine_lower_half_phdr` and aligned with boot blocker state when QEMU reaches the kernel-load path.
+* Updated `qemu_smoke_evidence` and `scripts/qemu_smoke.sh` so Limine's `Lower half PHDRs are not allowed` panic maps to `limine_lower_half_phdr` instead of the broader `kernel_not_loaded`.
+* Updated boot blocker reporting, focused validator tests, phase map, roadmap, and boot evidence docs for the lower-half PHDR blocker.
+
+### Notes
+
+* The latest inspected pre-v0.4.5 CI artifact reached Limine, opened the configured kernel path, and failed on `PANIC: elf: Lower half PHDRs are not allowed`.
+* This phase classifies the ELF load-layout blocker only; it does not migrate the kernel to a higher-half virtual layout.
+* This change does not claim QEMU boot.
+* This change does not claim kernel entry.
+* This change does not claim serial initialization.
+* This change does not claim hardware trap execution.
+* This change does not claim Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, general ELF loading, file descriptor behavior, or production readiness.
+* This change does not alter ABI contracts or syscall behavior.
+
 ## v0.4.4 - 2026-06-20
 
 **Status:** Limine ISO/kernel load semantics fix.

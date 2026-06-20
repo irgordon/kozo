@@ -38,6 +38,8 @@ v0.4.2 adds kernel ELF loadability evidence and validation so `kernel_not_loaded
 
 v0.4.4 fixes the Limine path semantics from a bare `/boot/kozo/kozo-kernel.elf` path to `boot():/boot/kozo/kozo-kernel.elf` and records ISO contents metadata to prove the normalized configured path is present in packaged images.
 
+v0.4.5 classifies Limine's lower-half program-header rejection as `limine_lower_half_phdr` after CI evidence showed Limine could open the configured kernel path but rejected the ELF load layout.
+
 ---
 
 # 2. Verified Blocker
@@ -72,7 +74,9 @@ If the run captures no Limine output and no KOZO marker output, the generated bl
 
 If Limine output appears without kernel load evidence, or if Limine fails to open or load the configured executable, the generated blocker report narrows to `kernel_not_loaded`.
 
-If `artifacts/runtime/kernel_elf_report.json` detects a structural ELF issue while QEMU reports `kernel_not_loaded`, the generated blocker report narrows to `invalid_kernel_elf`, `missing_load_segments`, `invalid_kernel_entry`, or `linker_output_invalid`.
+If Limine reports `Lower half PHDRs are not allowed`, QEMU smoke evidence narrows to `limine_lower_half_phdr`.
+
+If `artifacts/runtime/kernel_elf_report.json` detects a structural ELF issue while QEMU reports `kernel_not_loaded` or another kernel-load blocker, the generated blocker report narrows to `invalid_kernel_elf`, `missing_load_segments`, `invalid_kernel_entry`, `linker_output_invalid`, or `limine_lower_half_phdr`.
 
 If kernel load or handoff evidence appears without `KOZO_EARLY_0_ENTRY`, the generated blocker report narrows to `kernel_entry_not_reached`.
 
@@ -93,6 +97,8 @@ The v0.4.4 Limine config uses `boot():/boot/kozo/kozo-kernel.elf`, which explici
 The normalized configured path is `boot/kozo/kozo-kernel.elf`, and packaged image metadata records whether that path appears in `artifacts/runtime/boot_image/iso_contents.txt`.
 
 The v0.4.2 kernel ELF report records the staged kernel ELF as an x86_64 executable with `_start` matching the ELF entry point and PT_LOAD segments present. This does not prove Limine loaded or executed the kernel.
+
+The latest inspected pre-v0.4.5 CI artifact reached Limine, opened `boot():/boot/kozo/kozo-kernel.elf`, and failed with `PANIC: elf: Lower half PHDRs are not allowed`. The current evidence-backed load-layout blocker is `limine_lower_half_phdr`; kernel entry has not been reached.
 
 ---
 

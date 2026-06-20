@@ -40,15 +40,17 @@ v0.4.2 adds `artifacts/runtime/kernel_elf_report.json` and `kernel_loadability` 
 
 v0.4.4 updates Limine kernel load semantics to use `boot():/boot/kozo/kozo-kernel.elf` and adds ISO path visibility metadata for the configured kernel path.
 
+v0.4.5 adds Limine ELF load-layout classification. The latest inspected CI QEMU evidence reached Limine, opened the configured kernel path, and failed with `PANIC: elf: Lower half PHDRs are not allowed`, so the evidence-backed blocker is `limine_lower_half_phdr`.
+
 Current local boot blocker: `missing_iso_generation_tooling`.
 
 When CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated blocker report may narrow to `missing_qemu_serial_evidence` for that run.
 
 When CI runs QEMU against that ISO but does not capture `KOZO_BOOT_SMOKE_OK`, the generated blocker report may narrow further to `qemu_timeout`.
 
-The latest inspected post-v0.4.1 CI artifact reached Limine and failed to open the configured kernel executable path, so the evidence-backed diagnostic blocker is `kernel_not_loaded`.
+The latest inspected pre-v0.4.5 CI artifact reached Limine and opened the configured kernel executable path, but Limine rejected the kernel ELF lower-half program headers, so the evidence-backed diagnostic blocker is `limine_lower_half_phdr`.
 
-The v0.4.2 kernel ELF report shows the staged kernel ELF is structurally loadable by local ELF inspection. This does not prove QEMU boot, Limine ELF loading, kernel entry, or serial initialization.
+The v0.4.5 kernel ELF report records PT_LOAD virtual addresses, lower-half segment detection, lower-half entry detection, and the load-layout blocker. This does not prove QEMU boot, Limine ELF loading, kernel entry, or serial initialization.
 
 The v0.4.4 ISO path metadata may prove that the configured Limine path is present in packaged ISO contents. It does not prove Limine loaded the ELF, entered the kernel, initialized serial output, or reached `KOZO_BOOT_SMOKE_OK`.
 

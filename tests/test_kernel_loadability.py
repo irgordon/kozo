@@ -16,6 +16,8 @@ KOZO_NEGATIVE_COVERAGE = {
         "missing_entry": "test_fails_when_entry_address_is_missing",
         "missing_load_segments": "test_fails_when_load_segments_are_missing",
         "wrong_architecture": "test_fails_when_architecture_is_wrong",
+        "limine_lower_half_phdr": "test_fails_when_lower_half_phdr_boot_blocker_mismatches",
+        "load_layout_mismatch": "test_fails_when_lower_half_layout_blocker_is_missing",
         "blocker_mismatch": "test_fails_when_boot_blocker_does_not_match_elf_issue",
         "diagnostic_names_field": "test_failure_diagnostic_names_field",
     }
@@ -70,6 +72,33 @@ class KernelLoadabilityValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "fail")
         self.assert_kernel_failure(result, "field_mismatch", "kernel_loadability.architecture")
+
+    def test_accepts_lower_half_phdr_blocker_when_report_and_blocker_match(self):
+        self.assertEqual("kernel_loadability", KernelLoadabilityValidator.name)
+        result = self.validate_fixture(
+            mutate_report=lambda _: lower_half_phdr_report(),
+            mutate_blocker=lambda blocker: blocker | {"blocker_category": "limine_lower_half_phdr"},
+        )
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
+    def test_fails_when_lower_half_layout_blocker_is_missing(self):
+        self.assertEqual("kernel_loadability", KernelLoadabilityValidator.name)
+        result = self.validate_fixture(
+            mutate_report=lambda _: lower_half_phdr_report() | {"load_layout_blocker": "none"},
+            mutate_blocker=lambda blocker: blocker | {"blocker_category": "limine_lower_half_phdr"},
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_kernel_failure(result, "load_layout_mismatch", "kernel_loadability.load_layout_blocker")
+
+    def test_fails_when_lower_half_phdr_boot_blocker_mismatches(self):
+        self.assertEqual("kernel_loadability", KernelLoadabilityValidator.name)
+        result = self.validate_fixture(mutate_report=lambda _: lower_half_phdr_report())
+
+        self.assertEqual(result.status, "fail")
+        self.assert_kernel_failure(result, "blocker_mismatch", "boot_blocker.blocker_category")
 
     def test_fails_when_boot_blocker_does_not_match_elf_issue(self):
         self.assertEqual("kernel_loadability", KernelLoadabilityValidator.name)
@@ -161,9 +190,10 @@ def valid_report() -> dict[str, object]:
         "endianness": "little",
         "elf_type": "EXEC",
         "entry_symbol": "_start",
-        "entry_address": "0x200000",
-        "entry_symbol_address": "0x200000",
+        "entry_address": "0xffffffff80200000",
+        "entry_symbol_address": "0xffffffff80200000",
         "entry_symbol_matches_entry": True,
+        "entry_is_lower_half": False,
         "program_header_count": 6,
         "section_count": 13,
         "load_segments": [
@@ -171,19 +201,23 @@ def valid_report() -> dict[str, object]:
                 "type": "PT_LOAD",
                 "flags": "r-x",
                 "offset": "0x1000",
-                "virtual_address": "0x200000",
+                "virtual_address": "0xffffffff80200000",
                 "physical_address": "0x200000",
                 "file_size": "0x2f82",
                 "memory_size": "0x2f82",
                 "alignment": "0x1000",
             },
         ],
+        "minimum_load_virtual_address": "0xffffffff80200000",
+        "has_lower_half_load_segment": False,
+        "load_layout_blocker": "none",
         "detected_issues": [],
         "blocker_category": "none",
         "proves": [
             "kernel ELF is an x86_64 executable",
             "kernel ELF has an entry point matching _start",
             "kernel ELF has PT_LOAD segments",
+            "kernel ELF load layout was inspected for Limine lower-half PHDR rejection",
         ],
         "does_not_prove": [
             "QEMU boot",
@@ -201,6 +235,36 @@ def valid_report() -> dict[str, object]:
             "production readiness",
         ],
     }
+
+
+def lower_half_phdr_report() -> dict[str, object]:
+    report = valid_report()
+    report.update(
+        {
+            "entry_address": "0x200000",
+            "entry_symbol_address": "0x200000",
+            "entry_is_lower_half": True,
+            "load_segments": [
+                {
+                    "type": "PT_LOAD",
+                    "flags": "r-x",
+                    "offset": "0x1000",
+                    "virtual_address": "0x200000",
+                    "physical_address": "0x200000",
+                    "file_size": "0x2f82",
+                    "memory_size": "0x2f82",
+                    "alignment": "0x1000",
+                },
+            ],
+            "minimum_load_virtual_address": "0x200000",
+            "has_lower_half_load_segment": True,
+            "load_layout_blocker": "limine_lower_half_phdr",
+            "detected_issues": ["limine_lower_half_phdr"],
+            "blocker_category": "limine_lower_half_phdr",
+            "proves": ["kernel ELF loadability was inspected"],
+        }
+    )
+    return report
 
 
 def valid_blocker() -> dict[str, object]:

@@ -62,6 +62,7 @@ _ALLOWED_BLOCKERS = (
     "missing_boot_image",
     "qemu_launch_failed",
     "missing_iso_generation_tooling",
+    "limine_lower_half_phdr",
 )
 
 _EARLY_MARKERS = (
@@ -240,6 +241,8 @@ def _expected_blocker_from_logs(metadata: dict[str, object]) -> str | None:
         return "limine_not_reached"
     if "limine" not in combined.lower() and not observed:
         return "limine_not_reached"
+    if _has_lower_half_phdr_failure(combined):
+        return "limine_lower_half_phdr"
     if "limine" in combined.lower() and _has_kernel_open_failure(combined):
         return "kernel_not_loaded"
     if "limine" in combined.lower() and not _has_kernel_load_evidence(combined, observed):
@@ -263,6 +266,10 @@ def _has_kernel_load_evidence(text: str, observed: list[str]) -> bool:
 def _has_kernel_open_failure(text: str) -> bool:
     lowered = text.lower()
     return "failed to open executable" in lowered or "failed to load executable" in lowered
+
+
+def _has_lower_half_phdr_failure(text: str) -> bool:
+    return "lower half phdrs are not allowed" in text.lower()
 
 
 def _blocked_marker_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:

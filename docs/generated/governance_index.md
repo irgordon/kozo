@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.4.4`
+* Version: `v0.4.5`
 * Date: `2026-06-20`
-* Status: Limine ISO/kernel load semantics fix.
+* Status: Limine ELF load layout classification.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 39
 * Failed checks: 0
-* Run ID: `verify-20260620T020924Z`
-* Generated at: `2026-06-20T02:09:24Z`
+* Run ID: `verify-20260620T111159Z`
+* Generated at: `2026-06-20T11:11:59Z`
 
 ## Registered validators
 

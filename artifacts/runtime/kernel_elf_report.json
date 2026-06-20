@@ -13,6 +13,7 @@
   "entry_address": "0x200000",
   "entry_symbol_address": "0x200000",
   "entry_symbol_matches_entry": true,
+  "entry_is_lower_half": true,
   "program_header_count": 6,
   "section_count": 13,
   "load_segments": [
@@ -47,12 +48,15 @@
       "alignment": "0x1000"
     }
   ],
-  "detected_issues": [],
-  "blocker_category": "none",
+  "minimum_load_virtual_address": "0x200000",
+  "has_lower_half_load_segment": true,
+  "load_layout_blocker": "limine_lower_half_phdr",
+  "detected_issues": [
+    "limine_lower_half_phdr"
+  ],
+  "blocker_category": "limine_lower_half_phdr",
   "proves": [
-    "kernel ELF is an x86_64 executable",
-    "kernel ELF has an entry point matching _start",
-    "kernel ELF has PT_LOAD segments"
+    "kernel ELF loadability was inspected"
   ],
   "does_not_prove": [
     "QEMU boot",

@@ -42,6 +42,12 @@ class BootBlockerReportValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
 
+    def test_passes_when_limine_lower_half_phdr_is_kernel_elf_blocker(self):
+        result = self.validate_fixture(mutate_report_json=lambda _: kernel_elf_blocker_report("limine_lower_half_phdr"))
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
     def test_fails_when_boot_blocker_report_is_missing(self):
         self.assertEqual("boot_blocker_report", BootBlockerReportValidator.name)
         result = self.validate_fixture(remove_report=True)
@@ -292,6 +298,27 @@ def exact_qemu_blocker_report(category: str) -> dict[str, object]:
     return report
 
 
+def kernel_elf_blocker_report(category: str) -> dict[str, object]:
+    report = valid_report()
+    report.update(
+        {
+            "blocker_category": category,
+            "missing_components": [
+                "loadable kernel ELF image",
+            ],
+            "current_surfaces": [
+                value for value in report["current_surfaces"]
+                if value != "scripts/build_boot_image.sh writes package metadata for the blocked ISO tooling attempt"
+            ] + [
+                "artifacts/runtime/kernel_elf_report.json records kernel ELF loadability evidence",
+                "scripts/kernel_elf_report.py inspects the packaged kernel ELF structure",
+            ],
+            "next_required_fix": "Resolve the exact kernel ELF loadability issue recorded in artifacts/runtime/kernel_elf_report.json before continuing Limine kernel load debugging.",
+        }
+    )
+    return report
+
+
 def valid_doc_text() -> str:
     return "\n".join(
         (
@@ -306,6 +333,7 @@ def valid_doc_text() -> str:
             "boot_blocker_report",
             "docs/BOOT_TOOLING.md",
             "kernel_not_loaded",
+            "limine_lower_half_phdr",
             "missing_iso_generation_tooling",
             "missing_qemu_serial_evidence",
         )
