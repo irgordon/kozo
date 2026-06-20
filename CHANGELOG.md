@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.4.6 - 2026-06-20
+
+**Status:** Codebase structural audit.
+
+### Added
+
+* Added `docs/CODEBASE_AUDIT.md` to record stale-code, dead-code, god-file, brittle-function, duplicated-logic, boundary, and boot-path risk findings before the higher-half linker/entry transition.
+* Documented the primary structural risks for the next boot phase: duplicated boot blocker taxonomy, release/check wording drift around `limine_lower_half_phdr`, and higher-half entry/linker coupling.
+
+### Changed
+
+* Updated `docs/PHASEMAP.md` and `docs/ROADMAP.md` so v0.4.6 is the structural audit and v0.4.7 is the higher-half linker/entry transition target.
+
+### Notes
+
+* No cleanup was applied in this phase.
+* This change does not alter runtime behavior.
+* This change does not alter ABI contracts or syscall behavior.
+* This change does not alter linker layout.
+* This change does not claim QEMU boot, kernel entry, serial initialization, or hardware trap execution.
+* This change does not claim Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, ELF loading, file descriptor behavior, or production readiness.
+
 ## v0.4.5 - 2026-06-20
 
 **Status:** Limine ELF load layout classification.

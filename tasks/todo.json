@@ -1553,6 +1553,26 @@
         "verification.tests_run[5]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 53,
+      "title": "Add codebase structural audit before higher-half transition",
+      "status": "done",
+      "kind": "docs",
+      "files_expected": [
+        "CHANGELOG.md",
+        "docs/CODEBASE_AUDIT.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/generated/governance_index.md",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[4]",
+        "verification.tests_run[5]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -1605,7 +1625,8 @@
     "Limine kernel load path fix uses /boot/kozo/kozo-kernel.elf and classifies Limine executable-open failures as kernel_not_loaded without claiming QEMU boot",
     "Limine ISO kernel load semantics now use boot():/boot/kozo/kozo-kernel.elf, record normalized ISO path visibility metadata, and keep kernel_not_loaded active until CI serial evidence proves otherwise",
     "docs/PHASEMAP.md and docs/ROADMAP.md own release phase sequencing and roadmap direction from the governance document directory without changing runtime behavior, ABI contracts, syscall behavior, boot behavior, or compatibility claims",
-    "v0.4.5 classifies Limine lower-half PHDR rejection as limine_lower_half_phdr in kernel ELF reports, QEMU smoke metadata, boot blocker reporting, focused tests, and boot evidence docs while preserving no-QEMU-boot and non-compatibility claim boundaries"
+    "v0.4.5 classifies Limine lower-half PHDR rejection as limine_lower_half_phdr in kernel ELF reports, QEMU smoke metadata, boot blocker reporting, focused tests, and boot evidence docs while preserving no-QEMU-boot and non-compatibility claim boundaries",
+    "v0.4.6 adds docs/CODEBASE_AUDIT.md, updates phase and roadmap sequencing so v0.4.7 is the higher-half linker/entry transition, and records that no cleanup was applied during the audit phase"
   ],
   "verification": {
     "tests_run": [
@@ -1725,7 +1746,8 @@
       "kernel_loadability validates v0.4.2 kernel ELF loadability evidence for x86_64 executable format, entry point, _start alignment, program headers, PT_LOAD segments, blocker alignment, and non-claim boundaries",
       "host_dependency_portability validates v0.4.3 host portability policy, rejects user-specific absolute paths and Apple-specific toolchain assumptions, verifies CI/Linux tooling declarations, and preserves local macOS as a convenience path only",
       "All active release planning references resolve to docs/PHASEMAP.md and docs/ROADMAP.md, with historical changelog references preserved as history",
-      "kernel_loadability validates v0.4.5 Limine ELF load-layout evidence by requiring PT_LOAD virtual-address metadata, lower-half segment detection, and limine_lower_half_phdr blocker alignment without claiming QEMU boot or kernel entry"
+      "kernel_loadability validates v0.4.5 Limine ELF load-layout evidence by requiring PT_LOAD virtual-address metadata, lower-half segment detection, and limine_lower_half_phdr blocker alignment without claiming QEMU boot or kernel entry",
+      "Codebase structural audit records stale/dead/brittle/god-file risks, duplicated boot taxonomy, boundary issues, and higher-half transition hazards without changing runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU boot claims, or compatibility claims"
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -1787,7 +1809,8 @@
       "v0.4.3 adds a host dependency portability gate, removes local Homebrew-style Limine fallback paths, documents CI/Linux as authoritative portability proof, and preserves local macOS as convenience-only without changing runtime, ABI, syscall, QEMU boot, compatibility, or production-readiness claims",
       "v0.4.4 changes Limine config to boot():/boot/kozo/kozo-kernel.elf, records configured and normalized kernel path metadata plus ISO contents visibility, and preserves no-QEMU-boot, no-kernel-entry, no-serial-init, compatibility, and production-readiness non-claims",
       "Moved release planning documents under docs/, updated active release evidence/checklist and boot protocol validator references, and preserved runtime and compatibility non-goals",
-      "v0.4.5 classifies Limine lower-half PHDR rejection as limine_lower_half_phdr in kernel ELF reports, QEMU smoke metadata, boot blocker reporting, focused tests, and boot evidence docs while preserving no-QEMU-boot and non-compatibility claim boundaries"
+      "v0.4.5 classifies Limine lower-half PHDR rejection as limine_lower_half_phdr in kernel ELF reports, QEMU smoke metadata, boot blocker reporting, focused tests, and boot evidence docs while preserving no-QEMU-boot and non-compatibility claim boundaries",
+      "v0.4.6 adds docs/CODEBASE_AUDIT.md, updates phase and roadmap sequencing so v0.4.7 is the higher-half linker/entry transition, and records that no cleanup was applied during the audit phase"
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -1845,6 +1868,7 @@
     "Added v0.4.3 host dependency portability gate so build, verification, ISO, ELF, and QEMU smoke tooling depend on declared CI/Linux tooling, controlled environment variables, command discovery, or repository-relative paths instead of local host state.",
     "Added v0.4.4 Limine ISO/kernel load semantics so the configured boot(): path, normalized ISO path, and ISO contents visibility are recorded and validated without claiming QEMU boot or kernel entry.",
     "Moved release planning documents under docs/ and updated active references so governance planning documents live with the rest of the governance document set.",
-    "Added v0.4.5 Limine ELF load layout classification so Limine lower-half PHDR rejection narrows to limine_lower_half_phdr without changing linker layout, runtime behavior, ABI contracts, syscall behavior, or compatibility claims."
+    "Added v0.4.5 Limine ELF load layout classification so Limine lower-half PHDR rejection narrows to limine_lower_half_phdr without changing linker layout, runtime behavior, ABI contracts, syscall behavior, or compatibility claims.",
+    "Added v0.4.6 codebase structural audit documentation before the higher-half linker/entry transition, documenting duplicated boot taxonomy, stale release/check blocker wording, and transition coupling risks without changing runtime, ABI, syscall, linker, or compatibility behavior."
   ]
 }
