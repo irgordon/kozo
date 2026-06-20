@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260620T111217Z",
+  "run_id": "verify-20260620T114839Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -298,25 +298,11 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
-    "artifacts/runtime/kernel_elf_report.json",
-    "docs/BOOT.md",
-    "docs/BOOT_BLOCKERS.md",
+    "docs/CODEBASE_AUDIT.md",
     "docs/PHASEMAP.md",
-    "docs/RELEASE_EVIDENCE.md",
     "docs/ROADMAP.md",
-    "docs/RUNTIME_EVIDENCE.md",
     "docs/generated/governance_index.md",
-    "harness/validators_impl/boot_blocker_report.py",
-    "harness/validators_impl/kernel_loadability.py",
-    "harness/validators_impl/qemu_smoke_evidence.py",
-    "harness/validators_impl/validator_coverage.py",
-    "scripts/boot_blocker_report.sh",
-    "scripts/kernel_elf_report.py",
-    "scripts/qemu_smoke.sh",
-    "tasks/todo.json",
-    "tests/test_boot_blocker_report.py",
-    "tests/test_kernel_loadability.py",
-    "tests/test_qemu_smoke_evidence.py"
+    "tasks/todo.json"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -332,5 +318,5 @@
     "artifacts/runtime/qemu_smoke.stderr.log",
     "artifacts/runtime/qemu_smoke.metadata.json"
   ],
-  "generated_at": "2026-06-20T11:12:17Z"
+  "generated_at": "2026-06-20T11:48:39Z"
 }
