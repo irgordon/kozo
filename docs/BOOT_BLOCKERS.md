@@ -34,6 +34,8 @@ v0.4.0 narrows that diagnostic model with Limine serial/verbose configuration, e
 
 v0.4.1 fixes the Limine kernel executable path and tightens QEMU smoke classification so Limine executable-open failures remain `kernel_not_loaded`.
 
+v0.4.2 adds kernel ELF loadability evidence and validation so `kernel_not_loaded` can be separated from malformed ELF, missing PT_LOAD segments, invalid entry point, or linker-output failures.
+
 ---
 
 # 2. Verified Blocker
@@ -68,6 +70,8 @@ If the run captures no Limine output and no KOZO marker output, the generated bl
 
 If Limine output appears without kernel load evidence, or if Limine fails to open or load the configured executable, the generated blocker report narrows to `kernel_not_loaded`.
 
+If `artifacts/runtime/kernel_elf_report.json` detects a structural ELF issue while QEMU reports `kernel_not_loaded`, the generated blocker report narrows to `invalid_kernel_elf`, `missing_load_segments`, `invalid_kernel_entry`, or `linker_output_invalid`.
+
 If kernel load or handoff evidence appears without `KOZO_EARLY_0_ENTRY`, the generated blocker report narrows to `kernel_entry_not_reached`.
 
 If `KOZO_EARLY_0_ENTRY` appears without `KOZO_EARLY_2_SERIAL_INIT_OK`, the generated blocker report narrows to `serial_not_initialized`.
@@ -83,6 +87,8 @@ Therefore the repository cannot honestly claim QEMU boot execution.
 The latest inspected v0.4.0 CI artifact reached Limine and failed to open `boot:///boot/kozo/kozo-kernel.elf`, so its evidence-backed diagnostic blocker is `kernel_not_loaded`.
 
 The v0.4.1 Limine config uses `/boot/kozo/kozo-kernel.elf`, matching the staged ISO path `boot/kozo/kozo-kernel.elf`.
+
+The v0.4.2 kernel ELF report records the staged kernel ELF as an x86_64 executable with `_start` matching the ELF entry point and PT_LOAD segments present. This does not prove Limine loaded or executed the kernel.
 
 ---
 
@@ -154,6 +160,24 @@ The expected ISO path is:
 artifacts/runtime/boot_image/kozo.iso
 ```
 
+The kernel ELF loadability report is:
+
+```text
+artifacts/runtime/kernel_elf_report.json
+```
+
+The kernel ELF report generator is:
+
+```text
+scripts/kernel_elf_report.py
+```
+
+The kernel ELF loadability validator is:
+
+```text
+kernel_loadability
+```
+
 The validator is:
 
 ```text
@@ -175,5 +199,7 @@ Resolve the runtime evidence part of this blocker by adding:
 
 * serial marker validation for the booted kernel path
 * passing `qemu_smoke_evidence` over a QEMU serial log containing `KOZO_BOOT_SMOKE_OK`
+
+If CI still reports `kernel_not_loaded` after v0.4.2, inspect Limine ISO filesystem visibility, Limine ELF loading diagnostics, and generated ISO contents before investigating serial initialization.
 
 Only after that work passes verification may KOZO claim QEMU boot evidence.

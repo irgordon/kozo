@@ -10,6 +10,7 @@ KERNEL_ELF="$IMAGE_ROOT/boot/kozo/kozo-kernel.elf"
 MANIFEST="$BOOT_IMAGE_DIR/manifest.json"
 PACKAGE_METADATA="$BOOT_IMAGE_DIR/package_metadata.json"
 BOOT_ISO="$BOOT_IMAGE_DIR/kozo.iso"
+KERNEL_ELF_REPORT="$RUNTIME_DIR/kernel_elf_report.json"
 BRIDGE_TARGET="freestanding_amd64_sysv"
 LIMINE_CMD=""
 XORRISO_CMD=""
@@ -150,6 +151,9 @@ stage_limine_artifacts() {
 
 create_bootable_iso() {
   "$XORRISO_CMD" -as mkisofs \
+    -R \
+    -J \
+    -joliet-long \
     -b boot/limine/limine-bios-cd.bin \
     -no-emul-boot \
     -boot-load-size 4 \
@@ -160,6 +164,16 @@ create_bootable_iso() {
     --protective-msdos-label \
     -o "$BOOT_ISO" \
     "$IMAGE_ROOT"
+}
+
+write_kernel_elf_report() {
+  (
+    cd "$ROOT"
+    python3 "$ROOT/scripts/kernel_elf_report.py" \
+      "$KERNEL_ELF" \
+      "$ROOT/linker/kernel.ld" \
+      "$KERNEL_ELF_REPORT"
+  )
 }
 
 install_limine_bootloader() {
@@ -182,6 +196,7 @@ manifest = {
     "artifact_type": "boot-image-skeleton",
     "image_root": "artifacts/runtime/boot_image/image-root",
     "kernel_elf": "artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf",
+    "kernel_elf_report": "artifacts/runtime/kernel_elf_report.json",
     "limine_config": "artifacts/runtime/boot_image/image-root/boot/limine/limine.conf",
     "does_not_prove": [
         "QEMU boot",
@@ -276,6 +291,7 @@ need_file "$ROOT/boot/limine.conf"
 prepare_directories
 build_kernel_objects
 link_kernel_elf
+write_kernel_elf_report
 stage_limine_config
 detect_iso_tooling
 if [[ -z "$BLOCKER_CATEGORY" ]]; then
@@ -289,6 +305,7 @@ write_package_metadata
 
 printf "Boot image skeleton written to %s\n" "$BOOT_IMAGE_DIR"
 printf "Kernel ELF written to %s\n" "$KERNEL_ELF"
+printf "Kernel ELF report written to %s\n" "$KERNEL_ELF_REPORT"
 printf "Boot image packaging metadata written to %s\n" "$PACKAGE_METADATA"
 if [[ -f "$BOOT_ISO" ]]; then
   printf "Bootable ISO written to %s\n" "$BOOT_ISO"

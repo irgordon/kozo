@@ -52,6 +52,7 @@ Every release review must include:
 * `artifacts/runtime/runtime_smoke.log`
 * `artifacts/runtime/runtime_smoke.metadata.json`
 * `artifacts/runtime/boot_blocker_report.json`
+* `artifacts/runtime/kernel_elf_report.json`
 * `artifacts/runtime/boot_image/package_metadata.json`
 * `artifacts/runtime/boot_image/kozo.iso` when packaging succeeds
 * `artifacts/runtime/qemu_smoke.log` when a QEMU smoke blocker or QEMU serial evidence is under review
@@ -98,6 +99,7 @@ Release review must include verification logs when generated:
 * `artifacts/runtime/runtime_smoke.log`
 * `artifacts/runtime/runtime_smoke.metadata.json`
 * `artifacts/runtime/boot_blocker_report.json`
+* `artifacts/runtime/kernel_elf_report.json`
 * `artifacts/runtime/boot_image/package_metadata.json`
 * `artifacts/runtime/boot_image/kozo.iso` when packaging succeeds
 * `artifacts/runtime/qemu_smoke.log` when generated during QEMU smoke blocker review
@@ -118,6 +120,8 @@ When CI then runs QEMU against that ISO but the kernel marker is absent before t
 
 If Limine reaches the boot entry but fails to open or load the configured kernel executable, QEMU smoke evidence must report `kernel_not_loaded`.
 
+For v0.4.2 and later, release review must include `artifacts/runtime/kernel_elf_report.json` when kernel loadability is under review. That report may prove ELF structure, entry, and PT_LOAD segment presence, but it does not prove Limine loaded the ELF or executed kernel code.
+
 For v0.4.0 and later, QEMU smoke metadata must also include early marker diagnostics and may narrow timeout to one of:
 
 * `limine_not_reached`
@@ -127,7 +131,13 @@ For v0.4.0 and later, QEMU smoke metadata must also include early marker diagnos
 * `marker_not_emitted`
 * `qemu_timeout`
 
-The latest inspected v0.4.0 CI artifact narrowed to `kernel_not_loaded` because Limine reached the boot entry and failed to open the configured kernel executable before any KOZO marker appeared.
+The latest inspected post-v0.4.1 CI artifact narrowed to `kernel_not_loaded` because Limine reached the boot entry and failed to open the configured kernel executable before any KOZO marker appeared.
+
+The v0.4.2 kernel ELF loadability validator is:
+
+```text
+kernel_loadability
+```
 
 The current packaging metadata records the missing ISO generation tooling blocker:
 

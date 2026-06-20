@@ -12,18 +12,18 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.4.1`
-* Date: `2026-06-19`
-* Status: Limine kernel load path fix.
+* Version: `v0.4.2`
+* Date: `2026-06-20`
+* Status: Kernel binary loadability diagnosis.
 
 ## Verification status
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 37
+* Total checks: 38
 * Failed checks: 0
-* Run ID: `verify-20260620T011834Z`
-* Generated at: `2026-06-20T01:18:34Z`
+* Run ID: `verify-20260620T013415Z`
+* Generated at: `2026-06-20T01:34:15Z`
 
 ## Registered validators
 
@@ -61,11 +61,12 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 30 | `boot_image_skeleton` |
 | 31 | `boot_image_packaging` |
 | 32 | `boot_tooling` |
-| 33 | `qemu_smoke_evidence` |
-| 34 | `return_path_proof` |
-| 35 | `execution_proof` |
-| 36 | `validator_coverage` |
-| 37 | `evidence` |
+| 33 | `kernel_loadability` |
+| 34 | `qemu_smoke_evidence` |
+| 35 | `return_path_proof` |
+| 36 | `execution_proof` |
+| 37 | `validator_coverage` |
+| 38 | `evidence` |
 
 ## Active contracts
 
@@ -103,7 +104,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 37
+* Check count: 38
 * Failure count: 0
 
 ## Non-goals

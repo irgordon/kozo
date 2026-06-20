@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.4.2 - 2026-06-20
+
+**Status:** Kernel binary loadability diagnosis.
+
+### Added
+
+* Added deterministic kernel ELF loadability evidence at `artifacts/runtime/kernel_elf_report.json`.
+* Added `kernel_loadability` validation for ELF architecture, entry point, `_start` alignment, program headers, PT_LOAD segments, blocker alignment, and diagnostic quality.
+* Added focused negative coverage for missing reports, invalid reports, missing entry points, missing load segments, wrong architecture, blocker mismatches, and named diagnostics.
+
+### Changed
+
+* Updated `scripts/build_boot_image.sh` to generate kernel ELF loadability evidence after linking the staged kernel ELF.
+* Updated ISO generation to include Rock Ridge and Joliet filename metadata so Limine path lookup has lower-case path visibility when ISO tooling is available.
+* Updated boot blocker reporting so structural ELF issues narrow `kernel_not_loaded` to exact ELF blockers, while structurally loadable ELF evidence preserves the external kernel-load blocker.
+* Updated boot, runtime evidence, release evidence, phase map, and roadmap docs to record the v0.4.2 loadability diagnosis.
+
+### Notes
+
+* The inspected kernel ELF is an x86_64 executable with `_start` matching the ELF entry point and PT_LOAD segments present.
+* This change does not claim QEMU boot.
+* This change does not claim kernel entry, serial initialization, hardware trap execution, Limine ELF loading, Linux compatibility, POSIX compatibility, general userspace execution, process model behavior, VFS behavior, scheduler behavior, file descriptor behavior, or production readiness.
+* This change does not change ABI contracts or syscall behavior.
+
 ## v0.4.1 - 2026-06-19
 
 **Status:** Limine kernel load path fix.

@@ -36,6 +36,8 @@ v0.4.0 adds documented Limine serial and verbose diagnostics, early KOZO serial 
 
 v0.4.1 updates the Limine kernel path to match the staged ISO layout and classifies Limine executable-open failures as `kernel_not_loaded`.
 
+v0.4.2 adds deterministic kernel ELF loadability evidence at `artifacts/runtime/kernel_elf_report.json`, validates the staged kernel ELF architecture, entry point, `_start` alignment, program headers, and PT_LOAD segments, and keeps the no-QEMU-boot claim until serial evidence proves execution.
+
 Remaining blocker: `missing_iso_generation_tooling`.
 
 The local blocker is `missing_iso_generation_tooling`.
@@ -58,7 +60,9 @@ CI packaged-image blocker category, when the ISO exists: `missing_qemu_serial_ev
 
 CI observed QEMU execution blocker category, when QEMU runs the ISO but no marker is captured before the bounded timeout: `qemu_timeout`.
 
-Latest inspected v0.4.0 CI artifact diagnosis: `kernel_not_loaded`. QEMU launched the ISO, Limine was reached, and Limine failed to open the configured kernel executable path before any KOZO marker appeared.
+Latest inspected post-v0.4.1 CI artifact diagnosis: `kernel_not_loaded`. QEMU launched the ISO, Limine was reached, and Limine failed to open the configured kernel executable path before any KOZO marker appeared.
+
+Current v0.4.2 kernel ELF diagnosis: structurally loadable by local ELF inspection. The staged kernel ELF is an x86_64 executable, `_start` matches the ELF entry point, and PT_LOAD segments are present. This does not prove Limine loaded or executed the kernel.
 
 Selected boot protocol: Limine.
 
@@ -68,11 +72,15 @@ The boot protocol decision, boot image skeleton, boot tooling acquisition policy
 
 `scripts/build_boot_image.sh` writes `artifacts/runtime/boot_image/package_metadata.json`.
 
+`scripts/build_boot_image.sh` writes `artifacts/runtime/kernel_elf_report.json`.
+
 `scripts/qemu_smoke.sh` writes `artifacts/runtime/qemu_smoke.metadata.json`, `artifacts/runtime/qemu_smoke.log`, and `artifacts/runtime/qemu_smoke.stderr.log`.
 
 The expected ISO path is `artifacts/runtime/boot_image/kozo.iso`.
 
 The configured Limine kernel path is `/boot/kozo/kozo-kernel.elf`, matching the staged ISO path `boot/kozo/kozo-kernel.elf`.
+
+The ISO generation command includes Rock Ridge and Joliet metadata so the lower-case Limine path remains visible to the loader when ISO tooling is available.
 
 GitHub Actions full CI installs xorriso, acquires Limine v12.3.3 from a pinned source release, builds Limine, and attempts ISO generation.
 
@@ -115,12 +123,16 @@ The current source surfaces relevant to future boot work are:
 * `kernel/arch/x86_64/serial.odin`
 * `scripts/runtime_smoke.sh`
 * `scripts/build_boot_image.sh`
+* `scripts/kernel_elf_report.py`
 * `scripts/qemu_smoke.sh`
 * `docs/BOOT_TOOLING.md`
+* `artifacts/runtime/kernel_elf_report.json`
 * `artifacts/runtime/qemu_smoke.metadata.json`
 * `artifacts/runtime/qemu_smoke.log`
 
 `kernel/arch/x86_64/boot.asm` defines `_start`, and `scripts/build_boot_image.sh` links a kernel ELF for the Limine image skeleton.
+
+`artifacts/runtime/kernel_elf_report.json` records that the staged kernel ELF has an x86_64 executable format, `_start` entry alignment, and PT_LOAD segments. That report does not prove Limine has loaded the ELF or transferred control to `_start`.
 
 `kernel/main.odin` exports `kernel_entry` and emits `KOZO_BOOT_SMOKE_OK` after serial initialization, but no local bootable ISO transfers control to it through a proven loader path.
 
@@ -208,4 +220,16 @@ The QEMU smoke evidence validator is:
 
 ```text
 qemu_smoke_evidence
+```
+
+The current kernel ELF loadability report is:
+
+```text
+artifacts/runtime/kernel_elf_report.json
+```
+
+The kernel ELF loadability validator is:
+
+```text
+kernel_loadability
 ```

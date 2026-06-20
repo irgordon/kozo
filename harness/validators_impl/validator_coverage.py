@@ -511,6 +511,20 @@ _VALIDATOR_TEST_CONTRACTS = {
             "diagnostic_names_field",
         ),
     ),
+    "kernel_loadability": ValidatorTestContract(
+        "kernel_loadability",
+        _TESTS_DIR / "test_kernel_loadability.py",
+        "KernelLoadabilityValidator",
+        (
+            "missing_report",
+            "invalid_report",
+            "missing_entry",
+            "missing_load_segments",
+            "wrong_architecture",
+            "blocker_mismatch",
+            "diagnostic_names_field",
+        ),
+    ),
     "qemu_smoke_evidence": ValidatorTestContract(
         "qemu_smoke_evidence",
         _TESTS_DIR / "test_qemu_smoke_evidence.py",

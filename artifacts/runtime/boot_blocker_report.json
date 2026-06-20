@@ -1,6 +1,6 @@
 {
   "version": 0,
-  "phase": "v0.4.1",
+  "phase": "v0.4.2",
   "outcome": "blocked",
   "evidence_type": "boot-blocker-report",
   "generated_by": "scripts/boot_blocker_report.sh",
@@ -22,6 +22,8 @@
     "scripts/build_boot_image.sh stages the boot image skeleton",
     "docs/BOOT_TOOLING.md documents Limine and xorriso acquisition paths",
     "scripts/build_boot_image.sh implements the Limine and xorriso ISO generation path",
+    "scripts/kernel_elf_report.py inspects the packaged kernel ELF structure",
+    "artifacts/runtime/kernel_elf_report.json records kernel ELF loadability evidence",
     "scripts/qemu_smoke.sh fails closed until kozo.iso exists",
     "scripts/runtime_smoke.sh proves runtime-adjacent object and symbol evidence",
     "scripts/build_boot_image.sh writes package metadata for the blocked ISO tooling attempt"
@@ -49,6 +51,7 @@
     "docs/BOOT_TOOLING.md",
     "scripts/build_boot_image.sh",
     "artifacts/runtime/boot_image/package_metadata.json",
+    "artifacts/runtime/kernel_elf_report.json",
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.log",
     "artifacts/runtime/qemu_smoke.stderr.log",

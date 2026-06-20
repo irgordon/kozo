@@ -44,6 +44,7 @@ BOOT_PROTOCOL_DECISION_INVALID = "BOOT_PROTOCOL_DECISION_INVALID"
 BOOT_IMAGE_SKELETON_INVALID = "BOOT_IMAGE_SKELETON_INVALID"
 BOOT_IMAGE_PACKAGING_INVALID = "BOOT_IMAGE_PACKAGING_INVALID"
 BOOT_TOOLING_INVALID = "BOOT_TOOLING_INVALID"
+KERNEL_LOADABILITY_INVALID = "KERNEL_LOADABILITY_INVALID"
 QEMU_SMOKE_EVIDENCE_INVALID = "QEMU_SMOKE_EVIDENCE_INVALID"
 RETURN_PATH_PROOF_INVALID = "RETURN_PATH_PROOF_INVALID"
 EXECUTION_PROOF_INVALID = "EXECUTION_PROOF_INVALID"
@@ -94,6 +95,7 @@ CODES = MappingProxyType(
         BOOT_IMAGE_SKELETON_INVALID: "Boot image skeleton is missing, incomplete, or inconsistent with boot blocker state",
         BOOT_IMAGE_PACKAGING_INVALID: "Boot image packaging metadata is missing, malformed, or inconsistent with boot blocker state",
         BOOT_TOOLING_INVALID: "Boot tooling policy is missing, incomplete, or inconsistent with boot blocker state",
+        KERNEL_LOADABILITY_INVALID: "Kernel ELF loadability evidence is missing, malformed, or inconsistent with boot blocker state",
         QEMU_SMOKE_EVIDENCE_INVALID: "QEMU smoke evidence is missing, malformed, or inconsistent with boot evidence policy",
         RETURN_PATH_PROOF_INVALID: "Rust does not prove that post-call payload mutations are observed after the trap bridge returns",
         EXECUTION_PROOF_INVALID: "Syscall execution behavior proof is missing or misordered in source",

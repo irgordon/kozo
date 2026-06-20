@@ -15,7 +15,7 @@ _RUNTIME_EVIDENCE_PATH = _ROOT / "docs" / "RUNTIME_EVIDENCE.md"
 _RELEASE_EVIDENCE_PATH = _ROOT / "docs" / "RELEASE_EVIDENCE.md"
 
 _COMMON_FIELDS = {
-    "phase": "v0.4.1",
+    "phase": "v0.4.2",
     "evidence_type": "boot-blocker-report",
     "generated_by": "scripts/boot_blocker_report.sh",
     "validator": "boot_blocker_report",
@@ -44,6 +44,11 @@ _EXACT_QEMU_BLOCKER_FIELDS = {
     "next_required_fix": "Resolve the exact QEMU smoke blocker recorded in artifacts/runtime/qemu_smoke.metadata.json before claiming QEMU boot evidence.",
 }
 
+_KERNEL_ELF_BLOCKER_FIELDS = {
+    "outcome": "blocked",
+    "next_required_fix": "Resolve the exact kernel ELF loadability issue recorded in artifacts/runtime/kernel_elf_report.json before continuing Limine kernel load debugging.",
+}
+
 _TOOLING_MISSING_COMPONENTS = (
     "Limine executable",
     "xorriso executable",
@@ -66,6 +71,11 @@ _EXACT_QEMU_CURRENT_SURFACES = (
     "artifacts/runtime/qemu_smoke.metadata.json records the current QEMU smoke blocker",
 )
 
+_KERNEL_ELF_CURRENT_SURFACES = (
+    "artifacts/runtime/kernel_elf_report.json records kernel ELF loadability evidence",
+    "scripts/kernel_elf_report.py inspects the packaged kernel ELF structure",
+)
+
 _COMMON_CURRENT_SURFACES = (
     "kernel/arch/x86_64/boot.asm defines a 64-bit _start symbol",
     "kernel/main.odin exports kernel_entry",
@@ -75,6 +85,8 @@ _COMMON_CURRENT_SURFACES = (
     "scripts/build_boot_image.sh stages the boot image skeleton",
     "docs/BOOT_TOOLING.md documents Limine and xorriso acquisition paths",
     "scripts/build_boot_image.sh implements the Limine and xorriso ISO generation path",
+    "scripts/kernel_elf_report.py inspects the packaged kernel ELF structure",
+    "artifacts/runtime/kernel_elf_report.json records kernel ELF loadability evidence",
     "scripts/qemu_smoke.sh fails closed until kozo.iso exists",
     "scripts/runtime_smoke.sh proves runtime-adjacent object and symbol evidence",
 )
@@ -106,6 +118,7 @@ _REQUIRED_DOC_REFERENCES = (
     "artifacts/runtime/boot_blocker_report.json",
     "artifacts/runtime/boot_image/package_metadata.json",
     "artifacts/runtime/boot_image/kozo.iso",
+    "artifacts/runtime/kernel_elf_report.json",
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.log",
     "docs/BOOT_TOOLING.md",
@@ -114,6 +127,7 @@ _REQUIRED_DOC_REFERENCES = (
     "boot_blocker_report",
     "missing_iso_generation_tooling",
     "missing_qemu_serial_evidence",
+    "kernel_not_loaded",
 )
 
 _ALLOWED_EXACT_QEMU_BLOCKERS = (
@@ -127,6 +141,17 @@ _ALLOWED_EXACT_QEMU_BLOCKERS = (
     "missing_boot_image",
     "qemu_launch_failed",
     "missing_iso_generation_tooling",
+    "invalid_kernel_elf",
+    "missing_load_segments",
+    "invalid_kernel_entry",
+    "linker_output_invalid",
+)
+
+_KERNEL_ELF_BLOCKERS = (
+    "invalid_kernel_elf",
+    "missing_load_segments",
+    "invalid_kernel_entry",
+    "linker_output_invalid",
 )
 
 
@@ -212,6 +237,8 @@ def _expected_blocker_fields(report: dict[str, object]) -> dict[str, object] | N
         return _TOOLING_BLOCKER_FIELDS
     if report.get("blocker_category") == "missing_qemu_serial_evidence":
         return _QEMU_BLOCKER_FIELDS
+    if report.get("blocker_category") in _KERNEL_ELF_BLOCKERS:
+        return _KERNEL_ELF_BLOCKER_FIELDS | {"blocker_category": report.get("blocker_category")}
     if report.get("blocker_category") in _ALLOWED_EXACT_QEMU_BLOCKERS:
         return _EXACT_QEMU_BLOCKER_FIELDS | {"blocker_category": report.get("blocker_category")}
     return None
@@ -224,6 +251,8 @@ def _required_missing_components(report: dict[str, object]) -> tuple[str, ...]:
         return _TOOLING_MISSING_COMPONENTS
     if report.get("blocker_category") == "missing_qemu_serial_evidence":
         return _QEMU_MISSING_COMPONENTS
+    if report.get("blocker_category") in _KERNEL_ELF_BLOCKERS:
+        return ("loadable kernel ELF image",)
     if report.get("blocker_category") in _ALLOWED_EXACT_QEMU_BLOCKERS:
         return _QEMU_MISSING_COMPONENTS
     return _TOOLING_MISSING_COMPONENTS
@@ -236,6 +265,8 @@ def _required_current_surfaces(report: dict[str, object]) -> tuple[str, ...]:
         return _COMMON_CURRENT_SURFACES + _TOOLING_CURRENT_SURFACES
     if report.get("blocker_category") == "missing_qemu_serial_evidence":
         return _COMMON_CURRENT_SURFACES + _QEMU_CURRENT_SURFACES
+    if report.get("blocker_category") in _KERNEL_ELF_BLOCKERS:
+        return _COMMON_CURRENT_SURFACES + _KERNEL_ELF_CURRENT_SURFACES
     if report.get("blocker_category") in _ALLOWED_EXACT_QEMU_BLOCKERS:
         return _COMMON_CURRENT_SURFACES + _EXACT_QEMU_CURRENT_SURFACES
     return _COMMON_CURRENT_SURFACES + _TOOLING_CURRENT_SURFACES

@@ -1,0 +1,72 @@
+{
+  "version": 0,
+  "phase": "v0.4.2",
+  "evidence_type": "kernel-elf-loadability",
+  "generated_by": "scripts/kernel_elf_report.py",
+  "kernel_elf": "artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf",
+  "linker_script": "linker/kernel.ld",
+  "architecture": "x86_64",
+  "elf_class": "ELF64",
+  "endianness": "little",
+  "elf_type": "EXEC",
+  "entry_symbol": "_start",
+  "entry_address": "0x200000",
+  "entry_symbol_address": "0x200000",
+  "entry_symbol_matches_entry": true,
+  "program_header_count": 6,
+  "section_count": 13,
+  "load_segments": [
+    {
+      "type": "PT_LOAD",
+      "flags": "r-x",
+      "offset": "0x1000",
+      "virtual_address": "0x200000",
+      "physical_address": "0x200000",
+      "file_size": "0x2f82",
+      "memory_size": "0x2f82",
+      "alignment": "0x1000"
+    },
+    {
+      "type": "PT_LOAD",
+      "flags": "r--",
+      "offset": "0x4000",
+      "virtual_address": "0x203000",
+      "physical_address": "0x203000",
+      "file_size": "0xd2c",
+      "memory_size": "0xd2c",
+      "alignment": "0x1000"
+    },
+    {
+      "type": "PT_LOAD",
+      "flags": "rw-",
+      "offset": "0x5000",
+      "virtual_address": "0x204000",
+      "physical_address": "0x204000",
+      "file_size": "0x10",
+      "memory_size": "0x5000",
+      "alignment": "0x1000"
+    }
+  ],
+  "detected_issues": [],
+  "blocker_category": "none",
+  "proves": [
+    "kernel ELF is an x86_64 executable",
+    "kernel ELF has an entry point matching _start",
+    "kernel ELF has PT_LOAD segments"
+  ],
+  "does_not_prove": [
+    "QEMU boot",
+    "kernel entry execution",
+    "serial initialization",
+    "hardware trap execution",
+    "Linux compatibility",
+    "POSIX compatibility",
+    "general userspace execution",
+    "process model behavior",
+    "VFS behavior",
+    "scheduler maturity",
+    "ELF loading by Limine",
+    "file descriptor behavior",
+    "production readiness"
+  ]
+}

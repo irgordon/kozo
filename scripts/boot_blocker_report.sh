@@ -6,10 +6,11 @@ RUNTIME_DIR="$ROOT/artifacts/runtime"
 REPORT_PATH="$RUNTIME_DIR/boot_blocker_report.json"
 PACKAGE_METADATA_PATH="$RUNTIME_DIR/boot_image/package_metadata.json"
 QEMU_METADATA_PATH="$RUNTIME_DIR/qemu_smoke.metadata.json"
+KERNEL_ELF_REPORT_PATH="$RUNTIME_DIR/kernel_elf_report.json"
 
 mkdir -p "$RUNTIME_DIR"
 
-python3 - "$ROOT" "$REPORT_PATH" "$PACKAGE_METADATA_PATH" "$QEMU_METADATA_PATH" <<'PY'
+python3 - "$ROOT" "$REPORT_PATH" "$PACKAGE_METADATA_PATH" "$QEMU_METADATA_PATH" "$KERNEL_ELF_REPORT_PATH" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -18,6 +19,7 @@ root = Path(sys.argv[1])
 report_path = Path(sys.argv[2])
 package_metadata_path = Path(sys.argv[3])
 qemu_metadata_path = Path(sys.argv[4])
+kernel_elf_report_path = Path(sys.argv[5])
 
 allowed_qemu_blockers = {
     "limine_not_reached",
@@ -30,6 +32,17 @@ allowed_qemu_blockers = {
     "missing_boot_image",
     "qemu_launch_failed",
     "missing_iso_generation_tooling",
+    "invalid_kernel_elf",
+    "missing_load_segments",
+    "invalid_kernel_entry",
+    "linker_output_invalid",
+}
+
+elf_issue_blockers = {
+    "invalid_kernel_elf",
+    "missing_load_segments",
+    "invalid_kernel_entry",
+    "linker_output_invalid",
 }
 
 
@@ -71,12 +84,36 @@ def qemu_blocker(metadata: dict[str, object]) -> str:
     return blocker
 
 
+def kernel_elf_blocker(report: dict[str, object]) -> str:
+    blocker = report.get("blocker_category")
+    if not isinstance(blocker, str):
+        return ""
+    if blocker in elf_issue_blockers:
+        return blocker
+    return ""
+
+
 def blocker_state() -> dict[str, object]:
     package_metadata = load_json(package_metadata_path)
     qemu_metadata = load_json(qemu_metadata_path)
+    kernel_elf_report = load_json(kernel_elf_report_path)
     qemu_blocker_category = qemu_blocker(qemu_metadata)
+    elf_blocker_category = kernel_elf_blocker(kernel_elf_report)
     if qemu_blocker_category == "missing_iso_generation_tooling":
         qemu_blocker_category = ""
+    if qemu_blocker_category == "kernel_not_loaded" and elf_blocker_category:
+        return {
+            "outcome": "blocked",
+            "blocker_category": elf_blocker_category,
+            "missing_components": [
+                "loadable kernel ELF image"
+            ],
+            "current_surfaces": [
+                "artifacts/runtime/kernel_elf_report.json records kernel ELF loadability evidence",
+                "scripts/kernel_elf_report.py inspects the packaged kernel ELF structure",
+            ],
+            "next_required_fix": "Resolve the exact kernel ELF loadability issue recorded in artifacts/runtime/kernel_elf_report.json before continuing Limine kernel load debugging.",
+        }
     if qemu_passed(qemu_metadata):
         return {
             "outcome": "pass",
@@ -135,7 +172,7 @@ state = blocker_state()
 
 report = {
     "version": 0,
-    "phase": "v0.4.1",
+    "phase": "v0.4.2",
     "outcome": state["outcome"],
     "evidence_type": "boot-blocker-report",
     "generated_by": "scripts/boot_blocker_report.sh",
@@ -151,6 +188,8 @@ report = {
         "scripts/build_boot_image.sh stages the boot image skeleton",
         "docs/BOOT_TOOLING.md documents Limine and xorriso acquisition paths",
         "scripts/build_boot_image.sh implements the Limine and xorriso ISO generation path",
+        "scripts/kernel_elf_report.py inspects the packaged kernel ELF structure",
+        "artifacts/runtime/kernel_elf_report.json records kernel ELF loadability evidence",
         "scripts/qemu_smoke.sh fails closed until kozo.iso exists",
         "scripts/runtime_smoke.sh proves runtime-adjacent object and symbol evidence"
     ] + state["current_surfaces"],
@@ -177,6 +216,7 @@ report = {
         "docs/BOOT_TOOLING.md",
         "scripts/build_boot_image.sh",
         "artifacts/runtime/boot_image/package_metadata.json",
+        "artifacts/runtime/kernel_elf_report.json",
         "artifacts/runtime/qemu_smoke.metadata.json",
         "artifacts/runtime/qemu_smoke.log",
         "artifacts/runtime/qemu_smoke.stderr.log",

@@ -1418,6 +1418,47 @@
         "verification.tests_run[5]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 49,
+      "title": "Diagnose kernel binary loadability",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/BOOT.md",
+        "docs/BOOT_BLOCKERS.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/generated/governance_index.md",
+        "tasks/todo.json",
+        "scripts/build_boot_image.sh",
+        "scripts/boot_blocker_report.sh",
+        "scripts/kernel_elf_report.py",
+        "scripts/verify.sh",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/boot_blocker_report.py",
+        "harness/validators_impl/boot_image_packaging.py",
+        "harness/validators_impl/kernel_loadability.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/agent_context.schema.json",
+        "schemas/latest_verify.schema.json",
+        "tests/test_boot_blocker_report.py",
+        "tests/test_boot_image_packaging.py",
+        "tests/test_kernel_loadability.py",
+        "artifacts/runtime/boot_blocker_report.json",
+        "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[4]",
+        "verification.tests_run[5]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -1584,6 +1625,7 @@
       "QEMU smoke metadata narrows missing Limine or KOZO output to limine_not_reached rather than a broad qemu_timeout blocker",
       "Blocked QEMU metadata fails if the observed marker list does not match the serial and stderr logs",
       "QEMU smoke evidence treats Limine executable-open failures as kernel_not_loaded and preserves no-boot claims unless KOZO_BOOT_SMOKE_OK is captured",
+      "kernel_loadability validates v0.4.2 kernel ELF loadability evidence for x86_64 executable format, entry point, _start alignment, program headers, PT_LOAD segments, blocker alignment, and non-claim boundaries",
       "All active release planning references resolve to docs/PHASEMAP.md and docs/ROADMAP.md, with historical changelog references preserved as history"
     ],
     "actual_behavior": [
@@ -1642,6 +1684,7 @@
       "v0.3.9 records the CI-observed qemu_timeout blocker, adds artifacts/runtime/qemu_smoke.stderr.log evidence, and preserves the no-QEMU-boot claim unless KOZO_BOOT_SMOKE_OK appears in captured serial output.",
       "v0.4.0 adds Limine serial/verbose config, KOZO early marker instrumentation, diagnostic QEMU metadata, and narrowed reachability blockers while preserving no-QEMU-boot and non-compatibility claim boundaries.",
       "v0.4.1 updates the Limine kernel path and QEMU smoke taxonomy; full verification must refresh local blocked metadata separately from source changes",
+      "v0.4.2 adds deterministic kernel ELF loadability reporting, validates the staged kernel ELF structure, and adds ISO filename metadata for Limine path visibility while preserving no-QEMU-boot, no-kernel-entry, no-serial-init, and non-compatibility claim boundaries",
       "Moved release planning documents under docs/, updated active release evidence/checklist and boot protocol validator references, and preserved runtime and compatibility non-goals"
     ],
     "baseline_reference": "kozo-trap-path-v1"
@@ -1696,6 +1739,7 @@
     "Hardened v0.3.9 QEMU timeout blocker handling with stderr evidence, phase-aligned boot blocker reporting, post-packaging exact QEMU blockers, and marker-present blocked-metadata rejection while preserving no-boot and non-compatibility claim boundaries.",
     "Added v0.4.0 kernel entry reachability diagnostics so QEMU smoke can distinguish Limine reachability, kernel load, kernel entry, serial initialization, marker emission, and fallback timeout without claiming QEMU boot.",
     "Added v0.4.1 Limine kernel load path fix so the configured kernel path matches the staged ISO layout and Limine open failures no longer masquerade as kernel entry failures.",
+    "Added v0.4.2 kernel ELF loadability evidence so kernel_not_loaded can be separated from invalid ELF shape, missing PT_LOAD segments, invalid entry point, or linker output failures without claiming QEMU boot.",
     "Moved release planning documents under docs/ and updated active references so governance planning documents live with the rest of the governance document set."
   ]
 }
