@@ -272,14 +272,16 @@ def _expected_blocker_from_logs(metadata: dict[str, object]) -> str | None:
         return "kernel_not_loaded"
     if "limine" in combined.lower() and not _has_kernel_load_evidence(combined, observed):
         return "kernel_not_loaded"
-    if observed and observed[0] != _EARLY_MARKERS[0]:
-        return "qemu_timeout"
+    if _EARLY_MARKERS[1] in observed and _EARLY_MARKERS[2] not in observed:
+        return "serial_not_initialized"
     if _has_kernel_load_evidence(combined, observed) and _EARLY_MARKERS[0] not in observed:
         return "kernel_entry_not_reached"
     if _EARLY_MARKERS[0] in observed and _EARLY_MARKERS[2] not in observed:
         return "serial_not_initialized"
     if _EARLY_MARKERS[2] in observed and _EARLY_MARKERS[3] not in observed:
         return "marker_not_emitted"
+    if observed and observed[0] != _EARLY_MARKERS[0]:
+        return "qemu_timeout"
     return "qemu_timeout"
 
 

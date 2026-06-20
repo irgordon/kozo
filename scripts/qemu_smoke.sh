@@ -210,14 +210,16 @@ elif "limine" in combined_lower and _has_kernel_open_failure(combined_lower):
     print("kernel_not_loaded")
 elif "limine" in combined_lower and not _has_kernel_load_evidence(combined_lower, observed):
     print("kernel_not_loaded")
-elif observed and observed[0] != markers[0]:
-    print("qemu_timeout")
+elif markers[1] in observed and markers[2] not in observed:
+    print("serial_not_initialized")
 elif _has_kernel_load_evidence(combined_lower, observed) and markers[0] not in observed:
     print("kernel_entry_not_reached")
 elif markers[0] in observed and markers[2] not in observed:
     print("serial_not_initialized")
 elif markers[2] in observed and markers[3] not in observed:
     print("marker_not_emitted")
+elif observed and observed[0] != markers[0]:
+    print("qemu_timeout")
 else:
     print("qemu_timeout")
 PY

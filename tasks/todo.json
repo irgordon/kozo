@@ -1603,6 +1603,35 @@
         "verification.tests_run[5]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 55,
+      "title": "Instrument early serial initialization markers",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "docs/BOOT.md",
+        "docs/BOOT_BLOCKERS.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/generated/governance_index.md",
+        "tasks/todo.json",
+        "kernel/arch/x86_64/boot.asm",
+        "scripts/qemu_smoke.sh",
+        "harness/validators_impl/qemu_smoke_evidence.py",
+        "tests/test_qemu_smoke_evidence.py",
+        "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[4]",
+        "verification.tests_run[5]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -1901,6 +1930,7 @@
     "Added v0.4.5 Limine ELF load layout classification so Limine lower-half PHDR rejection narrows to limine_lower_half_phdr without changing linker layout, runtime behavior, ABI contracts, syscall behavior, or compatibility claims.",
     "Added v0.4.6 codebase structural audit documentation before the higher-half linker/entry transition, documenting duplicated boot taxonomy, stale release/check blocker wording, and transition coupling risks without changing runtime, ABI, syscall, linker, or compatibility behavior.",
     "Added v0.4.7 higher-half linker transition so the kernel ELF records higher-half PT_LOAD virtual addresses with low physical load addresses, clears the local limine_lower_half_phdr loadability report, and preserves no-QEMU-boot, no-kernel-entry, ABI, syscall, and compatibility claim boundaries until CI QEMU evidence advances.",
-    "Added v0.4.8 kernel entry handoff instrumentation so _start emits KOZO_EARLY_0_ENTRY through assembly COM1 output before stack setup or Odin code, QEMU smoke metadata records entry handoff fields, and validators reject stale kernel_entry_not_reached classifications once the entry marker appears."
+    "Added v0.4.8 kernel entry handoff instrumentation so _start emits KOZO_EARLY_0_ENTRY through assembly COM1 output before stack setup or Odin code, QEMU smoke metadata records entry handoff fields, and validators reject stale kernel_entry_not_reached classifications once the entry marker appears.",
+    "Added v0.4.9 early serial initialization instrumentation so _start emits KOZO_EARLY_1_SERIAL_INIT_START and KOZO_EARLY_2_SERIAL_INIT_OK before stack setup or Odin code, while QEMU smoke validation advances serial-init OK evidence to marker_not_emitted unless the final boot smoke marker appears."
   ]
 }

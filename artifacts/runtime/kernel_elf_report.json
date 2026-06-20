@@ -24,28 +24,18 @@
       "offset": "0x1000",
       "virtual_address": "0xffffffff80200000",
       "physical_address": "0x200000",
-      "file_size": "0x2fd2",
-      "memory_size": "0x2fd2",
+      "file_size": "0x3042",
+      "memory_size": "0x3042",
       "alignment": "0x1000"
     },
     {
       "type": "PT_LOAD",
       "flags": "r--",
-      "offset": "0x4000",
-      "virtual_address": "0xffffffff80203000",
-      "physical_address": "0x203000",
-      "file_size": "0xd4c",
-      "memory_size": "0xd4c",
-      "alignment": "0x1000"
-    },
-    {
-      "type": "PT_LOAD",
-      "flags": "rw-",
       "offset": "0x5000",
       "virtual_address": "0xffffffff80204000",
       "physical_address": "0x204000",
-      "file_size": "0x10",
-      "memory_size": "0x10",
+      "file_size": "0xd8c",
+      "memory_size": "0xd8c",
       "alignment": "0x1000"
     },
     {
@@ -54,6 +44,16 @@
       "offset": "0x6000",
       "virtual_address": "0xffffffff80205000",
       "physical_address": "0x205000",
+      "file_size": "0x10",
+      "memory_size": "0x10",
+      "alignment": "0x1000"
+    },
+    {
+      "type": "PT_LOAD",
+      "flags": "rw-",
+      "offset": "0x7000",
+      "virtual_address": "0xffffffff80206000",
+      "physical_address": "0x206000",
       "file_size": "0x0",
       "memory_size": "0x4000",
       "alignment": "0x1000"

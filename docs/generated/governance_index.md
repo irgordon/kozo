@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.4.8`
+* Version: `v0.4.9`
 * Date: `2026-06-20`
-* Status: Kernel entry handoff.
+* Status: Early serial initialization.
 
 ## Verification status
 

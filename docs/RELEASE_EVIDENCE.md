@@ -164,6 +164,8 @@ The v0.4.7 kernel ELF loadability report is expected to show higher-half PT_LOAD
 
 For v0.4.8 and later, QEMU smoke metadata must record Limine entry-point observation, expected entry symbol, expected entry marker, entry-marker observation, and entry fault signal. `kernel_entry_not_reached` remains valid only when Limine entry evidence exists and `KOZO_EARLY_0_ENTRY` is absent from captured QEMU serial output.
 
+For v0.4.9 and later, `serial_not_initialized` remains valid only when `KOZO_EARLY_2_SERIAL_INIT_OK` is absent from captured QEMU serial output. If `KOZO_EARLY_2_SERIAL_INIT_OK` appears without `KOZO_BOOT_SMOKE_OK`, the expected blocker is `marker_not_emitted`; if `KOZO_BOOT_SMOKE_OK` appears, QEMU smoke evidence must pass.
+
 The current packaging metadata records the missing ISO generation tooling blocker:
 
 ```text

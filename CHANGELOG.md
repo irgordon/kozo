@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.4.9 - 2026-06-20
+
+**Status:** Early serial initialization.
+
+### Changed
+
+* Updated `_start` in `kernel/arch/x86_64/boot.asm` to emit `KOZO_EARLY_1_SERIAL_INIT_START`, perform minimal COM1 initialization in assembly, and emit `KOZO_EARLY_2_SERIAL_INIT_OK` before stack setup or Odin calls.
+* Refactored the assembly COM1 setup and marker write sequence behind local NASM macros so `_start` reads as the ordered boot evidence path.
+* Updated QEMU smoke blocker classification and focused tests so serial-init-start-only evidence remains `serial_not_initialized`, while `KOZO_EARLY_2_SERIAL_INIT_OK` without `KOZO_BOOT_SMOKE_OK` advances to `marker_not_emitted`.
+* Updated boot, runtime evidence, release evidence, phase map, and roadmap docs for the early serial initialization evidence boundary.
+
+### Notes
+
+* The latest inspected v0.4.8 CI artifact captured `KOZO_EARLY_0_ENTRY`, proving kernel entry handoff, but did not capture `KOZO_EARLY_2_SERIAL_INIT_OK`.
+* This phase adds assembly-level early serial initialization markers; it does not claim serial initialization until CI QEMU serial output captures `KOZO_EARLY_2_SERIAL_INIT_OK`.
+* This change does not claim QEMU boot unless `KOZO_BOOT_SMOKE_OK` appears in captured QEMU serial output.
+* This change does not claim hardware trap execution.
+* This change does not alter ABI contracts or syscall behavior.
+* This change does not claim Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, file descriptor behavior, or production readiness.
+
 ## v0.4.8 - 2026-06-20
 
 **Status:** Kernel entry handoff.

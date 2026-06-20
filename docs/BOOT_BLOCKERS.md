@@ -44,6 +44,8 @@ v0.4.7 moves the kernel ELF PT_LOAD virtual addresses to the higher half and pre
 
 v0.4.8 adds the `KOZO_EARLY_0_ENTRY` marker directly in `_start` before stack setup and before Odin code, so the next CI QEMU artifact can distinguish entry handoff from later serial initialization.
 
+v0.4.9 adds `KOZO_EARLY_1_SERIAL_INIT_START` and `KOZO_EARLY_2_SERIAL_INIT_OK` directly in `_start`, before stack setup and before Odin code, so the next CI QEMU artifact can distinguish serial initialization from final smoke marker emission.
+
 ---
 
 # 2. Verified Blocker
@@ -109,6 +111,10 @@ The v0.4.7 local kernel ELF report records `_start` at `0xffffffff80200000`, PT_
 The latest inspected v0.4.7 CI artifact loaded the higher-half ELF and reported `ELF entry point: 0xffffffff80200000`, but no KOZO marker appeared. The evidence-backed blocker for that artifact is `kernel_entry_not_reached`.
 
 The v0.4.8 entry handoff path emits `KOZO_EARLY_0_ENTRY` from assembly before stack setup. If CI captures that marker without `KOZO_EARLY_2_SERIAL_INIT_OK`, the blocker must narrow to `serial_not_initialized`; until that marker is captured, kernel entry remains unclaimed.
+
+The latest inspected v0.4.8 CI artifact captured `KOZO_EARLY_0_ENTRY` and narrowed the blocker to `serial_not_initialized`. Kernel entry handoff is proven for that artifact, but serial initialization remains unproven because `KOZO_EARLY_2_SERIAL_INIT_OK` is absent.
+
+The v0.4.9 early serial path emits `KOZO_EARLY_1_SERIAL_INIT_START` and `KOZO_EARLY_2_SERIAL_INIT_OK` from assembly before stack setup. If CI captures `KOZO_EARLY_2_SERIAL_INIT_OK` without `KOZO_BOOT_SMOKE_OK`, the blocker must narrow to `marker_not_emitted`; until the OK marker is captured, serial initialization remains unclaimed.
 
 ---
 

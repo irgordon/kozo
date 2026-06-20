@@ -46,6 +46,8 @@ v0.4.7 moves the kernel ELF virtual load layout to the higher half while preserv
 
 v0.4.8 adds an assembly-level `KOZO_EARLY_0_ENTRY` emission path at `_start`, before stack setup and before calling Odin code. Kernel entry remains unclaimed until CI QEMU serial output captures that marker.
 
+v0.4.9 adds assembly-level `KOZO_EARLY_1_SERIAL_INIT_START` and `KOZO_EARLY_2_SERIAL_INIT_OK` emission at `_start`, before stack setup and before calling Odin code. Serial initialization remains unclaimed until CI QEMU serial output captures `KOZO_EARLY_2_SERIAL_INIT_OK`.
+
 Remaining blocker: `missing_iso_generation_tooling`.
 
 The local blocker is `missing_iso_generation_tooling`.
@@ -74,9 +76,13 @@ Latest inspected pre-v0.4.5 CI artifact diagnosis: `limine_lower_half_phdr`. QEM
 
 Latest inspected v0.4.7 CI artifact diagnosis: `kernel_entry_not_reached`. QEMU launched the ISO, Limine loaded the higher-half ELF, and Limine reported `ELF entry point: 0xffffffff80200000`, but no KOZO marker appeared.
 
+Latest inspected v0.4.8 CI artifact diagnosis: `serial_not_initialized`. QEMU launched the ISO, Limine loaded the higher-half ELF, and captured `KOZO_EARLY_0_ENTRY`, but did not capture `KOZO_EARLY_2_SERIAL_INIT_OK` or `KOZO_BOOT_SMOKE_OK`.
+
 Current v0.4.7 kernel ELF diagnosis: structurally parseable by local ELF inspection, with `_start` and all PT_LOAD virtual addresses in the higher half. The staged kernel ELF is an x86_64 executable, `_start` matches the ELF entry point, PT_LOAD segments are present, and physical load addresses remain low through linker `AT(...)` placement. This does not prove Limine loaded or executed the kernel.
 
 Current v0.4.8 entry handoff change: `_start` writes `KOZO_EARLY_0_ENTRY` directly to COM1 before stack setup, before `kernel_entry`, and before any Odin runtime dependency. This does not prove kernel entry until captured in QEMU serial output.
+
+Current v0.4.9 serial initialization change: `_start` writes the entry marker, the serial initialization start marker, performs minimal COM1 initialization in assembly, and writes the serial initialization OK marker before stack setup. This does not prove QEMU boot until `KOZO_BOOT_SMOKE_OK` appears in captured QEMU serial output.
 
 Selected boot protocol: Limine.
 

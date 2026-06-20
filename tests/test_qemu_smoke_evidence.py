@@ -103,8 +103,8 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
 
-    def test_accepts_qemu_timeout_fallback_blocker(self):
-        result = self.validate_blocked_fixture("qemu_timeout", "KOZO_EARLY_1_SERIAL_INIT_START\n")
+    def test_accepts_serial_init_start_only_as_serial_not_initialized(self):
+        result = self.validate_blocked_fixture("serial_not_initialized", "KOZO_EARLY_1_SERIAL_INIT_START\n")
 
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
@@ -254,6 +254,22 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "fail")
         self.assert_qemu_failure(result, "entry_handoff_mismatch", "qemu_smoke.entry_marker_observed")
+
+    def test_fails_when_serial_ok_is_marked_as_serial_not_initialized(self):
+        self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
+        serial_initialized = (
+            "KOZO_EARLY_0_ENTRY\n"
+            "KOZO_EARLY_1_SERIAL_INIT_START\n"
+            "KOZO_EARLY_2_SERIAL_INIT_OK\n"
+        )
+        result = self.validate_fixture(
+            metadata_factory=lambda: valid_blocked_metadata("serial_not_initialized", serial_initialized),
+            blocker_factory=lambda: valid_blocker("serial_not_initialized"),
+            mutate_serial_log=lambda _: serial_initialized,
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_qemu_failure(result, "blocker_taxonomy_mismatch", "qemu_smoke.blocker_category")
 
     def test_fails_when_blocker_category_is_unknown(self):
         self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
