@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260621T215451Z",
+  "run_id": "verify-20260621T225150Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -319,27 +319,11 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
-    "contracts/runtime_progression_entry_contract.v0.json",
-    "docs/BOOT.md",
-    "docs/CONTRACTS.md",
+    "docs/CODEBASE_AUDIT.md",
     "docs/PHASEMAP.md",
-    "docs/RELEASE_EVIDENCE.md",
     "docs/ROADMAP.md",
-    "docs/RUNTIME_EVIDENCE.md",
-    "docs/VALIDATION.md",
     "docs/generated/governance_index.md",
-    "harness/codes.py",
-    "harness/registry.py",
-    "harness/runtime_progression_entry_contract.py",
-    "harness/validators.py",
-    "harness/validators_impl/runtime_progression_entry_contract.py",
-    "harness/validators_impl/schema.py",
-    "harness/validators_impl/validator_coverage.py",
-    "schemas/agent_context.schema.json",
-    "schemas/latest_verify.schema.json",
-    "schemas/runtime_progression_entry_contract.schema.json",
-    "tasks/todo.json",
-    "tests/test_runtime_progression_entry_contract.py"
+    "tasks/todo.json"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -356,5 +340,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-06-21T21:54:51Z"
+  "generated_at": "2026-06-21T22:51:50Z"
 }
