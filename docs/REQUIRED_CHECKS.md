@@ -132,7 +132,7 @@ Full CI requires runtime smoke evidence because `.github/workflows/ci.yml` runs 
 
 The lint workflow does not require runtime smoke evidence because `.github/workflows/lint.yml` does not run full verification. If lint is changed to run `scripts/verify.sh`, runtime smoke evidence becomes required there through the same full-verification path.
 
-QEMU smoke evidence is required in full CI through `scripts/qemu_smoke.sh` and `qemu_smoke_evidence`. A blocked QEMU smoke result is acceptable only when metadata records an exact blocker and preserves no-QEMU-boot claims. A QEMU boot claim requires passing metadata and `KOZO_BOOT_SMOKE_OK` in `artifacts/runtime/qemu_smoke.log`.
+QEMU smoke evidence is required in full CI through `scripts/qemu_smoke.sh` and `qemu_smoke_evidence`. A blocked QEMU smoke result is acceptable only when metadata records an exact blocker and preserves no-QEMU-boot claims. A QEMU boot claim requires passing metadata and the full ordered marker sequence ending in `KOZO_BOOT_SMOKE_OK` in `artifacts/runtime/qemu_smoke.log`.
 
 The CI-observed timeout or loader state must be narrowed when possible. QEMU smoke metadata may report `limine_not_reached`, `kernel_not_loaded`, `kernel_entry_not_reached`, `serial_not_initialized`, `marker_not_emitted`, `limine_lower_half_phdr`, or fallback `qemu_timeout`; all remain blockers and do not authorize a QEMU boot claim.
 

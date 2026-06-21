@@ -48,6 +48,8 @@ v0.4.8 adds the first entry marker emission directly to `_start`. The marker is 
 
 v0.4.9 adds the serial initialization start and OK markers directly to `_start`. The markers are written through assembly COM1 output before stack setup and before Odin code so QEMU smoke evidence can distinguish serial initialization from final smoke marker emission.
 
+v0.5.0 adds the final `KOZO_BOOT_SMOKE_OK` marker directly to `_start` after assembly-level serial initialization. Passing QEMU smoke evidence requires the full ordered marker sequence in captured serial output.
+
 Current local boot blocker: `missing_iso_generation_tooling`.
 
 When CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated blocker report may narrow to `missing_qemu_serial_evidence` for that run.
@@ -220,7 +222,7 @@ The boot tooling policy path is:
 docs/BOOT_TOOLING.md
 ```
 
-The QEMU smoke log is passing QEMU serial smoke evidence only when `qemu_smoke_evidence` validates metadata with outcome `pass` and finds `KOZO_BOOT_SMOKE_OK` in the serial log. Blocked metadata remains blocker evidence only.
+The QEMU smoke log is passing QEMU serial smoke evidence only when `qemu_smoke_evidence` validates metadata with outcome `pass` and finds the full ordered marker sequence ending in `KOZO_BOOT_SMOKE_OK` in the serial log. Blocked metadata remains blocker evidence only.
 
 The QEMU smoke summary is a reviewer convenience artifact. It is generated from the QEMU smoke metadata, serial log, stderr log, and boot blocker report. It is not authoritative and must not replace metadata or log validation.
 

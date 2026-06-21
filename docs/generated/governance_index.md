@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.4.96`
-* Date: `2026-06-20`
-* Status: Smoke evidence observability.
+* Version: `v0.5.0`
+* Date: `2026-06-21`
+* Status: Boot smoke marker emission.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 39
 * Failed checks: 0
-* Run ID: `verify-20260621T034142Z`
-* Generated at: `2026-06-21T03:41:42Z`
+* Run ID: `verify-20260621T041648Z`
+* Generated at: `2026-06-21T04:16:48Z`
 
 ## Registered validators
 

@@ -16,6 +16,8 @@ KOZO_NEGATIVE_COVERAGE = {
         "missing_stderr_log": "test_fails_when_stderr_log_is_missing",
         "missing_serial_log": "test_fails_when_pass_metadata_has_no_serial_log",
         "marker_missing": "test_fails_when_marker_is_missing_from_serial_log",
+        "marker_sequence_incomplete": "test_fails_when_pass_metadata_has_final_marker_without_prior_markers",
+        "marker_order_invalid": "test_fails_when_marker_order_is_wrong",
         "wrong_evidence_type": "test_fails_when_evidence_type_is_wrong",
         "wrong_boot_protocol": "test_fails_when_boot_protocol_is_wrong",
         "missing_non_goal": "test_fails_when_non_goal_is_missing",
@@ -148,6 +150,33 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "fail")
         self.assert_qemu_failure(result, "marker_missing", "qemu_smoke.expected_marker")
+
+    def test_fails_when_pass_metadata_has_final_marker_without_prior_markers(self):
+        self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
+        final_marker_only = "Limine\nKOZO_BOOT_SMOKE_OK\n"
+        result = self.validate_fixture(
+            metadata_factory=lambda: valid_metadata("pass", serial_text=final_marker_only),
+            mutate_serial_log=lambda _: final_marker_only,
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_qemu_failure(result, "marker_sequence_incomplete", "qemu_smoke.marker_sequence.KOZO_EARLY_0_ENTRY")
+
+    def test_fails_when_marker_order_is_wrong(self):
+        self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
+        out_of_order = (
+            "KOZO_EARLY_0_ENTRY\n"
+            "KOZO_BOOT_SMOKE_OK\n"
+            "KOZO_EARLY_1_SERIAL_INIT_START\n"
+            "KOZO_EARLY_2_SERIAL_INIT_OK\n"
+        )
+        result = self.validate_fixture(
+            metadata_factory=lambda: valid_metadata("pass", serial_text=out_of_order),
+            mutate_serial_log=lambda _: out_of_order,
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_qemu_failure(result, "marker_order_invalid", "qemu_smoke.marker_sequence")
 
     def test_fails_when_evidence_type_is_wrong(self):
         self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
@@ -560,7 +589,13 @@ def remove_list_value(metadata: dict[str, object], key: str, value: str) -> dict
 
 
 def default_serial_log_text() -> str:
-    return "Limine\nKOZO_BOOT_SMOKE_OK\n"
+    return (
+        "Limine\n"
+        "KOZO_EARLY_0_ENTRY\n"
+        "KOZO_EARLY_1_SERIAL_INIT_START\n"
+        "KOZO_EARLY_2_SERIAL_INIT_OK\n"
+        "KOZO_BOOT_SMOKE_OK\n"
+    )
 
 
 def default_stderr_log_text() -> str:

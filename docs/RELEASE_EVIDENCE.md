@@ -168,6 +168,15 @@ For v0.4.8 and later, QEMU smoke metadata must record Limine entry-point observa
 
 For v0.4.9 and later, `serial_not_initialized` remains valid only when `KOZO_EARLY_2_SERIAL_INIT_OK` is absent from captured QEMU serial output. If `KOZO_EARLY_2_SERIAL_INIT_OK` appears without `KOZO_BOOT_SMOKE_OK`, the expected blocker is `marker_not_emitted`; if `KOZO_BOOT_SMOKE_OK` appears, QEMU smoke evidence must pass.
 
+For v0.5.0 and later, passing QEMU smoke evidence requires the full ordered marker sequence in captured QEMU serial output:
+
+```text
+KOZO_EARLY_0_ENTRY
+KOZO_EARLY_1_SERIAL_INIT_START
+KOZO_EARLY_2_SERIAL_INIT_OK
+KOZO_BOOT_SMOKE_OK
+```
+
 The current packaging metadata records the missing ISO generation tooling blocker:
 
 ```text

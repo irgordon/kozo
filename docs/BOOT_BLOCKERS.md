@@ -90,6 +90,15 @@ If `KOZO_EARLY_0_ENTRY` appears without `KOZO_EARLY_2_SERIAL_INIT_OK`, the gener
 
 If `KOZO_EARLY_2_SERIAL_INIT_OK` appears without `KOZO_BOOT_SMOKE_OK`, the generated blocker report narrows to `marker_not_emitted`.
 
+For v0.5.0 and later, passing QEMU smoke evidence requires this full ordered marker sequence:
+
+```text
+KOZO_EARLY_0_ENTRY
+KOZO_EARLY_1_SERIAL_INIT_START
+KOZO_EARLY_2_SERIAL_INIT_OK
+KOZO_BOOT_SMOKE_OK
+```
+
 Even then, QEMU boot evidence remains blocked until serial output is captured and validated.
 
 `scripts/qemu_smoke.sh` writes `artifacts/runtime/qemu_smoke.metadata.json`, `artifacts/runtime/qemu_smoke.log`, and `artifacts/runtime/qemu_smoke.stderr.log`. The expected kernel-emitted serial marker is `KOZO_BOOT_SMOKE_OK`.
@@ -115,6 +124,8 @@ The v0.4.8 entry handoff path emits `KOZO_EARLY_0_ENTRY` from assembly before st
 The latest inspected v0.4.8 CI artifact captured `KOZO_EARLY_0_ENTRY` and narrowed the blocker to `serial_not_initialized`. Kernel entry handoff is proven for that artifact, but serial initialization remains unproven because `KOZO_EARLY_2_SERIAL_INIT_OK` is absent.
 
 The v0.4.9 early serial path emits `KOZO_EARLY_1_SERIAL_INIT_START` and `KOZO_EARLY_2_SERIAL_INIT_OK` from assembly before stack setup. If CI captures `KOZO_EARLY_2_SERIAL_INIT_OK` without `KOZO_BOOT_SMOKE_OK`, the blocker must narrow to `marker_not_emitted`; until the OK marker is captured, serial initialization remains unclaimed.
+
+The v0.5.0 boot smoke path emits `KOZO_BOOT_SMOKE_OK` from assembly immediately after the serial initialization OK marker. This clears `marker_not_emitted` only when QEMU smoke validation captures the full ordered marker sequence.
 
 ---
 

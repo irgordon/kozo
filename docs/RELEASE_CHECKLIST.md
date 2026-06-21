@@ -127,6 +127,7 @@ Required checklist:
 * QEMU smoke metadata early markers, observed markers, earliest marker, timeout state, and byte counts are reviewed when the QEMU blocker is under direct review.
 * QEMU smoke metadata outcome is `pass` before any QEMU boot claim is made.
 * Passing QEMU smoke metadata includes `KOZO_BOOT_SMOKE_OK` as the expected marker.
+* Passing QEMU smoke serial output includes `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, and `KOZO_BOOT_SMOKE_OK` in order.
 * Release is blocked if runtime evidence is overclaimed or missing required non-goals.
 * No QEMU or boot claim is made unless separately implemented and proven.
 * Python unit tests pass.

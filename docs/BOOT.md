@@ -48,6 +48,8 @@ v0.4.8 adds an assembly-level `KOZO_EARLY_0_ENTRY` emission path at `_start`, be
 
 v0.4.9 adds assembly-level `KOZO_EARLY_1_SERIAL_INIT_START` and `KOZO_EARLY_2_SERIAL_INIT_OK` emission at `_start`, before stack setup and before calling Odin code. Serial initialization remains unclaimed until CI QEMU serial output captures `KOZO_EARLY_2_SERIAL_INIT_OK`.
 
+v0.5.0 adds assembly-level `KOZO_BOOT_SMOKE_OK` emission at `_start`, immediately after `KOZO_EARLY_2_SERIAL_INIT_OK` and before calling Odin code. QEMU boot evidence remains unclaimed unless QEMU smoke metadata validates passing evidence and captured serial output contains the full ordered marker sequence.
+
 Remaining blocker: `missing_iso_generation_tooling`.
 
 The local blocker is `missing_iso_generation_tooling`.
@@ -83,6 +85,8 @@ Current v0.4.7 kernel ELF diagnosis: structurally parseable by local ELF inspect
 Current v0.4.8 entry handoff change: `_start` writes `KOZO_EARLY_0_ENTRY` directly to COM1 before stack setup, before `kernel_entry`, and before any Odin runtime dependency. This does not prove kernel entry until captured in QEMU serial output.
 
 Current v0.4.9 serial initialization change: `_start` writes the entry marker, the serial initialization start marker, performs minimal COM1 initialization in assembly, and writes the serial initialization OK marker before stack setup. This does not prove QEMU boot until `KOZO_BOOT_SMOKE_OK` appears in captured QEMU serial output.
+
+Current v0.5.0 marker emission change: `_start` writes `KOZO_BOOT_SMOKE_OK` through the same assembly COM1 path after `KOZO_EARLY_2_SERIAL_INIT_OK`. This does not claim QEMU boot until QEMU smoke validation observes the full ordered marker sequence in captured serial output.
 
 Selected boot protocol: Limine.
 
@@ -159,7 +163,7 @@ The current source surfaces relevant to future boot work are:
 
 `artifacts/runtime/kernel_elf_report.json` records that the staged kernel ELF has an x86_64 executable format, `_start` entry alignment, PT_LOAD segments, PT_LOAD virtual and physical addresses, higher-half layout summary, and the current load-layout blocker. That report does not prove Limine has loaded the ELF or transferred control to `_start`.
 
-`kernel/main.odin` exports `kernel_entry` and emits `KOZO_BOOT_SMOKE_OK` after serial initialization, but no local bootable ISO transfers control to it through a proven loader path.
+`kernel/arch/x86_64/boot.asm` emits `KOZO_BOOT_SMOKE_OK` after assembly-level serial initialization. `kernel/main.odin` also keeps a later boot smoke marker path after Odin serial initialization. Passing QEMU smoke evidence requires the captured serial log to contain the expected marker sequence.
 
 `kernel/arch/x86_64/serial.odin` initializes COM1 serial output and owns the boot smoke marker output. That marker is not a QEMU boot claim until captured from QEMU serial output.
 

@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.5.0 - 2026-06-21
+
+**Status:** Boot smoke marker emission.
+
+### Changed
+
+* Updated `_start` in `kernel/arch/x86_64/boot.asm` to emit `KOZO_BOOT_SMOKE_OK` immediately after `KOZO_EARLY_2_SERIAL_INIT_OK` through the same proven assembly COM1 path.
+* Updated QEMU smoke validation so passing evidence requires the full ordered marker sequence: `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, and `KOZO_BOOT_SMOKE_OK`.
+* Updated boot, runtime evidence, release evidence, checklist, required checks, phase map, and roadmap docs for the v0.5.0 marker-emission boundary.
+
+### Notes
+
+* Local verification still records the local tooling blocker when Limine/xorriso ISO tooling is unavailable.
+* QEMU boot evidence is not claimed unless CI or local QEMU smoke metadata validates passing evidence and captured serial output contains the full ordered marker sequence.
+* This change does not alter ABI contracts or syscall behavior.
+* This change does not claim hardware trap execution, Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, file descriptor behavior, or production readiness.
+
 ## v0.4.96 - 2026-06-20
 
 **Status:** Smoke evidence observability.

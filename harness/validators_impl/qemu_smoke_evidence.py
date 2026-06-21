@@ -123,6 +123,7 @@ def _qemu_smoke_issue() -> QemuSmokeIssue | None:
         _diagnostic_field_issue(metadata),
         _entry_handoff_field_issue(metadata),
         _observed_marker_issue(metadata),
+        _marker_sequence_issue(metadata),
         _summary_issue(metadata),
         _blocker_taxonomy_issue(metadata),
         _list_contract_issue(metadata, "does_not_prove", _REQUIRED_NON_GOALS, "missing_non_goal"),
@@ -278,6 +279,23 @@ def _log_text() -> str:
     serial_text = _SERIAL_LOG_PATH.read_text(errors="replace") if _SERIAL_LOG_PATH.is_file() else ""
     stderr_text = _STDERR_LOG_PATH.read_text(errors="replace") if _STDERR_LOG_PATH.is_file() else ""
     return f"{serial_text}\n{stderr_text}"
+
+
+def _marker_sequence_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
+    log_text = _log_text()
+    if metadata.get("outcome") == "pass":
+        for marker in _EARLY_MARKERS:
+            if marker not in log_text:
+                return _issue("marker_sequence_incomplete", f"qemu_smoke.marker_sequence.{marker}", "QEMU smoke pass requires the full boot marker sequence")
+    return _marker_order_issue(log_text)
+
+
+def _marker_order_issue(log_text: str) -> QemuSmokeIssue | None:
+    positions = [(marker, log_text.find(marker)) for marker in _EARLY_MARKERS if marker in log_text]
+    ordered_positions = [position for _, position in positions]
+    if ordered_positions != sorted(ordered_positions):
+        return _issue("marker_order_invalid", "qemu_smoke.marker_sequence", "QEMU smoke markers must appear in boot order")
+    return None
 
 
 def _entry_handoff_field_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:

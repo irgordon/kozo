@@ -75,6 +75,10 @@ early_serial_init_ok_marker:
     db "KOZO_EARLY_2_SERIAL_INIT_OK", 13, 10
 early_serial_init_ok_marker_end:
 
+boot_smoke_marker:
+    db "KOZO_BOOT_SMOKE_OK", 13, 10
+boot_smoke_marker_end:
+
 section .text
 
 _start:
@@ -83,6 +87,7 @@ _start:
     WRITE_COM1_MARKER early_serial_init_start_marker, early_serial_init_start_marker_end
     INIT_COM1
     WRITE_COM1_MARKER early_serial_init_ok_marker, early_serial_init_ok_marker_end
+    WRITE_COM1_MARKER boot_smoke_marker, boot_smoke_marker_end
     xor rbp, rbp
     lea rsp, [rel boot_stack_top]
     and rsp, -16

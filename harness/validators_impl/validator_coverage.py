@@ -556,6 +556,8 @@ _VALIDATOR_TEST_CONTRACTS = {
             "missing_stderr_log",
             "missing_serial_log",
             "marker_missing",
+            "marker_sequence_incomplete",
+            "marker_order_invalid",
             "wrong_evidence_type",
             "wrong_boot_protocol",
             "missing_non_goal",
