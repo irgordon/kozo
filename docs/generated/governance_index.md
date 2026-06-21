@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.5.2`
+* Version: `v0.5.4`
 * Date: `2026-06-21`
-* Status: CI evidence access hardening.
+* Status: QEMU serial smoke evidence promotion.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 39
 * Failed checks: 0
-* Run ID: `verify-20260621T050646Z`
-* Generated at: `2026-06-21T05:06:46Z`
+* Run ID: `verify-20260621T154550Z`
+* Generated at: `2026-06-21T15:45:50Z`
 
 ## Registered validators
 

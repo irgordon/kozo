@@ -45,6 +45,14 @@ class BootToolingValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
 
+    def test_passes_when_qemu_serial_smoke_has_no_active_blocker(self):
+        result = self.validate_fixture(
+            mutate_report=lambda report: report | {"outcome": "pass", "blocker_category": "none"}
+        )
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
     def test_fails_when_limine_documentation_is_missing(self):
         self.assertEqual("boot_tooling", BootToolingValidator.name)
         result = self.validate_fixture(mutate_tooling=lambda text: text.replace("Limine purpose:", "Bootloader purpose:"))
@@ -93,6 +101,13 @@ class BootToolingValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "fail")
         self.assert_tooling_failure(result, "blocker_mismatch", "boot_blocker.blocker_category")
+
+    def test_fails_when_no_active_blocker_is_not_pass_outcome(self):
+        self.assertEqual("boot_tooling", BootToolingValidator.name)
+        result = self.validate_fixture(mutate_report=lambda report: report | {"blocker_category": "none"})
+
+        self.assertEqual(result.status, "fail")
+        self.assert_tooling_failure(result, "blocker_mismatch", "boot_blocker.outcome")
 
     def test_failure_diagnostic_names_field(self):
         self.assertEqual("boot_tooling", BootToolingValidator.name)
@@ -174,7 +189,7 @@ def valid_tooling_text() -> str:
 
 
 def valid_doc_text() -> str:
-    return "docs/BOOT_TOOLING.md\nmissing_iso_generation_tooling\n"
+    return "docs/BOOT_TOOLING.md\nNo active QEMU serial smoke blocker.\n"
 
 
 def valid_ci_text() -> str:

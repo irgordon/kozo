@@ -50,9 +50,11 @@ v0.4.9 adds assembly-level `KOZO_EARLY_1_SERIAL_INIT_START` and `KOZO_EARLY_2_SE
 
 v0.5.0 adds assembly-level `KOZO_BOOT_SMOKE_OK` emission at `_start`, immediately after `KOZO_EARLY_2_SERIAL_INIT_OK` and before stack setup or Odin code. Passing QEMU serial smoke evidence remains unclaimed unless QEMU smoke metadata validates passing evidence and captured serial output contains the full ordered marker sequence.
 
-v0.5.1 validates the pushed v0.5.0 state before further runtime work. Local verification passes, but the latest pushed CI run for commit `14fb015` failed in `scripts/verify.sh`, so QEMU serial smoke evidence is not promoted.
+v0.5.4 promotes the CI-proven QEMU serial smoke evidence after CI run `27894312430` captured the full ordered marker sequence and QEMU smoke metadata reported `outcome: pass` with `blocker_category: none`.
 
-Local generated blocker: `missing_iso_generation_tooling`.
+No active QEMU serial smoke blocker.
+
+Local generated blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
 
 If CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated blocker report narrows to `missing_qemu_serial_evidence` for that run.
 
@@ -62,13 +64,13 @@ If `scripts/qemu_smoke.sh` can run against a generated ISO, it writes `artifacts
 
 # 2. Current Result
 
-Boot feasibility result: blocked.
+Boot feasibility result: QEMU serial smoke evidence proven.
 
-Active release blocker: `ci_verification_failed_after_v0.5.0`.
+Active release blocker: none for QEMU serial smoke evidence.
 
 Local generated blocker category: `missing_iso_generation_tooling`.
 
-Remaining blocker: `missing_iso_generation_tooling`.
+No active QEMU serial smoke blocker.
 
 CI packaged-image blocker category, when the ISO exists: `missing_qemu_serial_evidence`.
 
@@ -90,7 +92,7 @@ Current v0.4.9 serial initialization change: `_start` writes the entry marker, t
 
 Current v0.5.0 marker emission change: `_start` writes `KOZO_BOOT_SMOKE_OK` through the same assembly COM1 path after `KOZO_EARLY_2_SERIAL_INIT_OK`. This supports only QEMU serial smoke evidence when QEMU smoke validation observes the full ordered marker sequence in captured serial output; it does not prove Odin runtime execution, stack setup, memory initialization, syscall dispatch, hardware trap execution, or broader boot lifecycle behavior.
 
-Latest inspected v0.5.0 CI status: `ci` failed in the `scripts/verify.sh` step for commit `14fb015`; `lint` passed. The uploaded artifact could not be downloaded from this review environment, so the next runtime phase must inspect that artifact before promoting QEMU serial smoke evidence or choosing a new runtime fix.
+Latest inspected v0.5.4 CI smoke status: CI run `27894312430` produced passing QEMU smoke metadata and captured `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, and `KOZO_BOOT_SMOKE_OK` in the serial log.
 
 Selected boot protocol: Limine.
 
@@ -118,7 +120,7 @@ GitHub Actions full CI installs xorriso, acquires Limine v12.3.3 from a pinned s
 
 The current local tooling does not yet provide the Limine artifacts and xorriso executable required to produce that image, so local verification continues to report blocked packaging metadata.
 
-KOZO has QEMU smoke evidence metadata, but local execution currently records `missing_iso_generation_tooling`. A QEMU boot claim remains unavailable unless `qemu_smoke_evidence` validates a passing serial log with `KOZO_BOOT_SMOKE_OK`.
+KOZO has CI-proven QEMU serial smoke evidence. Local execution may still record `missing_iso_generation_tooling` when Limine and xorriso are unavailable outside CI.
 
 The early marker sequence is:
 
@@ -133,16 +135,15 @@ KOZO_BOOT_SMOKE_OK
 
 # 3. Missing Components
 
-The concrete remaining missing components are:
+The concrete remaining local-only missing components are:
 
 * local Limine executable
 * local xorriso executable
 * local Limine bootloader artifacts
 * bootable ISO artifact when not produced by CI
-* validated QEMU serial smoke execution
-* a future CI QEMU run that proves Limine can load and enter the kernel executable path
+Validated QEMU serial smoke execution is no longer missing in CI evidence.
 
-Until those exist, KOZO must not claim QEMU boot evidence.
+This still does not authorize a broad QEMU boot, hardware trap, compatibility, userspace, subsystem, or production-readiness claim.
 
 ---
 

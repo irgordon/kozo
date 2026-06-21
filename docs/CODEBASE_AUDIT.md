@@ -464,3 +464,41 @@ Authenticated artifact download remains useful, but first-level triage no longer
 ## 16.4 Remaining Risk
 
 The next runtime phase still must classify the actual CI smoke evidence. v0.5.2 only makes that evidence visible in CI logs; it does not alter runtime behavior, marker semantics, QEMU behavior, or blocker taxonomy.
+
+---
+
+# 17. v0.5.4 QEMU Serial Smoke Evidence Promotion
+
+Date: 2026-06-21
+
+Status: Completed.
+
+## 17.1 Evidence Review
+
+CI run `27894312430` captured the full ordered QEMU serial smoke marker sequence:
+
+```text
+KOZO_EARLY_0_ENTRY
+KOZO_EARLY_1_SERIAL_INIT_START
+KOZO_EARLY_2_SERIAL_INIT_OK
+KOZO_BOOT_SMOKE_OK
+```
+
+The matching QEMU smoke metadata reported `outcome: pass` and `blocker_category: none`.
+
+## 17.2 Resolved Findings
+
+The following boot-path blockers are resolved for the QEMU serial smoke path:
+
+* `limine_lower_half_phdr`
+* `kernel_entry_not_reached`
+* `serial_not_initialized`
+* `marker_not_emitted`
+
+## 17.3 Remaining Findings
+
+`AUDIT-095-001`, `AUDIT-095-002`, and `AUDIT-095-005` remain deferred cleanup risks. The marker and blocker taxonomy is still duplicated across scripts, validators, tests, and docs. v0.5.4 realigns stale validators only; it does not centralize taxonomy or refactor QEMU smoke policy.
+
+## 17.4 Claim Boundary
+
+The promoted evidence proves QEMU serial smoke only. It does not prove Odin runtime execution, stack setup, memory initialization, syscall dispatch, hardware trap execution, Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, file descriptor behavior, or production readiness.

@@ -92,8 +92,9 @@ The current repository proves:
 * boot image skeleton, Limine configuration, ISO generation path, and QEMU smoke command existence
 * higher-half kernel ELF loadability metadata with no local lower-half PHDR blocker
 * assembly-level entry, serial initialization, and final smoke marker emission in source
+* CI-proven QEMU serial smoke evidence with the full ordered marker sequence
 
-The latest local generated evidence does not prove QEMU serial smoke pass because local QEMU smoke remains blocked by missing local Limine/xorriso tooling.
+The latest local generated evidence may still report missing local Limine/xorriso tooling, but CI run `27894312430` proves the narrow QEMU serial smoke path.
 
 ---
 
@@ -101,7 +102,6 @@ The latest local generated evidence does not prove QEMU serial smoke pass becaus
 
 KOZO still does not prove:
 
-* QEMU serial smoke pass from the latest pushed CI run
 * Odin runtime execution after the assembly marker sequence
 * stack setup
 * memory initialization
@@ -120,9 +120,7 @@ KOZO still does not prove:
 
 # 9. Current Active Blocker
 
-Current release blocker: `ci_verification_failed_after_v0.5.0`.
-
-The latest pushed `ci` workflow for commit `14fb015` failed in the `scripts/verify.sh` step. The artifact was uploaded, but this review environment could not authenticate artifact download, so the QEMU serial smoke result from that failed run is not promoted.
+Current QEMU serial smoke blocker: none.
 
 Local generated evidence still reports `missing_iso_generation_tooling`, which is a local environment blocker and not the CI/Linux portability state.
 
@@ -130,15 +128,12 @@ Local generated evidence still reports `missing_iso_generation_tooling`, which i
 
 # 10. Near-Term Runtime Work
 
-The next runtime work is evidence access hardening followed by evidence triage:
+The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 
-1. Print verification, QEMU smoke, serial/stderr, and boot blocker summaries directly in the full CI log.
-2. Keep artifact upload enabled, but do not require authenticated artifact download for first-level triage.
-3. Inspect the failed v0.5.0/v0.5.2 CI evidence from the log or artifacts.
-4. Determine whether the full ordered marker sequence appears in `runtime/qemu_smoke.log`.
-5. Determine why `scripts/verify.sh` failed in CI.
-6. Promote QEMU serial smoke evidence only if CI passes and `qemu_smoke_evidence` validates passing metadata.
-7. Otherwise, record or fix the exact evidence-backed blocker.
+1. Keep CI evidence summaries and artifact uploads active.
+2. Keep QEMU serial smoke evidence as marker-sequence evidence only.
+3. Centralize boot marker/blocker taxonomy if that cleanup is selected.
+4. Define the next narrow runtime evidence target before adding broader behavior.
 
 ---
 
@@ -202,6 +197,7 @@ Deferred until the CI smoke evidence blocker is resolved:
 | `v0.5.1` | Governance Planning Alignment | Align governance, planning, audit, release, and evidence docs with the local v0.5.0 proof state and the failed pushed v0.5.0 CI run. | Runtime behavior changes, ABI changes, syscall changes, linker changes, QEMU smoke behavior changes, QEMU serial smoke promotion without CI proof. |
 | `v0.5.2` | CI Evidence Access Hardening | Print verification, QEMU smoke, serial/stderr, and boot blocker summaries into full CI logs so first-level triage does not depend on authenticated artifact downloads or local `gh`. | Runtime behavior changes, ABI/syscall changes, linker changes, QEMU marker semantic changes, QEMU boot or compatibility claims. |
 | `v0.5.3` | CI Smoke Evidence Triage | Inspect the failed v0.5.0/v0.5.2 CI evidence, classify the verification failure, and repair only the exact evidence-backed blocker. | ABI/syscall maturity work before CI smoke evidence is classified. |
+| `v0.5.4` | QEMU Serial Smoke Evidence Promotion | Promote the CI-proven QEMU serial smoke evidence and realign stale validators, docs, audit state, and blocker wording. | Runtime behavior changes, ABI/syscall changes, linker changes, marker semantic changes, compatibility claims, production-readiness claims. |
 | `v0.6.0-rc.1` | Release candidate hardening | Freeze scope, freeze gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | New feature scope after RC. |
 | `v1.0.0` | Scoped release | Release only evidence-backed behavior with explicit non-goals. | Any unimplemented compatibility or runtime subsystem claim. |
 

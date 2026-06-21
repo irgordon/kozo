@@ -47,6 +47,16 @@ class BootImageSkeletonValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
 
+    def test_passes_when_qemu_serial_smoke_has_no_active_blocker(self):
+        result = self.validate_fixture(mutate_report=lambda report: report | {
+            "outcome": "pass",
+            "blocker_category": "none",
+            "missing_components": [],
+        })
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
     def test_fails_when_linker_script_is_missing(self):
         self.assertEqual("boot_image_skeleton", BootImageSkeletonValidator.name)
         result = self.validate_fixture(remove="linker")
@@ -90,6 +100,16 @@ class BootImageSkeletonValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "fail")
         self.assert_skeleton_failure(result, "blocker_state_mismatch", "boot_blocker.blocker_category")
+
+    def test_fails_when_pass_state_keeps_missing_components(self):
+        self.assertEqual("boot_image_skeleton", BootImageSkeletonValidator.name)
+        result = self.validate_fixture(mutate_report=lambda report: report | {
+            "outcome": "pass",
+            "blocker_category": "none",
+        })
+
+        self.assertEqual(result.status, "fail")
+        self.assert_skeleton_failure(result, "blocker_state_mismatch", "boot_blocker.missing_components")
 
     def test_failure_diagnostic_names_field(self):
         self.assertEqual("boot_image_skeleton", BootImageSkeletonValidator.name)
@@ -146,8 +166,8 @@ def write_fixture_files(root: Path) -> dict[str, Path]:
     paths["script"].write_text("linker/kernel.ld\nboot/limine.conf\nartifacts/runtime/boot_image\n")
     paths["memory"].write_text("global memset\nglobal memmove\n")
     paths["doc"].write_text("This phase does not prove boot success.\nThis phase does not prove QEMU execution.\nartifacts/runtime/boot_image/\n")
-    paths["boot_doc"].write_text("Remaining blocker: `missing_iso_generation_tooling`.\n")
-    paths["blockers"].write_text("The remaining blocker is `missing_iso_generation_tooling`.\n")
+    paths["boot_doc"].write_text("No active QEMU serial smoke blocker.\n")
+    paths["blockers"].write_text("No active QEMU serial smoke blocker.\n")
     paths["report"].write_text(json.dumps(valid_report(), indent=2) + "\n")
     return paths
 

@@ -195,17 +195,19 @@ The future ISO generation path should:
 6. update `artifacts/runtime/boot_image/package_metadata.json`
 7. leave QEMU boot validation to `scripts/qemu_smoke.sh`
 
-CI now follows this path as a required full-verification step, but QEMU smoke evidence remains a later phase.
+CI now follows this path as a required full-verification step. CI run `27894312430` used the packaged ISO path to produce passing QEMU serial smoke evidence.
 
 ---
 
 # 10. Boot Blocker Relationship
 
-The current blocker is:
+The historical local tooling blocker is:
 
 ```text
 missing_iso_generation_tooling
 ```
+
+No active QEMU serial smoke blocker.
 
 The previous `missing_limine_iso_tooling` blocker is resolved at the policy level by this document.
 
@@ -219,4 +221,4 @@ artifacts/runtime/boot_image/kozo.iso
 
 The local environment may still report `missing_iso_generation_tooling` until it provides the documented Limine executable, Limine bootloader artifacts, and xorriso executable.
 
-The next release phase must use the produced ISO, when available, to attempt QEMU serial smoke evidence before any QEMU boot claim is made.
+CI-proven QEMU serial smoke evidence is now available for the narrow smoke path. That evidence does not prove hardware trap execution, userspace execution, runtime subsystem behavior, compatibility, or production readiness.

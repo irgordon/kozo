@@ -17,6 +17,7 @@ _BOOT_DOC_PATH = _ROOT / "docs" / "BOOT.md"
 _BOOT_BLOCKERS_PATH = _ROOT / "docs" / "BOOT_BLOCKERS.md"
 _BOOT_BLOCKER_REPORT_PATH = _ROOT / "artifacts" / "runtime" / "boot_blocker_report.json"
 _ALLOWED_BLOCKERS = (
+    "none",
     "missing_iso_generation_tooling",
     "missing_qemu_serial_evidence",
     "limine_not_reached",
@@ -104,8 +105,8 @@ def _required_texts() -> tuple[RequiredText, ...]:
         RequiredText("doc_no_boot_claim", _BOOT_IMAGE_DOC_PATH, "This phase does not prove boot success.", "Boot image doc must avoid boot claim"),
         RequiredText("doc_no_qemu_claim", _BOOT_IMAGE_DOC_PATH, "This phase does not prove QEMU execution.", "Boot image doc must avoid QEMU claim"),
         RequiredText("doc_output_path", _BOOT_IMAGE_DOC_PATH, "artifacts/runtime/boot_image/", "Boot image doc must name output path"),
-        RequiredText("boot_doc_remaining_blocker", _BOOT_DOC_PATH, "Remaining blocker: `missing_iso_generation_tooling`.", "Boot doc must name remaining blocker"),
-        RequiredText("blockers_doc_remaining_blocker", _BOOT_BLOCKERS_PATH, "The remaining blocker is `missing_iso_generation_tooling`.", "Boot blockers doc must name remaining blocker"),
+        RequiredText("boot_doc_smoke_state", _BOOT_DOC_PATH, "No active QEMU serial smoke blocker.", "Boot doc must name current QEMU serial smoke state"),
+        RequiredText("blockers_doc_smoke_state", _BOOT_BLOCKERS_PATH, "No active QEMU serial smoke blocker.", "Boot blockers doc must name current QEMU serial smoke state"),
     )
 
 
@@ -129,14 +130,31 @@ def _blocker_report_issue() -> BootImageIssue | None:
     except json.JSONDecodeError:
         return _issue("invalid_blocker_report_json", _contract_field(_BOOT_BLOCKER_REPORT_PATH), "Boot blocker report must be valid JSON")
     if report.get("blocker_category") not in _ALLOWED_BLOCKERS:
-        return _issue("blocker_state_mismatch", "boot_blocker.blocker_category", "Boot blocker must be narrowed to ISO tooling or QEMU serial evidence")
+        return _issue("blocker_state_mismatch", "boot_blocker.blocker_category", "Boot blocker must be narrowed to ISO tooling, QEMU serial evidence, or none after smoke pass")
+    pass_state_issue = _pass_state_issue(report)
+    if pass_state_issue is not None:
+        return pass_state_issue
+    if report.get("blocker_category") == "none":
+        return None
     missing_components = report.get("missing_components")
     if not isinstance(missing_components, list) or _required_missing_component(report) not in missing_components:
         return _issue("blocker_state_mismatch", "boot_blocker.missing_components", "Boot blocker must name the remaining required component")
     return None
 
 
+def _pass_state_issue(report: dict[str, object]) -> BootImageIssue | None:
+    if report.get("blocker_category") != "none":
+        return None
+    if report.get("outcome") != "pass":
+        return _issue("blocker_state_mismatch", "boot_blocker.outcome", "No active blocker requires passing smoke evidence")
+    if report.get("missing_components") != []:
+        return _issue("blocker_state_mismatch", "boot_blocker.missing_components", "Passing smoke evidence must not retain missing components")
+    return None
+
+
 def _required_missing_component(report: dict[str, object]) -> str:
+    if report.get("blocker_category") == "none":
+        return ""
     if report.get("blocker_category") != "missing_iso_generation_tooling":
         return "validated QEMU serial smoke execution"
     return "Limine executable"

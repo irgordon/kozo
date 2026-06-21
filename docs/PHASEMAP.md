@@ -98,34 +98,22 @@ The current local generated evidence proves:
 * The kernel ELF uses higher-half PT_LOAD virtual addresses.
 * Local kernel ELF loadability reports no lower-half PHDR blocker.
 * The repository source emits `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, and `KOZO_BOOT_SMOKE_OK` from the assembly entry path.
+* CI run `27894312430` captured the full ordered marker sequence in QEMU serial output.
+* QEMU smoke metadata from that run reports `outcome: pass` and `blocker_category: none`.
+* QEMU serial smoke evidence is proven for the narrow smoke path.
 * Local QEMU smoke evidence remains blocked by `missing_iso_generation_tooling` because the local environment does not provide the CI Limine/xorriso tooling path.
-
-The latest pushed v0.5.0 CI state is not promoted:
-
-* `lint` succeeded for commit `14fb015`.
-* `ci` failed for commit `14fb015` in the `scripts/verify.sh` step.
-* The uploaded CI artifact exists, but this review environment could not authenticate artifact download.
-* QEMU serial smoke evidence is not promoted until a CI artifact proves the full ordered marker sequence.
 
 ## Current Active Blocker
 
-The active release blocker is `ci_verification_failed_after_v0.5.0`.
-
-This is not a new runtime blocker taxonomy value. It records that the latest pushed CI run failed before release planning can promote QEMU serial smoke evidence.
+There is no active QEMU serial smoke blocker.
 
 The active local generated blocker remains `missing_iso_generation_tooling`.
 
-Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr`, `kernel_entry_not_reached`, `serial_not_initialized`, and `marker_not_emitted` are retained only as historical evidence states unless a future CI artifact reintroduces one.
+Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr`, `kernel_entry_not_reached`, `serial_not_initialized`, and `marker_not_emitted` are retained only as resolved historical evidence states unless a future CI artifact reintroduces one.
 
 ## Next Runtime Phase
 
-The next runtime phase must make CI evidence visible in the Actions log before relying on authenticated artifact downloads.
-
-After CI evidence access is hardened, the following runtime phase should inspect the failed v0.5.0 CI evidence, classify the exact verification failure, and only then choose between:
-
-* promoting QEMU serial smoke evidence if the full marker sequence is present and verification can be made green
-* fixing QEMU smoke metadata or verification drift if the marker sequence is present but validation fails
-* fixing the next runtime blocker if the marker sequence is absent
+The next runtime phase should not expand claims automatically. It should either centralize the now-proven boot marker/blocker taxonomy or define the next narrow runtime evidence target while preserving the QEMU serial smoke claim boundary.
 
 ---
 
@@ -165,6 +153,7 @@ After CI evidence access is hardened, the following runtime phase should inspect
 | `v0.5.1` | Governance Planning Alignment | Reconcile phase map, roadmap, audit, release evidence, boot blockers, and task state with the actual v0.5.0 local and CI outcomes. | Updated planning/evidence docs, changelog entry, task state update, regenerated governance index. | Local verification remains green, latest pushed CI failure is recorded without promoting QEMU serial smoke evidence, stale ABI/syscall-maturity next-step wording is removed, and the next runtime phase is evidence-driven. |
 | `v0.5.2` | CI Evidence Access Hardening | Surface verification, QEMU smoke, serial/stderr, and boot blocker summaries directly in full CI logs so first-level diagnosis does not depend on authenticated artifact download. | `scripts/ci_evidence_summary.sh`, CI `if: always()` summary step, release/evidence/check policy docs, changelog and task state updates. | Failed CI runs print enough smoke evidence to classify the active blocker without `gh` or artifact download, while uploaded artifacts remain enabled and authoritative metadata/logs remain unchanged. |
 | `v0.5.3` | CI Smoke Evidence Triage | Inspect the failed v0.5.0/v0.5.2 CI evidence now visible in logs and repair the exact verification or QEMU smoke evidence blocker. | CI evidence diagnosis, updated smoke evidence docs if needed, focused fix only if the CI failure is mechanically identified. | Either CI passes with full ordered QEMU serial smoke evidence, or a narrower evidence-backed runtime blocker is recorded without overclaiming. |
+| `v0.5.4` | QEMU Serial Smoke Evidence Promotion | Promote the CI-proven QEMU serial smoke evidence and realign stale validators/docs that still require old boot blockers. | Boot validator realignment, runtime/release/boot docs, audit status update, changelog and task state update. | QEMU serial smoke evidence is proven only as a narrow marker-sequence smoke claim; stale blocker assumptions are removed without runtime, ABI, syscall, compatibility, or production-readiness changes. |
 | `v0.6.0-rc.1` | Release candidate hardening | Freeze release scope and release gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | Release evidence bundle, completed release checklist, current generated reports, changelog/release notes dry run, all required CI checks green. | Release candidate can be reviewed without adding new scope. |
 | `v1.0.0` | Scoped production release | Release only the proven, scoped KOZO surface. | Final release evidence bundle, final changelog and release notes, passing required gates, explicit non-goals. | v1.0.0 claims only evidence-backed behavior and preserves all compatibility non-goals. |
 

@@ -18,6 +18,7 @@ _CI_WORKFLOW_PATH = _ROOT / ".github" / "workflows" / "ci.yml"
 _BUILD_SCRIPT_PATH = _ROOT / "scripts" / "build_boot_image.sh"
 _REPORT_PATH = _ROOT / "artifacts" / "runtime" / "boot_blocker_report.json"
 _ALLOWED_BLOCKERS = (
+    "none",
     "missing_iso_generation_tooling",
     "missing_qemu_serial_evidence",
     "limine_not_reached",
@@ -100,7 +101,7 @@ def _required_texts() -> tuple[RequiredText, ...]:
         RequiredText("provenance", _BOOT_TOOLING_PATH, "Tool Provenance", "Boot tooling doc must document provenance"),
         RequiredText("no_opaque_binaries", _BOOT_TOOLING_PATH, "Opaque vendored binaries are discouraged.", "Boot tooling doc must discourage opaque vendored binaries"),
         RequiredText("future_iso_path", _BOOT_TOOLING_PATH, "artifacts/runtime/boot_image/kozo.iso", "Boot tooling doc must name expected ISO path"),
-        RequiredText("current_blocker", _BOOT_TOOLING_PATH, "missing_iso_generation_tooling", "Boot tooling doc must name current blocker"),
+        RequiredText("tooling_history", _BOOT_TOOLING_PATH, "missing_iso_generation_tooling", "Boot tooling doc must preserve tooling blocker history"),
         RequiredText("workflow_limine_pin", _CI_WORKFLOW_PATH, "LIMINE_VERSION: v12.3.3", "CI workflow must pin Limine version"),
         RequiredText("workflow_limine_checksum", _CI_WORKFLOW_PATH, "LIMINE_TARBALL_SHA256: 9e97c9fedc714daa5d7fd2b66a32d85df6bcbf3452657fd26bebad7c8b423009", "CI workflow must verify Limine checksum"),
         RequiredText("workflow_xorriso_install", _CI_WORKFLOW_PATH, "xorriso", "CI workflow must install xorriso"),
@@ -111,7 +112,7 @@ def _required_texts() -> tuple[RequiredText, ...]:
         RequiredText("build_script_limine_path", _BUILD_SCRIPT_PATH, "${LIMINE:-}", "Build script must support explicit Limine executable"),
         RequiredText("build_script_xorriso_path", _BUILD_SCRIPT_PATH, "${XORRISO:-}", "Build script must support explicit xorriso executable"),
         RequiredText("boot_doc_tooling", _BOOT_DOC_PATH, "docs/BOOT_TOOLING.md", "Boot doc must reference boot tooling doc"),
-        RequiredText("boot_doc_blocker", _BOOT_DOC_PATH, "missing_iso_generation_tooling", "Boot doc must name current blocker"),
+        RequiredText("boot_doc_smoke_state", _BOOT_DOC_PATH, "No active QEMU serial smoke blocker.", "Boot doc must name current QEMU serial smoke state"),
         RequiredText("image_doc_tooling", _BOOT_IMAGE_PATH, "docs/BOOT_TOOLING.md", "Boot image doc must reference boot tooling doc"),
         RequiredText("blockers_doc_tooling", _BOOT_BLOCKERS_PATH, "docs/BOOT_TOOLING.md", "Boot blockers doc must reference boot tooling doc"),
         RequiredText("runtime_doc_tooling", _RUNTIME_EVIDENCE_PATH, "docs/BOOT_TOOLING.md", "Runtime evidence doc must reference boot tooling doc"),
@@ -139,7 +140,9 @@ def _blocker_report_issue() -> BootToolingIssue | None:
     except json.JSONDecodeError:
         return _issue("invalid_report_json", _contract_field(_REPORT_PATH), "Boot blocker report must be valid JSON")
     if report.get("blocker_category") not in _ALLOWED_BLOCKERS:
-        return _issue("blocker_mismatch", "boot_blocker.blocker_category", "Boot blocker must be narrowed to ISO tooling or QEMU serial evidence")
+        return _issue("blocker_mismatch", "boot_blocker.blocker_category", "Boot blocker must be narrowed to ISO tooling, QEMU serial evidence, or none after smoke pass")
+    if report.get("blocker_category") == "none" and report.get("outcome") != "pass":
+        return _issue("blocker_mismatch", "boot_blocker.outcome", "No active blocker requires passing smoke evidence")
     return None
 
 

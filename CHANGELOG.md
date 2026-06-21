@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.5.4 - 2026-06-21
+
+**Status:** QEMU serial smoke evidence promotion.
+
+### Changed
+
+* Promoted CI-proven QEMU serial smoke evidence after CI run `27894312430` captured the full ordered marker sequence ending in `KOZO_BOOT_SMOKE_OK`.
+* Realigned stale boot image skeleton and boot tooling validators so `outcome: pass` with `blocker_category: none` is accepted after QEMU serial smoke evidence passes.
+* Updated boot, runtime evidence, release evidence, checklist, required checks, phase map, roadmap, and audit docs to remove obsolete active-blocker wording.
+
+### Notes
+
+* This change does not alter runtime behavior, ABI contracts, syscall behavior, linker layout, or marker semantics.
+* This change promotes only narrow QEMU serial smoke evidence.
+* This change does not claim hardware trap execution, Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, file descriptor behavior, or production readiness.
+
 ## v0.5.2 - 2026-06-21
 
 **Status:** CI evidence access hardening.

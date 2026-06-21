@@ -10,7 +10,7 @@ Scope: Runtime smoke evidence for the current governed KOZO runtime boundary
 
 This document defines KOZO's current runtime smoke evidence path.
 
-The current path is a bounded runtime-adjacent object and symbol smoke check. It proves that the freestanding x86_64 kernel objects and assembly bridge objects can be built together with the current entry, dispatcher, syscall bridge, and serial marker surfaces present in binary evidence.
+The current evidence set includes a bounded runtime-adjacent object and symbol smoke check plus CI-proven QEMU serial smoke evidence. The runtime-adjacent check proves that the freestanding x86_64 kernel objects and assembly bridge objects can be built together with the current entry, dispatcher, syscall bridge, and serial marker surfaces present in binary evidence. The QEMU serial smoke check proves only that QEMU launched the KOZO ISO, Limine loaded the KOZO kernel ELF, serial output was captured, and the expected smoke marker sequence was observed.
 
 The v0.3.0 boot baseline attempted to move beyond runtime-adjacent evidence. It is currently blocked by `missing_boot_protocol_and_image_packaging`.
 
@@ -54,11 +54,13 @@ v0.5.1 validates the pushed v0.5.0 outcome before further runtime work. Local ve
 
 v0.5.2 adds CI evidence access hardening. Full CI prints a concise verification, QEMU smoke, serial/stderr, and boot blocker summary into the Actions log so first-level triage does not require authenticated artifact download or local `gh`.
 
-Current local boot blocker: `missing_iso_generation_tooling`.
+v0.5.4 promotes QEMU serial smoke evidence after CI run `27894312430` captured the full ordered marker sequence and QEMU smoke metadata reported `outcome: pass` with `blocker_category: none`.
 
-Current release blocker: `ci_verification_failed_after_v0.5.0`.
+Current local boot blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
 
-When CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated blocker report may narrow to `missing_qemu_serial_evidence` for that run.
+Current release blocker for QEMU serial smoke evidence: none.
+
+When CI produces `artifacts/runtime/boot_image/kozo.iso` but QEMU serial evidence has not yet been captured, the generated blocker report may narrow to `missing_qemu_serial_evidence` for that run.
 
 When CI runs QEMU against that ISO but does not capture `KOZO_BOOT_SMOKE_OK`, the generated blocker report may narrow further to `qemu_timeout`.
 
@@ -70,7 +72,7 @@ The v0.4.8 QEMU smoke metadata records Limine entry-point evidence, expected ent
 
 The latest inspected v0.4.8 CI artifact captured `KOZO_EARLY_0_ENTRY`, so kernel entry handoff is proven for that artifact. It did not capture `KOZO_EARLY_2_SERIAL_INIT_OK`, so serial initialization remains unproven until that marker appears in captured QEMU serial output.
 
-The latest successful inspected CI artifact before v0.5.0 captured `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, and `KOZO_EARLY_2_SERIAL_INIT_OK`, but not `KOZO_BOOT_SMOKE_OK`, so that historical artifact supported `marker_not_emitted`. The pushed v0.5.0 CI run failed verification, so it supersedes the historical marker blocker as the active release blocker until its artifact is inspected.
+The latest inspected v0.5.4 CI artifact captured `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, and `KOZO_BOOT_SMOKE_OK`, so QEMU serial smoke evidence is proven for that artifact.
 
 The v0.4.4 ISO path metadata may prove that the configured Limine path is present in packaged ISO contents. It does not prove Limine loaded the ELF, entered the kernel, initialized serial output, or reached `KOZO_BOOT_SMOKE_OK`.
 
@@ -133,7 +135,7 @@ runtime-adjacent-object-symbol-smoke
 
 The smoke path builds freestanding x86_64 Odin kernel objects, assembles the current x86_64 boot and syscall bridge objects, records `nm` and `strings` evidence, and verifies required entry, dispatcher, bridge, and serial marker surfaces.
 
-This remains the narrowest passing runtime evidence target until `artifacts/runtime/boot_image/kozo.iso` is generated and then run under QEMU with validated serial smoke output.
+The QEMU serial smoke target is now proven in CI. It remains a narrow smoke target and does not replace separate evidence for Odin runtime execution, stack setup, memory initialization, syscall dispatch, hardware trap execution, userspace execution, or subsystem behavior.
 
 ---
 

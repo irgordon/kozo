@@ -1777,6 +1777,40 @@
         "verification.tests_run[16]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 61,
+      "title": "Promote QEMU serial smoke evidence",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "docs/BOOT.md",
+        "docs/BOOT_BLOCKERS.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/REQUIRED_CHECKS.md",
+        "docs/BOOT_TOOLING.md",
+        "docs/CODEBASE_AUDIT.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/generated/governance_index.md",
+        "harness/validators_impl/boot_image_skeleton.py",
+        "harness/validators_impl/boot_tooling.py",
+        "harness/validators_impl/boot_protocol_decision.py",
+        "tests/test_boot_image_skeleton.py",
+        "tests/test_boot_tooling.py",
+        "tests/test_boot_protocol_decision.py",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[13]",
+        "verification.tests_run[14]",
+        "verification.tests_run[16]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -2121,6 +2155,7 @@
     "Added v0.4.96 QEMU smoke summary observability so CI uploads a concise, non-authoritative summary derived from existing smoke metadata and logs without changing runtime, ABI, syscall, linker, QEMU marker semantics, or compatibility behavior.",
     "Added v0.5.0 boot smoke marker emission from the proven assembly serial path, with ordered-marker QEMU smoke validation and no ABI, syscall, compatibility, or production-readiness claim changes.",
     "Added v0.5.1 governance planning alignment so PHASEMAP, ROADMAP, boot blockers, runtime evidence, release evidence, audit findings, changelog, and task state reflect the failed pushed v0.5.0 CI verification boundary without changing runtime, ABI, syscall, linker, QEMU smoke, compatibility, or production-readiness claims.",
-    "Added v0.5.2 CI evidence access hardening so GitHub Actions logs expose first-level smoke evidence even when artifact download, API log access, or local gh tooling is unavailable."
+    "Added v0.5.2 CI evidence access hardening so GitHub Actions logs expose first-level smoke evidence even when artifact download, API log access, or local gh tooling is unavailable.",
+    "v0.5.4 promotes CI-proven QEMU serial smoke evidence, accepts pass/none boot blocker state in stale validators, and preserves all no-compatibility and no-production claim boundaries."
   ]
 }

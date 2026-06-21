@@ -120,15 +120,15 @@ Runtime evidence review is required for release review and is governed by `docs/
 
 The boot blocker report is required while v0.3.0 remains blocked and is governed by `docs/BOOT.md`, `docs/BOOT_BLOCKERS.md`, `scripts/boot_blocker_report.sh`, and `boot_blocker_report`.
 
-The current local boot blocker category is `missing_iso_generation_tooling`.
+The current local boot blocker category is `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
 
-The current release blocker category is `ci_verification_failed_after_v0.5.0`.
+The current QEMU serial smoke release blocker category is none.
 
-The latest pushed v0.5.0 CI run for commit `14fb015` failed in `scripts/verify.sh`. Release review must not promote QEMU serial smoke evidence from v0.5.0 until the failed CI artifact is inspected and a subsequent CI run passes with validated QEMU smoke metadata.
+CI run `27894312430` captured the full ordered marker sequence and QEMU smoke metadata reported `outcome: pass` with `blocker_category: none`, so QEMU serial smoke evidence is promoted for the narrow smoke path.
 
 When CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated boot blocker report may narrow to `missing_qemu_serial_evidence` for that run.
 
-When CI then runs QEMU against that ISO but the kernel marker is absent before timeout, the generated boot blocker report may narrow further to `qemu_timeout`.
+When CI runs QEMU against that ISO but the kernel marker is absent before timeout, the generated boot blocker report may narrow further to `qemu_timeout`.
 
 If Limine reaches the boot entry but fails to open or load the configured kernel executable, QEMU smoke evidence must report `kernel_not_loaded`.
 
@@ -180,6 +180,8 @@ KOZO_EARLY_1_SERIAL_INIT_START
 KOZO_EARLY_2_SERIAL_INIT_OK
 KOZO_BOOT_SMOKE_OK
 ```
+
+Passing QEMU serial smoke evidence proves only that QEMU launched the KOZO ISO, Limine loaded the KOZO kernel ELF, serial output was captured, and the expected marker sequence was observed. It does not prove hardware trap execution, Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, ELF loading, file descriptor behavior, production readiness, Odin runtime execution, stack setup, memory initialization, or syscall dispatch.
 
 The current packaging metadata records the missing ISO generation tooling blocker:
 
