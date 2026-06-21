@@ -502,3 +502,108 @@ The following boot-path blockers are resolved for the QEMU serial smoke path:
 ## 17.4 Claim Boundary
 
 The promoted evidence proves QEMU serial smoke only. It does not prove Odin runtime execution, stack setup, memory initialization, syscall dispatch, hardware trap execution, Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, file descriptor behavior, or production readiness.
+
+---
+
+# 18. v0.6.4 Structural Remediation
+
+Date: 2026-06-21
+
+Status: Completed.
+
+## 18.1 Scope
+
+This remediation reviewed:
+
+* `harness/`
+* `scripts/`
+* `tests/`
+* `kernel/`
+* `userspace/`
+* `contracts/`
+* `schemas/`
+* `docs/`
+
+The remediation was limited to mechanical, test-backed cleanup. It did not change runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke behavior, marker semantics, runtime halt behavior, runtime progression contracts, compatibility claims, or production-readiness claims.
+
+## 18.2 Commands Run
+
+```text
+git status --short --branch
+find harness scripts tests kernel userspace -type f \( -name "*.py" -o -name "*.odin" -o -name "*.asm" -o -name "*.sh" \) -exec wc -l {} +
+rg "TODO|FIXME|HACK|XXX|stub|placeholder|temporary|legacy|compat|shim|unused|dead" harness scripts tests kernel userspace contracts schemas docs
+rg "pass #|NotImplemented|raise NotImplementedError" harness scripts tests
+rg "schema_gen|schema_gen_agent_context" harness scripts tests kernel userspace contracts schemas docs
+rg "validators_impl\\.abi|from harness\\.validators_impl import abi|AbiValidator" harness tests docs scripts
+python3 -m compileall harness scripts tests
+python3 -m unittest discover -s tests
+python3 -m json.tool tasks/todo.json
+git diff --check
+scripts/verify.sh
+python3 -m json.tool artifacts/latest_verify.json
+```
+
+## 18.3 Summary
+
+No tracked source file exceeded 1200 LOC.
+
+The largest files were:
+
+| File | LOC | Decision |
+| --- | ---: | --- |
+| `harness/validators_impl/validator_coverage.py` | 1142 | Deferred. Near threshold, but below the split trigger and high risk because it owns validator coverage policy, AST inspection, marker metadata, and diagnostics. |
+| `tests/test_qemu_smoke_evidence.py` | 699 | Deferred. Large but fixture-heavy and directly protects QEMU smoke evidence behavior. |
+| `tests/test_syscall_table_contract.py` | 586 | Deferred. Large but fixture-heavy and tied to syscall contract coverage. |
+| `harness/validators_impl/syscall_table_contract.py` | 549 | Deferred. Below threshold and active validator logic. |
+| `tests/test_syscall_table_conformance.py` | 504 | Deferred. Large but active negative coverage. |
+
+The scan found one clearly safe cleanup: two tracked zero-byte generator stubs with no active references.
+
+## 18.4 Findings
+
+| ID | Priority | Area | File(s) | Finding | Evidence | Risk | Fix Applied | Deferred |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| AUDIT-064-001 | P3 | Dead code | `harness/schema_gen.py`, `harness/schema_gen_agent_context.py` | Two tracked Python files were zero-byte generator stubs with no active references. | `wc -l` reported 0 lines; `rg "schema_gen|schema_gen_agent_context" harness scripts tests kernel userspace contracts schemas docs` returned no references. | Leaving empty tracked stubs creates scan noise and suggests generator surfaces that do not exist. | Removed both files. | No |
+| AUDIT-064-002 | P2 | Validator size | `harness/validators_impl/validator_coverage.py` | Validator coverage remains the largest source file and is close to the 1200 LOC threshold. | LOC report: 1142 lines. | Splitting it now risks changing validator governance behavior before runtime progression work. | No code change. | Split into contract metadata, AST inspection, behavior checks, and diagnostics only in a dedicated test-backed phase. |
+| AUDIT-064-003 | P2 | Test size | `tests/test_qemu_smoke_evidence.py` | QEMU smoke tests are large but active and behavior-protecting. | LOC report: 699 lines. | Fixture extraction could hide behavior changes if done casually. | No code change. | Extract shared smoke metadata fixtures only when a future QEMU evidence change forces repeated edits. |
+| AUDIT-064-004 | P3 | Compatibility shim | `harness/validators_impl/abi.py` | ABI validator shim is compatibility-only but active. | `harness/validators.py` and `tests/test_abi.py` import `harness.validators_impl.abi.AbiValidator`. | Removing the shim would cause registry/import churn for no behavior benefit. | No code change. | Keep as a documented stable shim. |
+| AUDIT-064-005 | P2 | Scan markers | tests and docs | `dead`, `placeholder`, `stub`, and `compat` matches are mostly intentional negative-test fixtures or non-goal policy text. | `rg` results are concentrated in validator tests, compatibility docs, and non-goal metadata. | Blind cleanup would weaken negative coverage or remove necessary claim-boundary wording. | No code change. | Continue using focused reference checks before deleting any marker-bearing code. |
+
+## 18.5 Remediation Applied
+
+Removed:
+
+```text
+harness/schema_gen.py
+harness/schema_gen_agent_context.py
+```
+
+Proof of non-use:
+
+```text
+rg "schema_gen|schema_gen_agent_context" harness scripts tests kernel userspace contracts schemas docs
+```
+
+The reference scan returned no active source, script, test, contract, schema, or documentation references.
+
+## 18.6 Deferred Cleanup
+
+Deferred intentionally:
+
+* splitting `harness/validators_impl/validator_coverage.py`
+* splitting `tests/test_qemu_smoke_evidence.py`
+* centralizing marker and blocker taxonomy
+* removing the `abi.py` compatibility shim
+* extracting shared ABI/syscall fixture helpers
+
+These are deferred because each requires a dedicated behavior-preserving phase with focused tests.
+
+## 18.7 Verification Result
+
+The cleanup is behavior-preserving:
+
+* Python compileall passes.
+* Unit discovery passes.
+* Full verification passes.
+* JSON task and verification artifacts are valid.
+* Whitespace diff check passes.

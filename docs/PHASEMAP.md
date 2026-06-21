@@ -93,8 +93,8 @@ Detailed evidence rules are owned by `docs/RELEASE_EVIDENCE.md`.
 
 The current local generated evidence proves:
 
-* `scripts/verify.sh` passes locally with 39 checks and 0 failures.
-* Unit discovery passes locally with 451 tests.
+* `scripts/verify.sh` passes locally with 42 checks and 0 failures.
+* Unit discovery passes locally with 487 tests.
 * The kernel ELF uses higher-half PT_LOAD virtual addresses.
 * Local kernel ELF loadability reports no lower-half PHDR blocker.
 * The repository source emits `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, and `KOZO_BOOT_SMOKE_OK` from the assembly entry path.
@@ -161,6 +161,7 @@ The next runtime phase should not expand claims automatically. It should plan st
 | `v0.6.0` | Runtime Logic Baseline | Govern the immediate post-smoke terminal behavior so the kernel does not fall through after `KOZO_BOOT_SMOKE_OK`. | `contracts/runtime_halt_contract.v0.json`, runtime halt schema/loader/validator/tests, post-smoke assembly halt loop, runtime/release/contract docs. | The final smoke marker is followed by a deterministic terminal halt loop with no structural fallthrough, without ABI/syscall changes or hardware trap, interrupt, scheduler, userspace, compatibility, or production-readiness claims. |
 | `v0.6.2` | Runtime Progression Contract Planning | Define governance for any future transition beyond the current boot-smoke halt path without changing runtime behavior. | `contracts/runtime_progression_contract.v0.json`, runtime progression schema/loader/validator/tests, runtime/release/contract docs. | The halt loop remains authoritative until stack initialization evidence, runtime initialization evidence, memory initialization evidence, and progression path evidence are added and validated; no runtime progression, ABI/syscall, compatibility, or production-readiness claim is added. |
 | `v0.6.3` | Runtime Progression Entry Design | Reserve the first future runtime progression marker and define readiness requirements without changing runtime behavior. | `contracts/runtime_progression_entry_contract.v0.json`, runtime progression entry schema/loader/validator/tests, runtime/release/contract docs. | `KOZO_RUNTIME_PROGRESS_ENTRY` is documented as reserved and not emitted; the halt loop remains authoritative until stack, memory, runtime, and progression-path evidence exists. |
+| `v0.6.4` | Code Structure Remediation | Reduce structural debt mechanically before runtime progression behavior work. | `docs/CODEBASE_AUDIT.md` v0.6.4 section, removal of proven-unused zero-byte generator stubs, updated planning/changelog/task state. | No source file exceeds 1200 LOC, dead-code cleanup is proven by reference scans and validation, deferred cleanup is documented, and no runtime, ABI, syscall, linker, marker, compatibility, or production-readiness behavior changes. |
 | `v0.6.0-rc.1` | Release candidate hardening | Freeze release scope and release gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | Release evidence bundle, completed release checklist, current generated reports, changelog/release notes dry run, all required CI checks green. | Release candidate can be reviewed without adding new scope. |
 | `v1.0.0` | Scoped production release | Release only the proven, scoped KOZO surface. | Final release evidence bundle, final changelog and release notes, passing required gates, explicit non-goals. | v1.0.0 claims only evidence-backed behavior and preserves all compatibility non-goals. |
 

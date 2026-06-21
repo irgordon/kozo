@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.6.4 - 2026-06-21
+
+**Status:** Code structure remediation.
+
+### Changed
+
+* Added a v0.6.4 structural remediation section to `docs/CODEBASE_AUDIT.md`.
+* Removed two tracked zero-byte, unreferenced generator stubs: `harness/schema_gen.py` and `harness/schema_gen_agent_context.py`.
+* Recorded oversized-file, shim, stale-code, and deferred cleanup decisions before runtime progression behavior work.
+
+### Notes
+
+* This change is structural cleanup only.
+* This change preserves behavior and does not alter runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke behavior, marker semantics, runtime halt behavior, or runtime progression contracts.
+* This change does not add compatibility claims or production-readiness claims.
+
 ## v0.6.3 - 2026-06-21
 
 **Status:** Runtime progression entry design.

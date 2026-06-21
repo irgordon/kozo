@@ -164,7 +164,7 @@ After CI QEMU serial smoke evidence is green, resume deferred maturity work:
 
 # 12. Deferred Work
 
-Deferred until the CI smoke evidence blocker is resolved:
+Deferred until separately scoped runtime or cleanup phases:
 
 * ABI versioning expansion
 * syscall expansion process changes
@@ -212,6 +212,7 @@ Deferred until the CI smoke evidence blocker is resolved:
 | `v0.5.3` | CI Smoke Evidence Triage | Inspect the failed v0.5.0/v0.5.2 CI evidence, classify the verification failure, and repair only the exact evidence-backed blocker. | ABI/syscall maturity work before CI smoke evidence is classified. |
 | `v0.5.4` | QEMU Serial Smoke Evidence Promotion | Promote the CI-proven QEMU serial smoke evidence and realign stale validators, docs, audit state, and blocker wording. | Runtime behavior changes, ABI/syscall changes, linker changes, marker semantic changes, compatibility claims, production-readiness claims. |
 | `v0.6.0` | Runtime Logic Baseline | Add a governed runtime halt contract so the post-smoke assembly path enters deterministic terminal behavior after `KOZO_BOOT_SMOKE_OK`. | ABI/syscall changes, hardware trap claims, interrupt handling claims, scheduler behavior, userspace execution, compatibility claims, production-readiness claims. |
+| `v0.6.4` | Code Structure Remediation | Remove proven-unused zero-byte generator stubs and document oversized, stale, shim, and deferred cleanup decisions before runtime progression work. | Runtime behavior changes, ABI/syscall changes, linker changes, marker semantic changes, broad refactors, compatibility claims, production-readiness claims. |
 | `v0.6.0-rc.1` | Release candidate hardening | Freeze scope, freeze gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | New feature scope after RC. |
 | `v1.0.0` | Scoped release | Release only evidence-backed behavior with explicit non-goals. | Any unimplemented compatibility or runtime subsystem claim. |
 

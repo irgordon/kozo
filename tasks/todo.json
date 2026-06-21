@@ -1944,6 +1944,32 @@
         "verification.actual_behavior[68]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 65,
+      "title": "Apply code structure remediation audit cleanup",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "harness/schema_gen.py",
+        "harness/schema_gen_agent_context.py",
+        "docs/CODEBASE_AUDIT.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/generated/governance_index.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[34]",
+        "verification.tests_run[35]",
+        "verification.tests_run[36]",
+        "verification.tests_run[37]",
+        "verification.expected_behavior[53]",
+        "verification.actual_behavior[69]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -2172,6 +2198,26 @@
         "tool": "shell",
         "command": "python3 -m json.tool schemas/runtime_progression_entry_contract.schema.json",
         "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "python3 -m compileall harness scripts tests",
+        "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "python3 -m unittest discover -s tests",
+        "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "python3 -m json.tool tasks/todo.json",
+        "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "git diff --check",
+        "status": "passed"
       }
     ],
     "logs": [
@@ -2241,7 +2287,8 @@
       "v0.5.0 emits KOZO_BOOT_SMOKE_OK from the proven assembly serial path after KOZO_EARLY_2_SERIAL_INIT_OK and requires QEMU smoke validation to observe the full ordered marker sequence before passing",
       "v0.6.0 governs post-smoke terminal behavior after KOZO_BOOT_SMOKE_OK without changing ABI or syscall semantics.",
       "runtime_progression_contract defines future halt-to-runtime transition governance without changing runtime behavior or weakening the runtime halt contract.",
-      "runtime_progression_entry_contract reserves KOZO_RUNTIME_PROGRESS_ENTRY as future work without changing runtime behavior or overriding the runtime halt contract."
+      "runtime_progression_entry_contract reserves KOZO_RUNTIME_PROGRESS_ENTRY as future work without changing runtime behavior or overriding the runtime halt contract.",
+      "v0.6.4 removes only proven-unused structural debris and documents deferred cleanup without changing runtime, ABI, syscall, linker, marker, halt, or progression contract behavior."
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -2312,7 +2359,8 @@
       "CI evidence access hardening adds scripts/ci_evidence_summary.sh and full-CI log summary output without changing runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU marker semantics, compatibility claims, or production-readiness claims.",
       "runtime_halt_contract validates that boot.asm emits KOZO_BOOT_SMOKE_OK before entering a cli/hlt loop with structural fallthrough forbidden.",
       "runtime_progression_contract validates prerequisites, halt contract reference, transition requirements, forbidden shortcuts, future milestones, evidence requirements, and non-goals.",
-      "runtime_progression_entry_contract validates current halt/progression references, progression marker reservation, prerequisites, evidence requirements, transition requirements, forbidden shortcuts, ownership, future stages, and non-goals."
+      "runtime_progression_entry_contract validates current halt/progression references, progression marker reservation, prerequisites, evidence requirements, transition requirements, forbidden shortcuts, ownership, future stages, and non-goals.",
+      "v0.6.4 removes two zero-byte unreferenced generator stubs, documents oversized/dead/stale/shim findings, and preserves validator outcomes through compileall, unit discovery, and full verification."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },

@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.6.3`
+* Version: `v0.6.4`
 * Date: `2026-06-21`
-* Status: Runtime progression entry design.
+* Status: Code structure remediation.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 42
 * Failed checks: 0
-* Run ID: `verify-20260621T215451Z`
-* Generated at: `2026-06-21T21:54:51Z`
+* Run ID: `verify-20260621T225150Z`
+* Generated at: `2026-06-21T22:51:50Z`
 
 ## Registered validators
 
