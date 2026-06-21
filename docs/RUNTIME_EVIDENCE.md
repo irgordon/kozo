@@ -52,6 +52,8 @@ v0.5.0 adds the final `KOZO_BOOT_SMOKE_OK` marker directly to `_start` after ass
 
 v0.5.1 validates the pushed v0.5.0 outcome before further runtime work. Local verification passes, but the latest pushed CI run for commit `14fb015` failed in `scripts/verify.sh`. QEMU serial smoke evidence is not promoted until that CI failure is inspected and a passing CI run validates the full ordered marker sequence.
 
+v0.5.2 adds CI evidence access hardening. Full CI prints a concise verification, QEMU smoke, serial/stderr, and boot blocker summary into the Actions log so first-level triage does not require authenticated artifact download or local `gh`.
+
 Current local boot blocker: `missing_iso_generation_tooling`.
 
 Current release blocker: `ci_verification_failed_after_v0.5.0`.
@@ -232,6 +234,8 @@ The QEMU smoke log is passing QEMU serial smoke evidence only when `qemu_smoke_e
 
 The QEMU smoke summary is a reviewer convenience artifact. It is generated from the QEMU smoke metadata, serial log, stderr log, and boot blocker report. It is not authoritative and must not replace metadata or log validation.
 
+The CI evidence summary printed by `scripts/ci_evidence_summary.sh` is also reviewer convenience output. It reads local generated artifacts and log tails, does not require network access, and must not redefine runtime evidence or QEMU smoke pass criteria.
+
 The selected boot protocol is documented in:
 
 ```text
@@ -256,6 +260,8 @@ Full CI should also upload the boot blocker report while v0.3.0 remains blocked.
 Full CI should upload boot image package metadata and `artifacts/runtime/boot_image/kozo.iso` when ISO generation succeeds.
 
 Full CI should upload QEMU smoke log, stderr log, metadata, and summary when `scripts/qemu_smoke.sh` runs.
+
+Full CI should print the CI evidence summary after verification attempts with `if: always()` so a failed run still exposes the active blocker in the Actions log when artifact download is unavailable.
 
 ---
 

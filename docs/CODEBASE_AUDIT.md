@@ -429,3 +429,38 @@ The next runtime phase must inspect the failed v0.5.0 CI artifact.
 If the full ordered marker sequence appears, the risk is verification or metadata drift.
 
 If the full ordered marker sequence is absent, the risk is the next evidence-backed runtime blocker.
+
+---
+
+# 16. v0.5.2 CI Evidence Access Hardening
+
+Date: 2026-06-21
+
+Status: Completed.
+
+## 16.1 Observability Finding
+
+v0.5.1 exposed an operational gap: GitHub Actions run status was visible, but public log download returned `403`, artifact download returned `401`, and local `gh` tooling was unavailable. That left the active QEMU/verification blocker harder to classify even though CI uploaded evidence artifacts.
+
+## 16.2 Fix Applied
+
+v0.5.2 adds `scripts/ci_evidence_summary.sh` and requires full CI to run it with `if: always()`.
+
+The summary prints:
+
+* latest verification status and failed checks
+* QEMU smoke outcome, blocker, observed markers, expected marker, timeout, and byte counts
+* QEMU smoke summary text
+* last 80 serial log lines
+* last 80 stderr log lines
+* boot blocker report summary
+
+The summary is non-authoritative and derived from generated artifacts. It does not replace metadata, logs, or validators.
+
+## 16.3 Resolved Risk
+
+Authenticated artifact download remains useful, but first-level triage no longer depends on artifact download, API log access, or local `gh`.
+
+## 16.4 Remaining Risk
+
+The next runtime phase still must classify the actual CI smoke evidence. v0.5.2 only makes that evidence visible in CI logs; it does not alter runtime behavior, marker semantics, QEMU behavior, or blocker taxonomy.

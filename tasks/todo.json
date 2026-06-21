@@ -37,7 +37,16 @@
     "schemas/",
     "scripts/",
     "boot/",
-    "linker/"
+    "linker/",
+    ".github/workflows/ci.yml",
+    "scripts/ci_evidence_summary.sh",
+    "docs/REQUIRED_CHECKS.md",
+    "docs/RELEASE_EVIDENCE.md",
+    "docs/RUNTIME_EVIDENCE.md",
+    "docs/CODEBASE_AUDIT.md",
+    "tasks/todo.json",
+    "docs/generated/governance_index.md",
+    "artifacts/latest_verify.json"
   ],
   "steps": [
     {
@@ -1739,6 +1748,35 @@
         "verification.tests_run[10]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 60,
+      "title": "Harden CI smoke evidence access",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        ".github/workflows/ci.yml",
+        "scripts/ci_evidence_summary.sh",
+        "docs/REQUIRED_CHECKS.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/CODEBASE_AUDIT.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "docs/generated/governance_index.md",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[11]",
+        "verification.tests_run[12]",
+        "verification.tests_run[13]",
+        "verification.tests_run[14]",
+        "verification.tests_run[15]",
+        "verification.tests_run[16]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -1793,7 +1831,8 @@
     "docs/PHASEMAP.md and docs/ROADMAP.md own release phase sequencing and roadmap direction from the governance document directory without changing runtime behavior, ABI contracts, syscall behavior, boot behavior, or compatibility claims",
     "v0.4.5 classifies Limine lower-half PHDR rejection as limine_lower_half_phdr in kernel ELF reports, QEMU smoke metadata, boot blocker reporting, focused tests, and boot evidence docs while preserving no-QEMU-boot and non-compatibility claim boundaries",
     "v0.4.6 adds docs/CODEBASE_AUDIT.md, updates phase and roadmap sequencing so v0.4.7 is the higher-half linker/entry transition, and records that no cleanup was applied during the audit phase",
-    "v0.5.1 aligns governance, planning, audit, release, and evidence documents with the actual v0.5.0 outcome: local verification passes, the pushed CI run for 14fb015 failed in scripts/verify.sh, QEMU serial smoke evidence is not promoted, and the next runtime phase is CI smoke evidence triage."
+    "v0.5.1 aligns governance, planning, audit, release, and evidence documents with the actual v0.5.0 outcome: local verification passes, the pushed CI run for 14fb015 failed in scripts/verify.sh, QEMU serial smoke evidence is not promoted, and the next runtime phase is CI smoke evidence triage.",
+    "v0.5.2 CI evidence access hardening prints verification, QEMU smoke, serial/stderr, and boot blocker summaries into full CI logs with if: always(), keeps artifact upload enabled, and avoids requiring gh or authenticated artifact download for first-level triage."
   ],
   "verification": {
     "tests_run": [
@@ -1850,6 +1889,36 @@
       {
         "tool": "shell",
         "command": "direct ValidatorCoverageValidator invocation",
+        "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "bash -n scripts/ci_evidence_summary.sh",
+        "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "scripts/ci_evidence_summary.sh",
+        "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "python3 -m unittest discover -s tests",
+        "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "python3 -m json.tool tasks/todo.json",
+        "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "scripts/verify.sh",
+        "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "git diff --check",
         "status": "passed"
       }
     ],
@@ -1984,7 +2053,8 @@
       "v0.4.95 adds a code quality and style audit section before v0.5.0, updates phase and roadmap sequencing so v0.5.0 is Fix Boot Smoke Marker Emission, and records that no safe cleanup was applied during the audit phase",
       "v0.4.96 adds a non-authoritative QEMU smoke summary artifact, validates that it agrees with metadata and references the underlying logs, uploads it from CI, and keeps v0.5.0 focused on Fix Boot Smoke Marker Emission",
       "v0.5.0 emits KOZO_BOOT_SMOKE_OK from _start through the proven COM1 path and hardens qemu_smoke_evidence so pass metadata requires the full ordered marker sequence",
-      "v0.5.1 records ci_verification_failed_after_v0.5.0 as the active release blocker, keeps missing_iso_generation_tooling as the local generated blocker, removes stale ABI/syscall maturity next-step wording, and preserves all no-QEMU-boot, compatibility, and production-readiness claim boundaries."
+      "v0.5.1 records ci_verification_failed_after_v0.5.0 as the active release blocker, keeps missing_iso_generation_tooling as the local generated blocker, removes stale ABI/syscall maturity next-step wording, and preserves all no-QEMU-boot, compatibility, and production-readiness claim boundaries.",
+      "CI evidence access hardening adds scripts/ci_evidence_summary.sh and full-CI log summary output without changing runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU marker semantics, compatibility claims, or production-readiness claims."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -2050,6 +2120,7 @@
     "Added v0.4.95 code quality and style audit documentation before v0.5.0, documenting duplicated boot marker taxonomy, duplicated blocker taxonomy, QEMU script and validator coverage size, fixture duplication, and marker-emission risks without changing runtime, ABI, syscall, linker, QEMU marker semantics, or compatibility behavior.",
     "Added v0.4.96 QEMU smoke summary observability so CI uploads a concise, non-authoritative summary derived from existing smoke metadata and logs without changing runtime, ABI, syscall, linker, QEMU marker semantics, or compatibility behavior.",
     "Added v0.5.0 boot smoke marker emission from the proven assembly serial path, with ordered-marker QEMU smoke validation and no ABI, syscall, compatibility, or production-readiness claim changes.",
-    "Added v0.5.1 governance planning alignment so PHASEMAP, ROADMAP, boot blockers, runtime evidence, release evidence, audit findings, changelog, and task state reflect the failed pushed v0.5.0 CI verification boundary without changing runtime, ABI, syscall, linker, QEMU smoke, compatibility, or production-readiness claims."
+    "Added v0.5.1 governance planning alignment so PHASEMAP, ROADMAP, boot blockers, runtime evidence, release evidence, audit findings, changelog, and task state reflect the failed pushed v0.5.0 CI verification boundary without changing runtime, ABI, syscall, linker, QEMU smoke, compatibility, or production-readiness claims.",
+    "Added v0.5.2 CI evidence access hardening so GitHub Actions logs expose first-level smoke evidence even when artifact download, API log access, or local gh tooling is unavailable."
   ]
 }

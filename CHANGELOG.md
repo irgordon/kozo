@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.5.2 - 2026-06-21
+
+**Status:** CI evidence access hardening.
+
+### Added
+
+* Added `scripts/ci_evidence_summary.sh` as a local evidence reader for verification, QEMU smoke, serial/stderr log tails, and boot blocker summaries.
+* Added a full-CI `if: always()` evidence summary step so failed GitHub Actions runs print first-level smoke diagnostics into the visible job log.
+
+### Changed
+
+* Updated release, runtime evidence, required checks, roadmap, phase map, and audit documents to state that authenticated artifact downloads are useful but not required for first-level CI failure triage.
+* Preserved CI artifact upload for verification, QEMU smoke, boot blocker, and kernel ELF evidence.
+
+### Notes
+
+* This change does not alter runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU marker semantics, or validator semantics.
+* This change does not claim QEMU boot, hardware trap execution, Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, file descriptor behavior, or production readiness.
+
 ## v0.5.1 - 2026-06-21
 
 **Status:** Governance planning alignment.

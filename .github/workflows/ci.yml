@@ -122,6 +122,7 @@ jobs:
 
       - name: Validate shell syntax
         run: |
+          bash -n scripts/ci_evidence_summary.sh
           bash -n scripts/verify.sh
 
       - name: Validate JSON documents
@@ -168,6 +169,11 @@ jobs:
         run: |
           scripts/verify.sh
 
+      - name: Print CI evidence summary
+        if: always()
+        run: |
+          scripts/ci_evidence_summary.sh
+
       - name: Validate generated verification artifact
         run: |
           python3 -m json.tool artifacts/latest_verify.json >/dev/null
@@ -191,6 +197,7 @@ jobs:
             artifacts/runtime/runtime_smoke.log
             artifacts/runtime/runtime_smoke.metadata.json
             artifacts/runtime/boot_blocker_report.json
+            artifacts/runtime/kernel_elf_report.json
             artifacts/runtime/boot_image/package_metadata.json
             artifacts/runtime/boot_image/kozo.iso
             artifacts/runtime/qemu_smoke.log

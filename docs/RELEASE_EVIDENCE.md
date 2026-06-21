@@ -256,6 +256,10 @@ Full CI installs QEMU, runs `scripts/qemu_smoke.sh`, and should upload `artifact
 
 The QEMU smoke summary is non-authoritative. It is a concise reviewer convenience derived from the QEMU smoke metadata, logs, and boot blocker report. The metadata and logs remain the release evidence used by validators.
 
+Full CI must also print a concise evidence summary into the Actions log with `scripts/ci_evidence_summary.sh`. The log summary must include latest verification status, failed checks, QEMU smoke outcome, blocker category, observed markers, expected marker, smoke summary text, serial/stderr log tails, and boot blocker report summary.
+
+Authenticated artifact download is useful for release review, but it is not required for first-level failure triage. If artifact download, `gh`, or API log access is unavailable, reviewers must still be able to classify the active blocker from the visible CI log summary.
+
 Release review must treat CI/Linux as the authoritative portability proof for declared build and verification dependencies. Local macOS development may provide convenience evidence, but local host state must not replace CI dependency declarations or CI artifact review.
 
 Release evidence must not depend on user-specific absolute paths. Required tools must be declared in documentation and supplied by CI, controlled environment variables, command discovery, or repository-relative paths.
