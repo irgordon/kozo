@@ -455,6 +455,22 @@ _VALIDATOR_TEST_CONTRACTS = {
             "diagnostic_names_field",
         ),
     ),
+    "runtime_progression_contract": ValidatorTestContract(
+        "runtime_progression_contract",
+        _TESTS_DIR / "test_runtime_progression_contract.py",
+        "RuntimeProgressionContractValidator",
+        (
+            "missing_contract_file",
+            "invalid_contract_json",
+            "contract_schema_violation",
+            "missing_prerequisite",
+            "missing_halt_reference",
+            "missing_transition_requirement",
+            "missing_forbidden_shortcut",
+            "missing_non_goal",
+            "diagnostic_names_field",
+        ),
+    ),
     "boot_blocker_report": ValidatorTestContract(
         "boot_blocker_report",
         _TESTS_DIR / "test_boot_blocker_report.py",

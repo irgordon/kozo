@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.6.2 - 2026-06-21
+
+**Status:** Runtime progression contract planning.
+
+### Added
+
+* Added `contracts/runtime_progression_contract.v0.json` as the governed source for future halt-to-runtime transition planning.
+* Added a schema-backed `runtime_progression_contract` loader, validator, focused negative tests, and validator coverage metadata.
+
+### Changed
+
+* Updated runtime, release evidence, contract, validation, phase map, and roadmap docs to state that the v0.6.0 halt loop remains authoritative until runtime progression evidence is separately added and validated.
+
+### Notes
+
+* This change does not alter runtime behavior, ABI contracts, syscall behavior, linker layout, or QEMU smoke evidence.
+* This change does not remove, replace, bypass, or jump around the governed halt loop.
+* This change does not claim Odin runtime execution, memory manager behavior, interrupt handling, userspace execution, scheduler behavior, process model behavior, VFS behavior, device driver behavior, Linux compatibility, POSIX compatibility, or production readiness.
+
 ## v0.6.0 - 2026-06-21
 
 **Status:** Runtime logic baseline.

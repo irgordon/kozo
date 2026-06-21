@@ -1,0 +1,87 @@
+{
+  "version": 0,
+  "architecture": "x86_64",
+  "current_state": {
+    "path": "boot_smoke_to_halt",
+    "halt_contract": "contracts/runtime_halt_contract.v0.json",
+    "final_smoke_marker": "KOZO_BOOT_SMOKE_OK",
+    "terminal_behavior": "halt_loop"
+  },
+  "progression_prerequisites": [
+    "stack initialization evidence",
+    "runtime initialization evidence",
+    "memory initialization evidence",
+    "progression path evidence"
+  ],
+  "transition_requirements": [
+    "halt loop remains authoritative until runtime progression is separately proven",
+    "runtime progression must have contract-backed evidence before halt behavior changes",
+    "runtime progression must preserve the existing QEMU smoke marker sequence until a successor evidence path is accepted",
+    "runtime progression must update release evidence and validation before claims expand"
+  ],
+  "forbidden_shortcuts": [
+    "delete halt loop",
+    "replace halt loop",
+    "bypass halt loop",
+    "jump around halt loop"
+  ],
+  "future_runtime_milestones": [
+    {
+      "stage": 0,
+      "name": "Boot smoke",
+      "status": "proven"
+    },
+    {
+      "stage": 1,
+      "name": "Runtime progression entry",
+      "status": "planned"
+    },
+    {
+      "stage": 2,
+      "name": "Stack initialization evidence",
+      "status": "planned"
+    },
+    {
+      "stage": 3,
+      "name": "Runtime initialization evidence",
+      "status": "planned"
+    },
+    {
+      "stage": 4,
+      "name": "Controlled runtime loop",
+      "status": "planned"
+    },
+    {
+      "stage": 5,
+      "name": "First governed runtime capability",
+      "status": "planned"
+    },
+    {
+      "stage": 6,
+      "name": "Userspace planning",
+      "status": "planned"
+    }
+  ],
+  "evidence_requirements": [
+    "runtime progression contract",
+    "focused validator coverage",
+    "QEMU evidence for progression entry",
+    "release evidence update",
+    "planning document update"
+  ],
+  "non_goals": [
+    "Odin runtime execution",
+    "userspace execution",
+    "interrupt handling",
+    "scheduler behavior",
+    "VFS behavior",
+    "process model behavior",
+    "syscall dispatch during boot",
+    "memory manager behavior",
+    "hardware trap handling",
+    "device driver behavior",
+    "Linux compatibility",
+    "POSIX compatibility",
+    "production readiness"
+  ]
+}

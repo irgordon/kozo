@@ -21,6 +21,7 @@ _SCHEMA_PATHS = {
     "syscall_class_contract": _SCHEMA_DIR / "syscall_class_contract.schema.json",
     "syscall_catalog": _SCHEMA_DIR / "syscall_catalog.schema.json",
     "runtime_halt_contract": _SCHEMA_DIR / "runtime_halt_contract.schema.json",
+    "runtime_progression_contract": _SCHEMA_DIR / "runtime_progression_contract.schema.json",
 }
 
 

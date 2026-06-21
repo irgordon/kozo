@@ -98,6 +98,8 @@ Latest inspected v0.5.4 CI smoke status: CI run `27894312430` produced passing Q
 
 Current v0.6.0 runtime halt baseline: `contracts/runtime_halt_contract.v0.json` and `runtime_halt_contract` validate that `kernel/arch/x86_64/boot.asm` emits `KOZO_BOOT_SMOKE_OK` before entering a deterministic `cli`/`hlt` loop with no structural fallthrough.
 
+Current v0.6.2 runtime progression planning: `contracts/runtime_progression_contract.v0.json` and `runtime_progression_contract` define the prerequisites and forbidden shortcuts for any future transition beyond the boot-smoke halt path. The halt loop remains authoritative until stack initialization evidence, runtime initialization evidence, memory initialization evidence, and progression path evidence are separately added and validated. This planning contract does not implement runtime progression.
+
 Selected boot protocol: Limine.
 
 The current repository has a 64-bit `_start` symbol, an exported `kernel_entry`, early serial initialization, early KOZO marker strings, and runtime-adjacent object/symbol smoke evidence.

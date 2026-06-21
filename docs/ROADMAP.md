@@ -94,6 +94,7 @@ The current repository proves:
 * assembly-level entry, serial initialization, and final smoke marker emission in source
 * CI-proven QEMU serial smoke evidence with the full ordered marker sequence
 * governed post-smoke terminal behavior through `contracts/runtime_halt_contract.v0.json`
+* governed future halt-to-runtime transition planning through `contracts/runtime_progression_contract.v0.json`
 
 The latest local generated evidence may still report missing local Limine/xorriso tooling, but CI run `27894312430` proves the narrow QEMU serial smoke path.
 
@@ -106,6 +107,7 @@ KOZO still does not prove:
 * Odin runtime execution after the assembly marker sequence
 * stack setup
 * memory initialization
+* runtime progression past the governed halt loop
 * syscall dispatch during boot
 * hardware halt instruction semantics
 * interrupt handling
@@ -136,7 +138,8 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 1. Keep CI evidence summaries and artifact uploads active.
 2. Keep QEMU serial smoke evidence as marker-sequence evidence only.
 3. Keep the v0.6.0 post-smoke terminal halt contract narrow and source-structural.
-4. Define the next narrow runtime evidence target before adding broader behavior.
+4. Keep the v0.6.2 runtime progression contract as the gate for any future halt-to-runtime transition.
+5. Add the next narrow runtime progression entry evidence before replacing, bypassing, or jumping around the halt loop.
 
 ---
 
@@ -144,6 +147,10 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 
 After CI QEMU serial smoke evidence is green, resume deferred maturity work:
 
+* add runtime progression entry evidence
+* add stack initialization evidence
+* add runtime initialization evidence
+* add controlled runtime loop evidence
 * centralize boot marker and blocker taxonomy
 * split QEMU smoke script policy from metadata rendering
 * split large validator coverage implementation layers

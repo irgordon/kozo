@@ -186,6 +186,8 @@ Passing QEMU serial smoke evidence proves only that QEMU launched the KOZO ISO, 
 
 For v0.6.0 and later, release review must include `contracts/runtime_halt_contract.v0.json` when post-smoke terminal behavior is under review. The `runtime_halt_contract` validator proves the source-level assembly path emits `KOZO_BOOT_SMOKE_OK` before entering the governed terminal halt loop. It does not prove hardware halt instruction execution, interrupt handling, scheduler behavior, userspace execution, process model behavior, VFS behavior, file descriptor behavior, compatibility, or production readiness.
 
+For v0.6.2 and later, release review must include `contracts/runtime_progression_contract.v0.json` when future runtime progression is under review. The `runtime_progression_contract` validator proves only that the halt-to-runtime transition prerequisites and forbidden shortcuts are governed. It does not prove runtime progression, Odin runtime execution, stack setup, memory initialization, interrupt handling, syscall dispatch during boot, userspace execution, compatibility, or production readiness.
+
 The current packaging metadata records the missing ISO generation tooling blocker:
 
 ```text
@@ -226,6 +228,12 @@ The runtime halt contract validator is:
 
 ```text
 runtime_halt_contract
+```
+
+The runtime progression contract validator is:
+
+```text
+runtime_progression_contract
 ```
 
 The expected QEMU smoke marker is:

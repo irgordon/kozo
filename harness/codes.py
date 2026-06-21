@@ -40,6 +40,7 @@ RUNTIME_TRAP_PATH_INVALID = "RUNTIME_TRAP_PATH_INVALID"
 RUNTIME_SMOKE_EVIDENCE_INVALID = "RUNTIME_SMOKE_EVIDENCE_INVALID"
 RUNTIME_EVIDENCE_REVIEW_INVALID = "RUNTIME_EVIDENCE_REVIEW_INVALID"
 RUNTIME_HALT_CONTRACT_INVALID = "RUNTIME_HALT_CONTRACT_INVALID"
+RUNTIME_PROGRESSION_CONTRACT_INVALID = "RUNTIME_PROGRESSION_CONTRACT_INVALID"
 BOOT_BLOCKER_REPORT_INVALID = "BOOT_BLOCKER_REPORT_INVALID"
 BOOT_PROTOCOL_DECISION_INVALID = "BOOT_PROTOCOL_DECISION_INVALID"
 BOOT_IMAGE_SKELETON_INVALID = "BOOT_IMAGE_SKELETON_INVALID"
@@ -93,6 +94,7 @@ CODES = MappingProxyType(
         RUNTIME_SMOKE_EVIDENCE_INVALID: "Runtime smoke evidence is missing, malformed, or inconsistent with release evidence policy",
         RUNTIME_EVIDENCE_REVIEW_INVALID: "Runtime evidence review policy is missing, incomplete, or overclaim-prone",
         RUNTIME_HALT_CONTRACT_INVALID: "Runtime halt contract is missing, malformed, or inconsistent with the post-smoke terminal path",
+        RUNTIME_PROGRESSION_CONTRACT_INVALID: "Runtime progression contract is missing, malformed, or inconsistent with halt-to-runtime transition governance",
         BOOT_BLOCKER_REPORT_INVALID: "Boot blocker report is missing, malformed, or inconsistent with boot baseline policy",
         BOOT_PROTOCOL_DECISION_INVALID: "Boot protocol decision is missing, incomplete, or inconsistent with boot blocker policy",
         BOOT_IMAGE_SKELETON_INVALID: "Boot image skeleton is missing, incomplete, or inconsistent with boot blocker state",

@@ -254,6 +254,20 @@ runtime_halt_contract
 
 It validates source structure for the post-smoke terminal path. It does not prove hardware halt instruction execution, interrupt handling, scheduler behavior, userspace execution, process model behavior, VFS behavior, file descriptor behavior, or production readiness.
 
+The runtime progression contract is:
+
+```text
+contracts/runtime_progression_contract.v0.json
+```
+
+The runtime progression contract validator is:
+
+```text
+runtime_progression_contract
+```
+
+It validates planning governance for a future halt-to-runtime transition. It requires stack initialization evidence, runtime initialization evidence, memory initialization evidence, and progression path evidence before the halt loop can be removed, replaced, bypassed, or jumped around. It does not prove Odin runtime execution, userspace execution, interrupt handling, scheduler behavior, VFS behavior, process model behavior, syscall dispatch during boot, memory manager behavior, hardware trap handling, device driver behavior, compatibility, or production readiness.
+
 The selected boot protocol is documented in:
 
 ```text

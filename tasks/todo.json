@@ -51,7 +51,12 @@
     "schemas/runtime_halt_contract.schema.json",
     "harness/runtime_halt_contract.py",
     "harness/validators_impl/runtime_halt_contract.py",
-    "tests/test_runtime_halt_contract.py"
+    "tests/test_runtime_halt_contract.py",
+    "contracts/runtime_progression_contract.v0.json",
+    "schemas/runtime_progression_contract.schema.json",
+    "harness/runtime_progression_contract.py",
+    "harness/validators_impl/runtime_progression_contract.py",
+    "tests/test_runtime_progression_contract.py"
   ],
   "steps": [
     {
@@ -1856,6 +1861,45 @@
         "verification.tests_run[25]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 63,
+      "title": "Add governed runtime progression contract planning",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "contracts/runtime_progression_contract.v0.json",
+        "schemas/runtime_progression_contract.schema.json",
+        "harness/runtime_progression_contract.py",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/schema.py",
+        "harness/validators_impl/runtime_progression_contract.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/latest_verify.schema.json",
+        "schemas/agent_context.schema.json",
+        "tests/test_runtime_progression_contract.py",
+        "docs/BOOT.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/CONTRACTS.md",
+        "docs/VALIDATION.md",
+        "docs/generated/governance_index.md",
+        "CHANGELOG.md",
+        "tasks/todo.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[26]",
+        "verification.tests_run[27]",
+        "verification.tests_run[28]",
+        "verification.tests_run[29]",
+        "verification.expected_behavior[51]",
+        "verification.actual_behavior[67]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -2044,6 +2088,26 @@
         "tool": "shell",
         "command": "git diff --check",
         "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "python3 -m unittest tests/test_runtime_progression_contract.py",
+        "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "python3 -m unittest tests/test_validator_coverage.py",
+        "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "python3 -m json.tool schemas/latest_verify.schema.json",
+        "status": "passed"
+      },
+      {
+        "tool": "shell",
+        "command": "python3 -m json.tool schemas/agent_context.schema.json",
+        "status": "passed"
       }
     ],
     "logs": [
@@ -2111,7 +2175,8 @@
       "v0.4.95 code quality and style audit records duplicated boot marker taxonomy, duplicated blocker taxonomy, QEMU script size, validator coverage size, fixture duplication, and v0.5.0 marker-emission risks without changing runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU marker semantics, or compatibility claims",
       "v0.4.96 QEMU smoke evidence summary generation writes artifacts/runtime/qemu_smoke.summary.txt from existing metadata, logs, and blocker evidence so CI artifacts are easier to inspect without changing runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU marker semantics, or compatibility claims",
       "v0.5.0 emits KOZO_BOOT_SMOKE_OK from the proven assembly serial path after KOZO_EARLY_2_SERIAL_INIT_OK and requires QEMU smoke validation to observe the full ordered marker sequence before passing",
-      "v0.6.0 governs post-smoke terminal behavior after KOZO_BOOT_SMOKE_OK without changing ABI or syscall semantics."
+      "v0.6.0 governs post-smoke terminal behavior after KOZO_BOOT_SMOKE_OK without changing ABI or syscall semantics.",
+      "runtime_progression_contract defines future halt-to-runtime transition governance without changing runtime behavior or weakening the runtime halt contract."
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -2180,7 +2245,8 @@
       "v0.5.0 emits KOZO_BOOT_SMOKE_OK from _start through the proven COM1 path and hardens qemu_smoke_evidence so pass metadata requires the full ordered marker sequence",
       "v0.5.1 records ci_verification_failed_after_v0.5.0 as the active release blocker, keeps missing_iso_generation_tooling as the local generated blocker, removes stale ABI/syscall maturity next-step wording, and preserves all no-QEMU-boot, compatibility, and production-readiness claim boundaries.",
       "CI evidence access hardening adds scripts/ci_evidence_summary.sh and full-CI log summary output without changing runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU marker semantics, compatibility claims, or production-readiness claims.",
-      "runtime_halt_contract validates that boot.asm emits KOZO_BOOT_SMOKE_OK before entering a cli/hlt loop with structural fallthrough forbidden."
+      "runtime_halt_contract validates that boot.asm emits KOZO_BOOT_SMOKE_OK before entering a cli/hlt loop with structural fallthrough forbidden.",
+      "runtime_progression_contract validates prerequisites, halt contract reference, transition requirements, forbidden shortcuts, future milestones, evidence requirements, and non-goals."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },

@@ -73,6 +73,7 @@ Current contract paths include:
 | Syscall class contract | `contracts/syscall_class_contract.v0.json` | Semantic syscall class rules |
 | Syscall catalog | `contracts/syscall_catalog.v0.json` | Governed syscall summary checked against source contracts |
 | Runtime halt contract | `contracts/runtime_halt_contract.v0.json` | Post-smoke terminal behavior after `KOZO_BOOT_SMOKE_OK` |
+| Runtime progression contract | `contracts/runtime_progression_contract.v0.json` | Future halt-to-runtime transition governance |
 
 ---
 
@@ -128,7 +129,17 @@ It does not define ABI values, syscall behavior, interrupt handling, scheduler b
 
 ---
 
-# 12. Generated Reports
+# 12. Runtime Progression Contract Role
+
+`contracts/runtime_progression_contract.v0.json` describes governance for a future transition from the current boot-smoke halt path to a separately proven runtime progression path.
+
+It requires stack initialization evidence, runtime initialization evidence, memory initialization evidence, and progression path evidence before the halt loop can be removed, replaced, bypassed, or jumped around.
+
+It is a planning and transition contract. It does not implement runtime progression, execute Odin runtime code, define ABI values, define syscall behavior, enable interrupt handling, initialize a scheduler, start userspace execution, or claim compatibility or production readiness.
+
+---
+
+# 13. Generated Reports
 
 Generated reports are summaries.
 
