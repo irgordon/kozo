@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.4.96 - 2026-06-20
+
+**Status:** Smoke evidence observability.
+
+### Added
+
+* Added deterministic QEMU smoke summary generation at `artifacts/runtime/qemu_smoke.summary.txt`.
+* Added QEMU smoke validation coverage so the summary must match metadata, name the current blocker, name the expected marker, and reference the underlying logs and blocker report.
+* Added CI artifact upload coverage for the QEMU smoke summary.
+
+### Changed
+
+* Updated boot, runtime evidence, release evidence, required checks, phase map, and roadmap docs to describe the summary as a non-authoritative reviewer convenience artifact.
+
+### Notes
+
+* This change does not alter runtime behavior.
+* This change does not alter ABI contracts or syscall behavior.
+* This change does not alter linker layout or QEMU smoke marker semantics.
+* This change does not attempt `KOZO_BOOT_SMOKE_OK` emission.
+* This change does not claim QEMU boot, hardware trap execution, Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, ELF loading, file descriptor behavior, or production readiness.
+
 ## v0.4.95 - 2026-06-20
 
 **Status:** Code quality and style audit.

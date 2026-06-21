@@ -23,6 +23,7 @@ BOOT_IMAGE_PACKAGE_METADATA="$ARTIFACTS_DIR/runtime/boot_image/package_metadata.
 QEMU_SMOKE_LOG="$ARTIFACTS_DIR/runtime/qemu_smoke.log"
 QEMU_SMOKE_STDERR_LOG="$ARTIFACTS_DIR/runtime/qemu_smoke.stderr.log"
 QEMU_SMOKE_METADATA="$ARTIFACTS_DIR/runtime/qemu_smoke.metadata.json"
+QEMU_SMOKE_SUMMARY="$ARTIFACTS_DIR/runtime/qemu_smoke.summary.txt"
 VERIFY_TMP=""
 
 mkdir -p "$LOG_DIR" "$ARTIFACTS_DIR"
@@ -140,6 +141,7 @@ collect_evidence_files() {
     "$QEMU_SMOKE_LOG"
     "$QEMU_SMOKE_STDERR_LOG"
     "$QEMU_SMOKE_METADATA"
+    "$QEMU_SMOKE_SUMMARY"
   )
 
   local file

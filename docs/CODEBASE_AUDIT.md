@@ -326,3 +326,40 @@ Risk areas for v0.5.0:
 * duplicated marker/blocker taxonomy while updating tests and docs
 
 v0.5.0 must not claim QEMU boot unless `KOZO_BOOT_SMOKE_OK` appears in captured QEMU serial output.
+
+---
+
+# 14. v0.4.96 Smoke Evidence Observability Update
+
+Date: 2026-06-20
+
+Status: Completed.
+
+## 14.1 Summary
+
+The v0.4.95 audit noted that runtime smoke diagnosis required manual correlation across multiple CI artifacts. v0.4.96 addresses that observability gap by adding `artifacts/runtime/qemu_smoke.summary.txt`.
+
+The summary is generated from existing QEMU smoke evidence:
+
+* `artifacts/runtime/qemu_smoke.metadata.json`
+* `artifacts/runtime/qemu_smoke.log`
+* `artifacts/runtime/qemu_smoke.stderr.log`
+* `artifacts/runtime/boot_blocker_report.json`
+
+The summary is non-authoritative. It exists to help reviewers quickly classify the current smoke state. Metadata, logs, contracts, validators, and docs remain the governed evidence.
+
+## 14.2 Future Runtime Phase Guidance
+
+Future runtime phases should inspect `artifacts/runtime/qemu_smoke.summary.txt` first, then confirm the summary against metadata and logs before selecting the next implementation target.
+
+For v0.5.0, the expected starting point remains:
+
+```text
+KOZO_EARLY_0_ENTRY: present
+KOZO_EARLY_1_SERIAL_INIT_START: present
+KOZO_EARLY_2_SERIAL_INIT_OK: present
+KOZO_BOOT_SMOKE_OK: absent
+blocker_category: marker_not_emitted
+```
+
+v0.5.0 should still focus on final boot smoke marker emission and must not claim QEMU boot unless `KOZO_BOOT_SMOKE_OK` appears in captured QEMU serial output.

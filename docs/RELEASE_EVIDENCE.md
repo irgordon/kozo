@@ -63,6 +63,7 @@ Every release review must include:
 * `artifacts/runtime/boot_image/kozo.iso` when packaging succeeds
 * `artifacts/runtime/qemu_smoke.log` when a QEMU smoke blocker or QEMU serial evidence is under review
 * `artifacts/runtime/qemu_smoke.metadata.json` when a QEMU smoke blocker or QEMU serial evidence is under review
+* `artifacts/runtime/qemu_smoke.summary.txt` when a QEMU smoke blocker or QEMU serial evidence is under review
 * `docs/BOOT_PROTOCOL.md`
 * `docs/BOOT_IMAGE.md`
 * `docs/BOOT_TOOLING.md`
@@ -111,6 +112,7 @@ Release review must include verification logs when generated:
 * `artifacts/runtime/qemu_smoke.log` when generated during QEMU smoke blocker review
 * `artifacts/runtime/qemu_smoke.stderr.log` when generated during QEMU smoke blocker review
 * `artifacts/runtime/qemu_smoke.metadata.json` when generated during QEMU smoke blocker review
+* `artifacts/runtime/qemu_smoke.summary.txt` when generated during QEMU smoke blocker review
 
 Future runtime smoke phases must add their runtime logs to this list before using them as release evidence.
 
@@ -237,7 +239,9 @@ Full CI also runs the boot blocker report generator through `scripts/verify.sh` 
 
 Full CI installs xorriso, acquires pinned Limine source tooling, runs `scripts/build_boot_image.sh`, and should upload `artifacts/runtime/boot_image/package_metadata.json` plus `artifacts/runtime/boot_image/kozo.iso` when the image exists.
 
-Full CI installs QEMU, runs `scripts/qemu_smoke.sh`, and should upload `artifacts/runtime/qemu_smoke.log` plus `artifacts/runtime/qemu_smoke.metadata.json` whether the result is pass or an exact blocker.
+Full CI installs QEMU, runs `scripts/qemu_smoke.sh`, and should upload `artifacts/runtime/qemu_smoke.log`, `artifacts/runtime/qemu_smoke.stderr.log`, `artifacts/runtime/qemu_smoke.metadata.json`, and `artifacts/runtime/qemu_smoke.summary.txt` whether the result is pass or an exact blocker.
+
+The QEMU smoke summary is non-authoritative. It is a concise reviewer convenience derived from the QEMU smoke metadata, logs, and boot blocker report. The metadata and logs remain the release evidence used by validators.
 
 Release review must treat CI/Linux as the authoritative portability proof for declared build and verification dependencies. Local macOS development may provide convenience evidence, but local host state must not replace CI dependency declarations or CI artifact review.
 
@@ -298,6 +302,7 @@ release-evidence/
       kozo.iso
     qemu_smoke.log
     qemu_smoke.metadata.json
+    qemu_smoke.summary.txt
   logs/
     odin-check.log
     odin-build.log

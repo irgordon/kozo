@@ -10,6 +10,8 @@ PACKAGE_METADATA="$BOOT_IMAGE_DIR/package_metadata.json"
 QEMU_LOG="$RUNTIME_DIR/qemu_smoke.log"
 QEMU_METADATA="$RUNTIME_DIR/qemu_smoke.metadata.json"
 QEMU_STDERR_LOG="$RUNTIME_DIR/qemu_smoke.stderr.log"
+QEMU_SUMMARY="$RUNTIME_DIR/qemu_smoke.summary.txt"
+BOOT_BLOCKER_REPORT="$RUNTIME_DIR/boot_blocker_report.json"
 EXPECTED_MARKER="KOZO_BOOT_SMOKE_OK"
 EARLY_MARKERS=(
   "KOZO_EARLY_0_ENTRY"
@@ -346,6 +348,116 @@ if outcome == "blocked":
     metadata["blocker_category"] = blocker
 
 metadata_path.write_text(json.dumps(metadata, indent=2) + "\n")
+PY
+  write_smoke_summary
+}
+
+write_smoke_summary() {
+  python3 - \
+    "$QEMU_SUMMARY" \
+    "$QEMU_METADATA" \
+    "$QEMU_LOG" \
+    "$QEMU_STDERR_LOG" \
+    "$BOOT_BLOCKER_REPORT" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+summary_path = Path(sys.argv[1])
+metadata_path = Path(sys.argv[2])
+serial_log_path = Path(sys.argv[3])
+stderr_log_path = Path(sys.argv[4])
+blocker_report_path = Path(sys.argv[5])
+
+
+def _read_metadata(path: Path) -> dict[str, object]:
+    try:
+        value = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return value if isinstance(value, dict) else {}
+
+
+def _read_tail(path: Path, limit: int = 50) -> list[str]:
+    if not path.is_file():
+        return []
+    return path.read_text(errors="replace").splitlines()[-limit:]
+
+
+def _display_path(path: Path) -> str:
+    try:
+        return str(path.relative_to(Path.cwd()))
+    except ValueError:
+        return str(path)
+
+
+def _blocker(metadata: dict[str, object]) -> str:
+    if metadata.get("outcome") == "pass":
+        return "none"
+    value = metadata.get("blocker_category")
+    return value if isinstance(value, str) and value else "unknown"
+
+
+def _observed_markers(metadata: dict[str, object]) -> list[str]:
+    value = metadata.get("observed_markers")
+    return [item for item in value if isinstance(item, str)] if isinstance(value, list) else []
+
+
+def _append_marker_lines(lines: list[str], markers: list[str]) -> None:
+    if not markers:
+        lines.append("  - none")
+        return
+    for marker in markers:
+        lines.append(f"  - {marker}")
+
+
+def _append_tail(lines: list[str], title: str, tail: list[str]) -> None:
+    lines.append("")
+    lines.append(title)
+    if not tail:
+        lines.append("(empty)")
+        return
+    lines.extend(tail)
+
+
+metadata = _read_metadata(metadata_path)
+summary_lines = [
+    "QEMU Smoke Summary",
+    "",
+    "Outcome",
+    f"Outcome: {metadata.get('outcome', 'unknown')}",
+    "",
+    "Blocker Category",
+    f"Blocker: {_blocker(metadata)}",
+    "",
+    "Observed Markers",
+]
+_append_marker_lines(summary_lines, _observed_markers(metadata))
+summary_lines.extend(
+    [
+        "",
+        "Expected Marker",
+        f"Expected Marker: {metadata.get('expected_marker', '')}",
+        "",
+        "Verifier Result",
+        f"Validator: {metadata.get('validator', '')}",
+        "",
+        "Metadata",
+        f"QEMU exit code: {metadata.get('qemu_exit_code', '')}",
+        f"Timed out: {metadata.get('timed_out', '')}",
+        f"Serial log bytes: {metadata.get('serial_log_bytes', '')}",
+        f"Stderr log bytes: {metadata.get('stderr_log_bytes', '')}",
+        "",
+        "Evidence References",
+        _display_path(serial_log_path),
+        _display_path(stderr_log_path),
+        _display_path(metadata_path),
+        _display_path(blocker_report_path),
+    ]
+)
+_append_tail(summary_lines, "Last 50 serial lines", _read_tail(serial_log_path))
+_append_tail(summary_lines, "Last 50 stderr lines", _read_tail(stderr_log_path))
+summary_path.write_text("\n".join(summary_lines) + "\n")
 PY
 }
 

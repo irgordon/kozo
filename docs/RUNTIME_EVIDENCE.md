@@ -190,6 +190,12 @@ The QEMU smoke metadata path is:
 artifacts/runtime/qemu_smoke.metadata.json
 ```
 
+The QEMU smoke summary path is:
+
+```text
+artifacts/runtime/qemu_smoke.summary.txt
+```
+
 The boot image package metadata path is:
 
 ```text
@@ -216,6 +222,8 @@ docs/BOOT_TOOLING.md
 
 The QEMU smoke log is passing QEMU serial smoke evidence only when `qemu_smoke_evidence` validates metadata with outcome `pass` and finds `KOZO_BOOT_SMOKE_OK` in the serial log. Blocked metadata remains blocker evidence only.
 
+The QEMU smoke summary is a reviewer convenience artifact. It is generated from the QEMU smoke metadata, serial log, stderr log, and boot blocker report. It is not authoritative and must not replace metadata or log validation.
+
 The selected boot protocol is documented in:
 
 ```text
@@ -239,7 +247,7 @@ Full CI should also upload the boot blocker report while v0.3.0 remains blocked.
 
 Full CI should upload boot image package metadata and `artifacts/runtime/boot_image/kozo.iso` when ISO generation succeeds.
 
-Full CI should upload QEMU smoke log and metadata when `scripts/qemu_smoke.sh` runs.
+Full CI should upload QEMU smoke log, stderr log, metadata, and summary when `scripts/qemu_smoke.sh` runs.
 
 ---
 
@@ -277,6 +285,7 @@ Before release review:
 * Run `scripts/boot_blocker_report.sh` while v0.3.0 remains blocked.
 * Run `scripts/qemu_smoke.sh` only when reviewing the current QEMU blocker directly; it is expected to fail closed until bootable image packaging exists.
 * Confirm `artifacts/runtime/qemu_smoke.metadata.json` is valid JSON when QEMU smoke is in scope.
+* Confirm `artifacts/runtime/qemu_smoke.summary.txt` exists when QEMU smoke is in scope.
 * Confirm `qemu_smoke_evidence` passes when QEMU smoke metadata is generated.
 * Confirm `artifacts/runtime/runtime_smoke.log` exists and is non-empty.
 * Confirm `artifacts/runtime/runtime_smoke.metadata.json` is valid JSON.

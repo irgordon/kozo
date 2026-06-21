@@ -58,7 +58,7 @@ No build or verification script may depend on user-specific absolute paths.
 
 | Check Name | Command or Workflow | Owner Document | Required for PR | Required for Release | Evidence Output |
 | --- | --- | --- | --- | --- | --- |
-| Full verification | `scripts/verify.sh` | `docs/VALIDATION.md` | Yes | Yes | `artifacts/latest_verify.json`, `artifacts/logs/*.log`, `artifacts/runtime/runtime_smoke.log`, `artifacts/runtime/runtime_smoke.metadata.json`, `artifacts/runtime/boot_blocker_report.json`, `artifacts/runtime/qemu_smoke.log`, `artifacts/runtime/qemu_smoke.stderr.log`, `artifacts/runtime/qemu_smoke.metadata.json` |
+| Full verification | `scripts/verify.sh` | `docs/VALIDATION.md` | Yes | Yes | `artifacts/latest_verify.json`, `artifacts/logs/*.log`, `artifacts/runtime/runtime_smoke.log`, `artifacts/runtime/runtime_smoke.metadata.json`, `artifacts/runtime/boot_blocker_report.json`, `artifacts/runtime/qemu_smoke.log`, `artifacts/runtime/qemu_smoke.stderr.log`, `artifacts/runtime/qemu_smoke.metadata.json`, `artifacts/runtime/qemu_smoke.summary.txt` |
 | Unit discovery | `python3 -m unittest discover -s tests` | `docs/VALIDATION.md` | Yes | Yes | test output |
 | Odin check | `odin check kernel` | `docs/VALIDATION.md` | Yes | Yes | CI output, `artifacts/logs/odin-check.log` through full verification |
 | Pinned Rust cargo check | pinned cargo check for `userspace/core_service` | `docs/VALIDATION.md` | Yes | Yes | CI output, `artifacts/logs/cargo-check.log` through full verification |
@@ -69,7 +69,7 @@ No build or verification script may depend on user-specific absolute paths.
 | Boot blocker report | `scripts/boot_blocker_report.sh` | `docs/BOOT.md` | Yes, through full verification while boot is blocked | Yes, while boot is blocked | `artifacts/runtime/boot_blocker_report.json` |
 | Boot image packaging metadata | `scripts/build_boot_image.sh` | `docs/BOOT_IMAGE.md` | Yes, through full verification while boot image packaging is blocked | Yes, while boot image packaging is blocked | `artifacts/runtime/boot_image/package_metadata.json` |
 | CI ISO tooling install | GitHub Actions `ci / full verification` | `docs/BOOT_TOOLING.md` | Yes | Yes | CI output, `artifacts/runtime/boot_image/package_metadata.json`, `artifacts/runtime/boot_image/kozo.iso` when produced |
-| QEMU smoke evidence | `scripts/qemu_smoke.sh` and `qemu_smoke_evidence` | `docs/BOOT.md` | Yes, through full verification | Yes, when the QEMU blocker is under direct review | `artifacts/runtime/qemu_smoke.log`, `artifacts/runtime/qemu_smoke.stderr.log`, `artifacts/runtime/qemu_smoke.metadata.json` |
+| QEMU smoke evidence | `scripts/qemu_smoke.sh` and `qemu_smoke_evidence` | `docs/BOOT.md` | Yes, through full verification | Yes, when the QEMU blocker is under direct review | `artifacts/runtime/qemu_smoke.log`, `artifacts/runtime/qemu_smoke.stderr.log`, `artifacts/runtime/qemu_smoke.metadata.json`, `artifacts/runtime/qemu_smoke.summary.txt` |
 | CI workflow | GitHub Actions `ci / full verification` | `docs/REQUIRED_CHECKS.md` | Yes | Yes | GitHub Actions status |
 | Lint workflow | GitHub Actions `lint / static checks` | `docs/REQUIRED_CHECKS.md` | Yes | Yes | GitHub Actions status |
 
@@ -147,6 +147,8 @@ CI should upload the boot blocker report while boot is blocked so release review
 CI should upload `artifacts/runtime/boot_image/package_metadata.json` and `artifacts/runtime/boot_image/kozo.iso` when the ISO is produced.
 
 CI should upload `artifacts/runtime/qemu_smoke.log`, `artifacts/runtime/qemu_smoke.stderr.log`, and `artifacts/runtime/qemu_smoke.metadata.json` when QEMU smoke runs.
+
+CI should also upload `artifacts/runtime/qemu_smoke.summary.txt` when QEMU smoke runs. The summary is a non-authoritative reviewer convenience derived from the QEMU smoke metadata, serial log, stderr log, and boot blocker report.
 
 ---
 

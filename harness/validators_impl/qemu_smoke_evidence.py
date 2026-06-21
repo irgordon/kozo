@@ -11,6 +11,7 @@ _ROOT = Path(__file__).resolve().parents[2]
 _METADATA_PATH = _ROOT / "artifacts" / "runtime" / "qemu_smoke.metadata.json"
 _SERIAL_LOG_PATH = _ROOT / "artifacts" / "runtime" / "qemu_smoke.log"
 _STDERR_LOG_PATH = _ROOT / "artifacts" / "runtime" / "qemu_smoke.stderr.log"
+_SUMMARY_PATH = _ROOT / "artifacts" / "runtime" / "qemu_smoke.summary.txt"
 _BOOT_BLOCKER_REPORT_PATH = _ROOT / "artifacts" / "runtime" / "boot_blocker_report.json"
 _BOOT_DOC_PATH = _ROOT / "docs" / "BOOT.md"
 _RUNTIME_EVIDENCE_PATH = _ROOT / "docs" / "RUNTIME_EVIDENCE.md"
@@ -76,6 +77,7 @@ _REQUIRED_DOC_REFERENCES = (
     "artifacts/runtime/qemu_smoke.log",
     "artifacts/runtime/qemu_smoke.stderr.log",
     "artifacts/runtime/qemu_smoke.metadata.json",
+    "artifacts/runtime/qemu_smoke.summary.txt",
     "qemu_smoke_evidence",
     "KOZO_BOOT_SMOKE_OK",
 )
@@ -121,6 +123,7 @@ def _qemu_smoke_issue() -> QemuSmokeIssue | None:
         _diagnostic_field_issue(metadata),
         _entry_handoff_field_issue(metadata),
         _observed_marker_issue(metadata),
+        _summary_issue(metadata),
         _blocker_taxonomy_issue(metadata),
         _list_contract_issue(metadata, "does_not_prove", _REQUIRED_NON_GOALS, "missing_non_goal"),
         _blocker_report_issue(metadata, blocker_report),
@@ -202,6 +205,73 @@ def _observed_markers_from_logs() -> list[str]:
     stderr_text = _STDERR_LOG_PATH.read_text(errors="replace") if _STDERR_LOG_PATH.is_file() else ""
     combined = f"{serial_text}\n{stderr_text}"
     return [marker for marker in _EARLY_MARKERS if marker in combined]
+
+
+def _summary_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
+    if not _SUMMARY_PATH.is_file():
+        return _issue("missing_summary", "qemu_smoke.summary", "Missing QEMU smoke summary artifact")
+    text = _SUMMARY_PATH.read_text(errors="replace")
+    return _first_issue(
+        _summary_section_issue(text),
+        _summary_outcome_issue(text, metadata),
+        _summary_blocker_issue(text, metadata),
+        _summary_marker_issue(text, metadata),
+        _summary_reference_issue(text),
+    )
+
+
+def _summary_section_issue(text: str) -> QemuSmokeIssue | None:
+    for section in (
+        "QEMU Smoke Summary",
+        "Outcome",
+        "Blocker Category",
+        "Observed Markers",
+        "Expected Marker",
+        "Verifier Result",
+        "Last 50 serial lines",
+        "Last 50 stderr lines",
+    ):
+        if section not in text:
+            return _issue("summary_missing_section", f"qemu_smoke.summary.{section}", f"QEMU smoke summary is missing {section}")
+    return None
+
+
+def _summary_outcome_issue(text: str, metadata: dict[str, object]) -> QemuSmokeIssue | None:
+    expected = f"Outcome: {metadata.get('outcome')}"
+    if expected not in text:
+        return _issue("summary_metadata_mismatch", "qemu_smoke.summary.outcome", "QEMU smoke summary outcome must match metadata")
+    return None
+
+
+def _summary_blocker_issue(text: str, metadata: dict[str, object]) -> QemuSmokeIssue | None:
+    blocker = "none" if metadata.get("outcome") == "pass" else metadata.get("blocker_category")
+    expected = f"Blocker: {blocker}"
+    if expected not in text:
+        return _issue("summary_metadata_mismatch", "qemu_smoke.summary.blocker_category", "QEMU smoke summary blocker must match metadata")
+    return None
+
+
+def _summary_marker_issue(text: str, metadata: dict[str, object]) -> QemuSmokeIssue | None:
+    marker = metadata.get("expected_marker")
+    expected = f"Expected Marker: {marker}"
+    if expected not in text:
+        return _issue("summary_metadata_mismatch", "qemu_smoke.summary.expected_marker", "QEMU smoke summary expected marker must match metadata")
+    for marker in metadata.get("observed_markers", []):
+        if isinstance(marker, str) and f"  - {marker}" not in text:
+            return _issue("summary_metadata_mismatch", "qemu_smoke.summary.observed_markers", "QEMU smoke summary observed markers must match metadata")
+    return None
+
+
+def _summary_reference_issue(text: str) -> QemuSmokeIssue | None:
+    for reference in (
+        "artifacts/runtime/qemu_smoke.log",
+        "artifacts/runtime/qemu_smoke.stderr.log",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/boot_blocker_report.json",
+    ):
+        if reference not in text:
+            return _issue("summary_missing_reference", f"qemu_smoke.summary.{reference}", f"QEMU smoke summary is missing {reference}")
+    return None
 
 
 def _log_text() -> str:

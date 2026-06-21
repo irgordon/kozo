@@ -1,0 +1,34 @@
+QEMU Smoke Summary
+
+Outcome
+Outcome: blocked
+
+Blocker Category
+Blocker: missing_iso_generation_tooling
+
+Observed Markers
+  - none
+
+Expected Marker
+Expected Marker: KOZO_BOOT_SMOKE_OK
+
+Verifier Result
+Validator: qemu_smoke_evidence
+
+Metadata
+QEMU exit code: 0
+Timed out: False
+Serial log bytes: 0
+Stderr log bytes: 0
+
+Evidence References
+artifacts/runtime/qemu_smoke.log
+artifacts/runtime/qemu_smoke.stderr.log
+artifacts/runtime/qemu_smoke.metadata.json
+artifacts/runtime/boot_blocker_report.json
+
+Last 50 serial lines
+(empty)
+
+Last 50 stderr lines
+(empty)

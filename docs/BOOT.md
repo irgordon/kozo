@@ -54,7 +54,7 @@ The local blocker is `missing_iso_generation_tooling`.
 
 If CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated blocker report narrows to `missing_qemu_serial_evidence` for that run.
 
-If `scripts/qemu_smoke.sh` can run against a generated ISO, it writes `artifacts/runtime/qemu_smoke.log`, `artifacts/runtime/qemu_smoke.stderr.log`, and `artifacts/runtime/qemu_smoke.metadata.json`. Passing QEMU evidence requires the serial log to contain `KOZO_BOOT_SMOKE_OK`; blocked metadata preserves the no-QEMU-boot claim.
+If `scripts/qemu_smoke.sh` can run against a generated ISO, it writes `artifacts/runtime/qemu_smoke.log`, `artifacts/runtime/qemu_smoke.stderr.log`, `artifacts/runtime/qemu_smoke.metadata.json`, and `artifacts/runtime/qemu_smoke.summary.txt`. Passing QEMU evidence requires the serial log to contain `KOZO_BOOT_SMOKE_OK`; blocked metadata preserves the no-QEMU-boot claim. The summary is non-authoritative reviewer convenience derived from the metadata and logs.
 
 ---
 
@@ -94,7 +94,7 @@ The boot protocol decision, boot image skeleton, boot tooling acquisition policy
 
 `scripts/build_boot_image.sh` writes `artifacts/runtime/kernel_elf_report.json`.
 
-`scripts/qemu_smoke.sh` writes `artifacts/runtime/qemu_smoke.metadata.json`, `artifacts/runtime/qemu_smoke.log`, and `artifacts/runtime/qemu_smoke.stderr.log`.
+`scripts/qemu_smoke.sh` writes `artifacts/runtime/qemu_smoke.metadata.json`, `artifacts/runtime/qemu_smoke.log`, `artifacts/runtime/qemu_smoke.stderr.log`, and `artifacts/runtime/qemu_smoke.summary.txt`.
 
 The expected ISO path is `artifacts/runtime/boot_image/kozo.iso`.
 
@@ -153,6 +153,7 @@ The current source surfaces relevant to future boot work are:
 * `artifacts/runtime/kernel_elf_report.json`
 * `artifacts/runtime/qemu_smoke.metadata.json`
 * `artifacts/runtime/qemu_smoke.log`
+* `artifacts/runtime/qemu_smoke.summary.txt`
 
 `kernel/arch/x86_64/boot.asm` defines `_start`, and `scripts/build_boot_image.sh` links a kernel ELF for the Limine image skeleton.
 
