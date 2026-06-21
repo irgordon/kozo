@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260621T213841Z",
+  "run_id": "verify-20260621T215451Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 41,
+    "total_checks": 42,
     "failed_check_count": 0
   },
   "checks": [
@@ -213,6 +213,13 @@
       "detail": "Runtime progression contract preserves the halt baseline until future progression evidence exists"
     },
     {
+      "name": "runtime_progression_entry_contract",
+      "subsystem": "runtime_progression_entry_contract",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Runtime progression entry contract reserves the future entry marker without changing the halt baseline"
+    },
+    {
       "name": "boot_blocker_report",
       "subsystem": "boot_blocker_report",
       "status": "pass",
@@ -312,7 +319,7 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
-    "contracts/runtime_progression_contract.v0.json",
+    "contracts/runtime_progression_entry_contract.v0.json",
     "docs/BOOT.md",
     "docs/CONTRACTS.md",
     "docs/PHASEMAP.md",
@@ -323,16 +330,16 @@
     "docs/generated/governance_index.md",
     "harness/codes.py",
     "harness/registry.py",
-    "harness/runtime_progression_contract.py",
+    "harness/runtime_progression_entry_contract.py",
     "harness/validators.py",
-    "harness/validators_impl/runtime_progression_contract.py",
+    "harness/validators_impl/runtime_progression_entry_contract.py",
     "harness/validators_impl/schema.py",
     "harness/validators_impl/validator_coverage.py",
     "schemas/agent_context.schema.json",
     "schemas/latest_verify.schema.json",
-    "schemas/runtime_progression_contract.schema.json",
+    "schemas/runtime_progression_entry_contract.schema.json",
     "tasks/todo.json",
-    "tests/test_runtime_progression_contract.py"
+    "tests/test_runtime_progression_entry_contract.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -349,5 +356,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-06-21T21:38:41Z"
+  "generated_at": "2026-06-21T21:54:51Z"
 }
