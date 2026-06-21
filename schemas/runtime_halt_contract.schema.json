@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KOZO runtime halt contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "source",
+    "final_smoke_marker",
+    "terminal_behavior",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {
+      "const": 0
+    },
+    "architecture": {
+      "type": "string",
+      "pattern": ".*\\S.*"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "entry_symbol"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "entry_symbol": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        }
+      }
+    },
+    "final_smoke_marker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "symbol",
+        "text",
+        "write_macro"
+      ],
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "text": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "write_macro": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        }
+      }
+    },
+    "terminal_behavior": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "label",
+        "disable_interrupts",
+        "instructions",
+        "fallthrough_forbidden"
+      ],
+      "properties": {
+        "kind": {
+          "const": "halt_loop"
+        },
+        "label": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "disable_interrupts": {
+          "type": "boolean"
+        },
+        "instructions": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "type": "string",
+            "pattern": ".*\\S.*"
+          }
+        },
+        "fallthrough_forbidden": {
+          "type": "boolean"
+        }
+      }
+    },
+    "non_goals": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    }
+  }
+}

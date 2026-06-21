@@ -72,6 +72,7 @@ Current contract paths include:
 | Syscall table contract | `contracts/syscall_table_contract.v0.json` | Currently proven dispatcher table behavior |
 | Syscall class contract | `contracts/syscall_class_contract.v0.json` | Semantic syscall class rules |
 | Syscall catalog | `contracts/syscall_catalog.v0.json` | Governed syscall summary checked against source contracts |
+| Runtime halt contract | `contracts/runtime_halt_contract.v0.json` | Post-smoke terminal behavior after `KOZO_BOOT_SMOKE_OK` |
 
 ---
 
@@ -117,7 +118,17 @@ Catalog entries must be validated against the authoritative contracts and source
 
 ---
 
-# 11. Generated Reports
+# 11. Runtime Halt Contract Role
+
+`contracts/runtime_halt_contract.v0.json` describes the governed terminal behavior after the assembly boot smoke marker path emits `KOZO_BOOT_SMOKE_OK`.
+
+It requires the post-marker path in `kernel/arch/x86_64/boot.asm` to enter a deterministic halt loop without falling through into unrelated bytes.
+
+It does not define ABI values, syscall behavior, interrupt handling, scheduler behavior, userspace execution, hardware trap execution, or production readiness.
+
+---
+
+# 12. Generated Reports
 
 Generated reports are summaries.
 
@@ -131,7 +142,7 @@ Generated reports do not own contract truth. If a generated report conflicts wit
 
 ---
 
-# 12. Validators as Proof Mechanisms
+# 13. Validators as Proof Mechanisms
 
 Validators prove that checked-in source, contracts, generated artifacts, and task state agree.
 
@@ -141,7 +152,7 @@ When a validator finds missing source, missing evidence, stale generated reports
 
 ---
 
-# 13. Contract Change Requirements
+# 14. Contract Change Requirements
 
 A contract change requires:
 
@@ -154,7 +165,7 @@ A contract change requires:
 
 ---
 
-# 14. Relationship to Other Governance Documents
+# 15. Relationship to Other Governance Documents
 
 `GOVERNANCE.md` owns document precedence.
 

@@ -39,6 +39,7 @@ BRIDGE_ALIGNMENT_INVALID = "BRIDGE_ALIGNMENT_INVALID"
 RUNTIME_TRAP_PATH_INVALID = "RUNTIME_TRAP_PATH_INVALID"
 RUNTIME_SMOKE_EVIDENCE_INVALID = "RUNTIME_SMOKE_EVIDENCE_INVALID"
 RUNTIME_EVIDENCE_REVIEW_INVALID = "RUNTIME_EVIDENCE_REVIEW_INVALID"
+RUNTIME_HALT_CONTRACT_INVALID = "RUNTIME_HALT_CONTRACT_INVALID"
 BOOT_BLOCKER_REPORT_INVALID = "BOOT_BLOCKER_REPORT_INVALID"
 BOOT_PROTOCOL_DECISION_INVALID = "BOOT_PROTOCOL_DECISION_INVALID"
 BOOT_IMAGE_SKELETON_INVALID = "BOOT_IMAGE_SKELETON_INVALID"
@@ -91,6 +92,7 @@ CODES = MappingProxyType(
         RUNTIME_TRAP_PATH_INVALID: "Rust does not cross the assembly syscall bridge as required by the runtime trap contract",
         RUNTIME_SMOKE_EVIDENCE_INVALID: "Runtime smoke evidence is missing, malformed, or inconsistent with release evidence policy",
         RUNTIME_EVIDENCE_REVIEW_INVALID: "Runtime evidence review policy is missing, incomplete, or overclaim-prone",
+        RUNTIME_HALT_CONTRACT_INVALID: "Runtime halt contract is missing, malformed, or inconsistent with the post-smoke terminal path",
         BOOT_BLOCKER_REPORT_INVALID: "Boot blocker report is missing, malformed, or inconsistent with boot baseline policy",
         BOOT_PROTOCOL_DECISION_INVALID: "Boot protocol decision is missing, incomplete, or inconsistent with boot blocker policy",
         BOOT_IMAGE_SKELETON_INVALID: "Boot image skeleton is missing, incomplete, or inconsistent with boot blocker state",

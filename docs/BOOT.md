@@ -52,6 +52,8 @@ v0.5.0 adds assembly-level `KOZO_BOOT_SMOKE_OK` emission at `_start`, immediatel
 
 v0.5.4 promotes the CI-proven QEMU serial smoke evidence after CI run `27894312430` captured the full ordered marker sequence and QEMU smoke metadata reported `outcome: pass` with `blocker_category: none`.
 
+v0.6.0 adds a governed runtime halt contract for the immediate post-smoke path. After `_start` emits `KOZO_BOOT_SMOKE_OK`, the assembly path enters a deterministic terminal `cli`/`hlt` loop instead of falling through into unrelated bytes or continuing into ungoverned runtime work.
+
 No active QEMU serial smoke blocker.
 
 Local generated blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
@@ -93,6 +95,8 @@ Current v0.4.9 serial initialization change: `_start` writes the entry marker, t
 Current v0.5.0 marker emission change: `_start` writes `KOZO_BOOT_SMOKE_OK` through the same assembly COM1 path after `KOZO_EARLY_2_SERIAL_INIT_OK`. This supports only QEMU serial smoke evidence when QEMU smoke validation observes the full ordered marker sequence in captured serial output; it does not prove Odin runtime execution, stack setup, memory initialization, syscall dispatch, hardware trap execution, or broader boot lifecycle behavior.
 
 Latest inspected v0.5.4 CI smoke status: CI run `27894312430` produced passing QEMU smoke metadata and captured `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, and `KOZO_BOOT_SMOKE_OK` in the serial log.
+
+Current v0.6.0 runtime halt baseline: `contracts/runtime_halt_contract.v0.json` and `runtime_halt_contract` validate that `kernel/arch/x86_64/boot.asm` emits `KOZO_BOOT_SMOKE_OK` before entering a deterministic `cli`/`hlt` loop with no structural fallthrough.
 
 Selected boot protocol: Limine.
 
@@ -170,6 +174,8 @@ The current source surfaces relevant to future boot work are:
 
 `kernel/arch/x86_64/boot.asm` emits `KOZO_BOOT_SMOKE_OK` after assembly-level serial initialization. `kernel/main.odin` also keeps a later boot smoke marker path after Odin serial initialization. Passing QEMU serial smoke evidence requires the captured serial log to contain the expected marker sequence.
 
+After the assembly-level `KOZO_BOOT_SMOKE_OK` emission, `kernel/arch/x86_64/boot.asm` enters the governed terminal halt loop. That source-level terminal behavior is validated by `runtime_halt_contract` and does not prove hardware halt instruction semantics, interrupt handling, scheduler behavior, stack setup, Odin runtime execution, memory initialization, syscall dispatch, or production readiness.
+
 `kernel/arch/x86_64/serial.odin` initializes COM1 serial output for the later Odin path. The v0.5.0 smoke marker is owned by the assembly entry path and is not Odin runtime, stack, memory, syscall, or hardware-trap evidence.
 
 `kernel/arch/x86_64/serial.odin` also owns the v0.4.0 early markers. Those markers are diagnostic evidence only; they do not prove hardware trap execution, userspace execution, or subsystem maturity.
@@ -182,7 +188,7 @@ The previous `missing_bootable_iso_packaging` blocker was refined to `missing_li
 
 The previous `missing_limine_iso_tooling` blocker is refined by `docs/BOOT_TOOLING.md`.
 
-The next boot-enabling fix must use the documented CI/local Limine and xorriso tooling path to produce a bootable ISO consistently before QEMU smoke execution, serial evidence capture, and QEMU smoke validation can be claimed.
+The QEMU serial smoke path is now proven in CI. The next runtime work must keep that claim narrow and should define the next governed runtime evidence target before expanding behavior.
 
 The existing QEMU smoke command writes blocked or passing metadata to `artifacts/runtime/qemu_smoke.metadata.json` and serial output to `artifacts/runtime/qemu_smoke.log`.
 

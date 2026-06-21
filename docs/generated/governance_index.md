@@ -12,18 +12,18 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.5.4`
+* Version: `v0.6.0`
 * Date: `2026-06-21`
-* Status: QEMU serial smoke evidence promotion.
+* Status: Runtime logic baseline.
 
 ## Verification status
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 39
+* Total checks: 40
 * Failed checks: 0
-* Run ID: `verify-20260621T154550Z`
-* Generated at: `2026-06-21T15:45:50Z`
+* Run ID: `verify-20260621T165302Z`
+* Generated at: `2026-06-21T16:53:02Z`
 
 ## Registered validators
 
@@ -56,24 +56,26 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 25 | `runtime_trap_path` |
 | 26 | `runtime_smoke_evidence` |
 | 27 | `runtime_evidence_review` |
-| 28 | `boot_blocker_report` |
-| 29 | `boot_protocol_decision` |
-| 30 | `boot_image_skeleton` |
-| 31 | `boot_image_packaging` |
-| 32 | `boot_tooling` |
-| 33 | `kernel_loadability` |
-| 34 | `host_dependency_portability` |
-| 35 | `qemu_smoke_evidence` |
-| 36 | `return_path_proof` |
-| 37 | `execution_proof` |
-| 38 | `validator_coverage` |
-| 39 | `evidence` |
+| 28 | `runtime_halt_contract` |
+| 29 | `boot_blocker_report` |
+| 30 | `boot_protocol_decision` |
+| 31 | `boot_image_skeleton` |
+| 32 | `boot_image_packaging` |
+| 33 | `boot_tooling` |
+| 34 | `kernel_loadability` |
+| 35 | `host_dependency_portability` |
+| 36 | `qemu_smoke_evidence` |
+| 37 | `return_path_proof` |
+| 38 | `execution_proof` |
+| 39 | `validator_coverage` |
+| 40 | `evidence` |
 
 ## Active contracts
 
 | Path | Version | Role |
 | --- | --- | --- |
 | `contracts/kozo_abi_manifest.json` | `0` | ABI manifest |
+| `contracts/runtime_halt_contract.v0.json` | `0` | runtime halt contract.v0 |
 | `contracts/syscall_boundary_contract.v0.json` | `0` | syscall boundary contract |
 | `contracts/syscall_catalog.v0.json` | `0` | syscall catalog |
 | `contracts/syscall_class_contract.v0.json` | `0` | syscall class contract |
@@ -87,6 +89,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | `schemas/kozo_abi_manifest.schema.json` | kozo_abi_manifest.schema.json |
 | `schemas/latest_verify.schema.json` | latest_verify.schema.json |
 | `schemas/runtime.schema.json` | runtime.schema.json |
+| `schemas/runtime_halt_contract.schema.json` | KOZO runtime halt contract |
 | `schemas/syscall_boundary_contract.schema.json` | syscall_boundary_contract.schema.json |
 | `schemas/syscall_catalog.schema.json` | syscall_catalog.schema.json |
 | `schemas/syscall_class_contract.schema.json` | syscall_class_contract.schema.json |
@@ -105,7 +108,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 39
+* Check count: 40
 * Failure count: 0
 
 ## Non-goals

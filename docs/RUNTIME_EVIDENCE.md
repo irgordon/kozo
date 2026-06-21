@@ -56,6 +56,8 @@ v0.5.2 adds CI evidence access hardening. Full CI prints a concise verification,
 
 v0.5.4 promotes QEMU serial smoke evidence after CI run `27894312430` captured the full ordered marker sequence and QEMU smoke metadata reported `outcome: pass` with `blocker_category: none`.
 
+v0.6.0 adds the governed post-smoke runtime halt baseline. The runtime halt contract validates that the assembly path emits `KOZO_BOOT_SMOKE_OK` before entering a deterministic terminal halt loop and forbids structural fallthrough after the smoke marker.
+
 Current local boot blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
 
 Current release blocker for QEMU serial smoke evidence: none.
@@ -238,6 +240,20 @@ The QEMU smoke summary is a reviewer convenience artifact. It is generated from 
 
 The CI evidence summary printed by `scripts/ci_evidence_summary.sh` is also reviewer convenience output. It reads local generated artifacts and log tails, does not require network access, and must not redefine runtime evidence or QEMU smoke pass criteria.
 
+The runtime halt contract is:
+
+```text
+contracts/runtime_halt_contract.v0.json
+```
+
+The runtime halt contract validator is:
+
+```text
+runtime_halt_contract
+```
+
+It validates source structure for the post-smoke terminal path. It does not prove hardware halt instruction execution, interrupt handling, scheduler behavior, userspace execution, process model behavior, VFS behavior, file descriptor behavior, or production readiness.
+
 The selected boot protocol is documented in:
 
 ```text
@@ -340,6 +356,8 @@ Runtime evidence is invalidated by:
 * changes to `scripts/boot_blocker_report.sh`
 * changes to `scripts/qemu_smoke.sh`
 * changes to `harness/validators_impl/boot_blocker_report.py`
+* changes to `contracts/runtime_halt_contract.v0.json`
+* changes to `harness/validators_impl/runtime_halt_contract.py`
 * stale, missing, malformed, or failed runtime smoke artifacts
 * stale, missing, malformed, or failed boot blocker artifacts while boot is blocked
 
@@ -371,6 +389,23 @@ It checks:
 * release evidence policy references the metadata
 * diagnostics name the failed runtime evidence field
 
+The runtime halt contract validator is:
+
+```text
+runtime_halt_contract
+```
+
+It checks:
+
+* runtime halt contract exists
+* runtime halt contract is valid JSON
+* runtime halt contract matches its schema
+* the declared final smoke marker is present in `kernel/arch/x86_64/boot.asm`
+* the final smoke marker is emitted before the terminal halt loop
+* the terminal halt loop contains the required `cli`, `hlt`, and loop-back instructions
+* structural fallthrough after the loop is forbidden
+* diagnostics name the failed contract field
+
 ---
 
 # 13. What This Evidence Proves
@@ -383,6 +418,7 @@ This evidence proves:
 * syscall bridge symbols are present in binary evidence
 * current serial heartbeat marker strings are present in binary evidence
 * the generated runtime smoke artifact is available for release review
+* the source-level post-smoke path is governed by a runtime halt contract
 
 ---
 
@@ -396,6 +432,12 @@ This evidence does not prove:
 * Rust userspace execution in a kernel-managed process
 * scheduler behavior
 * memory isolation
+* hardware halt instruction semantics
+* interrupt handling
+* Odin runtime execution
+* stack setup
+* memory initialization
+* syscall dispatch during boot
 * production readiness
 
 Those surfaces require later phase work.

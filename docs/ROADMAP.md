@@ -93,6 +93,7 @@ The current repository proves:
 * higher-half kernel ELF loadability metadata with no local lower-half PHDR blocker
 * assembly-level entry, serial initialization, and final smoke marker emission in source
 * CI-proven QEMU serial smoke evidence with the full ordered marker sequence
+* governed post-smoke terminal behavior through `contracts/runtime_halt_contract.v0.json`
 
 The latest local generated evidence may still report missing local Limine/xorriso tooling, but CI run `27894312430` proves the narrow QEMU serial smoke path.
 
@@ -106,6 +107,8 @@ KOZO still does not prove:
 * stack setup
 * memory initialization
 * syscall dispatch during boot
+* hardware halt instruction semantics
+* interrupt handling
 * hardware trap execution
 * Linux compatibility
 * POSIX compatibility
@@ -132,7 +135,7 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 
 1. Keep CI evidence summaries and artifact uploads active.
 2. Keep QEMU serial smoke evidence as marker-sequence evidence only.
-3. Centralize boot marker/blocker taxonomy if that cleanup is selected.
+3. Keep the v0.6.0 post-smoke terminal halt contract narrow and source-structural.
 4. Define the next narrow runtime evidence target before adding broader behavior.
 
 ---
@@ -198,6 +201,7 @@ Deferred until the CI smoke evidence blocker is resolved:
 | `v0.5.2` | CI Evidence Access Hardening | Print verification, QEMU smoke, serial/stderr, and boot blocker summaries into full CI logs so first-level triage does not depend on authenticated artifact downloads or local `gh`. | Runtime behavior changes, ABI/syscall changes, linker changes, QEMU marker semantic changes, QEMU boot or compatibility claims. |
 | `v0.5.3` | CI Smoke Evidence Triage | Inspect the failed v0.5.0/v0.5.2 CI evidence, classify the verification failure, and repair only the exact evidence-backed blocker. | ABI/syscall maturity work before CI smoke evidence is classified. |
 | `v0.5.4` | QEMU Serial Smoke Evidence Promotion | Promote the CI-proven QEMU serial smoke evidence and realign stale validators, docs, audit state, and blocker wording. | Runtime behavior changes, ABI/syscall changes, linker changes, marker semantic changes, compatibility claims, production-readiness claims. |
+| `v0.6.0` | Runtime Logic Baseline | Add a governed runtime halt contract so the post-smoke assembly path enters deterministic terminal behavior after `KOZO_BOOT_SMOKE_OK`. | ABI/syscall changes, hardware trap claims, interrupt handling claims, scheduler behavior, userspace execution, compatibility claims, production-readiness claims. |
 | `v0.6.0-rc.1` | Release candidate hardening | Freeze scope, freeze gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | New feature scope after RC. |
 | `v1.0.0` | Scoped release | Release only evidence-backed behavior with explicit non-goals. | Any unimplemented compatibility or runtime subsystem claim. |
 

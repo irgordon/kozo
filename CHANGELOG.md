@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.6.0 - 2026-06-21
+
+**Status:** Runtime logic baseline.
+
+### Added
+
+* Added `contracts/runtime_halt_contract.v0.json` as the governed source for post-smoke terminal behavior.
+* Added a schema-backed `runtime_halt_contract` loader, validator, focused negative tests, and marker-level coverage metadata.
+
+### Changed
+
+* Updated `_start` in `kernel/arch/x86_64/boot.asm` so the assembly path enters a deterministic `cli`/`hlt` loop immediately after emitting `KOZO_BOOT_SMOKE_OK`.
+* Updated runtime, contract, validation, release evidence, phase map, and roadmap docs to record the post-smoke terminal behavior boundary.
+
+### Notes
+
+* This change does not alter ABI contracts or syscall behavior.
+* This change does not claim hardware trap execution, interrupt handling, scheduler behavior, userspace execution, process model behavior, VFS behavior, file descriptor behavior, Linux compatibility, POSIX compatibility, or production readiness.
+
 ## v0.5.4 - 2026-06-21
 
 **Status:** QEMU serial smoke evidence promotion.

@@ -101,6 +101,8 @@ The current local generated evidence proves:
 * CI run `27894312430` captured the full ordered marker sequence in QEMU serial output.
 * QEMU smoke metadata from that run reports `outcome: pass` and `blocker_category: none`.
 * QEMU serial smoke evidence is proven for the narrow smoke path.
+* The post-smoke path in `kernel/arch/x86_64/boot.asm` is governed by `contracts/runtime_halt_contract.v0.json`.
+* After `KOZO_BOOT_SMOKE_OK`, the assembly path enters a deterministic terminal `cli`/`hlt` loop with structural fallthrough forbidden.
 * Local QEMU smoke evidence remains blocked by `missing_iso_generation_tooling` because the local environment does not provide the CI Limine/xorriso tooling path.
 
 ## Current Active Blocker
@@ -113,7 +115,7 @@ Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr
 
 ## Next Runtime Phase
 
-The next runtime phase should not expand claims automatically. It should either centralize the now-proven boot marker/blocker taxonomy or define the next narrow runtime evidence target while preserving the QEMU serial smoke claim boundary.
+The next runtime phase should not expand claims automatically. It should define the next narrow runtime evidence target after the governed post-smoke terminal baseline while preserving the QEMU serial smoke claim boundary.
 
 ---
 
@@ -154,6 +156,7 @@ The next runtime phase should not expand claims automatically. It should either 
 | `v0.5.2` | CI Evidence Access Hardening | Surface verification, QEMU smoke, serial/stderr, and boot blocker summaries directly in full CI logs so first-level diagnosis does not depend on authenticated artifact download. | `scripts/ci_evidence_summary.sh`, CI `if: always()` summary step, release/evidence/check policy docs, changelog and task state updates. | Failed CI runs print enough smoke evidence to classify the active blocker without `gh` or artifact download, while uploaded artifacts remain enabled and authoritative metadata/logs remain unchanged. |
 | `v0.5.3` | CI Smoke Evidence Triage | Inspect the failed v0.5.0/v0.5.2 CI evidence now visible in logs and repair the exact verification or QEMU smoke evidence blocker. | CI evidence diagnosis, updated smoke evidence docs if needed, focused fix only if the CI failure is mechanically identified. | Either CI passes with full ordered QEMU serial smoke evidence, or a narrower evidence-backed runtime blocker is recorded without overclaiming. |
 | `v0.5.4` | QEMU Serial Smoke Evidence Promotion | Promote the CI-proven QEMU serial smoke evidence and realign stale validators/docs that still require old boot blockers. | Boot validator realignment, runtime/release/boot docs, audit status update, changelog and task state update. | QEMU serial smoke evidence is proven only as a narrow marker-sequence smoke claim; stale blocker assumptions are removed without runtime, ABI, syscall, compatibility, or production-readiness changes. |
+| `v0.6.0` | Runtime Logic Baseline | Govern the immediate post-smoke terminal behavior so the kernel does not fall through after `KOZO_BOOT_SMOKE_OK`. | `contracts/runtime_halt_contract.v0.json`, runtime halt schema/loader/validator/tests, post-smoke assembly halt loop, runtime/release/contract docs. | The final smoke marker is followed by a deterministic terminal halt loop with no structural fallthrough, without ABI/syscall changes or hardware trap, interrupt, scheduler, userspace, compatibility, or production-readiness claims. |
 | `v0.6.0-rc.1` | Release candidate hardening | Freeze release scope and release gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | Release evidence bundle, completed release checklist, current generated reports, changelog/release notes dry run, all required CI checks green. | Release candidate can be reviewed without adding new scope. |
 | `v1.0.0` | Scoped production release | Release only the proven, scoped KOZO surface. | Final release evidence bundle, final changelog and release notes, passing required gates, explicit non-goals. | v1.0.0 claims only evidence-backed behavior and preserves all compatibility non-goals. |
 

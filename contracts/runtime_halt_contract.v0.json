@@ -1,0 +1,34 @@
+{
+  "version": 0,
+  "architecture": "x86_64",
+  "source": {
+    "path": "kernel/arch/x86_64/boot.asm",
+    "entry_symbol": "_start"
+  },
+  "final_smoke_marker": {
+    "symbol": "boot_smoke_marker",
+    "text": "KOZO_BOOT_SMOKE_OK",
+    "write_macro": "WRITE_COM1_MARKER"
+  },
+  "terminal_behavior": {
+    "kind": "halt_loop",
+    "label": ".halt",
+    "disable_interrupts": true,
+    "instructions": [
+      "cli",
+      "hlt",
+      "jmp .halt"
+    ],
+    "fallthrough_forbidden": true
+  },
+  "non_goals": [
+    "hardware trap execution",
+    "interrupt handling",
+    "scheduler behavior",
+    "userspace execution",
+    "process model behavior",
+    "VFS behavior",
+    "file descriptor behavior",
+    "production readiness"
+  ]
+}

@@ -125,6 +125,12 @@ Current generated report validators include:
 * `syscall_surface_report`
 * `abi_surface_report`
 
+Current runtime evidence and runtime contract validators include:
+
+* `runtime_smoke_evidence`
+* `qemu_smoke_evidence`
+* `runtime_halt_contract`
+
 ---
 
 # 11. Evidence and Logs

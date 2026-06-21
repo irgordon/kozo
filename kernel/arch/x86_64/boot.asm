@@ -88,11 +88,8 @@ _start:
     INIT_COM1
     WRITE_COM1_MARKER early_serial_init_ok_marker, early_serial_init_ok_marker_end
     WRITE_COM1_MARKER boot_smoke_marker, boot_smoke_marker_end
-    xor rbp, rbp
-    lea rsp, [rel boot_stack_top]
-    and rsp, -16
-    call kernel_entry
+    cli
 
-.hang:
+.halt:
     hlt
-    jmp .hang
+    jmp .halt

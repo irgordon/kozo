@@ -74,6 +74,7 @@ Every release review must include:
 * `docs/RELEASE_CHECKLIST.md`
 * `docs/REQUIRED_CHECKS.md`
 * `docs/RUNTIME_EVIDENCE_REVIEW.md`
+* `contracts/runtime_halt_contract.v0.json` when post-smoke runtime terminal behavior is under review
 * release notes
 * known non-goals list
 * checked-in contracts
@@ -183,6 +184,8 @@ KOZO_BOOT_SMOKE_OK
 
 Passing QEMU serial smoke evidence proves only that QEMU launched the KOZO ISO, Limine loaded the KOZO kernel ELF, serial output was captured, and the expected marker sequence was observed. It does not prove hardware trap execution, Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, ELF loading, file descriptor behavior, production readiness, Odin runtime execution, stack setup, memory initialization, or syscall dispatch.
 
+For v0.6.0 and later, release review must include `contracts/runtime_halt_contract.v0.json` when post-smoke terminal behavior is under review. The `runtime_halt_contract` validator proves the source-level assembly path emits `KOZO_BOOT_SMOKE_OK` before entering the governed terminal halt loop. It does not prove hardware halt instruction execution, interrupt handling, scheduler behavior, userspace execution, process model behavior, VFS behavior, file descriptor behavior, compatibility, or production readiness.
+
 The current packaging metadata records the missing ISO generation tooling blocker:
 
 ```text
@@ -217,6 +220,12 @@ The QEMU smoke evidence validator is:
 
 ```text
 qemu_smoke_evidence
+```
+
+The runtime halt contract validator is:
+
+```text
+runtime_halt_contract
 ```
 
 The expected QEMU smoke marker is:
@@ -332,6 +341,7 @@ release-evidence/
     abi_surface.md
     governance_index.md
   contracts/
+    runtime_halt_contract.v0.json
   schemas/
   changelog.md
   release_notes.md
