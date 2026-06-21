@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260621T225150Z",
+  "run_id": "verify-20260621T235320Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 42,
+    "total_checks": 43,
     "failed_check_count": 0
   },
   "checks": [
@@ -199,6 +199,13 @@
       "detail": "Runtime evidence review policy names the evidence scope, limits, release gates, and protected metadata"
     },
     {
+      "name": "runtime_evidence_taxonomy",
+      "subsystem": "runtime_evidence_taxonomy",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Runtime evidence taxonomy governs smoke marker and blocker vocabulary"
+    },
+    {
       "name": "runtime_halt_contract",
       "subsystem": "runtime_halt_contract",
       "status": "pass",
@@ -319,11 +326,29 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
+    "contracts/runtime_evidence_taxonomy.v0.json",
+    "docs/BOOT_BLOCKERS.md",
     "docs/CODEBASE_AUDIT.md",
+    "docs/CONTRACTS.md",
     "docs/PHASEMAP.md",
     "docs/ROADMAP.md",
+    "docs/RUNTIME_EVIDENCE.md",
+    "docs/VALIDATION.md",
     "docs/generated/governance_index.md",
-    "tasks/todo.json"
+    "harness/codes.py",
+    "harness/registry.py",
+    "harness/runtime_evidence_taxonomy.py",
+    "harness/validators.py",
+    "harness/validators_impl/boot_blocker_report.py",
+    "harness/validators_impl/qemu_smoke_evidence.py",
+    "harness/validators_impl/runtime_evidence_taxonomy.py",
+    "harness/validators_impl/schema.py",
+    "harness/validators_impl/validator_coverage.py",
+    "schemas/agent_context.schema.json",
+    "schemas/latest_verify.schema.json",
+    "schemas/runtime_evidence_taxonomy.schema.json",
+    "tasks/todo.json",
+    "tests/test_runtime_evidence_taxonomy.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -340,5 +365,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-06-21T22:51:50Z"
+  "generated_at": "2026-06-21T23:53:20Z"
 }
