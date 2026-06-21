@@ -46,13 +46,19 @@ v0.4.8 adds the `KOZO_EARLY_0_ENTRY` marker directly in `_start` before stack se
 
 v0.4.9 adds `KOZO_EARLY_1_SERIAL_INIT_START` and `KOZO_EARLY_2_SERIAL_INIT_OK` directly in `_start`, before stack setup and before Odin code, so the next CI QEMU artifact can distinguish serial initialization from final smoke marker emission.
 
+v0.5.0 adds `KOZO_BOOT_SMOKE_OK` directly in `_start` after the serial initialization OK marker, but the pushed v0.5.0 CI run for commit `14fb015` failed in `scripts/verify.sh`.
+
+v0.5.1 records that failure as the active release blocker until the failed CI artifact is inspected and the exact verification or QEMU smoke evidence failure is classified.
+
 ---
 
 # 2. Verified Blocker
 
-Blocker category: `missing_iso_generation_tooling`.
+Active release blocker category: `ci_verification_failed_after_v0.5.0`.
 
-The local blocker category is `missing_iso_generation_tooling`.
+The latest pushed v0.5.0 `ci` workflow failed in the `scripts/verify.sh` step. The failed run uploaded `kozo-verification-logs`, but this review environment could not authenticate artifact download. QEMU serial smoke evidence is therefore not promoted.
+
+Local generated blocker category: `missing_iso_generation_tooling`.
 
 CI packaged-image blocker category, when `artifacts/runtime/boot_image/kozo.iso` exists: `missing_qemu_serial_evidence`.
 
@@ -65,6 +71,8 @@ The previous `missing_limine_iso_tooling` blocker is refined by `docs/BOOT_TOOLI
 The previous `missing_bootable_iso_generation` blocker is refined by the v0.3.6 ISO generation command path.
 
 The remaining blocker is `missing_iso_generation_tooling`.
+
+The remaining local generated blocker is `missing_iso_generation_tooling`.
 
 For this local environment, `missing_iso_generation_tooling` means Limine and xorriso are not available outside CI.
 
@@ -99,11 +107,11 @@ KOZO_EARLY_2_SERIAL_INIT_OK
 KOZO_BOOT_SMOKE_OK
 ```
 
-Even then, QEMU boot evidence remains blocked until serial output is captured and validated.
+Even then, QEMU serial smoke evidence remains unpromoted until serial output is captured, validated, and CI verification passes.
 
 `scripts/qemu_smoke.sh` writes `artifacts/runtime/qemu_smoke.metadata.json`, `artifacts/runtime/qemu_smoke.log`, and `artifacts/runtime/qemu_smoke.stderr.log`. The expected kernel-emitted serial marker is `KOZO_BOOT_SMOKE_OK`.
 
-Therefore the repository cannot honestly claim QEMU boot execution.
+Therefore the repository cannot honestly claim QEMU boot execution or passing QEMU serial smoke evidence.
 
 The latest inspected v0.4.0 CI artifact reached Limine and failed to open `boot:///boot/kozo/kozo-kernel.elf`, so its evidence-backed diagnostic blocker is `kernel_not_loaded`.
 
@@ -126,6 +134,8 @@ The latest inspected v0.4.8 CI artifact captured `KOZO_EARLY_0_ENTRY` and narrow
 The v0.4.9 early serial path emits `KOZO_EARLY_1_SERIAL_INIT_START` and `KOZO_EARLY_2_SERIAL_INIT_OK` from assembly before stack setup. If CI captures `KOZO_EARLY_2_SERIAL_INIT_OK` without `KOZO_BOOT_SMOKE_OK`, the blocker must narrow to `marker_not_emitted`; until the OK marker is captured, serial initialization remains unclaimed.
 
 The v0.5.0 boot smoke path emits `KOZO_BOOT_SMOKE_OK` from assembly immediately after the serial initialization OK marker. This clears `marker_not_emitted` only when QEMU smoke validation captures the full ordered marker sequence.
+
+The next runtime phase must inspect the failed v0.5.0 CI artifact before selecting a runtime fix. If the full marker sequence is present, the next fix should focus on verification or metadata drift. If the sequence is absent, the next fix should use the observed marker state to classify the next blocker.
 
 ---
 

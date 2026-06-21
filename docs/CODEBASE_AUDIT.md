@@ -363,3 +363,69 @@ blocker_category: marker_not_emitted
 ```
 
 v0.5.0 should still focus on final boot smoke marker emission and must not claim QEMU boot unless `KOZO_BOOT_SMOKE_OK` appears in captured QEMU serial output.
+
+---
+
+# 15. v0.5.1 Governance Planning Alignment
+
+Date: 2026-06-21
+
+Status: Completed.
+
+## 15.1 Current Evidence Review
+
+v0.5.1 reviewed the v0.5.0 local and pushed CI state before further runtime work.
+
+Local evidence:
+
+* `scripts/verify.sh` passes with 39 checks and 0 failures.
+* Unit discovery passes with 451 tests.
+* Local QEMU smoke metadata remains blocked by `missing_iso_generation_tooling`.
+
+Pushed CI evidence:
+
+* `lint` passed for commit `14fb015`.
+* `ci` failed for commit `14fb015` in the `scripts/verify.sh` step.
+* The failed run uploaded `kozo-verification-logs`, but this review environment could not authenticate artifact download.
+
+QEMU serial smoke evidence is not promoted from the failed CI run.
+
+## 15.2 Finding Status
+
+| ID | Status | Rationale |
+| --- | --- | --- |
+| AUDIT-001 | Deferred | Boot blocker taxonomy remains duplicated. Do not centralize it until the v0.5.0 CI verification failure is classified. |
+| AUDIT-002 | Resolved | v0.4.7 moved the kernel ELF PT_LOAD virtual addresses to the higher half and local loadability evidence reports no lower-half PHDR blocker. |
+| AUDIT-003 | Resolved | Release checklist and required checks now include exact QEMU blocker wording and the v0.5.1 CI failure boundary. |
+| AUDIT-004 | Deferred | `validator_coverage.py` remains large by design for now; splitting it is cleanup, not a runtime blocker. |
+| AUDIT-005 | Deferred | ABI/syscall fixture duplication is deferred until ABI/syscall maturity work resumes. |
+| AUDIT-006 | Deferred | Boot evidence scripts still mix orchestration and metadata rendering; this should wait until the CI smoke failure is classified. |
+| AUDIT-007 | Deferred | Script/validator blocker policy duplication remains the highest cleanup risk after CI smoke evidence stabilizes. |
+| AUDIT-008 | Resolved | Current-state sections now separate active release blocker, local generated blocker, and historical blockers. |
+| AUDIT-009 | Deferred | Scan-noise cleanup remains a future audit-quality improvement. |
+| AUDIT-010 | Open | Subprocess usage remains acceptable and should keep explicit argument vectors and bounded timeouts. |
+| AUDIT-095-001 | Deferred | Boot marker taxonomy is still duplicated across script, validator, tests, and docs. |
+| AUDIT-095-002 | Deferred | Boot blocker taxonomy remains duplicated and should be centralized after CI smoke evidence is green or precisely blocked. |
+| AUDIT-095-003 | Deferred | QEMU/build script splitting remains post-triage cleanup. |
+| AUDIT-095-004 | Deferred | Validator coverage splitting remains post-triage cleanup. |
+| AUDIT-095-005 | Deferred | QEMU script/validator policy duplication remains relevant because the pushed v0.5.0 CI failed in verification. |
+| AUDIT-095-006 | Deferred | Shared fixtures should wait until the next ABI/syscall or smoke metadata change forces repeated edits. |
+| AUDIT-095-007 | Deferred | Prefer tracked-file scans in future audits. |
+| AUDIT-095-008 | Open | Historical host/path references remain allowed when they are clearly historical or test-policy fixtures. |
+
+## 15.3 Removed Drift
+
+v0.5.1 removes these stale planning assumptions:
+
+* `v0.5.1` is no longer ABI/syscall maturity.
+* `marker_not_emitted` is no longer the active release blocker after the pushed v0.5.0 CI failure.
+* QEMU serial smoke evidence is not promoted from failed CI.
+* Local `missing_iso_generation_tooling` is a local generated blocker, not the CI/Linux release blocker.
+
+## 15.4 Next Runtime Risk
+
+The next runtime phase must inspect the failed v0.5.0 CI artifact.
+
+If the full ordered marker sequence appears, the risk is verification or metadata drift.
+
+If the full ordered marker sequence is absent, the risk is the next evidence-backed runtime blocker.

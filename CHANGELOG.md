@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.5.1 - 2026-06-21
+
+**Status:** Governance planning alignment.
+
+### Changed
+
+* Validated the pushed v0.5.0 state before further runtime work: local verification passes, but the latest pushed CI run for `14fb015` failed in `scripts/verify.sh`.
+* Aligned `docs/PHASEMAP.md`, `docs/ROADMAP.md`, boot blocker docs, runtime evidence docs, release evidence docs, and audit notes with the current evidence boundary.
+* Replaced the stale v0.5.1 ABI/syscall maturity plan with a governance planning alignment phase and made the next runtime phase depend on CI artifact inspection.
+* Recorded that QEMU serial smoke evidence is not promoted until CI proves the full ordered marker sequence.
+
+### Notes
+
+* This change does not alter runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke behavior, or validator semantics.
+* This change does not claim QEMU boot, hardware trap execution, Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, file descriptor behavior, or production readiness.
+
 ## v0.5.0 - 2026-06-21
 
 **Status:** Boot smoke marker emission.

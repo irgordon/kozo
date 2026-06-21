@@ -128,6 +128,7 @@ Required checklist:
 * QEMU smoke metadata outcome is `pass` before any QEMU boot claim is made.
 * Passing QEMU smoke metadata includes `KOZO_BOOT_SMOKE_OK` as the expected marker.
 * Passing QEMU smoke serial output includes `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, and `KOZO_BOOT_SMOKE_OK` in order.
+* The latest pushed v0.5.0 CI failure is resolved or explicitly carried as `ci_verification_failed_after_v0.5.0`; QEMU serial smoke evidence is not promoted from a failed CI run.
 * Release is blocked if runtime evidence is overclaimed or missing required non-goals.
 * No QEMU or boot claim is made unless separately implemented and proven.
 * Python unit tests pass.

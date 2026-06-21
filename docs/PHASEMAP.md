@@ -87,7 +87,49 @@ Detailed evidence rules are owned by `docs/RELEASE_EVIDENCE.md`.
 
 ---
 
-# 6. Phase Table
+# 6. Current Planning State
+
+## Current Proven State
+
+The current local generated evidence proves:
+
+* `scripts/verify.sh` passes locally with 39 checks and 0 failures.
+* Unit discovery passes locally with 451 tests.
+* The kernel ELF uses higher-half PT_LOAD virtual addresses.
+* Local kernel ELF loadability reports no lower-half PHDR blocker.
+* The repository source emits `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, and `KOZO_BOOT_SMOKE_OK` from the assembly entry path.
+* Local QEMU smoke evidence remains blocked by `missing_iso_generation_tooling` because the local environment does not provide the CI Limine/xorriso tooling path.
+
+The latest pushed v0.5.0 CI state is not promoted:
+
+* `lint` succeeded for commit `14fb015`.
+* `ci` failed for commit `14fb015` in the `scripts/verify.sh` step.
+* The uploaded CI artifact exists, but this review environment could not authenticate artifact download.
+* QEMU serial smoke evidence is not promoted until a CI artifact proves the full ordered marker sequence.
+
+## Current Active Blocker
+
+The active release blocker is `ci_verification_failed_after_v0.5.0`.
+
+This is not a new runtime blocker taxonomy value. It records that the latest pushed CI run failed before release planning can promote QEMU serial smoke evidence.
+
+The active local generated blocker remains `missing_iso_generation_tooling`.
+
+Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr`, `kernel_entry_not_reached`, `serial_not_initialized`, and `marker_not_emitted` are retained only as historical evidence states unless a future CI artifact reintroduces one.
+
+## Next Runtime Phase
+
+The next runtime phase must be evidence inspection and CI verification repair, not ABI/syscall expansion.
+
+The next runtime phase should inspect the failed v0.5.0 CI artifact, classify the exact verification failure, and only then choose between:
+
+* promoting QEMU serial smoke evidence if the full marker sequence is present and verification can be made green
+* fixing QEMU smoke metadata or verification drift if the marker sequence is present but validation fails
+* fixing the next runtime blocker if the marker sequence is absent
+
+---
+
+# 7. Phase Table
 
 | Phase | Name | Purpose | Required Deliverables | Exit Criteria |
 | --- | --- | --- | --- | --- |
@@ -120,13 +162,14 @@ Detailed evidence rules are owned by `docs/RELEASE_EVIDENCE.md`.
 | `v0.4.95` | Code Quality and Style Audit | Audit stale code, dead code, brittle functions, god files, duplicated logic, and coding-style drift before fixing final boot smoke marker emission. | `docs/CODEBASE_AUDIT.md`, structural scan commands, compile/unit/toolchain validation, updated v0.5.0 risk notes. | Structural risks are documented without runtime behavior, ABI, syscall, linker, QEMU marker semantic, compatibility, or production-readiness changes. |
 | `v0.4.96` | Smoke Evidence Observability | Add a deterministic QEMU smoke summary artifact so CI artifacts expose the current smoke outcome and blocker without manual log correlation. | `artifacts/runtime/qemu_smoke.summary.txt`, QEMU smoke validator coverage, CI upload updates, runtime/release evidence docs. | The summary is non-authoritative and derived from metadata/log evidence; no runtime behavior, marker semantics, compatibility, or production-readiness claim is changed. |
 | `v0.5.0` | Boot Smoke Marker Emission | Emit `KOZO_BOOT_SMOKE_OK` after the proven assembly serial initialization marker and require QEMU smoke validation to observe the full ordered marker sequence before pass evidence can support a QEMU smoke claim. | Assembly-level final marker, ordered marker validation, focused QEMU smoke tests, boot/runtime/release evidence docs. | QEMU boot remains unclaimed unless QEMU smoke validation captures `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, and `KOZO_BOOT_SMOKE_OK` in order. |
-| `v0.5.1` | ABI and syscall maturity | Stabilize current ABI/syscall governance and define expansion rules after the current boot-marker blocker is classified. | ABI version policy, syscall expansion checklist, generated binding compatibility expectations, regression evidence for all governed syscalls. | Current syscall surface is frozen unless changed through governed process. |
+| `v0.5.1` | Governance Planning Alignment | Reconcile phase map, roadmap, audit, release evidence, boot blockers, and task state with the actual v0.5.0 local and CI outcomes. | Updated planning/evidence docs, changelog entry, task state update, regenerated governance index. | Local verification remains green, latest pushed CI failure is recorded without promoting QEMU serial smoke evidence, stale ABI/syscall-maturity next-step wording is removed, and the next runtime phase is evidence-driven. |
+| `v0.5.2` | CI Smoke Evidence Triage | Inspect the failed v0.5.0 CI artifact and repair the exact verification or QEMU smoke evidence blocker. | CI artifact diagnosis, updated smoke evidence docs if needed, focused fix only if the CI failure is mechanically identified. | Either CI passes with full ordered QEMU serial smoke evidence, or a narrower evidence-backed runtime blocker is recorded without overclaiming. |
 | `v0.6.0-rc.1` | Release candidate hardening | Freeze release scope and release gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | Release evidence bundle, completed release checklist, current generated reports, changelog/release notes dry run, all required CI checks green. | Release candidate can be reviewed without adding new scope. |
 | `v1.0.0` | Scoped production release | Release only the proven, scoped KOZO surface. | Final release evidence bundle, final changelog and release notes, passing required gates, explicit non-goals. | v1.0.0 claims only evidence-backed behavior and preserves all compatibility non-goals. |
 
 ---
 
-# 7. v1.0.0 Constraints
+# 8. v1.0.0 Constraints
 
 `v1.0.0` must remain scoped to proven behavior.
 
@@ -144,7 +187,7 @@ It must not claim:
 
 ---
 
-# 8. Release Checklist
+# 9. Release Checklist
 
 Before release:
 

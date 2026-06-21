@@ -1712,6 +1712,33 @@
         "verification.tests_run[5]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 59,
+      "title": "Align governance planning with v0.5.0 evidence",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "docs/BOOT.md",
+        "docs/BOOT_BLOCKERS.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/REQUIRED_CHECKS.md",
+        "docs/CODEBASE_AUDIT.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/generated/governance_index.md",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[5]",
+        "verification.tests_run[9]",
+        "verification.tests_run[10]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -1765,7 +1792,8 @@
     "Limine ISO kernel load semantics now use boot():/boot/kozo/kozo-kernel.elf, record normalized ISO path visibility metadata, and keep kernel_not_loaded active until CI serial evidence proves otherwise",
     "docs/PHASEMAP.md and docs/ROADMAP.md own release phase sequencing and roadmap direction from the governance document directory without changing runtime behavior, ABI contracts, syscall behavior, boot behavior, or compatibility claims",
     "v0.4.5 classifies Limine lower-half PHDR rejection as limine_lower_half_phdr in kernel ELF reports, QEMU smoke metadata, boot blocker reporting, focused tests, and boot evidence docs while preserving no-QEMU-boot and non-compatibility claim boundaries",
-    "v0.4.6 adds docs/CODEBASE_AUDIT.md, updates phase and roadmap sequencing so v0.4.7 is the higher-half linker/entry transition, and records that no cleanup was applied during the audit phase"
+    "v0.4.6 adds docs/CODEBASE_AUDIT.md, updates phase and roadmap sequencing so v0.4.7 is the higher-half linker/entry transition, and records that no cleanup was applied during the audit phase",
+    "v0.5.1 aligns governance, planning, audit, release, and evidence documents with the actual v0.5.0 outcome: local verification passes, the pushed CI run for 14fb015 failed in scripts/verify.sh, QEMU serial smoke evidence is not promoted, and the next runtime phase is CI smoke evidence triage."
   ],
   "verification": {
     "tests_run": [
@@ -1955,7 +1983,8 @@
       "v0.4.6 adds docs/CODEBASE_AUDIT.md, updates phase and roadmap sequencing so v0.4.7 is the higher-half linker/entry transition, and records that no cleanup was applied during the audit phase",
       "v0.4.95 adds a code quality and style audit section before v0.5.0, updates phase and roadmap sequencing so v0.5.0 is Fix Boot Smoke Marker Emission, and records that no safe cleanup was applied during the audit phase",
       "v0.4.96 adds a non-authoritative QEMU smoke summary artifact, validates that it agrees with metadata and references the underlying logs, uploads it from CI, and keeps v0.5.0 focused on Fix Boot Smoke Marker Emission",
-      "v0.5.0 emits KOZO_BOOT_SMOKE_OK from _start through the proven COM1 path and hardens qemu_smoke_evidence so pass metadata requires the full ordered marker sequence"
+      "v0.5.0 emits KOZO_BOOT_SMOKE_OK from _start through the proven COM1 path and hardens qemu_smoke_evidence so pass metadata requires the full ordered marker sequence",
+      "v0.5.1 records ci_verification_failed_after_v0.5.0 as the active release blocker, keeps missing_iso_generation_tooling as the local generated blocker, removes stale ABI/syscall maturity next-step wording, and preserves all no-QEMU-boot, compatibility, and production-readiness claim boundaries."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -2020,6 +2049,7 @@
     "Added v0.4.9 early serial initialization instrumentation so _start emits KOZO_EARLY_1_SERIAL_INIT_START and KOZO_EARLY_2_SERIAL_INIT_OK before stack setup or Odin code, while QEMU smoke validation advances serial-init OK evidence to marker_not_emitted unless the final boot smoke marker appears.",
     "Added v0.4.95 code quality and style audit documentation before v0.5.0, documenting duplicated boot marker taxonomy, duplicated blocker taxonomy, QEMU script and validator coverage size, fixture duplication, and marker-emission risks without changing runtime, ABI, syscall, linker, QEMU marker semantics, or compatibility behavior.",
     "Added v0.4.96 QEMU smoke summary observability so CI uploads a concise, non-authoritative summary derived from existing smoke metadata and logs without changing runtime, ABI, syscall, linker, QEMU marker semantics, or compatibility behavior.",
-    "Added v0.5.0 boot smoke marker emission from the proven assembly serial path, with ordered-marker QEMU smoke validation and no ABI, syscall, compatibility, or production-readiness claim changes."
+    "Added v0.5.0 boot smoke marker emission from the proven assembly serial path, with ordered-marker QEMU smoke validation and no ABI, syscall, compatibility, or production-readiness claim changes.",
+    "Added v0.5.1 governance planning alignment so PHASEMAP, ROADMAP, boot blockers, runtime evidence, release evidence, audit findings, changelog, and task state reflect the failed pushed v0.5.0 CI verification boundary without changing runtime, ABI, syscall, linker, QEMU smoke, compatibility, or production-readiness claims."
   ]
 }

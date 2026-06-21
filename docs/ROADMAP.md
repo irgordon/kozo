@@ -82,7 +82,89 @@ The roadmap does not add or imply:
 
 ---
 
-# 7. Roadmap Table
+# 7. Current Proven Capabilities
+
+The current repository proves:
+
+* governed ABI, syscall, runtime trap, return-path, layout, and protocol proof surfaces through the verification harness
+* generated report governance for ABI, syscall, and governance surfaces
+* host dependency portability through CI/Linux policy checks
+* boot image skeleton, Limine configuration, ISO generation path, and QEMU smoke command existence
+* higher-half kernel ELF loadability metadata with no local lower-half PHDR blocker
+* assembly-level entry, serial initialization, and final smoke marker emission in source
+
+The latest local generated evidence does not prove QEMU serial smoke pass because local QEMU smoke remains blocked by missing local Limine/xorriso tooling.
+
+---
+
+# 8. Current Limitations
+
+KOZO still does not prove:
+
+* QEMU serial smoke pass from the latest pushed CI run
+* Odin runtime execution after the assembly marker sequence
+* stack setup
+* memory initialization
+* syscall dispatch during boot
+* hardware trap execution
+* Linux compatibility
+* POSIX compatibility
+* userspace execution
+* process model behavior
+* VFS behavior
+* scheduler maturity
+* file descriptor behavior
+* production readiness
+
+---
+
+# 9. Current Active Blocker
+
+Current release blocker: `ci_verification_failed_after_v0.5.0`.
+
+The latest pushed `ci` workflow for commit `14fb015` failed in the `scripts/verify.sh` step. The artifact was uploaded, but this review environment could not authenticate artifact download, so the QEMU serial smoke result from that failed run is not promoted.
+
+Local generated evidence still reports `missing_iso_generation_tooling`, which is a local environment blocker and not the CI/Linux portability state.
+
+---
+
+# 10. Near-Term Runtime Work
+
+The next runtime work is evidence triage:
+
+1. Inspect the failed v0.5.0 CI artifact.
+2. Determine whether the full ordered marker sequence appears in `runtime/qemu_smoke.log`.
+3. Determine why `scripts/verify.sh` failed in CI.
+4. Promote QEMU serial smoke evidence only if CI passes and `qemu_smoke_evidence` validates passing metadata.
+5. Otherwise, record or fix the exact evidence-backed blocker.
+
+---
+
+# 11. Post-Boot Roadmap
+
+After CI QEMU serial smoke evidence is green, resume deferred maturity work:
+
+* centralize boot marker and blocker taxonomy
+* split QEMU smoke script policy from metadata rendering
+* split large validator coverage implementation layers
+* define ABI/syscall expansion rules
+* strengthen security boundary implementation evidence
+
+---
+
+# 12. Deferred Work
+
+Deferred until the CI smoke evidence blocker is resolved:
+
+* ABI versioning expansion
+* syscall expansion process changes
+* new runtime subsystems
+* hardware trap execution work
+* broader boot lifecycle claims
+
+---
+
+# 13. Roadmap Table
 
 | Target | Theme | Goals | Non-Goals |
 | --- | --- | --- | --- |
@@ -115,13 +197,14 @@ The roadmap does not add or imply:
 | `v0.4.95` | Code Quality and Style Audit | Audit stale/dead/brittle/god-file risks and coding-style drift before the final boot smoke marker phase. | Runtime behavior changes, ABI changes, syscall changes, linker layout changes, QEMU marker semantic changes, broad refactors. |
 | `v0.4.96` | Smoke Evidence Observability | Add a deterministic QEMU smoke summary artifact so CI and release reviewers can classify the current smoke state without manually correlating multiple artifacts. | Runtime behavior changes, ABI changes, syscall changes, linker layout changes, QEMU marker semantic changes, QEMU boot or compatibility claims. |
 | `v0.5.0` | Boot Smoke Marker Emission | Emit `KOZO_BOOT_SMOKE_OK` through the proven assembly serial path after early serial initialization and require ordered-marker QEMU smoke validation. | QEMU boot claim without the full ordered marker sequence, ABI or syscall behavior changes, broad runtime subsystem expansion. |
-| `v0.5.1` | ABI and syscall maturity | Define ABI versioning, syscall expansion process, generated binding compatibility expectations, and regression evidence. | New syscall expansion without governed process. |
+| `v0.5.1` | Governance Planning Alignment | Align governance, planning, audit, release, and evidence docs with the local v0.5.0 proof state and the failed pushed v0.5.0 CI run. | Runtime behavior changes, ABI changes, syscall changes, linker changes, QEMU smoke behavior changes, QEMU serial smoke promotion without CI proof. |
+| `v0.5.2` | CI Smoke Evidence Triage | Inspect the failed v0.5.0 CI artifact, classify the verification failure, and repair only the exact evidence-backed blocker. | ABI/syscall maturity work before CI smoke evidence is classified. |
 | `v0.6.0-rc.1` | Release candidate hardening | Freeze scope, freeze gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | New feature scope after RC. |
 | `v1.0.0` | Scoped release | Release only evidence-backed behavior with explicit non-goals. | Any unimplemented compatibility or runtime subsystem claim. |
 
 ---
 
-# 8. Release Gates
+# 14. Release Gates
 
 Required gates:
 
@@ -139,7 +222,7 @@ Required gates:
 
 ---
 
-# 9. Evidence Requirements
+# 15. Evidence Requirements
 
 Release evidence must include:
 
@@ -158,7 +241,7 @@ Detailed evidence ownership is defined in `docs/RELEASE_EVIDENCE.md`.
 
 ---
 
-# 10. Explicit Deferred Work
+# 16. Explicit Deferred Work
 
 Deferred until separately scoped and proven:
 

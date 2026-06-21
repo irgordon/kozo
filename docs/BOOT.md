@@ -50,9 +50,9 @@ v0.4.9 adds assembly-level `KOZO_EARLY_1_SERIAL_INIT_START` and `KOZO_EARLY_2_SE
 
 v0.5.0 adds assembly-level `KOZO_BOOT_SMOKE_OK` emission at `_start`, immediately after `KOZO_EARLY_2_SERIAL_INIT_OK` and before stack setup or Odin code. Passing QEMU serial smoke evidence remains unclaimed unless QEMU smoke metadata validates passing evidence and captured serial output contains the full ordered marker sequence.
 
-Remaining blocker: `missing_iso_generation_tooling`.
+v0.5.1 validates the pushed v0.5.0 state before further runtime work. Local verification passes, but the latest pushed CI run for commit `14fb015` failed in `scripts/verify.sh`, so QEMU serial smoke evidence is not promoted.
 
-The local blocker is `missing_iso_generation_tooling`.
+Local generated blocker: `missing_iso_generation_tooling`.
 
 If CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated blocker report narrows to `missing_qemu_serial_evidence` for that run.
 
@@ -64,9 +64,11 @@ If `scripts/qemu_smoke.sh` can run against a generated ISO, it writes `artifacts
 
 Boot feasibility result: blocked.
 
-Blocker category: `missing_iso_generation_tooling`.
+Active release blocker: `ci_verification_failed_after_v0.5.0`.
 
-The local blocker category is `missing_iso_generation_tooling`.
+Local generated blocker category: `missing_iso_generation_tooling`.
+
+Remaining blocker: `missing_iso_generation_tooling`.
 
 CI packaged-image blocker category, when the ISO exists: `missing_qemu_serial_evidence`.
 
@@ -87,6 +89,8 @@ Current v0.4.8 entry handoff change: `_start` writes `KOZO_EARLY_0_ENTRY` direct
 Current v0.4.9 serial initialization change: `_start` writes the entry marker, the serial initialization start marker, performs minimal COM1 initialization in assembly, and writes the serial initialization OK marker before stack setup. This does not prove QEMU boot until `KOZO_BOOT_SMOKE_OK` appears in captured QEMU serial output.
 
 Current v0.5.0 marker emission change: `_start` writes `KOZO_BOOT_SMOKE_OK` through the same assembly COM1 path after `KOZO_EARLY_2_SERIAL_INIT_OK`. This supports only QEMU serial smoke evidence when QEMU smoke validation observes the full ordered marker sequence in captured serial output; it does not prove Odin runtime execution, stack setup, memory initialization, syscall dispatch, hardware trap execution, or broader boot lifecycle behavior.
+
+Latest inspected v0.5.0 CI status: `ci` failed in the `scripts/verify.sh` step for commit `14fb015`; `lint` passed. The uploaded artifact could not be downloaded from this review environment, so the next runtime phase must inspect that artifact before promoting QEMU serial smoke evidence or choosing a new runtime fix.
 
 Selected boot protocol: Limine.
 

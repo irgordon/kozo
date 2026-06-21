@@ -132,7 +132,9 @@ Full CI requires runtime smoke evidence because `.github/workflows/ci.yml` runs 
 
 The lint workflow does not require runtime smoke evidence because `.github/workflows/lint.yml` does not run full verification. If lint is changed to run `scripts/verify.sh`, runtime smoke evidence becomes required there through the same full-verification path.
 
-QEMU smoke evidence is required in full CI through `scripts/qemu_smoke.sh` and `qemu_smoke_evidence`. A blocked QEMU smoke result is acceptable only when metadata records an exact blocker and preserves no-QEMU-boot claims. A passing QEMU serial smoke claim requires passing metadata and the full ordered marker sequence ending in `KOZO_BOOT_SMOKE_OK` in `artifacts/runtime/qemu_smoke.log`; that claim does not prove Odin runtime execution, stack setup, memory initialization, syscall dispatch, hardware trap execution, or broader boot lifecycle behavior.
+QEMU smoke evidence is required in full CI through `scripts/qemu_smoke.sh` and `qemu_smoke_evidence`. A blocked QEMU smoke result is acceptable only when metadata records an exact blocker and preserves no-QEMU-boot claims. A passing QEMU serial smoke claim requires a green full CI run, passing metadata, and the full ordered marker sequence ending in `KOZO_BOOT_SMOKE_OK` in `artifacts/runtime/qemu_smoke.log`; that claim does not prove Odin runtime execution, stack setup, memory initialization, syscall dispatch, hardware trap execution, or broader boot lifecycle behavior.
+
+If full CI fails after QEMU smoke runs, release review must treat the run as blocked even if uploaded artifacts appear promising. The v0.5.0 pushed run for commit `14fb015` is recorded as `ci_verification_failed_after_v0.5.0` until its artifact is inspected and the exact failure is fixed or a later run passes.
 
 The CI-observed timeout or loader state must be narrowed when possible. QEMU smoke metadata may report `limine_not_reached`, `kernel_not_loaded`, `kernel_entry_not_reached`, `serial_not_initialized`, `marker_not_emitted`, `limine_lower_half_phdr`, or fallback `qemu_timeout`; all remain blockers and do not authorize a QEMU boot claim.
 

@@ -122,6 +122,10 @@ The boot blocker report is required while v0.3.0 remains blocked and is governed
 
 The current local boot blocker category is `missing_iso_generation_tooling`.
 
+The current release blocker category is `ci_verification_failed_after_v0.5.0`.
+
+The latest pushed v0.5.0 CI run for commit `14fb015` failed in `scripts/verify.sh`. Release review must not promote QEMU serial smoke evidence from v0.5.0 until the failed CI artifact is inspected and a subsequent CI run passes with validated QEMU smoke metadata.
+
 When CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated boot blocker report may narrow to `missing_qemu_serial_evidence` for that run.
 
 When CI then runs QEMU against that ISO but the kernel marker is absent before timeout, the generated boot blocker report may narrow further to `qemu_timeout`.
