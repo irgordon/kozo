@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260621T165302Z",
+  "run_id": "verify-20260621T213841Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 40,
+    "total_checks": 41,
     "failed_check_count": 0
   },
   "checks": [
@@ -70,7 +70,7 @@
       "subsystem": "odin",
       "status": "pass",
       "code": "OK",
-      "detail": "Odin changes are backed by declared odin check evidence"
+      "detail": "No Odin kernel changes require validation in this bootstrap loop"
     },
     {
       "name": "abi",
@@ -206,6 +206,13 @@
       "detail": "Runtime halt contract proves the post-smoke assembly path enters a terminal halt loop"
     },
     {
+      "name": "runtime_progression_contract",
+      "subsystem": "runtime_progression_contract",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Runtime progression contract preserves the halt baseline until future progression evidence exists"
+    },
+    {
       "name": "boot_blocker_report",
       "subsystem": "boot_blocker_report",
       "status": "pass",
@@ -305,8 +312,7 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
-    "artifacts/runtime/kernel_elf_report.json",
-    "contracts/runtime_halt_contract.v0.json",
+    "contracts/runtime_progression_contract.v0.json",
     "docs/BOOT.md",
     "docs/CONTRACTS.md",
     "docs/PHASEMAP.md",
@@ -317,17 +323,16 @@
     "docs/generated/governance_index.md",
     "harness/codes.py",
     "harness/registry.py",
-    "harness/runtime_halt_contract.py",
+    "harness/runtime_progression_contract.py",
     "harness/validators.py",
-    "harness/validators_impl/runtime_halt_contract.py",
+    "harness/validators_impl/runtime_progression_contract.py",
     "harness/validators_impl/schema.py",
     "harness/validators_impl/validator_coverage.py",
-    "kernel/arch/x86_64/boot.asm",
     "schemas/agent_context.schema.json",
     "schemas/latest_verify.schema.json",
-    "schemas/runtime_halt_contract.schema.json",
+    "schemas/runtime_progression_contract.schema.json",
     "tasks/todo.json",
-    "tests/test_runtime_halt_contract.py"
+    "tests/test_runtime_progression_contract.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -344,5 +349,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-06-21T16:53:02Z"
+  "generated_at": "2026-06-21T21:38:41Z"
 }
