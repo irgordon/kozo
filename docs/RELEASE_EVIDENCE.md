@@ -188,6 +188,8 @@ For v0.6.0 and later, release review must include `contracts/runtime_halt_contra
 
 For v0.6.2 and later, release review must include `contracts/runtime_progression_contract.v0.json` when future runtime progression is under review. The `runtime_progression_contract` validator proves only that the halt-to-runtime transition prerequisites and forbidden shortcuts are governed. It does not prove runtime progression, Odin runtime execution, stack setup, memory initialization, interrupt handling, syscall dispatch during boot, userspace execution, compatibility, or production readiness.
 
+For v0.6.3 and later, release review must include `contracts/runtime_progression_entry_contract.v0.json` when future runtime progression entry is under review. The `runtime_progression_entry_contract` validator proves only that `KOZO_RUNTIME_PROGRESS_ENTRY` is reserved and that transition prerequisites are governed. It does not prove the marker is emitted, runtime progression exists, stack initialization exists, memory initialization exists, Odin runtime execution exists, or compatibility or production readiness exists.
+
 The current packaging metadata records the missing ISO generation tooling blocker:
 
 ```text
@@ -234,6 +236,12 @@ The runtime progression contract validator is:
 
 ```text
 runtime_progression_contract
+```
+
+The runtime progression entry contract validator is:
+
+```text
+runtime_progression_entry_contract
 ```
 
 The expected QEMU smoke marker is:

@@ -12,18 +12,18 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.6.2`
+* Version: `v0.6.3`
 * Date: `2026-06-21`
-* Status: Runtime progression contract planning.
+* Status: Runtime progression entry design.
 
 ## Verification status
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 41
+* Total checks: 42
 * Failed checks: 0
-* Run ID: `verify-20260621T213841Z`
-* Generated at: `2026-06-21T21:38:41Z`
+* Run ID: `verify-20260621T215451Z`
+* Generated at: `2026-06-21T21:54:51Z`
 
 ## Registered validators
 
@@ -58,18 +58,19 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 27 | `runtime_evidence_review` |
 | 28 | `runtime_halt_contract` |
 | 29 | `runtime_progression_contract` |
-| 30 | `boot_blocker_report` |
-| 31 | `boot_protocol_decision` |
-| 32 | `boot_image_skeleton` |
-| 33 | `boot_image_packaging` |
-| 34 | `boot_tooling` |
-| 35 | `kernel_loadability` |
-| 36 | `host_dependency_portability` |
-| 37 | `qemu_smoke_evidence` |
-| 38 | `return_path_proof` |
-| 39 | `execution_proof` |
-| 40 | `validator_coverage` |
-| 41 | `evidence` |
+| 30 | `runtime_progression_entry_contract` |
+| 31 | `boot_blocker_report` |
+| 32 | `boot_protocol_decision` |
+| 33 | `boot_image_skeleton` |
+| 34 | `boot_image_packaging` |
+| 35 | `boot_tooling` |
+| 36 | `kernel_loadability` |
+| 37 | `host_dependency_portability` |
+| 38 | `qemu_smoke_evidence` |
+| 39 | `return_path_proof` |
+| 40 | `execution_proof` |
+| 41 | `validator_coverage` |
+| 42 | `evidence` |
 
 ## Active contracts
 
@@ -78,6 +79,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | `contracts/kozo_abi_manifest.json` | `0` | ABI manifest |
 | `contracts/runtime_halt_contract.v0.json` | `0` | runtime halt contract.v0 |
 | `contracts/runtime_progression_contract.v0.json` | `0` | runtime progression contract.v0 |
+| `contracts/runtime_progression_entry_contract.v0.json` | `0` | runtime progression entry contract.v0 |
 | `contracts/syscall_boundary_contract.v0.json` | `0` | syscall boundary contract |
 | `contracts/syscall_catalog.v0.json` | `0` | syscall catalog |
 | `contracts/syscall_class_contract.v0.json` | `0` | syscall class contract |
@@ -93,6 +95,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | `schemas/runtime.schema.json` | runtime.schema.json |
 | `schemas/runtime_halt_contract.schema.json` | KOZO runtime halt contract |
 | `schemas/runtime_progression_contract.schema.json` | KOZO runtime progression contract |
+| `schemas/runtime_progression_entry_contract.schema.json` | KOZO runtime progression entry contract |
 | `schemas/syscall_boundary_contract.schema.json` | syscall_boundary_contract.schema.json |
 | `schemas/syscall_catalog.schema.json` | syscall_catalog.schema.json |
 | `schemas/syscall_class_contract.schema.json` | syscall_class_contract.schema.json |
@@ -111,7 +114,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 41
+* Check count: 42
 * Failure count: 0
 
 ## Non-goals

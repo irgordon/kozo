@@ -1,0 +1,100 @@
+{
+  "version": 0,
+  "architecture": "x86_64",
+  "current_state": {
+    "path": "boot_smoke_to_halt",
+    "halt_contract": "contracts/runtime_halt_contract.v0.json",
+    "progression_contract": "contracts/runtime_progression_contract.v0.json",
+    "final_smoke_marker": "KOZO_BOOT_SMOKE_OK",
+    "terminal_behavior": "halt_loop"
+  },
+  "progression_entry": {
+    "marker": "KOZO_RUNTIME_PROGRESS_ENTRY",
+    "status": "reserved",
+    "emitted": false,
+    "entry_boundary": "after boot smoke evidence and before any halt replacement once prerequisites are proven"
+  },
+  "required_prerequisites": [
+    "stack initialization evidence",
+    "memory initialization evidence",
+    "runtime initialization evidence",
+    "progression path evidence"
+  ],
+  "required_evidence": [
+    "runtime progression entry contract",
+    "QEMU evidence for KOZO_RUNTIME_PROGRESS_ENTRY",
+    "stack initialization evidence",
+    "memory initialization evidence",
+    "runtime initialization evidence",
+    "release evidence update"
+  ],
+  "transition_requirements": [
+    "runtime_halt_contract remains authoritative until runtime progression evidence exists",
+    "runtime_progression_contract remains the parent transition governance contract",
+    "KOZO_RUNTIME_PROGRESS_ENTRY must not be claimed until emitted by runtime code and captured in evidence",
+    "halt replacement requires contract-backed progression evidence"
+  ],
+  "forbidden_shortcuts": [
+    "delete halt loop",
+    "replace halt loop",
+    "bypass halt loop",
+    "jump around halt loop"
+  ],
+  "transition_ownership": [
+    "runtime_halt_contract owns current terminal behavior",
+    "runtime_progression_contract owns halt-to-runtime transition governance",
+    "runtime_progression_entry_contract owns future progression entry marker reservation and readiness requirements"
+  ],
+  "future_progression_stages": [
+    {
+      "stage": 0,
+      "name": "Boot smoke",
+      "status": "proven"
+    },
+    {
+      "stage": 1,
+      "name": "Runtime progression entry",
+      "status": "planned"
+    },
+    {
+      "stage": 2,
+      "name": "Stack initialization evidence",
+      "status": "planned"
+    },
+    {
+      "stage": 3,
+      "name": "Memory initialization evidence",
+      "status": "planned"
+    },
+    {
+      "stage": 4,
+      "name": "Runtime initialization evidence",
+      "status": "planned"
+    },
+    {
+      "stage": 5,
+      "name": "Controlled runtime loop",
+      "status": "planned"
+    },
+    {
+      "stage": 6,
+      "name": "First governed runtime capability",
+      "status": "planned"
+    }
+  ],
+  "non_goals": [
+    "runtime progression execution",
+    "stack initialization",
+    "memory initialization",
+    "Odin runtime execution",
+    "userspace execution",
+    "interrupt handling",
+    "scheduler behavior",
+    "VFS behavior",
+    "process model behavior",
+    "device driver behavior",
+    "Linux compatibility",
+    "POSIX compatibility",
+    "production readiness"
+  ]
+}

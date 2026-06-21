@@ -104,6 +104,7 @@ The current local generated evidence proves:
 * The post-smoke path in `kernel/arch/x86_64/boot.asm` is governed by `contracts/runtime_halt_contract.v0.json`.
 * After `KOZO_BOOT_SMOKE_OK`, the assembly path enters a deterministic terminal `cli`/`hlt` loop with structural fallthrough forbidden.
 * `contracts/runtime_progression_contract.v0.json` governs future halt-to-runtime transition prerequisites and forbids deleting, replacing, bypassing, or jumping around the halt loop without separate progression evidence.
+* `contracts/runtime_progression_entry_contract.v0.json` reserves the future `KOZO_RUNTIME_PROGRESS_ENTRY` marker without emitting it or changing runtime behavior.
 * Local QEMU smoke evidence remains blocked by `missing_iso_generation_tooling` because the local environment does not provide the CI Limine/xorriso tooling path.
 
 ## Current Active Blocker
@@ -116,7 +117,7 @@ Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr
 
 ## Next Runtime Phase
 
-The next runtime phase should not expand claims automatically. It should add evidence for a narrow runtime progression entry only after preserving the runtime halt contract boundary and satisfying the progression contract's transition rules.
+The next runtime phase should not expand claims automatically. It should plan stack initialization evidence before any runtime progression entry implementation or halt replacement.
 
 ---
 
@@ -159,6 +160,7 @@ The next runtime phase should not expand claims automatically. It should add evi
 | `v0.5.4` | QEMU Serial Smoke Evidence Promotion | Promote the CI-proven QEMU serial smoke evidence and realign stale validators/docs that still require old boot blockers. | Boot validator realignment, runtime/release/boot docs, audit status update, changelog and task state update. | QEMU serial smoke evidence is proven only as a narrow marker-sequence smoke claim; stale blocker assumptions are removed without runtime, ABI, syscall, compatibility, or production-readiness changes. |
 | `v0.6.0` | Runtime Logic Baseline | Govern the immediate post-smoke terminal behavior so the kernel does not fall through after `KOZO_BOOT_SMOKE_OK`. | `contracts/runtime_halt_contract.v0.json`, runtime halt schema/loader/validator/tests, post-smoke assembly halt loop, runtime/release/contract docs. | The final smoke marker is followed by a deterministic terminal halt loop with no structural fallthrough, without ABI/syscall changes or hardware trap, interrupt, scheduler, userspace, compatibility, or production-readiness claims. |
 | `v0.6.2` | Runtime Progression Contract Planning | Define governance for any future transition beyond the current boot-smoke halt path without changing runtime behavior. | `contracts/runtime_progression_contract.v0.json`, runtime progression schema/loader/validator/tests, runtime/release/contract docs. | The halt loop remains authoritative until stack initialization evidence, runtime initialization evidence, memory initialization evidence, and progression path evidence are added and validated; no runtime progression, ABI/syscall, compatibility, or production-readiness claim is added. |
+| `v0.6.3` | Runtime Progression Entry Design | Reserve the first future runtime progression marker and define readiness requirements without changing runtime behavior. | `contracts/runtime_progression_entry_contract.v0.json`, runtime progression entry schema/loader/validator/tests, runtime/release/contract docs. | `KOZO_RUNTIME_PROGRESS_ENTRY` is documented as reserved and not emitted; the halt loop remains authoritative until stack, memory, runtime, and progression-path evidence exists. |
 | `v0.6.0-rc.1` | Release candidate hardening | Freeze release scope and release gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | Release evidence bundle, completed release checklist, current generated reports, changelog/release notes dry run, all required CI checks green. | Release candidate can be reviewed without adding new scope. |
 | `v1.0.0` | Scoped production release | Release only the proven, scoped KOZO surface. | Final release evidence bundle, final changelog and release notes, passing required gates, explicit non-goals. | v1.0.0 claims only evidence-backed behavior and preserves all compatibility non-goals. |
 

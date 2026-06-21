@@ -74,6 +74,7 @@ Current contract paths include:
 | Syscall catalog | `contracts/syscall_catalog.v0.json` | Governed syscall summary checked against source contracts |
 | Runtime halt contract | `contracts/runtime_halt_contract.v0.json` | Post-smoke terminal behavior after `KOZO_BOOT_SMOKE_OK` |
 | Runtime progression contract | `contracts/runtime_progression_contract.v0.json` | Future halt-to-runtime transition governance |
+| Runtime progression entry contract | `contracts/runtime_progression_entry_contract.v0.json` | Future progression entry marker and readiness governance |
 
 ---
 
@@ -139,7 +140,17 @@ It is a planning and transition contract. It does not implement runtime progress
 
 ---
 
-# 13. Generated Reports
+# 13. Runtime Progression Entry Contract Role
+
+`contracts/runtime_progression_entry_contract.v0.json` reserves `KOZO_RUNTIME_PROGRESS_ENTRY` as the future runtime progression entry marker.
+
+It defines the planned entry boundary, required prerequisites, required evidence, transition ownership, and future progression stages. The marker is not emitted by current runtime code and is not runtime evidence until captured through a governed evidence path.
+
+It does not replace the runtime halt contract, implement stack initialization, implement memory initialization, execute Odin runtime code, enable userspace execution, or claim compatibility or production readiness.
+
+---
+
+# 14. Generated Reports
 
 Generated reports are summaries.
 

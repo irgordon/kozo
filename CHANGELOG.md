@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.6.3 - 2026-06-21
+
+**Status:** Runtime progression entry design.
+
+### Added
+
+* Added `contracts/runtime_progression_entry_contract.v0.json` as the governed source for future runtime progression entry marker planning.
+* Added a schema-backed `runtime_progression_entry_contract` loader, validator, focused negative tests, and validator coverage metadata.
+
+### Changed
+
+* Updated runtime, release evidence, contract, validation, phase map, and roadmap docs to reserve `KOZO_RUNTIME_PROGRESS_ENTRY` as future work without emitting it or treating it as evidence.
+
+### Notes
+
+* This change does not alter runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke evidence, or marker semantics.
+* This change does not remove, replace, bypass, or jump around the governed halt loop.
+* This change does not add stack initialization, memory initialization, Odin runtime execution, userspace execution, scheduler behavior, process model behavior, VFS behavior, device driver behavior, Linux compatibility, POSIX compatibility, or production readiness.
+
 ## v0.6.2 - 2026-06-21
 
 **Status:** Runtime progression contract planning.

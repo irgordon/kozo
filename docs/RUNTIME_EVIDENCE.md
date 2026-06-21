@@ -268,6 +268,20 @@ runtime_progression_contract
 
 It validates planning governance for a future halt-to-runtime transition. It requires stack initialization evidence, runtime initialization evidence, memory initialization evidence, and progression path evidence before the halt loop can be removed, replaced, bypassed, or jumped around. It does not prove Odin runtime execution, userspace execution, interrupt handling, scheduler behavior, VFS behavior, process model behavior, syscall dispatch during boot, memory manager behavior, hardware trap handling, device driver behavior, compatibility, or production readiness.
 
+The runtime progression entry contract is:
+
+```text
+contracts/runtime_progression_entry_contract.v0.json
+```
+
+The runtime progression entry validator is:
+
+```text
+runtime_progression_entry_contract
+```
+
+It reserves `KOZO_RUNTIME_PROGRESS_ENTRY` as a future runtime progression marker. The marker is planned, not emitted, and must not be treated as runtime evidence until runtime code emits it and QEMU evidence captures it. The contract keeps the halt loop authoritative until stack initialization evidence, memory initialization evidence, runtime initialization evidence, and progression path evidence exist.
+
 The selected boot protocol is documented in:
 
 ```text

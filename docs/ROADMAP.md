@@ -95,6 +95,7 @@ The current repository proves:
 * CI-proven QEMU serial smoke evidence with the full ordered marker sequence
 * governed post-smoke terminal behavior through `contracts/runtime_halt_contract.v0.json`
 * governed future halt-to-runtime transition planning through `contracts/runtime_progression_contract.v0.json`
+* governed future progression entry marker reservation through `contracts/runtime_progression_entry_contract.v0.json`
 
 The latest local generated evidence may still report missing local Limine/xorriso tooling, but CI run `27894312430` proves the narrow QEMU serial smoke path.
 
@@ -108,6 +109,7 @@ KOZO still does not prove:
 * stack setup
 * memory initialization
 * runtime progression past the governed halt loop
+* `KOZO_RUNTIME_PROGRESS_ENTRY` emission
 * syscall dispatch during boot
 * hardware halt instruction semantics
 * interrupt handling
@@ -139,7 +141,8 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 2. Keep QEMU serial smoke evidence as marker-sequence evidence only.
 3. Keep the v0.6.0 post-smoke terminal halt contract narrow and source-structural.
 4. Keep the v0.6.2 runtime progression contract as the gate for any future halt-to-runtime transition.
-5. Add the next narrow runtime progression entry evidence before replacing, bypassing, or jumping around the halt loop.
+5. Keep the v0.6.3 runtime progression entry contract as a marker reservation, not runtime evidence.
+6. Plan stack initialization evidence before implementing progression entry or replacing the halt loop.
 
 ---
 
@@ -147,8 +150,8 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 
 After CI QEMU serial smoke evidence is green, resume deferred maturity work:
 
-* add runtime progression entry evidence
 * add stack initialization evidence
+* add runtime progression entry evidence
 * add runtime initialization evidence
 * add controlled runtime loop evidence
 * centralize boot marker and blocker taxonomy

@@ -100,6 +100,8 @@ Current v0.6.0 runtime halt baseline: `contracts/runtime_halt_contract.v0.json` 
 
 Current v0.6.2 runtime progression planning: `contracts/runtime_progression_contract.v0.json` and `runtime_progression_contract` define the prerequisites and forbidden shortcuts for any future transition beyond the boot-smoke halt path. The halt loop remains authoritative until stack initialization evidence, runtime initialization evidence, memory initialization evidence, and progression path evidence are separately added and validated. This planning contract does not implement runtime progression.
 
+Current v0.6.3 runtime progression entry design: `contracts/runtime_progression_entry_contract.v0.json` reserves the future `KOZO_RUNTIME_PROGRESS_ENTRY` marker and defines where progression evidence begins. The marker is not emitted, runtime progression is not implemented, and the halt loop remains authoritative until the required stack, memory, runtime, and progression-path evidence exists.
+
 Selected boot protocol: Limine.
 
 The current repository has a 64-bit `_start` symbol, an exported `kernel_entry`, early serial initialization, early KOZO marker strings, and runtime-adjacent object/symbol smoke evidence.
