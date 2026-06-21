@@ -58,6 +58,8 @@ v0.5.4 promotes QEMU serial smoke evidence after CI run `27894312430` captured t
 
 v0.6.0 adds the governed post-smoke runtime halt baseline. The runtime halt contract validates that the assembly path emits `KOZO_BOOT_SMOKE_OK` before entering a deterministic terminal halt loop and forbids structural fallthrough after the smoke marker.
 
+v0.6.5 adds `contracts/runtime_evidence_taxonomy.v0.json` as the governed source for QEMU serial smoke marker names, marker order, smoke outcome names, blocker categories, pass condition, blocked condition, and taxonomy-level non-goals. The generated smoke metadata remains evidence, not taxonomy authority.
+
 Current local boot blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
 
 Current release blocker for QEMU serial smoke evidence: none.
@@ -138,6 +140,8 @@ runtime-adjacent-object-symbol-smoke
 The smoke path builds freestanding x86_64 Odin kernel objects, assembles the current x86_64 boot and syscall bridge objects, records `nm` and `strings` evidence, and verifies required entry, dispatcher, bridge, and serial marker surfaces.
 
 The QEMU serial smoke target is now proven in CI. It remains a narrow smoke target and does not replace separate evidence for Odin runtime execution, stack setup, memory initialization, syscall dispatch, hardware trap execution, userspace execution, or subsystem behavior.
+
+The marker order and blocker vocabulary for QEMU serial smoke are owned by `contracts/runtime_evidence_taxonomy.v0.json` and enforced by `runtime_evidence_taxonomy`, `qemu_smoke_evidence`, and `boot_blocker_report`.
 
 ---
 

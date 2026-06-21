@@ -28,6 +28,10 @@ QEMU smoke command: present and fail-closed on missing ISO generation tooling or
 
 QEMU smoke evidence validator: `qemu_smoke_evidence`.
 
+Runtime evidence taxonomy validator: `runtime_evidence_taxonomy`.
+
+The governed marker order, QEMU smoke outcomes, and blocker category vocabulary are owned by `contracts/runtime_evidence_taxonomy.v0.json`. This document records blocker history and current evidence state; it does not redefine taxonomy authority.
+
 v0.3.9 records the CI-observed `qemu_timeout` state as an exact QEMU smoke blocker when QEMU runs the packaged ISO but the serial log does not contain `KOZO_BOOT_SMOKE_OK` before the bounded timeout.
 
 v0.4.0 narrows that diagnostic model with Limine serial/verbose configuration, early KOZO marker instrumentation, and exact reachability blockers.

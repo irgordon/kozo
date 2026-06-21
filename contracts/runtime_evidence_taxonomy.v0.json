@@ -1,0 +1,103 @@
+{
+  "version": 0,
+  "smoke_markers": [
+    "KOZO_EARLY_0_ENTRY",
+    "KOZO_EARLY_1_SERIAL_INIT_START",
+    "KOZO_EARLY_2_SERIAL_INIT_OK",
+    "KOZO_BOOT_SMOKE_OK"
+  ],
+  "smoke_marker_order": [
+    "KOZO_EARLY_0_ENTRY",
+    "KOZO_EARLY_1_SERIAL_INIT_START",
+    "KOZO_EARLY_2_SERIAL_INIT_OK",
+    "KOZO_BOOT_SMOKE_OK"
+  ],
+  "expected_smoke_marker": "KOZO_BOOT_SMOKE_OK",
+  "smoke_outcomes": [
+    "pass",
+    "blocked"
+  ],
+  "blocker_categories": {
+    "none": "No active QEMU serial smoke blocker remains.",
+    "limine_not_reached": "QEMU serial evidence did not show Limine reachability.",
+    "kernel_not_loaded": "Limine did not load the KOZO kernel ELF.",
+    "kernel_entry_not_reached": "Limine reported kernel entry evidence but KOZO entry marker was absent.",
+    "serial_not_initialized": "KOZO entry was observed but serial initialization completion was absent.",
+    "marker_not_emitted": "Early serial initialization was observed but the final smoke marker was absent.",
+    "qemu_timeout": "QEMU execution timed out before a passing smoke sequence was observed.",
+    "missing_qemu_tooling": "QEMU tooling is unavailable.",
+    "missing_boot_image": "The QEMU smoke script cannot find the boot image.",
+    "qemu_launch_failed": "QEMU launch failed.",
+    "missing_iso_generation_tooling": "Local Limine or ISO generation tooling is unavailable.",
+    "missing_qemu_serial_evidence": "QEMU serial evidence has not been captured.",
+    "invalid_kernel_elf": "Kernel ELF structure is invalid.",
+    "missing_load_segments": "Kernel ELF load segments are missing.",
+    "invalid_kernel_entry": "Kernel ELF entry point is invalid.",
+    "linker_output_invalid": "Kernel linker output is invalid.",
+    "limine_lower_half_phdr": "Limine rejected lower-half kernel ELF program headers."
+  },
+  "qemu_smoke_blockers": [
+    "limine_not_reached",
+    "kernel_not_loaded",
+    "kernel_entry_not_reached",
+    "serial_not_initialized",
+    "marker_not_emitted",
+    "qemu_timeout",
+    "missing_qemu_tooling",
+    "missing_boot_image",
+    "qemu_launch_failed",
+    "missing_iso_generation_tooling",
+    "limine_lower_half_phdr"
+  ],
+  "boot_blocker_categories": [
+    "none",
+    "missing_iso_generation_tooling",
+    "missing_qemu_serial_evidence",
+    "limine_not_reached",
+    "kernel_not_loaded",
+    "kernel_entry_not_reached",
+    "serial_not_initialized",
+    "marker_not_emitted",
+    "qemu_timeout",
+    "missing_qemu_tooling",
+    "missing_boot_image",
+    "qemu_launch_failed",
+    "invalid_kernel_elf",
+    "missing_load_segments",
+    "invalid_kernel_entry",
+    "linker_output_invalid",
+    "limine_lower_half_phdr"
+  ],
+  "kernel_elf_blockers": [
+    "invalid_kernel_elf",
+    "missing_load_segments",
+    "invalid_kernel_entry",
+    "linker_output_invalid",
+    "limine_lower_half_phdr"
+  ],
+  "pass_condition": {
+    "outcome": "pass",
+    "required_marker_sequence": "full_ordered_smoke_marker_sequence",
+    "expected_marker": "KOZO_BOOT_SMOKE_OK"
+  },
+  "blocked_condition": {
+    "outcome": "blocked",
+    "required_blocker_category": "one governed blocker category"
+  },
+  "non_goals": [
+    "hardware trap execution",
+    "interrupt handling",
+    "Odin runtime execution",
+    "stack setup",
+    "memory initialization",
+    "syscall dispatch",
+    "userspace execution",
+    "process model behavior",
+    "VFS behavior",
+    "scheduler behavior",
+    "file descriptor behavior",
+    "Linux compatibility",
+    "POSIX compatibility",
+    "production readiness"
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KOZO runtime evidence taxonomy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "smoke_markers",
+    "smoke_marker_order",
+    "expected_smoke_marker",
+    "smoke_outcomes",
+    "blocker_categories",
+    "qemu_smoke_blockers",
+    "boot_blocker_categories",
+    "kernel_elf_blockers",
+    "pass_condition",
+    "blocked_condition",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {
+      "const": 0
+    },
+    "smoke_markers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    },
+    "smoke_marker_order": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    },
+    "expected_smoke_marker": {
+      "type": "string",
+      "pattern": ".*\\S.*"
+    },
+    "smoke_outcomes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    },
+    "blocker_categories": {
+      "type": "object"
+    },
+    "qemu_smoke_blockers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    },
+    "boot_blocker_categories": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    },
+    "kernel_elf_blockers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    },
+    "pass_condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outcome",
+        "required_marker_sequence",
+        "expected_marker"
+      ],
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "required_marker_sequence": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "expected_marker": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        }
+      }
+    },
+    "blocked_condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outcome",
+        "required_blocker_category"
+      ],
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "required_blocker_category": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        }
+      }
+    },
+    "non_goals": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    }
+  }
+}

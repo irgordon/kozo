@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.6.5 - 2026-06-21
+
+**Status:** Runtime evidence taxonomy centralization.
+
+### Changed
+
+* Added `contracts/runtime_evidence_taxonomy.v0.json` and `schemas/runtime_evidence_taxonomy.schema.json` as the governed QEMU serial smoke marker, outcome, blocker, pass-condition, blocked-condition, and non-goal vocabulary.
+* Added `harness/runtime_evidence_taxonomy.py` and `runtime_evidence_taxonomy` validation with focused negative tests.
+* Migrated QEMU smoke and boot blocker validators to consume taxonomy helper functions for marker order, expected smoke marker, outcome names, and blocker allowlists.
+* Updated governance, validation, runtime evidence, boot blocker, audit, phase, roadmap, changelog, and task-state records.
+
+### Notes
+
+* This preserves marker strings, marker order, and QEMU smoke pass criteria.
+* This change does not alter runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke behavior, marker emission, runtime halt behavior, or runtime progression contracts.
+* This change does not add compatibility claims or production-readiness claims.
+
 ## v0.6.4 - 2026-06-21
 
 **Status:** Code structure remediation.

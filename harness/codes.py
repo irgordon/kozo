@@ -39,6 +39,7 @@ BRIDGE_ALIGNMENT_INVALID = "BRIDGE_ALIGNMENT_INVALID"
 RUNTIME_TRAP_PATH_INVALID = "RUNTIME_TRAP_PATH_INVALID"
 RUNTIME_SMOKE_EVIDENCE_INVALID = "RUNTIME_SMOKE_EVIDENCE_INVALID"
 RUNTIME_EVIDENCE_REVIEW_INVALID = "RUNTIME_EVIDENCE_REVIEW_INVALID"
+RUNTIME_EVIDENCE_TAXONOMY_INVALID = "RUNTIME_EVIDENCE_TAXONOMY_INVALID"
 RUNTIME_HALT_CONTRACT_INVALID = "RUNTIME_HALT_CONTRACT_INVALID"
 RUNTIME_PROGRESSION_CONTRACT_INVALID = "RUNTIME_PROGRESSION_CONTRACT_INVALID"
 RUNTIME_PROGRESSION_ENTRY_CONTRACT_INVALID = "RUNTIME_PROGRESSION_ENTRY_CONTRACT_INVALID"
@@ -94,6 +95,7 @@ CODES = MappingProxyType(
         RUNTIME_TRAP_PATH_INVALID: "Rust does not cross the assembly syscall bridge as required by the runtime trap contract",
         RUNTIME_SMOKE_EVIDENCE_INVALID: "Runtime smoke evidence is missing, malformed, or inconsistent with release evidence policy",
         RUNTIME_EVIDENCE_REVIEW_INVALID: "Runtime evidence review policy is missing, incomplete, or overclaim-prone",
+        RUNTIME_EVIDENCE_TAXONOMY_INVALID: "Runtime evidence taxonomy is missing, malformed, or inconsistent with governed smoke vocabulary",
         RUNTIME_HALT_CONTRACT_INVALID: "Runtime halt contract is missing, malformed, or inconsistent with the post-smoke terminal path",
         RUNTIME_PROGRESSION_CONTRACT_INVALID: "Runtime progression contract is missing, malformed, or inconsistent with halt-to-runtime transition governance",
         RUNTIME_PROGRESSION_ENTRY_CONTRACT_INVALID: "Runtime progression entry contract is missing, malformed, or inconsistent with future entry governance",

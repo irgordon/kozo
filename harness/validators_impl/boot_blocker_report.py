@@ -4,6 +4,10 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
+from harness.runtime_evidence_taxonomy import (
+    get_boot_blocker_categories,
+    get_kernel_elf_blocker_categories,
+)
 from harness.codes import BOOT_BLOCKER_REPORT_INVALID, OK
 from harness.validator import BaseValidator, ValidationResult
 
@@ -131,30 +135,16 @@ _REQUIRED_DOC_REFERENCES = (
     "limine_lower_half_phdr",
 )
 
-_ALLOWED_EXACT_QEMU_BLOCKERS = (
-    "limine_not_reached",
-    "kernel_not_loaded",
-    "kernel_entry_not_reached",
-    "serial_not_initialized",
-    "marker_not_emitted",
-    "qemu_timeout",
-    "missing_qemu_tooling",
-    "missing_boot_image",
-    "qemu_launch_failed",
+_DIRECT_BLOCKERS = (
+    "none",
     "missing_iso_generation_tooling",
-    "invalid_kernel_elf",
-    "missing_load_segments",
-    "invalid_kernel_entry",
-    "linker_output_invalid",
-    "limine_lower_half_phdr",
+    "missing_qemu_serial_evidence",
 )
-
-_KERNEL_ELF_BLOCKERS = (
-    "invalid_kernel_elf",
-    "missing_load_segments",
-    "invalid_kernel_entry",
-    "linker_output_invalid",
-    "limine_lower_half_phdr",
+_KERNEL_ELF_BLOCKERS = get_kernel_elf_blocker_categories()
+_ALLOWED_EXACT_QEMU_BLOCKERS = tuple(
+    category
+    for category in get_boot_blocker_categories()
+    if category not in _DIRECT_BLOCKERS
 )
 
 

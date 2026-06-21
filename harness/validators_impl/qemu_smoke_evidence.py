@@ -4,6 +4,12 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
+from harness.runtime_evidence_taxonomy import (
+    get_expected_smoke_marker,
+    get_qemu_smoke_blocker_categories,
+    get_smoke_marker_order,
+    get_smoke_outcomes,
+)
 from harness.codes import OK, QEMU_SMOKE_EVIDENCE_INVALID
 from harness.validator import BaseValidator, ValidationResult
 
@@ -52,26 +58,10 @@ _REQUIRED_NON_GOALS = (
     "production readiness",
 )
 
-_ALLOWED_BLOCKERS = (
-    "limine_not_reached",
-    "kernel_not_loaded",
-    "kernel_entry_not_reached",
-    "serial_not_initialized",
-    "marker_not_emitted",
-    "qemu_timeout",
-    "missing_qemu_tooling",
-    "missing_boot_image",
-    "qemu_launch_failed",
-    "missing_iso_generation_tooling",
-    "limine_lower_half_phdr",
-)
-
-_EARLY_MARKERS = (
-    "KOZO_EARLY_0_ENTRY",
-    "KOZO_EARLY_1_SERIAL_INIT_START",
-    "KOZO_EARLY_2_SERIAL_INIT_OK",
-    "KOZO_BOOT_SMOKE_OK",
-)
+_ALLOWED_BLOCKERS = get_qemu_smoke_blocker_categories()
+_EARLY_MARKERS = get_smoke_marker_order()
+_PASS_OUTCOME, _BLOCKED_OUTCOME = get_smoke_outcomes()
+_EXPECTED_MARKER = get_expected_smoke_marker()
 
 _REQUIRED_DOC_REFERENCES = (
     "artifacts/runtime/qemu_smoke.log",
@@ -148,8 +138,8 @@ def _common_field_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
     for field, expected in _COMMON_FIELDS.items():
         if metadata.get(field) != expected:
             return _issue("field_mismatch", f"qemu_smoke.{field}", f"QEMU smoke field {field} must be {expected}")
-    if not metadata.get("expected_marker"):
-        return _issue("missing_expected_marker", "qemu_smoke.expected_marker", "QEMU smoke expected marker must be non-empty")
+    if metadata.get("expected_marker") != _EXPECTED_MARKER:
+        return _issue("missing_expected_marker", "qemu_smoke.expected_marker", "QEMU smoke expected marker must match runtime evidence taxonomy")
     if not metadata.get("boot_image"):
         return _issue("missing_boot_image_reference", "qemu_smoke.boot_image", "QEMU smoke boot image reference must be non-empty")
     if not isinstance(metadata.get("qemu_exit_code"), int):
@@ -283,7 +273,7 @@ def _log_text() -> str:
 
 def _marker_sequence_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
     log_text = _log_text()
-    if metadata.get("outcome") == "pass":
+    if metadata.get("outcome") == _PASS_OUTCOME:
         for marker in _EARLY_MARKERS:
             if marker not in log_text:
                 return _issue("marker_sequence_incomplete", f"qemu_smoke.marker_sequence.{marker}", "QEMU smoke pass requires the full boot marker sequence")
@@ -317,9 +307,9 @@ def _entry_handoff_field_issue(metadata: dict[str, object]) -> QemuSmokeIssue | 
 
 
 def _outcome_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
-    if metadata.get("outcome") == "pass":
+    if metadata.get("outcome") == _PASS_OUTCOME:
         return _list_contract_issue(metadata, "proves", _PASS_PROVES, "missing_proves_claim")
-    if metadata.get("outcome") == "blocked":
+    if metadata.get("outcome") == _BLOCKED_OUTCOME:
         return _blocked_outcome_issue(metadata)
     return _issue("field_mismatch", "qemu_smoke.outcome", "QEMU smoke outcome must be pass or blocked")
 
@@ -332,7 +322,7 @@ def _blocked_outcome_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None
 
 
 def _blocker_taxonomy_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
-    if metadata.get("outcome") != "blocked":
+    if metadata.get("outcome") != _BLOCKED_OUTCOME:
         return None
     expected = _expected_blocker_from_logs(metadata)
     if expected is None:
@@ -392,7 +382,7 @@ def _has_lower_half_phdr_failure(text: str) -> bool:
 
 
 def _blocked_marker_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
-    if metadata.get("outcome") != "blocked":
+    if metadata.get("outcome") != _BLOCKED_OUTCOME:
         return None
     marker = metadata.get("expected_marker")
     if isinstance(marker, str) and _SERIAL_LOG_PATH.is_file() and marker in _SERIAL_LOG_PATH.read_text(errors="replace"):
@@ -401,7 +391,7 @@ def _blocked_marker_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
 
 
 def _pass_evidence_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
-    if metadata.get("outcome") != "pass":
+    if metadata.get("outcome") != _PASS_OUTCOME:
         return None
     if not _SERIAL_LOG_PATH.is_file():
         return _issue("missing_serial_log", "qemu_smoke.serial_log", "QEMU smoke pass metadata requires a serial log")
@@ -439,7 +429,7 @@ def _list_contract_issue(
 
 
 def _blocker_report_issue(metadata: dict[str, object], blocker_report: dict[str, object]) -> QemuSmokeIssue | None:
-    if metadata.get("outcome") == "pass":
+    if metadata.get("outcome") == _PASS_OUTCOME:
         expected_category = "none"
     else:
         expected_category = metadata.get("blocker_category")

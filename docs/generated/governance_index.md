@@ -12,18 +12,18 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.6.4`
+* Version: `v0.6.5`
 * Date: `2026-06-21`
-* Status: Code structure remediation.
+* Status: Runtime evidence taxonomy centralization.
 
 ## Verification status
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 42
+* Total checks: 43
 * Failed checks: 0
-* Run ID: `verify-20260621T225150Z`
-* Generated at: `2026-06-21T22:51:50Z`
+* Run ID: `verify-20260621T235320Z`
+* Generated at: `2026-06-21T23:53:20Z`
 
 ## Registered validators
 
@@ -56,27 +56,29 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 25 | `runtime_trap_path` |
 | 26 | `runtime_smoke_evidence` |
 | 27 | `runtime_evidence_review` |
-| 28 | `runtime_halt_contract` |
-| 29 | `runtime_progression_contract` |
-| 30 | `runtime_progression_entry_contract` |
-| 31 | `boot_blocker_report` |
-| 32 | `boot_protocol_decision` |
-| 33 | `boot_image_skeleton` |
-| 34 | `boot_image_packaging` |
-| 35 | `boot_tooling` |
-| 36 | `kernel_loadability` |
-| 37 | `host_dependency_portability` |
-| 38 | `qemu_smoke_evidence` |
-| 39 | `return_path_proof` |
-| 40 | `execution_proof` |
-| 41 | `validator_coverage` |
-| 42 | `evidence` |
+| 28 | `runtime_evidence_taxonomy` |
+| 29 | `runtime_halt_contract` |
+| 30 | `runtime_progression_contract` |
+| 31 | `runtime_progression_entry_contract` |
+| 32 | `boot_blocker_report` |
+| 33 | `boot_protocol_decision` |
+| 34 | `boot_image_skeleton` |
+| 35 | `boot_image_packaging` |
+| 36 | `boot_tooling` |
+| 37 | `kernel_loadability` |
+| 38 | `host_dependency_portability` |
+| 39 | `qemu_smoke_evidence` |
+| 40 | `return_path_proof` |
+| 41 | `execution_proof` |
+| 42 | `validator_coverage` |
+| 43 | `evidence` |
 
 ## Active contracts
 
 | Path | Version | Role |
 | --- | --- | --- |
 | `contracts/kozo_abi_manifest.json` | `0` | ABI manifest |
+| `contracts/runtime_evidence_taxonomy.v0.json` | `0` | runtime evidence taxonomy.v0 |
 | `contracts/runtime_halt_contract.v0.json` | `0` | runtime halt contract.v0 |
 | `contracts/runtime_progression_contract.v0.json` | `0` | runtime progression contract.v0 |
 | `contracts/runtime_progression_entry_contract.v0.json` | `0` | runtime progression entry contract.v0 |
@@ -93,6 +95,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | `schemas/kozo_abi_manifest.schema.json` | kozo_abi_manifest.schema.json |
 | `schemas/latest_verify.schema.json` | latest_verify.schema.json |
 | `schemas/runtime.schema.json` | runtime.schema.json |
+| `schemas/runtime_evidence_taxonomy.schema.json` | KOZO runtime evidence taxonomy |
 | `schemas/runtime_halt_contract.schema.json` | KOZO runtime halt contract |
 | `schemas/runtime_progression_contract.schema.json` | KOZO runtime progression contract |
 | `schemas/runtime_progression_entry_contract.schema.json` | KOZO runtime progression entry contract |
@@ -114,7 +117,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 42
+* Check count: 43
 * Failure count: 0
 
 ## Non-goals

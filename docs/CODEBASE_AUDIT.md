@@ -607,3 +607,65 @@ The cleanup is behavior-preserving:
 * Full verification passes.
 * JSON task and verification artifacts are valid.
 * Whitespace diff check passes.
+
+---
+
+# 19. v0.6.5 Runtime Evidence Taxonomy Centralization
+
+Date: 2026-06-21
+
+Status: Completed.
+
+## 19.1 Scope
+
+This remediation addressed duplicated QEMU serial smoke marker and blocker vocabulary in validators. It added `contracts/runtime_evidence_taxonomy.v0.json` as the governed taxonomy source and migrated `qemu_smoke_evidence` and `boot_blocker_report` to consume taxonomy helper functions.
+
+It did not change runtime behavior, marker strings, marker order, QEMU smoke pass criteria, ABI contracts, syscall behavior, linker layout, runtime halt behavior, runtime progression contracts, compatibility claims, or production-readiness claims.
+
+## 19.2 Finding Status
+
+| ID | Status | Rationale |
+| --- | --- | --- |
+| AUDIT-001 | Partially resolved | The governed taxonomy now owns blocker category vocabulary and boot blocker validators consume it. Shell scripts, tests, and historical docs still contain literals for metadata generation, fixtures, and review history. |
+| AUDIT-095-001 | Partially resolved | The governed taxonomy now owns QEMU smoke marker order and the QEMU smoke validator consumes it. Shell scripts and tests still contain marker literals where they emit or fixture evidence. |
+| AUDIT-095-002 | Partially resolved | QEMU smoke and boot blocker validators now consume centralized blocker allowlists from the taxonomy helper. Metadata generators still emit blocker names directly and should be migrated only in a separate low-risk phase. |
+| AUDIT-095-005 | Partially resolved | Validator-side policy no longer carries independent marker order or blocker allowlists. Script-side classification remains separate and is intentionally deferred to avoid broad shell rewrites. |
+
+## 19.3 Remediation Applied
+
+Added:
+
+```text
+contracts/runtime_evidence_taxonomy.v0.json
+schemas/runtime_evidence_taxonomy.schema.json
+harness/runtime_evidence_taxonomy.py
+harness/validators_impl/runtime_evidence_taxonomy.py
+tests/test_runtime_evidence_taxonomy.py
+```
+
+Migrated:
+
+* `harness/validators_impl/qemu_smoke_evidence.py` now reads marker order, expected smoke marker, smoke outcomes, and QEMU blocker allowlist from `harness/runtime_evidence_taxonomy.py`.
+* `harness/validators_impl/boot_blocker_report.py` now reads boot blocker and kernel ELF blocker categories from `harness/runtime_evidence_taxonomy.py`.
+
+## 19.4 Deferred Cleanup
+
+Deferred intentionally:
+
+* migrating `scripts/qemu_smoke.sh` to consume the taxonomy contract
+* migrating `scripts/boot_blocker_report.sh` to consume the taxonomy contract
+* extracting shared QEMU smoke test fixtures
+* removing historical marker and blocker names from audit/changelog history
+
+These remain deferred because this phase avoided shell rewrites, broad test rewrites, and historical documentation rewrites.
+
+## 19.5 Verification Result
+
+The centralization is behavior-preserving:
+
+* Runtime evidence taxonomy focused tests pass.
+* QEMU smoke evidence focused tests pass.
+* Boot blocker report focused tests pass.
+* Validator coverage focused tests pass.
+* Full unit discovery passes.
+* Full verification passes.

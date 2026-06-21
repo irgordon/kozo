@@ -72,6 +72,7 @@ Current contract paths include:
 | Syscall table contract | `contracts/syscall_table_contract.v0.json` | Currently proven dispatcher table behavior |
 | Syscall class contract | `contracts/syscall_class_contract.v0.json` | Semantic syscall class rules |
 | Syscall catalog | `contracts/syscall_catalog.v0.json` | Governed syscall summary checked against source contracts |
+| Runtime evidence taxonomy | `contracts/runtime_evidence_taxonomy.v0.json` | Governed QEMU smoke marker, outcome, and blocker vocabulary |
 | Runtime halt contract | `contracts/runtime_halt_contract.v0.json` | Post-smoke terminal behavior after `KOZO_BOOT_SMOKE_OK` |
 | Runtime progression contract | `contracts/runtime_progression_contract.v0.json` | Future halt-to-runtime transition governance |
 | Runtime progression entry contract | `contracts/runtime_progression_entry_contract.v0.json` | Future progression entry marker and readiness governance |
@@ -120,7 +121,19 @@ Catalog entries must be validated against the authoritative contracts and source
 
 ---
 
-# 11. Runtime Halt Contract Role
+# 11. Runtime Evidence Taxonomy Contract Role
+
+`contracts/runtime_evidence_taxonomy.v0.json` owns the governed vocabulary for QEMU serial smoke markers, marker order, smoke outcomes, blocker categories, pass condition, blocked condition, and taxonomy-level non-goals.
+
+It centralizes marker and blocker names so scripts, validators, tests, documentation, and generated evidence metadata do not define independent taxonomies.
+
+Generated smoke metadata remains evidence. It does not define taxonomy authority.
+
+This contract does not define runtime behavior, ABI values, syscall behavior, linker behavior, marker emission behavior, compatibility claims, or production readiness.
+
+---
+
+# 12. Runtime Halt Contract Role
 
 `contracts/runtime_halt_contract.v0.json` describes the governed terminal behavior after the assembly boot smoke marker path emits `KOZO_BOOT_SMOKE_OK`.
 
@@ -130,7 +143,7 @@ It does not define ABI values, syscall behavior, interrupt handling, scheduler b
 
 ---
 
-# 12. Runtime Progression Contract Role
+# 13. Runtime Progression Contract Role
 
 `contracts/runtime_progression_contract.v0.json` describes governance for a future transition from the current boot-smoke halt path to a separately proven runtime progression path.
 
@@ -140,7 +153,7 @@ It is a planning and transition contract. It does not implement runtime progress
 
 ---
 
-# 13. Runtime Progression Entry Contract Role
+# 14. Runtime Progression Entry Contract Role
 
 `contracts/runtime_progression_entry_contract.v0.json` reserves `KOZO_RUNTIME_PROGRESS_ENTRY` as the future runtime progression entry marker.
 
@@ -150,7 +163,7 @@ It does not replace the runtime halt contract, implement stack initialization, i
 
 ---
 
-# 14. Generated Reports
+# 15. Generated Reports
 
 Generated reports are summaries.
 
@@ -164,7 +177,7 @@ Generated reports do not own contract truth. If a generated report conflicts wit
 
 ---
 
-# 13. Validators as Proof Mechanisms
+# 16. Validators as Proof Mechanisms
 
 Validators prove that checked-in source, contracts, generated artifacts, and task state agree.
 
@@ -174,7 +187,7 @@ When a validator finds missing source, missing evidence, stale generated reports
 
 ---
 
-# 14. Contract Change Requirements
+# 17. Contract Change Requirements
 
 A contract change requires:
 
@@ -187,7 +200,7 @@ A contract change requires:
 
 ---
 
-# 15. Relationship to Other Governance Documents
+# 18. Relationship to Other Governance Documents
 
 `GOVERNANCE.md` owns document precedence.
 

@@ -438,6 +438,23 @@ _VALIDATOR_TEST_CONTRACTS = {
             "diagnostic_names_review_field",
         ),
     ),
+    "runtime_evidence_taxonomy": ValidatorTestContract(
+        "runtime_evidence_taxonomy",
+        _TESTS_DIR / "test_runtime_evidence_taxonomy.py",
+        "RuntimeEvidenceTaxonomyValidator",
+        (
+            "missing_contract_file",
+            "invalid_contract_json",
+            "contract_schema_violation",
+            "missing_marker",
+            "wrong_marker_order",
+            "expected_marker_not_final",
+            "missing_outcome",
+            "missing_blocker_category",
+            "missing_non_goal",
+            "diagnostic_names_field",
+        ),
+    ),
     "runtime_halt_contract": ValidatorTestContract(
         "runtime_halt_contract",
         _TESTS_DIR / "test_runtime_halt_contract.py",

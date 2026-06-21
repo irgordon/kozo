@@ -129,6 +129,7 @@ Current runtime evidence and runtime contract validators include:
 
 * `runtime_smoke_evidence`
 * `qemu_smoke_evidence`
+* `runtime_evidence_taxonomy`
 * `runtime_halt_contract`
 * `runtime_progression_contract`
 * `runtime_progression_entry_contract`
