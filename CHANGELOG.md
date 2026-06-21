@@ -13,7 +13,8 @@
 ### Notes
 
 * Local verification still records the local tooling blocker when Limine/xorriso ISO tooling is unavailable.
-* QEMU boot evidence is not claimed unless CI or local QEMU smoke metadata validates passing evidence and captured serial output contains the full ordered marker sequence.
+* Passing QEMU serial smoke evidence is not claimed unless CI or local QEMU smoke metadata validates passing evidence and captured serial output contains the full ordered marker sequence.
+* The v0.5.0 marker does not prove Odin runtime execution, stack setup, memory initialization, syscall dispatch, hardware trap execution, or broader boot lifecycle behavior.
 * This change does not alter ABI contracts or syscall behavior.
 * This change does not claim hardware trap execution, Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, file descriptor behavior, or production readiness.
 

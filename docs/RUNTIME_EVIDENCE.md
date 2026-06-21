@@ -125,7 +125,7 @@ runtime-adjacent-object-symbol-smoke
 
 The smoke path builds freestanding x86_64 Odin kernel objects, assembles the current x86_64 boot and syscall bridge objects, records `nm` and `strings` evidence, and verifies required entry, dispatcher, bridge, and serial marker surfaces.
 
-This remains the narrowest passing runtime evidence target until `artifacts/runtime/boot_image/kozo.iso` is generated and then booted with validated serial output.
+This remains the narrowest passing runtime evidence target until `artifacts/runtime/boot_image/kozo.iso` is generated and then run under QEMU with validated serial smoke output.
 
 ---
 
