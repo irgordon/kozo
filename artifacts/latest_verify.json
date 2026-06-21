@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260621T154550Z",
+  "run_id": "verify-20260621T165302Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 39,
+    "total_checks": 40,
     "failed_check_count": 0
   },
   "checks": [
@@ -70,7 +70,7 @@
       "subsystem": "odin",
       "status": "pass",
       "code": "OK",
-      "detail": "No Odin kernel changes require validation in this bootstrap loop"
+      "detail": "Odin changes are backed by declared odin check evidence"
     },
     {
       "name": "abi",
@@ -199,6 +199,13 @@
       "detail": "Runtime evidence review policy names the evidence scope, limits, release gates, and protected metadata"
     },
     {
+      "name": "runtime_halt_contract",
+      "subsystem": "runtime_halt_contract",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Runtime halt contract proves the post-smoke assembly path enters a terminal halt loop"
+    },
+    {
       "name": "boot_blocker_report",
       "subsystem": "boot_blocker_report",
       "status": "pass",
@@ -298,24 +305,29 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
+    "artifacts/runtime/kernel_elf_report.json",
+    "contracts/runtime_halt_contract.v0.json",
     "docs/BOOT.md",
-    "docs/BOOT_BLOCKERS.md",
-    "docs/BOOT_TOOLING.md",
-    "docs/CODEBASE_AUDIT.md",
+    "docs/CONTRACTS.md",
     "docs/PHASEMAP.md",
-    "docs/RELEASE_CHECKLIST.md",
     "docs/RELEASE_EVIDENCE.md",
-    "docs/REQUIRED_CHECKS.md",
     "docs/ROADMAP.md",
     "docs/RUNTIME_EVIDENCE.md",
+    "docs/VALIDATION.md",
     "docs/generated/governance_index.md",
-    "harness/validators_impl/boot_image_skeleton.py",
-    "harness/validators_impl/boot_protocol_decision.py",
-    "harness/validators_impl/boot_tooling.py",
+    "harness/codes.py",
+    "harness/registry.py",
+    "harness/runtime_halt_contract.py",
+    "harness/validators.py",
+    "harness/validators_impl/runtime_halt_contract.py",
+    "harness/validators_impl/schema.py",
+    "harness/validators_impl/validator_coverage.py",
+    "kernel/arch/x86_64/boot.asm",
+    "schemas/agent_context.schema.json",
+    "schemas/latest_verify.schema.json",
+    "schemas/runtime_halt_contract.schema.json",
     "tasks/todo.json",
-    "tests/test_boot_image_skeleton.py",
-    "tests/test_boot_protocol_decision.py",
-    "tests/test_boot_tooling.py"
+    "tests/test_runtime_halt_contract.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -332,5 +344,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-06-21T15:45:50Z"
+  "generated_at": "2026-06-21T16:53:02Z"
 }
