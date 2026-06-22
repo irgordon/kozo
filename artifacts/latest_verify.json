@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260621T235320Z",
+  "run_id": "verify-20260622T002721Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 43,
+    "total_checks": 44,
     "failed_check_count": 0
   },
   "checks": [
@@ -227,6 +227,13 @@
       "detail": "Runtime progression entry contract reserves the future entry marker without changing the halt baseline"
     },
     {
+      "name": "runtime_progression_stages",
+      "subsystem": "runtime_progression_stages",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Runtime progression stages contract centralizes planned runtime stage ordering and transitions"
+    },
+    {
       "name": "boot_blocker_report",
       "subsystem": "boot_blocker_report",
       "status": "pass",
@@ -326,8 +333,8 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
-    "contracts/runtime_evidence_taxonomy.v0.json",
-    "docs/BOOT_BLOCKERS.md",
+    "contracts/runtime_progression_stages.v0.json",
+    "docs/BOOT.md",
     "docs/CODEBASE_AUDIT.md",
     "docs/CONTRACTS.md",
     "docs/PHASEMAP.md",
@@ -337,18 +344,16 @@
     "docs/generated/governance_index.md",
     "harness/codes.py",
     "harness/registry.py",
-    "harness/runtime_evidence_taxonomy.py",
+    "harness/runtime_progression_stages.py",
     "harness/validators.py",
-    "harness/validators_impl/boot_blocker_report.py",
-    "harness/validators_impl/qemu_smoke_evidence.py",
-    "harness/validators_impl/runtime_evidence_taxonomy.py",
+    "harness/validators_impl/runtime_progression_stages.py",
     "harness/validators_impl/schema.py",
     "harness/validators_impl/validator_coverage.py",
     "schemas/agent_context.schema.json",
     "schemas/latest_verify.schema.json",
-    "schemas/runtime_evidence_taxonomy.schema.json",
+    "schemas/runtime_progression_stages.schema.json",
     "tasks/todo.json",
-    "tests/test_runtime_evidence_taxonomy.py"
+    "tests/test_runtime_progression_stages.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -365,5 +370,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-06-21T23:53:20Z"
+  "generated_at": "2026-06-22T00:27:21Z"
 }
