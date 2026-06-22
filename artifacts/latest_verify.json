@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260622T002721Z",
+  "run_id": "verify-20260622T004434Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 44,
+    "total_checks": 45,
     "failed_check_count": 0
   },
   "checks": [
@@ -234,6 +234,13 @@
       "detail": "Runtime progression stages contract centralizes planned runtime stage ordering and transitions"
     },
     {
+      "name": "stack_initialization_evidence_contract",
+      "subsystem": "stack_initialization_evidence_contract",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Stack initialization evidence contract reserves the future stack proof boundary without implementing stack setup"
+    },
+    {
       "name": "boot_blocker_report",
       "subsystem": "boot_blocker_report",
       "status": "pass",
@@ -333,7 +340,10 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
+    "contracts/runtime_progression_contract.v0.json",
+    "contracts/runtime_progression_entry_contract.v0.json",
     "contracts/runtime_progression_stages.v0.json",
+    "contracts/stack_initialization_evidence_contract.v0.json",
     "docs/BOOT.md",
     "docs/CODEBASE_AUDIT.md",
     "docs/CONTRACTS.md",
@@ -344,16 +354,22 @@
     "docs/generated/governance_index.md",
     "harness/codes.py",
     "harness/registry.py",
-    "harness/runtime_progression_stages.py",
+    "harness/stack_initialization_evidence_contract.py",
     "harness/validators.py",
+    "harness/validators_impl/runtime_progression_contract.py",
+    "harness/validators_impl/runtime_progression_entry_contract.py",
     "harness/validators_impl/runtime_progression_stages.py",
     "harness/validators_impl/schema.py",
+    "harness/validators_impl/stack_initialization_evidence_contract.py",
     "harness/validators_impl/validator_coverage.py",
     "schemas/agent_context.schema.json",
     "schemas/latest_verify.schema.json",
-    "schemas/runtime_progression_stages.schema.json",
+    "schemas/stack_initialization_evidence_contract.schema.json",
     "tasks/todo.json",
-    "tests/test_runtime_progression_stages.py"
+    "tests/test_runtime_progression_contract.py",
+    "tests/test_runtime_progression_entry_contract.py",
+    "tests/test_runtime_progression_stages.py",
+    "tests/test_stack_initialization_evidence_contract.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -370,5 +386,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-06-22T00:27:21Z"
+  "generated_at": "2026-06-22T00:44:34Z"
 }
