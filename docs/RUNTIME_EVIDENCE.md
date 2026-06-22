@@ -60,6 +60,8 @@ v0.6.0 adds the governed post-smoke runtime halt baseline. The runtime halt cont
 
 v0.6.5 adds `contracts/runtime_evidence_taxonomy.v0.json` as the governed source for QEMU serial smoke marker names, marker order, smoke outcome names, blocker categories, pass condition, blocked condition, and taxonomy-level non-goals. The generated smoke metadata remains evidence, not taxonomy authority.
 
+v0.6.6 adds `contracts/runtime_progression_stages.v0.json` as the governed source for future runtime progression stage order, prerequisites, evidence, contracts, validators, allowed next stages, and forbidden shortcuts. It is planning governance only and does not implement stack initialization, memory initialization, runtime progression, userspace execution, compatibility, or production behavior.
+
 Current local boot blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
 
 Current release blocker for QEMU serial smoke evidence: none.
@@ -285,6 +287,33 @@ runtime_progression_entry_contract
 ```
 
 It reserves `KOZO_RUNTIME_PROGRESS_ENTRY` as a future runtime progression marker. The marker is planned, not emitted, and must not be treated as runtime evidence until runtime code emits it and QEMU evidence captures it. The contract keeps the halt loop authoritative until stack initialization evidence, memory initialization evidence, runtime initialization evidence, and progression path evidence exist.
+
+The runtime progression stages contract is:
+
+```text
+contracts/runtime_progression_stages.v0.json
+```
+
+The runtime progression stages validator is:
+
+```text
+runtime_progression_stages
+```
+
+It owns the canonical planned progression sequence:
+
+```text
+BOOT_SMOKE
+RUNTIME_PROGRESSION_ENTRY
+STACK_INITIALIZATION_EVIDENCE
+MEMORY_INITIALIZATION_EVIDENCE
+RUNTIME_INITIALIZATION_EVIDENCE
+CONTROLLED_RUNTIME_LOOP
+FIRST_GOVERNED_RUNTIME_CAPABILITY
+USERSPACE_PLANNING
+```
+
+This stage model is not runtime evidence. It keeps future progression work ordered and subordinate to the halt contract until each stage has separately governed evidence.
 
 The selected boot protocol is documented in:
 

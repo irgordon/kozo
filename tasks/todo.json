@@ -2013,6 +2013,46 @@
         "verification.tests_run[44]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 67,
+      "title": "Centralize runtime progression stages",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "contracts/runtime_progression_stages.v0.json",
+        "schemas/runtime_progression_stages.schema.json",
+        "harness/runtime_progression_stages.py",
+        "harness/validators_impl/runtime_progression_stages.py",
+        "tests/test_runtime_progression_stages.py",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/schema.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/latest_verify.schema.json",
+        "schemas/agent_context.schema.json",
+        "docs/BOOT.md",
+        "docs/CONTRACTS.md",
+        "docs/VALIDATION.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/CODEBASE_AUDIT.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/generated/governance_index.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[45]",
+        "verification.tests_run[46]",
+        "verification.tests_run[47]",
+        "verification.tests_run[48]",
+        "verification.tests_run[49]",
+        "verification.tests_run[50]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -2296,6 +2336,36 @@
         "status": "passed",
         "tool": "git diff --check",
         "command": "git diff --check"
+      },
+      {
+        "tool": "python3 -m unittest tests/test_runtime_progression_stages.py",
+        "command": "python3 -m unittest tests/test_runtime_progression_stages.py",
+        "status": "passed"
+      },
+      {
+        "tool": "python3 -m unittest tests/test_validator_coverage.py",
+        "command": "python3 -m unittest tests/test_validator_coverage.py",
+        "status": "passed"
+      },
+      {
+        "tool": "python3 -m unittest discover -s tests",
+        "command": "python3 -m unittest discover -s tests",
+        "status": "passed"
+      },
+      {
+        "tool": "python3 -m json.tool tasks/todo.json",
+        "command": "python3 -m json.tool tasks/todo.json",
+        "status": "passed"
+      },
+      {
+        "tool": "git diff --check",
+        "command": "git diff --check",
+        "status": "passed"
+      },
+      {
+        "tool": "scripts/verify.sh",
+        "command": "scripts/verify.sh",
+        "status": "passed"
       }
     ],
     "logs": [
@@ -2311,7 +2381,8 @@
       "The default kernel build path must succeed without broken serial inline assembly",
       "The Rust heartbeat request must cross the assembly bridge through extern syscall_entry rather than a local stub",
       "The verify artifact is only authoritative when the current tree reproduces it via scripts/verify.sh",
-      "runtime evidence taxonomy is authoritative for marker and blocker vocabulary; generated smoke metadata remains evidence and does not define taxonomy authority."
+      "runtime evidence taxonomy is authoritative for marker and blocker vocabulary; generated smoke metadata remains evidence and does not define taxonomy authority.",
+      "Runtime progression stages remain planning governance only; the halt loop remains authoritative until separate progression evidence exists."
     ],
     "expected_behavior": [
       "verify.sh succeeds on a clean tree and prints the generated artifact JSON before VERIFY: PASS",
@@ -2368,7 +2439,8 @@
       "runtime_progression_contract defines future halt-to-runtime transition governance without changing runtime behavior or weakening the runtime halt contract.",
       "runtime_progression_entry_contract reserves KOZO_RUNTIME_PROGRESS_ENTRY as future work without changing runtime behavior or overriding the runtime halt contract.",
       "v0.6.4 removes only proven-unused structural debris and documents deferred cleanup without changing runtime, ABI, syscall, linker, marker, halt, or progression contract behavior.",
-      "v0.6.5 centralizes QEMU serial smoke marker order, expected marker, outcomes, and blocker vocabulary in a governed runtime evidence taxonomy contract without changing runtime behavior or smoke pass criteria."
+      "v0.6.5 centralizes QEMU serial smoke marker order, expected marker, outcomes, and blocker vocabulary in a governed runtime evidence taxonomy contract without changing runtime behavior or smoke pass criteria.",
+      "v0.6.6 centralizes future runtime progression stage definitions without changing runtime behavior, halt behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke behavior, compatibility claims, or production-readiness claims."
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -2441,7 +2513,8 @@
       "runtime_progression_contract validates prerequisites, halt contract reference, transition requirements, forbidden shortcuts, future milestones, evidence requirements, and non-goals.",
       "runtime_progression_entry_contract validates current halt/progression references, progression marker reservation, prerequisites, evidence requirements, transition requirements, forbidden shortcuts, ownership, future stages, and non-goals.",
       "v0.6.4 removes two zero-byte unreferenced generator stubs, documents oversized/dead/stale/shim findings, and preserves validator outcomes through compileall, unit discovery, and full verification.",
-      "v0.6.5 adds runtime_evidence_taxonomy contract, schema, loader, validator, and focused tests; QEMU smoke and boot blocker validators consume taxonomy helpers while marker strings, marker order, and pass criteria remain unchanged."
+      "v0.6.5 adds runtime_evidence_taxonomy contract, schema, loader, validator, and focused tests; QEMU smoke and boot blocker validators consume taxonomy helpers while marker strings, marker order, and pass criteria remain unchanged.",
+      "Added runtime_progression_stages contract, schema, loader, validator, focused tests, registry/schema wiring, planning/evidence documentation, audit alignment, changelog entry, and refreshed generated governance/proof state."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },

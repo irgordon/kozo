@@ -93,8 +93,8 @@ Detailed evidence rules are owned by `docs/RELEASE_EVIDENCE.md`.
 
 The current local generated evidence proves:
 
-* `scripts/verify.sh` passes locally with 42 checks and 0 failures.
-* Unit discovery passes locally with 487 tests.
+* `scripts/verify.sh` passes locally with 44 checks and 0 failures.
+* Unit discovery passes locally with 511 tests.
 * The kernel ELF uses higher-half PT_LOAD virtual addresses.
 * Local kernel ELF loadability reports no lower-half PHDR blocker.
 * The repository source emits `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, and `KOZO_BOOT_SMOKE_OK` from the assembly entry path.
@@ -106,6 +106,7 @@ The current local generated evidence proves:
 * `contracts/runtime_progression_contract.v0.json` governs future halt-to-runtime transition prerequisites and forbids deleting, replacing, bypassing, or jumping around the halt loop without separate progression evidence.
 * `contracts/runtime_progression_entry_contract.v0.json` reserves the future `KOZO_RUNTIME_PROGRESS_ENTRY` marker without emitting it or changing runtime behavior.
 * `contracts/runtime_evidence_taxonomy.v0.json` governs QEMU serial smoke marker order, smoke outcomes, blocker categories, pass condition, blocked condition, and taxonomy non-goals.
+* `contracts/runtime_progression_stages.v0.json` governs the future runtime progression stage model from `BOOT_SMOKE` through `USERSPACE_PLANNING`.
 * Local QEMU smoke evidence remains blocked by `missing_iso_generation_tooling` because the local environment does not provide the CI Limine/xorriso tooling path.
 
 ## Current Active Blocker
@@ -164,6 +165,7 @@ The next runtime phase should not expand claims automatically. It should plan st
 | `v0.6.3` | Runtime Progression Entry Design | Reserve the first future runtime progression marker and define readiness requirements without changing runtime behavior. | `contracts/runtime_progression_entry_contract.v0.json`, runtime progression entry schema/loader/validator/tests, runtime/release/contract docs. | `KOZO_RUNTIME_PROGRESS_ENTRY` is documented as reserved and not emitted; the halt loop remains authoritative until stack, memory, runtime, and progression-path evidence exists. |
 | `v0.6.4` | Code Structure Remediation | Reduce structural debt mechanically before runtime progression behavior work. | `docs/CODEBASE_AUDIT.md` v0.6.4 section, removal of proven-unused zero-byte generator stubs, updated planning/changelog/task state. | No source file exceeds 1200 LOC, dead-code cleanup is proven by reference scans and validation, deferred cleanup is documented, and no runtime, ABI, syscall, linker, marker, compatibility, or production-readiness behavior changes. |
 | `v0.6.5` | Runtime Evidence Taxonomy Centralization | Centralize QEMU serial smoke marker and blocker vocabulary before more runtime evidence changes. | `contracts/runtime_evidence_taxonomy.v0.json`, runtime evidence taxonomy schema/loader/validator/tests, migrated QEMU smoke and boot blocker validators, updated evidence/contract/audit docs. | Marker strings, marker order, QEMU smoke pass criteria, runtime behavior, ABI, syscall, linker, halt, and progression contracts remain unchanged while validators consume the governed taxonomy. |
+| `v0.6.6` | Runtime Progression Stages Contract | Centralize future runtime progression stage definitions before stack, memory, runtime, or capability evidence work. | `contracts/runtime_progression_stages.v0.json`, runtime progression stages schema/loader/validator/tests, planning/evidence/contract docs. | Stage ordering, prerequisites, evidence, ownership, allowed transitions, forbidden shortcuts, and non-goals are governed without changing runtime behavior, halt behavior, ABI, syscall behavior, QEMU smoke, compatibility, or production-readiness claims. |
 | `v0.6.0-rc.1` | Release candidate hardening | Freeze release scope and release gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | Release evidence bundle, completed release checklist, current generated reports, changelog/release notes dry run, all required CI checks green. | Release candidate can be reviewed without adding new scope. |
 | `v1.0.0` | Scoped production release | Release only the proven, scoped KOZO surface. | Final release evidence bundle, final changelog and release notes, passing required gates, explicit non-goals. | v1.0.0 claims only evidence-backed behavior and preserves all compatibility non-goals. |
 

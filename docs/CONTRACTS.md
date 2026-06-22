@@ -76,6 +76,7 @@ Current contract paths include:
 | Runtime halt contract | `contracts/runtime_halt_contract.v0.json` | Post-smoke terminal behavior after `KOZO_BOOT_SMOKE_OK` |
 | Runtime progression contract | `contracts/runtime_progression_contract.v0.json` | Future halt-to-runtime transition governance |
 | Runtime progression entry contract | `contracts/runtime_progression_entry_contract.v0.json` | Future progression entry marker and readiness governance |
+| Runtime progression stages contract | `contracts/runtime_progression_stages.v0.json` | Canonical future runtime progression stage model |
 
 ---
 
@@ -163,7 +164,19 @@ It does not replace the runtime halt contract, implement stack initialization, i
 
 ---
 
-# 15. Generated Reports
+# 15. Runtime Progression Stages Contract Role
+
+`contracts/runtime_progression_stages.v0.json` owns the canonical stage model for future runtime progression.
+
+It defines stage order, stage prerequisites, required evidence, required contracts, required validators, allowed next stages, and forbidden shortcuts from `BOOT_SMOKE` through `USERSPACE_PLANNING`.
+
+Planning documents may describe the stage model, but they do not define it. If planning text conflicts with this contract, this contract wins and the planning document must be corrected.
+
+This contract does not implement runtime progression, replace the halt loop, initialize stack or memory, execute Odin runtime code, enable interrupts, enable userspace execution, or claim compatibility or production readiness.
+
+---
+
+# 16. Generated Reports
 
 Generated reports are summaries.
 
@@ -177,7 +190,7 @@ Generated reports do not own contract truth. If a generated report conflicts wit
 
 ---
 
-# 16. Validators as Proof Mechanisms
+# 17. Validators as Proof Mechanisms
 
 Validators prove that checked-in source, contracts, generated artifacts, and task state agree.
 
@@ -187,7 +200,7 @@ When a validator finds missing source, missing evidence, stale generated reports
 
 ---
 
-# 17. Contract Change Requirements
+# 18. Contract Change Requirements
 
 A contract change requires:
 
@@ -200,7 +213,7 @@ A contract change requires:
 
 ---
 
-# 18. Relationship to Other Governance Documents
+# 19. Relationship to Other Governance Documents
 
 `GOVERNANCE.md` owns document precedence.
 

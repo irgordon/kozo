@@ -669,3 +669,55 @@ The centralization is behavior-preserving:
 * Validator coverage focused tests pass.
 * Full unit discovery passes.
 * Full verification passes.
+
+---
+
+# 20. v0.6.6 Runtime Progression Stage Centralization
+
+Date: 2026-06-21
+
+Status: Completed.
+
+## 20.1 Scope
+
+This remediation addressed progression-state fragmentation risk before stack, memory, runtime, loop, capability, or userspace progression evidence work begins.
+
+It did not change runtime behavior, halt behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke behavior, runtime progression behavior, compatibility claims, or production-readiness claims.
+
+## 20.2 Finding Status
+
+| ID | Status | Rationale |
+| --- | --- | --- |
+| AUDIT-066-001 | Resolved | `contracts/runtime_progression_stages.v0.json` now owns the canonical future runtime progression stage model. Planning docs describe the model instead of defining independent stage authority. |
+
+## 20.3 Remediation Applied
+
+Added:
+
+```text
+contracts/runtime_progression_stages.v0.json
+schemas/runtime_progression_stages.schema.json
+harness/runtime_progression_stages.py
+harness/validators_impl/runtime_progression_stages.py
+tests/test_runtime_progression_stages.py
+```
+
+The validator checks stage order, unique stage identifiers, prerequisites, evidence requirements, required contracts, required validators, allowed transitions, forbidden shortcuts, and non-goals.
+
+## 20.4 Deferred Cleanup
+
+Deferred intentionally:
+
+* `runtime_progression_contract` and `runtime_progression_entry_contract` still contain historical stage summaries for review context.
+* Future stack, memory, runtime, controlled-loop, capability, and userspace planning phases should extend the stage model only through governed contract updates.
+
+These remain deferred because this phase centralizes stage authority without rewriting existing historical planning contracts.
+
+## 20.5 Verification Result
+
+The centralization is behavior-preserving:
+
+* Runtime progression stages focused tests pass.
+* Validator coverage focused tests pass.
+* Full unit discovery passes.
+* Full verification passes.

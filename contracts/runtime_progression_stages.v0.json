@@ -1,0 +1,272 @@
+{
+  "version": 0,
+  "architecture": "x86_64",
+  "current_state": {
+    "path": "boot_smoke_to_halt",
+    "halt_contract": "contracts/runtime_halt_contract.v0.json",
+    "progression_contract": "contracts/runtime_progression_contract.v0.json",
+    "progression_entry_contract": "contracts/runtime_progression_entry_contract.v0.json",
+    "terminal_behavior": "halt_loop"
+  },
+  "stages": [
+    {
+      "stage_id": 0,
+      "stage_name": "BOOT_SMOKE",
+      "description": "QEMU serial smoke evidence reaches the governed boot smoke marker and then remains under the runtime halt contract.",
+      "status": "proven",
+      "required_prerequisites": [
+        "Limine kernel ELF load evidence",
+        "kernel entry handoff evidence",
+        "early serial initialization evidence",
+        "QEMU serial smoke evidence",
+        "runtime halt contract"
+      ],
+      "required_evidence": [
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.summary.txt",
+        "artifacts/runtime/boot_blocker_report.json"
+      ],
+      "required_contracts": [
+        "contracts/runtime_halt_contract.v0.json",
+        "contracts/runtime_evidence_taxonomy.v0.json"
+      ],
+      "required_validators": [
+        "qemu_smoke_evidence",
+        "boot_blocker_report",
+        "runtime_halt_contract",
+        "runtime_evidence_taxonomy"
+      ],
+      "allowed_next_stages": [
+        "RUNTIME_PROGRESSION_ENTRY"
+      ],
+      "forbidden_shortcuts": [
+        "BOOT_SMOKE to FIRST_GOVERNED_RUNTIME_CAPABILITY",
+        "BOOT_SMOKE to USERSPACE_PLANNING"
+      ]
+    },
+    {
+      "stage_id": 1,
+      "stage_name": "RUNTIME_PROGRESSION_ENTRY",
+      "description": "Future runtime code emits the reserved progression entry marker after boot smoke evidence and before halt replacement.",
+      "status": "planned",
+      "required_prerequisites": [
+        "runtime progression entry contract",
+        "runtime halt contract remains authoritative",
+        "progression path evidence plan"
+      ],
+      "required_evidence": [
+        "QEMU evidence for KOZO_RUNTIME_PROGRESS_ENTRY",
+        "release evidence update"
+      ],
+      "required_contracts": [
+        "contracts/runtime_halt_contract.v0.json",
+        "contracts/runtime_progression_contract.v0.json",
+        "contracts/runtime_progression_entry_contract.v0.json"
+      ],
+      "required_validators": [
+        "runtime_progression_contract",
+        "runtime_progression_entry_contract",
+        "qemu_smoke_evidence"
+      ],
+      "allowed_next_stages": [
+        "STACK_INITIALIZATION_EVIDENCE"
+      ],
+      "forbidden_shortcuts": [
+        "RUNTIME_PROGRESSION_ENTRY to MEMORY_INITIALIZATION_EVIDENCE",
+        "RUNTIME_PROGRESSION_ENTRY to FIRST_GOVERNED_RUNTIME_CAPABILITY",
+        "RUNTIME_PROGRESSION_ENTRY to USERSPACE_PLANNING"
+      ]
+    },
+    {
+      "stage_id": 2,
+      "stage_name": "STACK_INITIALIZATION_EVIDENCE",
+      "description": "Future evidence proves a governed stack initialization point before broader runtime execution.",
+      "status": "planned",
+      "required_prerequisites": [
+        "runtime progression entry evidence",
+        "stack initialization contract",
+        "stack initialization validator"
+      ],
+      "required_evidence": [
+        "QEMU evidence for stack initialization marker",
+        "stack initialization metadata"
+      ],
+      "required_contracts": [
+        "future stack initialization contract"
+      ],
+      "required_validators": [
+        "future stack initialization validator"
+      ],
+      "allowed_next_stages": [
+        "MEMORY_INITIALIZATION_EVIDENCE"
+      ],
+      "forbidden_shortcuts": [
+        "STACK_INITIALIZATION_EVIDENCE to RUNTIME_INITIALIZATION_EVIDENCE",
+        "STACK_INITIALIZATION_EVIDENCE to FIRST_GOVERNED_RUNTIME_CAPABILITY",
+        "STACK_INITIALIZATION_EVIDENCE to USERSPACE_PLANNING"
+      ]
+    },
+    {
+      "stage_id": 3,
+      "stage_name": "MEMORY_INITIALIZATION_EVIDENCE",
+      "description": "Future evidence proves the minimal governed memory initialization boundary.",
+      "status": "planned",
+      "required_prerequisites": [
+        "stack initialization evidence",
+        "memory initialization contract",
+        "memory initialization validator"
+      ],
+      "required_evidence": [
+        "QEMU evidence for memory initialization marker",
+        "memory initialization metadata"
+      ],
+      "required_contracts": [
+        "future memory initialization contract"
+      ],
+      "required_validators": [
+        "future memory initialization validator"
+      ],
+      "allowed_next_stages": [
+        "RUNTIME_INITIALIZATION_EVIDENCE"
+      ],
+      "forbidden_shortcuts": [
+        "MEMORY_INITIALIZATION_EVIDENCE to FIRST_GOVERNED_RUNTIME_CAPABILITY",
+        "MEMORY_INITIALIZATION_EVIDENCE to USERSPACE_PLANNING"
+      ]
+    },
+    {
+      "stage_id": 4,
+      "stage_name": "RUNTIME_INITIALIZATION_EVIDENCE",
+      "description": "Future evidence proves the minimal governed runtime initialization boundary.",
+      "status": "planned",
+      "required_prerequisites": [
+        "memory initialization evidence",
+        "runtime initialization contract",
+        "runtime initialization validator"
+      ],
+      "required_evidence": [
+        "QEMU evidence for runtime initialization marker",
+        "runtime initialization metadata"
+      ],
+      "required_contracts": [
+        "future runtime initialization contract"
+      ],
+      "required_validators": [
+        "future runtime initialization validator"
+      ],
+      "allowed_next_stages": [
+        "CONTROLLED_RUNTIME_LOOP"
+      ],
+      "forbidden_shortcuts": [
+        "RUNTIME_INITIALIZATION_EVIDENCE to USERSPACE_PLANNING"
+      ]
+    },
+    {
+      "stage_id": 5,
+      "stage_name": "CONTROLLED_RUNTIME_LOOP",
+      "description": "Future evidence proves a bounded runtime loop that replaces the halt baseline only after prerequisites are proven.",
+      "status": "planned",
+      "required_prerequisites": [
+        "runtime initialization evidence",
+        "controlled runtime loop contract",
+        "halt replacement evidence"
+      ],
+      "required_evidence": [
+        "QEMU evidence for controlled runtime loop",
+        "release evidence update"
+      ],
+      "required_contracts": [
+        "future controlled runtime loop contract"
+      ],
+      "required_validators": [
+        "future controlled runtime loop validator"
+      ],
+      "allowed_next_stages": [
+        "FIRST_GOVERNED_RUNTIME_CAPABILITY"
+      ],
+      "forbidden_shortcuts": [
+        "CONTROLLED_RUNTIME_LOOP to USERSPACE_PLANNING"
+      ]
+    },
+    {
+      "stage_id": 6,
+      "stage_name": "FIRST_GOVERNED_RUNTIME_CAPABILITY",
+      "description": "Future evidence proves the first narrow runtime capability after controlled runtime progression.",
+      "status": "planned",
+      "required_prerequisites": [
+        "controlled runtime loop evidence",
+        "first runtime capability contract",
+        "first runtime capability validator"
+      ],
+      "required_evidence": [
+        "QEMU evidence for first governed runtime capability",
+        "release evidence update"
+      ],
+      "required_contracts": [
+        "future first governed runtime capability contract"
+      ],
+      "required_validators": [
+        "future first governed runtime capability validator"
+      ],
+      "allowed_next_stages": [
+        "USERSPACE_PLANNING"
+      ],
+      "forbidden_shortcuts": [
+        "FIRST_GOVERNED_RUNTIME_CAPABILITY to userspace implementation"
+      ]
+    },
+    {
+      "stage_id": 7,
+      "stage_name": "USERSPACE_PLANNING",
+      "description": "Future planning stage for userspace boundaries after governed runtime capability evidence exists.",
+      "status": "planned",
+      "required_prerequisites": [
+        "first governed runtime capability evidence",
+        "userspace planning contract"
+      ],
+      "required_evidence": [
+        "userspace planning evidence"
+      ],
+      "required_contracts": [
+        "future userspace planning contract"
+      ],
+      "required_validators": [
+        "future userspace planning validator"
+      ],
+      "allowed_next_stages": [],
+      "forbidden_shortcuts": [
+        "USERSPACE_PLANNING to userspace execution without separate implementation evidence"
+      ]
+    }
+  ],
+  "transition_requirements": [
+    "runtime_halt_contract remains authoritative until runtime progression evidence exists",
+    "stages must advance in declared order unless a later contract explicitly supersedes this stage model",
+    "halt replacement requires contract-backed progression evidence",
+    "planning stages do not constitute runtime evidence"
+  ],
+  "forbidden_global_shortcuts": [
+    "delete halt loop without progression evidence",
+    "replace halt loop without progression evidence",
+    "bypass halt loop without progression evidence",
+    "jump around halt loop without progression evidence",
+    "claim userspace execution from planning evidence",
+    "claim production readiness from planning evidence"
+  ],
+  "non_goals": [
+    "runtime progression execution",
+    "halt loop replacement",
+    "stack initialization",
+    "memory initialization",
+    "Odin runtime execution",
+    "interrupt handling",
+    "scheduler behavior",
+    "userspace execution",
+    "process model behavior",
+    "VFS behavior",
+    "device driver behavior",
+    "Linux compatibility",
+    "POSIX compatibility",
+    "production readiness"
+  ]
+}

@@ -102,6 +102,8 @@ Current v0.6.2 runtime progression planning: `contracts/runtime_progression_cont
 
 Current v0.6.3 runtime progression entry design: `contracts/runtime_progression_entry_contract.v0.json` reserves the future `KOZO_RUNTIME_PROGRESS_ENTRY` marker and defines where progression evidence begins. The marker is not emitted, runtime progression is not implemented, and the halt loop remains authoritative until the required stack, memory, runtime, and progression-path evidence exists.
 
+Current v0.6.6 runtime progression stage governance: `contracts/runtime_progression_stages.v0.json` is the authoritative model for the planned progression from `BOOT_SMOKE` to `USERSPACE_PLANNING`. It defines stage ordering, prerequisites, evidence, transition rules, and forbidden shortcuts. It does not implement runtime progression or replace the halt behavior.
+
 Selected boot protocol: Limine.
 
 The current repository has a 64-bit `_start` symbol, an exported `kernel_entry`, early serial initialization, early KOZO marker strings, and runtime-adjacent object/symbol smoke evidence.

@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.6.6 - 2026-06-21
+
+**Status:** Runtime progression stages contract.
+
+### Added
+
+* Added `contracts/runtime_progression_stages.v0.json` and `schemas/runtime_progression_stages.schema.json` as the canonical future runtime progression stage model.
+* Added `harness/runtime_progression_stages.py` and `runtime_progression_stages` validation with focused negative tests.
+
+### Changed
+
+* Updated planning, runtime evidence, boot, contract, validation, audit, changelog, and task-state records to reference the stage contract as authoritative.
+
+### Notes
+
+* This change does not alter runtime behavior, halt behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke behavior, or runtime progression behavior.
+* This change does not add stack initialization, memory initialization, Odin runtime execution, interrupt handling, scheduler behavior, userspace execution, process model behavior, VFS behavior, device driver behavior, compatibility claims, or production-readiness claims.
+
 ## v0.6.5 - 2026-06-21
 
 **Status:** Runtime evidence taxonomy centralization.

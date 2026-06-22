@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KOZO runtime progression stages contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "current_state",
+    "stages",
+    "transition_requirements",
+    "forbidden_global_shortcuts",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {
+      "const": 0
+    },
+    "architecture": {
+      "type": "string",
+      "pattern": ".*\\S.*"
+    },
+    "current_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "halt_contract",
+        "progression_contract",
+        "progression_entry_contract",
+        "terminal_behavior"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "halt_contract": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "progression_contract": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "progression_entry_contract": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "terminal_behavior": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        }
+      }
+    },
+    "stages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stage_id",
+          "stage_name",
+          "description",
+          "status",
+          "required_prerequisites",
+          "required_evidence",
+          "required_contracts",
+          "required_validators",
+          "allowed_next_stages",
+          "forbidden_shortcuts"
+        ],
+        "properties": {
+          "stage_id": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "stage_name": {
+            "type": "string",
+            "pattern": ".*\\S.*"
+          },
+          "description": {
+            "type": "string",
+            "pattern": ".*\\S.*"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "proven",
+              "planned"
+            ]
+          },
+          "required_prerequisites": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            }
+          },
+          "required_evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            }
+          },
+          "required_contracts": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            }
+          },
+          "required_validators": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            }
+          },
+          "allowed_next_stages": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            }
+          },
+          "forbidden_shortcuts": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": ".*\\S.*"
+            }
+          }
+        }
+      }
+    },
+    "transition_requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    },
+    "forbidden_global_shortcuts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    },
+    "non_goals": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    }
+  }
+}

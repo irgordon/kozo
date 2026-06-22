@@ -96,6 +96,7 @@ The current repository proves:
 * governed post-smoke terminal behavior through `contracts/runtime_halt_contract.v0.json`
 * governed future halt-to-runtime transition planning through `contracts/runtime_progression_contract.v0.json`
 * governed future progression entry marker reservation through `contracts/runtime_progression_entry_contract.v0.json`
+* governed future runtime progression stage ordering through `contracts/runtime_progression_stages.v0.json`
 
 The latest local generated evidence may still report missing local Limine/xorriso tooling, but CI run `27894312430` proves the narrow QEMU serial smoke path.
 
@@ -110,6 +111,7 @@ KOZO still does not prove:
 * memory initialization
 * runtime progression past the governed halt loop
 * `KOZO_RUNTIME_PROGRESS_ENTRY` emission
+* stack, memory, runtime, loop, capability, or userspace progression stages beyond planning
 * syscall dispatch during boot
 * hardware halt instruction semantics
 * interrupt handling

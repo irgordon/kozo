@@ -35,6 +35,7 @@ from harness.validators_impl.runtime_evidence_taxonomy import RuntimeEvidenceTax
 from harness.validators_impl.runtime_halt_contract import RuntimeHaltContractValidator
 from harness.validators_impl.runtime_progression_contract import RuntimeProgressionContractValidator
 from harness.validators_impl.runtime_progression_entry_contract import RuntimeProgressionEntryContractValidator
+from harness.validators_impl.runtime_progression_stages import RuntimeProgressionStagesValidator
 from harness.validators_impl.boot_blocker_report import BootBlockerReportValidator
 from harness.validators_impl.boot_protocol_decision import BootProtocolDecisionValidator
 from harness.validators_impl.boot_image_skeleton import BootImageSkeletonValidator
@@ -80,6 +81,7 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "runtime_halt_contract": RuntimeHaltContractValidator,
     "runtime_progression_contract": RuntimeProgressionContractValidator,
     "runtime_progression_entry_contract": RuntimeProgressionEntryContractValidator,
+    "runtime_progression_stages": RuntimeProgressionStagesValidator,
     "boot_blocker_report": BootBlockerReportValidator,
     "boot_protocol_decision": BootProtocolDecisionValidator,
     "boot_image_skeleton": BootImageSkeletonValidator,
