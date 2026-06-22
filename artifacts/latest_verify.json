@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260622T004434Z",
+  "run_id": "verify-20260622T012553Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 45,
+    "total_checks": 46,
     "failed_check_count": 0
   },
   "checks": [
@@ -70,7 +70,7 @@
       "subsystem": "odin",
       "status": "pass",
       "code": "OK",
-      "detail": "No Odin kernel changes require validation in this bootstrap loop"
+      "detail": "Odin changes are backed by declared odin check evidence"
     },
     {
       "name": "abi",
@@ -238,7 +238,14 @@
       "subsystem": "stack_initialization_evidence_contract",
       "status": "pass",
       "code": "OK",
-      "detail": "Stack initialization evidence contract reserves the future stack proof boundary without implementing stack setup"
+      "detail": "Stack initialization evidence contract governs the controlled boot stack proof boundary"
+    },
+    {
+      "name": "stack_initialization_evidence",
+      "subsystem": "stack_initialization_evidence",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Stack initialization evidence is aligned with the controlled boot stack marker path"
     },
     {
       "name": "boot_blocker_report",
@@ -340,6 +347,10 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
+    "artifacts/runtime/kernel_elf_report.json",
+    "artifacts/runtime/qemu_smoke.metadata.json",
+    "artifacts/runtime/qemu_smoke.summary.txt",
+    "contracts/runtime_evidence_taxonomy.v0.json",
     "contracts/runtime_progression_contract.v0.json",
     "contracts/runtime_progression_entry_contract.v0.json",
     "contracts/runtime_progression_stages.v0.json",
@@ -348,6 +359,9 @@
     "docs/CODEBASE_AUDIT.md",
     "docs/CONTRACTS.md",
     "docs/PHASEMAP.md",
+    "docs/RELEASE_CHECKLIST.md",
+    "docs/RELEASE_EVIDENCE.md",
+    "docs/REQUIRED_CHECKS.md",
     "docs/ROADMAP.md",
     "docs/RUNTIME_EVIDENCE.md",
     "docs/VALIDATION.md",
@@ -356,19 +370,26 @@
     "harness/registry.py",
     "harness/stack_initialization_evidence_contract.py",
     "harness/validators.py",
+    "harness/validators_impl/qemu_smoke_evidence.py",
+    "harness/validators_impl/runtime_evidence_taxonomy.py",
     "harness/validators_impl/runtime_progression_contract.py",
     "harness/validators_impl/runtime_progression_entry_contract.py",
     "harness/validators_impl/runtime_progression_stages.py",
-    "harness/validators_impl/schema.py",
+    "harness/validators_impl/stack_initialization_evidence.py",
     "harness/validators_impl/stack_initialization_evidence_contract.py",
     "harness/validators_impl/validator_coverage.py",
+    "kernel/arch/x86_64/boot.asm",
     "schemas/agent_context.schema.json",
     "schemas/latest_verify.schema.json",
     "schemas/stack_initialization_evidence_contract.schema.json",
+    "scripts/qemu_smoke.sh",
     "tasks/todo.json",
+    "tests/test_qemu_smoke_evidence.py",
+    "tests/test_runtime_evidence_taxonomy.py",
     "tests/test_runtime_progression_contract.py",
     "tests/test_runtime_progression_entry_contract.py",
     "tests/test_runtime_progression_stages.py",
+    "tests/test_stack_initialization_evidence.py",
     "tests/test_stack_initialization_evidence_contract.py"
   ],
   "evidence_files": [
@@ -386,5 +407,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-06-22T00:44:34Z"
+  "generated_at": "2026-06-22T01:25:53Z"
 }
