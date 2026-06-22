@@ -97,17 +97,17 @@ The current local generated evidence proves:
 * Unit discovery passes locally with 511 tests.
 * The kernel ELF uses higher-half PT_LOAD virtual addresses.
 * Local kernel ELF loadability reports no lower-half PHDR blocker.
-* The repository source emits `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, and `KOZO_BOOT_SMOKE_OK` from the assembly entry path.
+* The repository source emits `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, and `KOZO_STACK_INIT_OK` from the assembly entry path.
 * CI run `27894312430` captured the full ordered marker sequence in QEMU serial output.
 * QEMU smoke metadata from that run reports `outcome: pass` and `blocker_category: none`.
 * QEMU serial smoke evidence is proven for the narrow smoke path.
 * The post-smoke path in `kernel/arch/x86_64/boot.asm` is governed by `contracts/runtime_halt_contract.v0.json`.
-* After `KOZO_BOOT_SMOKE_OK`, the assembly path enters a deterministic terminal `cli`/`hlt` loop with structural fallthrough forbidden.
+* After `KOZO_STACK_INIT_OK`, the assembly path enters a deterministic terminal `cli`/`hlt` loop with structural fallthrough forbidden.
 * `contracts/runtime_progression_contract.v0.json` governs future halt-to-runtime transition prerequisites and forbids deleting, replacing, bypassing, or jumping around the halt loop without separate progression evidence.
 * `contracts/runtime_progression_entry_contract.v0.json` reserves the future `KOZO_RUNTIME_PROGRESS_ENTRY` marker without emitting it or changing runtime behavior.
 * `contracts/runtime_evidence_taxonomy.v0.json` governs QEMU serial smoke marker order, smoke outcomes, blocker categories, pass condition, blocked condition, and taxonomy non-goals.
 * `contracts/runtime_progression_stages.v0.json` governs the future runtime progression stage model from `BOOT_SMOKE` through `USERSPACE_PLANNING`.
-* `contracts/stack_initialization_evidence_contract.v0.json` governs future stack initialization evidence requirements and reserves `KOZO_STACK_INIT_OK` without emitting or claiming it.
+* `contracts/stack_initialization_evidence_contract.v0.json` governs controlled stack initialization evidence, and `stack_initialization_evidence` validates the source and marker evidence boundary.
 * Local QEMU smoke evidence remains blocked by `missing_iso_generation_tooling` because the local environment does not provide the CI Limine/xorriso tooling path.
 
 ## Current Active Blocker
@@ -120,7 +120,7 @@ Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr
 
 ## Next Runtime Phase
 
-The next runtime phase should not expand claims automatically. It should plan stack initialization evidence before any runtime progression entry implementation or halt replacement.
+The next runtime phase should not expand claims automatically. It should plan memory initialization evidence before any runtime progression entry implementation or halt replacement.
 
 ---
 
@@ -168,6 +168,7 @@ The next runtime phase should not expand claims automatically. It should plan st
 | `v0.6.5` | Runtime Evidence Taxonomy Centralization | Centralize QEMU serial smoke marker and blocker vocabulary before more runtime evidence changes. | `contracts/runtime_evidence_taxonomy.v0.json`, runtime evidence taxonomy schema/loader/validator/tests, migrated QEMU smoke and boot blocker validators, updated evidence/contract/audit docs. | Marker strings, marker order, QEMU smoke pass criteria, runtime behavior, ABI, syscall, linker, halt, and progression contracts remain unchanged while validators consume the governed taxonomy. |
 | `v0.6.6` | Runtime Progression Stages Contract | Centralize future runtime progression stage definitions before stack, memory, runtime, or capability evidence work. | `contracts/runtime_progression_stages.v0.json`, runtime progression stages schema/loader/validator/tests, planning/evidence/contract docs. | Stage ordering, prerequisites, evidence, ownership, allowed transitions, forbidden shortcuts, and non-goals are governed without changing runtime behavior, halt behavior, ABI, syscall behavior, QEMU smoke, compatibility, or production-readiness claims. |
 | `v0.6.7` | Stack Initialization Evidence Planning | Define the future evidence boundary for stack initialization before runtime progression implementation. | `contracts/stack_initialization_evidence_contract.v0.json`, stack initialization evidence schema/loader/validator/tests, progression contract alignment, planning/evidence/contract docs. | `KOZO_STACK_INIT_OK` is reserved but not emitted, stack setup remains unimplemented, and no runtime behavior, ABI, syscall, linker, QEMU smoke, compatibility, or production-readiness claim changes. |
+| `v0.7.0` | Stack Initialization Evidence | Implement the controlled boot stack proof and extend the governed marker sequence to `KOZO_STACK_INIT_OK`. | Static boot stack setup in `_start`, `stack_initialization_evidence`, runtime evidence taxonomy update, progression contract alignment, runtime/release/contract docs. | Controlled stack establishment and marker emission are proven without memory initialization, Odin runtime execution, halt replacement, userspace, compatibility, or production-readiness claims. |
 | `v0.6.0-rc.1` | Release candidate hardening | Freeze release scope and release gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | Release evidence bundle, completed release checklist, current generated reports, changelog/release notes dry run, all required CI checks green. | Release candidate can be reviewed without adding new scope. |
 | `v1.0.0` | Scoped production release | Release only the proven, scoped KOZO surface. | Final release evidence bundle, final changelog and release notes, passing required gates, explicit non-goals. | v1.0.0 claims only evidence-backed behavior and preserves all compatibility non-goals. |
 

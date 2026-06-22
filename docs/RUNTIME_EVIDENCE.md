@@ -62,7 +62,7 @@ v0.6.5 adds `contracts/runtime_evidence_taxonomy.v0.json` as the governed source
 
 v0.6.6 adds `contracts/runtime_progression_stages.v0.json` as the governed source for future runtime progression stage order, prerequisites, evidence, contracts, validators, allowed next stages, and forbidden shortcuts. It is planning governance only and does not implement stack initialization, memory initialization, runtime progression, userspace execution, compatibility, or production behavior.
 
-v0.6.7 adds `contracts/stack_initialization_evidence_contract.v0.json` as the governed source for future stack initialization proof requirements. It reserves `KOZO_STACK_INIT_OK` for future runtime evidence, but the marker is not emitted and stack initialization is not proven.
+v0.7.0 implements the governed stack initialization evidence path. `_start` sets `rsp` to the static boot stack, performs a minimal stack-use probe, emits `KOZO_STACK_INIT_OK`, and then enters the governed halt loop. This proves controlled stack establishment and stack marker emission only.
 
 Current local boot blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
 
@@ -80,7 +80,7 @@ The v0.4.8 QEMU smoke metadata records Limine entry-point evidence, expected ent
 
 The latest inspected v0.4.8 CI artifact captured `KOZO_EARLY_0_ENTRY`, so kernel entry handoff is proven for that artifact. It did not capture `KOZO_EARLY_2_SERIAL_INIT_OK`, so serial initialization remains unproven until that marker appears in captured QEMU serial output.
 
-The latest inspected v0.5.4 CI artifact captured `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, and `KOZO_BOOT_SMOKE_OK`, so QEMU serial smoke evidence is proven for that artifact.
+The expected v0.7.0 QEMU serial sequence is `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, and `KOZO_STACK_INIT_OK`.
 
 The v0.4.4 ISO path metadata may prove that the configured Limine path is present in packaged ISO contents. It does not prove Limine loaded the ELF, entered the kernel, initialized serial output, or reached `KOZO_BOOT_SMOKE_OK`.
 
@@ -143,11 +143,11 @@ runtime-adjacent-object-symbol-smoke
 
 The smoke path builds freestanding x86_64 Odin kernel objects, assembles the current x86_64 boot and syscall bridge objects, records `nm` and `strings` evidence, and verifies required entry, dispatcher, bridge, and serial marker surfaces.
 
-The QEMU serial smoke target is now proven in CI. It remains a narrow smoke target and does not replace separate evidence for Odin runtime execution, stack setup, memory initialization, syscall dispatch, hardware trap execution, userspace execution, or subsystem behavior.
+The QEMU serial smoke target is now proven in CI, and v0.7.0 extends its expected marker sequence to include stack initialization evidence. It remains a narrow smoke target and does not replace separate evidence for Odin runtime execution, general stack readiness, memory initialization, syscall dispatch, hardware trap execution, userspace execution, or subsystem behavior.
 
 The marker order and blocker vocabulary for QEMU serial smoke are owned by `contracts/runtime_evidence_taxonomy.v0.json` and enforced by `runtime_evidence_taxonomy`, `qemu_smoke_evidence`, and `boot_blocker_report`.
 
-Stack initialization evidence is planned, not proven. `contracts/stack_initialization_evidence_contract.v0.json` defines future proof requirements for `KOZO_STACK_INIT_OK`, controlled stack location, documented ownership, stack pointer validity, and validator evidence.
+Stack initialization evidence is governed by `contracts/stack_initialization_evidence_contract.v0.json` and validated by `stack_initialization_evidence`. It proves only that the assembly boot path selects the controlled static boot stack, performs a bounded stack-use probe, and emits `KOZO_STACK_INIT_OK`.
 
 ---
 
@@ -244,7 +244,7 @@ The boot tooling policy path is:
 docs/BOOT_TOOLING.md
 ```
 
-The QEMU smoke log is passing QEMU serial smoke evidence only when `qemu_smoke_evidence` validates metadata with outcome `pass` and finds the full ordered marker sequence ending in `KOZO_BOOT_SMOKE_OK` in the serial log. Blocked metadata remains blocker evidence only.
+The QEMU smoke log is passing QEMU serial smoke evidence only when `qemu_smoke_evidence` validates metadata with outcome `pass` and finds the full ordered marker sequence ending in `KOZO_STACK_INIT_OK` in the serial log. Blocked metadata remains blocker evidence only.
 
 The QEMU smoke summary is a reviewer convenience artifact. It is generated from the QEMU smoke metadata, serial log, stderr log, and boot blocker report. It is not authoritative and must not replace metadata or log validation.
 

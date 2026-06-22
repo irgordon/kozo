@@ -766,3 +766,48 @@ Deferred intentionally:
 * replacing or bypassing the runtime halt contract
 
 These are deferred because this phase is planning-only and the current runtime path remains boot smoke followed by the governed halt loop.
+
+---
+
+# 22. v0.7.0 Stack Initialization Evidence
+
+Date: 2026-06-21
+
+Status: Completed.
+
+## 22.1 Scope
+
+This runtime evidence phase implemented the controlled boot stack proof defined by `contracts/stack_initialization_evidence_contract.v0.json`.
+
+It changed only the assembly boot evidence path, the governed marker taxonomy, stack evidence validation, planning state, and documentation. It did not add memory initialization, Odin runtime execution, interrupt handling, scheduler behavior, userspace execution, process model behavior, VFS behavior, device driver behavior, compatibility claims, or production-readiness claims.
+
+## 22.2 Finding Status
+
+| ID | Status | Rationale |
+| --- | --- | --- |
+| AUDIT-066-001 | Extended | `STACK_INITIALIZATION_EVIDENCE` now has contract-backed implementation evidence and remains under the canonical runtime progression stage model. |
+
+## 22.3 Remediation Applied
+
+Added or updated:
+
+```text
+kernel/arch/x86_64/boot.asm
+contracts/stack_initialization_evidence_contract.v0.json
+contracts/runtime_evidence_taxonomy.v0.json
+harness/validators_impl/stack_initialization_evidence.py
+tests/test_stack_initialization_evidence.py
+```
+
+The assembly path now loads `rsp` from `boot_stack_top`, performs a bounded push/pop stack-use probe, emits `KOZO_STACK_INIT_OK`, and then enters the existing halt loop.
+
+## 22.4 Deferred Cleanup
+
+Deferred intentionally:
+
+* memory initialization evidence
+* Odin runtime execution evidence
+* runtime progression entry execution
+* halt loop replacement or bypass
+
+These remain deferred because v0.7.0 proves only controlled boot stack establishment and marker emission.

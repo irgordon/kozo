@@ -139,7 +139,7 @@ def _milestone_issue(contract: runtime_progression_contract.RuntimeProgressionCo
     expected = (
         (0, "Boot smoke", "proven"),
         (1, "Runtime progression entry", "planned"),
-        (2, "Stack initialization evidence", "planned"),
+        (2, "Stack initialization evidence", "proven"),
         (3, "Runtime initialization evidence", "planned"),
         (4, "Controlled runtime loop", "planned"),
         (5, "First governed runtime capability", "planned"),

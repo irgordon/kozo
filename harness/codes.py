@@ -45,6 +45,7 @@ RUNTIME_PROGRESSION_CONTRACT_INVALID = "RUNTIME_PROGRESSION_CONTRACT_INVALID"
 RUNTIME_PROGRESSION_ENTRY_CONTRACT_INVALID = "RUNTIME_PROGRESSION_ENTRY_CONTRACT_INVALID"
 RUNTIME_PROGRESSION_STAGES_INVALID = "RUNTIME_PROGRESSION_STAGES_INVALID"
 STACK_INITIALIZATION_EVIDENCE_CONTRACT_INVALID = "STACK_INITIALIZATION_EVIDENCE_CONTRACT_INVALID"
+STACK_INITIALIZATION_EVIDENCE_INVALID = "STACK_INITIALIZATION_EVIDENCE_INVALID"
 BOOT_BLOCKER_REPORT_INVALID = "BOOT_BLOCKER_REPORT_INVALID"
 BOOT_PROTOCOL_DECISION_INVALID = "BOOT_PROTOCOL_DECISION_INVALID"
 BOOT_IMAGE_SKELETON_INVALID = "BOOT_IMAGE_SKELETON_INVALID"
@@ -103,6 +104,7 @@ CODES = MappingProxyType(
         RUNTIME_PROGRESSION_ENTRY_CONTRACT_INVALID: "Runtime progression entry contract is missing, malformed, or inconsistent with future entry governance",
         RUNTIME_PROGRESSION_STAGES_INVALID: "Runtime progression stages contract is missing, malformed, or inconsistent with canonical progression ordering",
         STACK_INITIALIZATION_EVIDENCE_CONTRACT_INVALID: "Stack initialization evidence contract is missing, malformed, or inconsistent with future stack proof governance",
+        STACK_INITIALIZATION_EVIDENCE_INVALID: "Stack initialization evidence is missing, malformed, or inconsistent with the controlled boot stack proof",
         BOOT_BLOCKER_REPORT_INVALID: "Boot blocker report is missing, malformed, or inconsistent with boot baseline policy",
         BOOT_PROTOCOL_DECISION_INVALID: "Boot protocol decision is missing, incomplete, or inconsistent with boot blocker policy",
         BOOT_IMAGE_SKELETON_INVALID: "Boot image skeleton is missing, incomplete, or inconsistent with boot blocker state",

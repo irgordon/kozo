@@ -13,8 +13,13 @@ _EXPECTED_ARCHITECTURE = "x86_64"
 _EXPECTED_RUNTIME_PATH = "boot_smoke_to_halt"
 _EXPECTED_STAGE = "STACK_INITIALIZATION_EVIDENCE"
 _EXPECTED_MARKER = "KOZO_STACK_INIT_OK"
-_EXPECTED_MARKER_STATUS = "reserved"
+_EXPECTED_MARKER_STATUS = "emitted"
 _EXPECTED_FUTURE_VALIDATOR = "stack_initialization_evidence"
+_EXPECTED_SOURCE_FILE = "kernel/arch/x86_64/boot.asm"
+_EXPECTED_STACK_SYMBOL = "boot_stack"
+_EXPECTED_STACK_TOP_SYMBOL = "boot_stack_top"
+_EXPECTED_STACK_SIZE_BYTES = 16384
+_EXPECTED_STACK_POINTER_REGISTER = "rsp"
 _REQUIRED_PREREQUISITES = (
     "QEMU serial smoke evidence",
     "runtime halt contract",
@@ -49,8 +54,8 @@ _REQUIRED_ASSUMPTIONS_NOT_ENABLED = (
     "production readiness",
 )
 _REQUIRED_NON_GOALS = (
-    "stack initialization implementation",
-    "stack allocation",
+    "dynamic stack allocation",
+    "general stack readiness",
     "memory initialization",
     "Odin runtime execution",
     "runtime progression execution",
@@ -85,7 +90,7 @@ class StackInitializationEvidenceContractValidator(BaseValidator):
             return _failure(issue)
         return ValidationResult.pass_(
             code=OK,
-            detail="Stack initialization evidence contract reserves the future stack proof boundary without implementing stack setup",
+            detail="Stack initialization evidence contract governs the controlled boot stack proof boundary",
         )
 
 
@@ -133,9 +138,9 @@ def _current_state_issue(
 
 
 def _implemented_issue(implemented: bool) -> StackEvidenceIssue | None:
-    if implemented is False:
+    if implemented is True:
         return None
-    return _issue("stack_implementation_claimed", "current_state.implemented", "Stack evidence planning must not claim stack setup is implemented")
+    return _issue("stack_implementation_missing", "current_state.implemented", "Stack evidence contract must mark the controlled boot stack proof as implemented")
 
 
 def _contract_reference_issue(contract_path: str, field: str) -> StackEvidenceIssue | None:
@@ -153,13 +158,18 @@ def _stack_marker_issue(
         _expected_value_issue(definition.reserved_marker, _EXPECTED_MARKER, "missing_marker", "stack_definition.reserved_marker"),
         _expected_value_issue(definition.marker_status, _EXPECTED_MARKER_STATUS, "wrong_marker_status", "stack_definition.marker_status"),
         _marker_emission_issue(definition.marker_emitted),
+        _expected_value_issue(definition.source_file, _EXPECTED_SOURCE_FILE, "wrong_source_file", "stack_definition.source_file"),
+        _expected_value_issue(definition.stack_symbol, _EXPECTED_STACK_SYMBOL, "wrong_stack_symbol", "stack_definition.stack_symbol"),
+        _expected_value_issue(definition.stack_top_symbol, _EXPECTED_STACK_TOP_SYMBOL, "wrong_stack_top_symbol", "stack_definition.stack_top_symbol"),
+        _expected_number_issue(definition.stack_size_bytes, _EXPECTED_STACK_SIZE_BYTES, "wrong_stack_size", "stack_definition.stack_size_bytes"),
+        _expected_value_issue(definition.stack_pointer_register, _EXPECTED_STACK_POINTER_REGISTER, "wrong_stack_pointer_register", "stack_definition.stack_pointer_register"),
     )
 
 
 def _marker_emission_issue(emitted: bool) -> StackEvidenceIssue | None:
-    if emitted is False:
+    if emitted is True:
         return None
-    return _issue("marker_claimed", "stack_definition.marker_emitted", "KOZO_STACK_INIT_OK must stay reserved and not emitted in this planning phase")
+    return _issue("marker_not_emitted", "stack_definition.marker_emitted", "KOZO_STACK_INIT_OK must be emitted by the controlled stack evidence path")
 
 
 def _required_value_issue(
@@ -185,6 +195,17 @@ def _expected_value_issue(
     return _issue(reason, contract_field, f"Expected {contract_field} to be {expected}, got {actual}")
 
 
+def _expected_number_issue(
+    actual: int,
+    expected: int,
+    reason: str,
+    contract_field: str,
+) -> StackEvidenceIssue | None:
+    if actual == expected:
+        return None
+    return _issue(reason, contract_field, f"Expected {contract_field} to be {expected}, got {actual}")
+
+
 def _first_issue(*issues: StackEvidenceIssue | None) -> StackEvidenceIssue | None:
     for issue in issues:
         if issue is not None:
@@ -200,7 +221,7 @@ def _failure(issue: StackEvidenceIssue) -> ValidationResult:
     return ValidationResult.fail(
         code=STACK_INITIALIZATION_EVIDENCE_CONTRACT_INVALID,
         detail=issue.detail,
-        action="Keep stack initialization evidence planning separate from stack setup implementation until runtime evidence exists",
+        action="Keep stack initialization evidence contract aligned with the controlled boot stack proof",
         meta={
             "reason": issue.reason,
             "contract_field": issue.contract_field,

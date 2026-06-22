@@ -173,21 +173,19 @@ It defines stage order, stage prerequisites, required evidence, required contrac
 
 Planning documents may describe the stage model, but they do not define it. If planning text conflicts with this contract, this contract wins and the planning document must be corrected.
 
-This contract does not implement runtime progression, replace the halt loop, initialize stack or memory, execute Odin runtime code, enable interrupts, enable userspace execution, or claim compatibility or production readiness.
+This contract does not implement runtime progression, replace the halt loop, initialize memory, execute Odin runtime code, enable interrupts, enable userspace execution, or claim compatibility or production readiness.
 
 ---
 
-# 16. Generated Reports
-
 # 16. Stack Initialization Evidence Contract Role
 
-`contracts/stack_initialization_evidence_contract.v0.json` defines what KOZO must prove before claiming stack initialization.
+`contracts/stack_initialization_evidence_contract.v0.json` defines what KOZO must prove before claiming controlled boot stack initialization evidence.
 
-It reserves `KOZO_STACK_INIT_OK` as future runtime evidence, defines prerequisites, evidence requirements, proof boundaries, assumptions enabled by future stack evidence, assumptions that remain invalid, and non-goals.
+It defines `KOZO_STACK_INIT_OK` as the stack evidence marker, records the controlled static boot stack source fields, defines prerequisites, evidence requirements, proof boundaries, assumptions enabled by stack evidence, assumptions that remain invalid, and non-goals.
 
-The marker is not emitted by current runtime code and must not be treated as evidence until captured from runtime code through a governed evidence path.
+The marker is emitted by current runtime code after `rsp` is loaded from `boot_stack_top` and a minimal stack-use probe runs. It must still be captured from runtime code through a governed evidence path before generated evidence can claim a passing sequence.
 
-This contract does not implement stack setup, allocate memory, execute Odin runtime code, replace the halt loop, enable interrupts, add userspace execution, or claim compatibility or production readiness.
+This contract does not allocate memory dynamically, execute Odin runtime code, replace the halt loop, enable interrupts, add userspace execution, prove general stack readiness, or claim compatibility or production readiness.
 
 ---
 

@@ -37,7 +37,7 @@ _COMMON_FIELDS = {
 _PASS_PROVES = (
     "QEMU launched the KOZO ISO",
     "serial output was captured",
-    "the expected KOZO boot smoke marker was observed",
+    "the expected KOZO stack initialization marker was observed",
 )
 
 _BLOCKED_PROVES = (
@@ -47,6 +47,11 @@ _BLOCKED_PROVES = (
 
 _REQUIRED_NON_GOALS = (
     "hardware trap execution",
+    "interrupt handling",
+    "Odin runtime execution",
+    "general stack readiness",
+    "memory initialization",
+    "syscall dispatch",
     "Linux compatibility",
     "POSIX compatibility",
     "general userspace execution",
@@ -358,6 +363,8 @@ def _expected_blocker_from_logs(metadata: dict[str, object]) -> str | None:
         return "serial_not_initialized"
     if _EARLY_MARKERS[2] in observed and _EARLY_MARKERS[3] not in observed:
         return "marker_not_emitted"
+    if _EARLY_MARKERS[3] in observed and _EARLY_MARKERS[4] not in observed:
+        return "stack_marker_not_emitted"
     if observed and observed[0] != _EARLY_MARKERS[0]:
         return "qemu_timeout"
     return "qemu_timeout"

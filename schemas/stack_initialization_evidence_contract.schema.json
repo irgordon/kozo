@@ -63,7 +63,12 @@
         "description",
         "reserved_marker",
         "marker_status",
-        "marker_emitted"
+        "marker_emitted",
+        "source_file",
+        "stack_symbol",
+        "stack_top_symbol",
+        "stack_size_bytes",
+        "stack_pointer_register"
       ],
       "properties": {
         "description": {
@@ -80,6 +85,26 @@
         },
         "marker_emitted": {
           "type": "boolean"
+        },
+        "source_file": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "stack_symbol": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "stack_top_symbol": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "stack_size_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "stack_pointer_register": {
+          "type": "string",
+          "pattern": ".*\\S.*"
         }
       }
     },

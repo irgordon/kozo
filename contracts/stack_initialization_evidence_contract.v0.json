@@ -6,13 +6,18 @@
     "halt_contract": "contracts/runtime_halt_contract.v0.json",
     "progression_stages_contract": "contracts/runtime_progression_stages.v0.json",
     "stage": "STACK_INITIALIZATION_EVIDENCE",
-    "implemented": false
+    "implemented": true
   },
   "stack_definition": {
     "description": "Stack initialization means runtime code has explicitly selected a controlled stack region, loaded the stack pointer with that region, proven the pointer is usable for stack-dependent control flow, and documented ownership of that region.",
     "reserved_marker": "KOZO_STACK_INIT_OK",
-    "marker_status": "reserved",
-    "marker_emitted": false
+    "marker_status": "emitted",
+    "marker_emitted": true,
+    "source_file": "kernel/arch/x86_64/boot.asm",
+    "stack_symbol": "boot_stack",
+    "stack_top_symbol": "boot_stack_top",
+    "stack_size_bytes": 16384,
+    "stack_pointer_register": "rsp"
   },
   "prerequisites": [
     "QEMU serial smoke evidence",
@@ -57,8 +62,8 @@
     "stack_initialization_evidence"
   ],
   "non_goals": [
-    "stack initialization implementation",
-    "stack allocation",
+    "dynamic stack allocation",
+    "general stack readiness",
     "memory initialization",
     "Odin runtime execution",
     "runtime progression execution",

@@ -15,6 +15,7 @@ _REQUIRED_MARKERS = (
     "KOZO_EARLY_1_SERIAL_INIT_START",
     "KOZO_EARLY_2_SERIAL_INIT_OK",
     "KOZO_BOOT_SMOKE_OK",
+    "KOZO_STACK_INIT_OK",
 )
 _REQUIRED_OUTCOMES = ("pass", "blocked")
 _REQUIRED_BLOCKERS = (
@@ -24,6 +25,7 @@ _REQUIRED_BLOCKERS = (
     "kernel_entry_not_reached",
     "serial_not_initialized",
     "marker_not_emitted",
+    "stack_marker_not_emitted",
     "qemu_timeout",
     "missing_qemu_tooling",
     "missing_boot_image",
@@ -40,7 +42,7 @@ _REQUIRED_NON_GOALS = (
     "hardware trap execution",
     "interrupt handling",
     "Odin runtime execution",
-    "stack setup",
+    "general stack readiness",
     "memory initialization",
     "syscall dispatch",
     "userspace execution",

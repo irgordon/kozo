@@ -126,8 +126,8 @@ Required checklist:
 * QEMU smoke metadata outcome may be `blocked` with `limine_not_reached`, `kernel_not_loaded`, `kernel_entry_not_reached`, `serial_not_initialized`, `marker_not_emitted`, `qemu_timeout`, or `limine_lower_half_phdr` only as a no-boot-claim blocker.
 * QEMU smoke metadata early markers, observed markers, earliest marker, timeout state, and byte counts are reviewed when the QEMU blocker is under direct review.
 * QEMU smoke metadata outcome is `pass` before any QEMU boot claim is made.
-* Passing QEMU smoke metadata includes `KOZO_BOOT_SMOKE_OK` as the expected marker.
-* Passing QEMU smoke serial output includes `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, and `KOZO_BOOT_SMOKE_OK` in order.
+* Passing QEMU smoke metadata includes `KOZO_STACK_INIT_OK` as the expected marker.
+* Passing QEMU smoke serial output includes `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, and `KOZO_STACK_INIT_OK` in order.
 * QEMU serial smoke evidence is promoted only from a green CI run with passing metadata and the full ordered marker sequence.
 * Passing QEMU serial smoke evidence is reviewed as a narrow smoke claim, not as hardware trap, userspace, subsystem, compatibility, or production-readiness evidence.
 * Release is blocked if runtime evidence is overclaimed or missing required non-goals.

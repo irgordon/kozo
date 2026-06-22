@@ -61,7 +61,7 @@
     {
       "stage": 2,
       "name": "Stack initialization evidence",
-      "status": "planned"
+      "status": "proven"
     },
     {
       "stage": 3,
@@ -86,7 +86,7 @@
   ],
   "non_goals": [
     "runtime progression execution",
-    "stack initialization",
+    "general stack readiness",
     "memory initialization",
     "Odin runtime execution",
     "userspace execution",

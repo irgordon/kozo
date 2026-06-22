@@ -38,7 +38,7 @@ _REQUIRED_FORBIDDEN_SHORTCUTS = (
 _REQUIRED_NON_GOALS = (
     "runtime progression execution",
     "halt loop replacement",
-    "stack initialization",
+    "general stack readiness",
     "memory initialization",
     "Odin runtime execution",
     "interrupt handling",

@@ -173,22 +173,25 @@ For v0.4.8 and later, QEMU smoke metadata must record Limine entry-point observa
 
 For v0.4.9 and later, `serial_not_initialized` remains valid only when `KOZO_EARLY_2_SERIAL_INIT_OK` is absent from captured QEMU serial output. If `KOZO_EARLY_2_SERIAL_INIT_OK` appears without `KOZO_BOOT_SMOKE_OK`, the expected blocker is `marker_not_emitted`; if `KOZO_BOOT_SMOKE_OK` appears, QEMU smoke evidence must pass.
 
-For v0.5.0 and later, passing QEMU smoke evidence requires the full ordered marker sequence in captured QEMU serial output:
+For v0.7.0 and later, passing QEMU smoke evidence requires the full ordered marker sequence in captured QEMU serial output:
 
 ```text
 KOZO_EARLY_0_ENTRY
 KOZO_EARLY_1_SERIAL_INIT_START
 KOZO_EARLY_2_SERIAL_INIT_OK
 KOZO_BOOT_SMOKE_OK
+KOZO_STACK_INIT_OK
 ```
 
-Passing QEMU serial smoke evidence proves only that QEMU launched the KOZO ISO, Limine loaded the KOZO kernel ELF, serial output was captured, and the expected marker sequence was observed. It does not prove hardware trap execution, Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, ELF loading, file descriptor behavior, production readiness, Odin runtime execution, stack setup, memory initialization, or syscall dispatch.
+Passing QEMU serial smoke evidence proves only that QEMU launched the KOZO ISO, Limine loaded the KOZO kernel ELF, serial output was captured, the expected marker sequence was observed, and the controlled stack marker was emitted. It does not prove hardware trap execution, Linux compatibility, POSIX compatibility, userspace execution, process model behavior, VFS behavior, scheduler maturity, ELF loading, file descriptor behavior, production readiness, Odin runtime execution, general stack readiness, memory initialization, or syscall dispatch.
 
 For v0.6.0 and later, release review must include `contracts/runtime_halt_contract.v0.json` when post-smoke terminal behavior is under review. The `runtime_halt_contract` validator proves the source-level assembly path emits `KOZO_BOOT_SMOKE_OK` before entering the governed terminal halt loop. It does not prove hardware halt instruction execution, interrupt handling, scheduler behavior, userspace execution, process model behavior, VFS behavior, file descriptor behavior, compatibility, or production readiness.
 
 For v0.6.2 and later, release review must include `contracts/runtime_progression_contract.v0.json` when future runtime progression is under review. The `runtime_progression_contract` validator proves only that the halt-to-runtime transition prerequisites and forbidden shortcuts are governed. It does not prove runtime progression, Odin runtime execution, stack setup, memory initialization, interrupt handling, syscall dispatch during boot, userspace execution, compatibility, or production readiness.
 
 For v0.6.3 and later, release review must include `contracts/runtime_progression_entry_contract.v0.json` when future runtime progression entry is under review. The `runtime_progression_entry_contract` validator proves only that `KOZO_RUNTIME_PROGRESS_ENTRY` is reserved and that transition prerequisites are governed. It does not prove the marker is emitted, runtime progression exists, stack initialization exists, memory initialization exists, Odin runtime execution exists, or compatibility or production readiness exists.
+
+For v0.7.0 and later, release review must include `contracts/stack_initialization_evidence_contract.v0.json`, `stack_initialization_evidence`, and the QEMU smoke metadata/logs when stack initialization evidence is under review. This proves only controlled static boot stack setup, a minimal stack-use probe, and `KOZO_STACK_INIT_OK` emission before the governed halt loop.
 
 The current packaging metadata records the missing ISO generation tooling blocker:
 

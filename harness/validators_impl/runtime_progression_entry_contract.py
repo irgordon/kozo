@@ -51,7 +51,7 @@ _REQUIRED_OWNERSHIP = (
 )
 _REQUIRED_NON_GOALS = (
     "runtime progression execution",
-    "stack initialization",
+    "general stack readiness",
     "memory initialization",
     "Odin runtime execution",
     "userspace execution",
@@ -179,7 +179,7 @@ def _stage_issue(
     expected = (
         (0, "Boot smoke", "proven"),
         (1, "Runtime progression entry", "planned"),
-        (2, "Stack initialization evidence", "planned"),
+        (2, "Stack initialization evidence", "proven"),
         (3, "Memory initialization evidence", "planned"),
         (4, "Runtime initialization evidence", "planned"),
         (5, "Controlled runtime loop", "planned"),

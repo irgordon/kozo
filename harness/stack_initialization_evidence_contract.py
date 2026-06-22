@@ -26,6 +26,11 @@ class StackDefinition:
     reserved_marker: str
     marker_status: str
     marker_emitted: bool
+    source_file: str
+    stack_symbol: str
+    stack_top_symbol: str
+    stack_size_bytes: int
+    stack_pointer_register: str
 
 
 @dataclass(frozen=True)
@@ -98,4 +103,9 @@ def _stack_definition(data: dict[str, Any]) -> StackDefinition:
         definition["reserved_marker"],
         definition["marker_status"],
         definition["marker_emitted"],
+        definition["source_file"],
+        definition["stack_symbol"],
+        definition["stack_top_symbol"],
+        definition["stack_size_bytes"],
+        definition["stack_pointer_register"],
     )

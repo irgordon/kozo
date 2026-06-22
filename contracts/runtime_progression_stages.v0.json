@@ -80,8 +80,8 @@
     {
       "stage_id": 2,
       "stage_name": "STACK_INITIALIZATION_EVIDENCE",
-      "description": "Future evidence proves a governed stack initialization point before broader runtime execution.",
-      "status": "planned",
+      "description": "Evidence proves a governed stack initialization point before broader runtime execution.",
+      "status": "proven",
       "required_prerequisites": [
         "runtime progression entry evidence",
         "stack initialization evidence contract",
@@ -95,7 +95,8 @@
         "contracts/stack_initialization_evidence_contract.v0.json"
       ],
       "required_validators": [
-        "stack_initialization_evidence_contract"
+        "stack_initialization_evidence_contract",
+        "stack_initialization_evidence"
       ],
       "allowed_next_stages": [
         "MEMORY_INITIALIZATION_EVIDENCE"
@@ -256,7 +257,7 @@
   "non_goals": [
     "runtime progression execution",
     "halt loop replacement",
-    "stack initialization",
+    "general stack readiness",
     "memory initialization",
     "Odin runtime execution",
     "interrupt handling",

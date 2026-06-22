@@ -255,7 +255,7 @@ def valid_contract() -> dict[str, object]:
         "non_goals": [
             "runtime progression execution",
             "halt loop replacement",
-            "stack initialization",
+            "general stack readiness",
             "memory initialization",
             "Odin runtime execution",
             "interrupt handling",
@@ -307,7 +307,7 @@ def valid_stages() -> list[dict[str, object]]:
             "stage_id": index,
             "stage_name": name,
             "description": f"{name} stage",
-            "status": "proven" if index == 0 else "planned",
+            "status": "proven" if index in (0, 2) else "planned",
             "required_prerequisites": [prerequisites[name]],
             "required_evidence": [evidence[name]],
             "required_contracts": [f"{name} contract"],

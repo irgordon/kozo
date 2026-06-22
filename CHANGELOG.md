@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.7.0 - 2026-06-21
+
+**Status:** Stack initialization evidence.
+
+### Added
+
+* Implemented a controlled static boot stack in the assembly entry path and set `rsp` before stack evidence emission.
+* Emitted `KOZO_STACK_INIT_OK` from runtime code after the existing QEMU serial smoke marker sequence.
+* Added `stack_initialization_evidence` validation with focused negative tests.
+
+### Changed
+
+* Extended the governed runtime evidence taxonomy so the complete QEMU smoke sequence now ends with `KOZO_STACK_INIT_OK`.
+* Updated runtime progression contracts so `STACK_INITIALIZATION_EVIDENCE` is proven while later memory, runtime, scheduler, userspace, and capability stages remain planned.
+
+### Notes
+
+* This change does not alter ABI contracts, syscall behavior, linker layout, QEMU invocation behavior, or runtime halt behavior.
+* This change does not add memory initialization, Odin runtime execution, interrupt handling, scheduler behavior, userspace execution, process model behavior, VFS behavior, device driver behavior, compatibility claims, or production-readiness claims.
+
 ## v0.6.7 - 2026-06-21
 
 **Status:** Stack initialization evidence planning.

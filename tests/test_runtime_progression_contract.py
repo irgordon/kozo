@@ -215,7 +215,7 @@ def valid_contract() -> dict[str, object]:
         "future_runtime_milestones": [
             {"stage": 0, "name": "Boot smoke", "status": "proven"},
             {"stage": 1, "name": "Runtime progression entry", "status": "planned"},
-            {"stage": 2, "name": "Stack initialization evidence", "status": "planned"},
+            {"stage": 2, "name": "Stack initialization evidence", "status": "proven"},
             {"stage": 3, "name": "Runtime initialization evidence", "status": "planned"},
             {"stage": 4, "name": "Controlled runtime loop", "status": "planned"},
             {"stage": 5, "name": "First governed runtime capability", "status": "planned"},

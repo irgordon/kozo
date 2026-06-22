@@ -79,6 +79,10 @@ boot_smoke_marker:
     db "KOZO_BOOT_SMOKE_OK", 13, 10
 boot_smoke_marker_end:
 
+stack_init_marker:
+    db "KOZO_STACK_INIT_OK", 13, 10
+stack_init_marker_end:
+
 section .text
 
 _start:
@@ -88,6 +92,11 @@ _start:
     INIT_COM1
     WRITE_COM1_MARKER early_serial_init_ok_marker, early_serial_init_ok_marker_end
     WRITE_COM1_MARKER boot_smoke_marker, boot_smoke_marker_end
+    lea rsp, [rel boot_stack_top]
+    mov rax, 0x4b4f5a4f5354414b
+    push rax
+    pop rax
+    WRITE_COM1_MARKER stack_init_marker, stack_init_marker_end
     cli
 
 .halt:

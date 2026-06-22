@@ -2063,8 +2063,20 @@
         "contracts/stack_initialization_evidence_contract.v0.json",
         "schemas/stack_initialization_evidence_contract.schema.json",
         "harness/stack_initialization_evidence_contract.py",
+        "harness/validators_impl/stack_initialization_evidence.py",
         "harness/validators_impl/stack_initialization_evidence_contract.py",
+        "tests/test_stack_initialization_evidence.py",
         "tests/test_stack_initialization_evidence_contract.py",
+        "kernel/arch/x86_64/boot.asm",
+        "contracts/runtime_evidence_taxonomy.v0.json",
+        "scripts/qemu_smoke.sh",
+        "harness/validators_impl/qemu_smoke_evidence.py",
+        "harness/validators_impl/runtime_evidence_taxonomy.py",
+        "tests/test_qemu_smoke_evidence.py",
+        "tests/test_runtime_evidence_taxonomy.py",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/REQUIRED_CHECKS.md",
         "contracts/runtime_progression_stages.v0.json",
         "contracts/runtime_progression_contract.v0.json",
         "contracts/runtime_progression_entry_contract.v0.json",
@@ -2591,7 +2603,8 @@
       "v0.6.4 removes two zero-byte unreferenced generator stubs, documents oversized/dead/stale/shim findings, and preserves validator outcomes through compileall, unit discovery, and full verification.",
       "v0.6.5 adds runtime_evidence_taxonomy contract, schema, loader, validator, and focused tests; QEMU smoke and boot blocker validators consume taxonomy helpers while marker strings, marker order, and pass criteria remain unchanged.",
       "Added runtime_progression_stages contract, schema, loader, validator, focused tests, registry/schema wiring, planning/evidence documentation, audit alignment, changelog entry, and refreshed generated governance/proof state.",
-      "Added stack_initialization_evidence_contract as the planning authority for future STACK_INITIALIZATION_EVIDENCE, reserved KOZO_STACK_INIT_OK without emitting it, aligned progression contracts, and preserved runtime behavior."
+      "Added stack_initialization_evidence_contract as the planning authority for future STACK_INITIALIZATION_EVIDENCE, reserved KOZO_STACK_INIT_OK without emitting it, aligned progression contracts, and preserved runtime behavior.",
+      "v0.7.0 implements controlled boot stack evidence by setting rsp to boot_stack_top, probing stack use, emitting KOZO_STACK_INIT_OK, extending the governed marker sequence, and preserving no memory/runtime/userspace/compatibility/production claims."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -2659,6 +2672,7 @@
     "Added v0.5.0 boot smoke marker emission from the proven assembly serial path, with ordered-marker QEMU smoke validation and no ABI, syscall, compatibility, or production-readiness claim changes.",
     "Added v0.5.1 governance planning alignment so PHASEMAP, ROADMAP, boot blockers, runtime evidence, release evidence, audit findings, changelog, and task state reflect the failed pushed v0.5.0 CI verification boundary without changing runtime, ABI, syscall, linker, QEMU smoke, compatibility, or production-readiness claims.",
     "Added v0.5.2 CI evidence access hardening so GitHub Actions logs expose first-level smoke evidence even when artifact download, API log access, or local gh tooling is unavailable.",
-    "v0.5.4 promotes CI-proven QEMU serial smoke evidence, accepts pass/none boot blocker state in stale validators, and preserves all no-compatibility and no-production claim boundaries."
+    "v0.5.4 promotes CI-proven QEMU serial smoke evidence, accepts pass/none boot blocker state in stale validators, and preserves all no-compatibility and no-production claim boundaries.",
+    "v0.7.0 adds stack initialization evidence through the assembly boot path and validator coverage while preserving ABI, syscall, linker, memory, Odin runtime, userspace, compatibility, and production-readiness boundaries."
   ]
 }

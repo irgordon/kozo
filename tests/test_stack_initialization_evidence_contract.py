@@ -20,6 +20,7 @@ KOZO_NEGATIVE_COVERAGE = {
         "missing_assumption_mapping": "test_fails_when_assumption_mapping_is_missing",
         "missing_evidence_requirement": "test_fails_when_evidence_requirement_is_missing",
         "missing_non_goal": "test_fails_when_non_goal_is_missing",
+        "marker_not_emitted": "test_fails_when_stack_marker_is_not_marked_emitted",
         "diagnostic_names_field": "test_failure_diagnostic_names_field",
     }
 }
@@ -78,7 +79,7 @@ class StackInitializationEvidenceContractValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
         self.assert_stack_failure(result, "missing_marker", "stack_definition.reserved_marker")
 
-    def test_fails_when_stack_marker_is_marked_emitted(self):
+    def test_fails_when_stack_marker_is_not_marked_emitted(self):
         self.assertEqual(
             "stack_initialization_evidence_contract",
             StackInitializationEvidenceContractValidator.name,
@@ -86,13 +87,13 @@ class StackInitializationEvidenceContractValidatorTests(unittest.TestCase):
         result = self.validate_fixture(
             mutate_contract=lambda contract: contract | {
                 "stack_definition": contract["stack_definition"] | {
-                    "marker_emitted": True
+                    "marker_emitted": False
                 }
             }
         )
 
         self.assertEqual(result.status, "fail")
-        self.assert_stack_failure(result, "marker_claimed", "stack_definition.marker_emitted")
+        self.assert_stack_failure(result, "marker_not_emitted", "stack_definition.marker_emitted")
 
     def test_fails_when_prerequisite_is_missing(self):
         self.assertEqual(
@@ -241,13 +242,18 @@ def valid_contract() -> dict[str, object]:
             "halt_contract": "contracts/runtime_halt_contract.v0.json",
             "progression_stages_contract": "contracts/runtime_progression_stages.v0.json",
             "stage": "STACK_INITIALIZATION_EVIDENCE",
-            "implemented": False,
+            "implemented": True,
         },
         "stack_definition": {
             "description": "Stack initialization means runtime code has selected and proven a controlled stack region.",
             "reserved_marker": "KOZO_STACK_INIT_OK",
-            "marker_status": "reserved",
-            "marker_emitted": False,
+            "marker_status": "emitted",
+            "marker_emitted": True,
+            "source_file": "kernel/arch/x86_64/boot.asm",
+            "stack_symbol": "boot_stack",
+            "stack_top_symbol": "boot_stack_top",
+            "stack_size_bytes": 16384,
+            "stack_pointer_register": "rsp",
         },
         "prerequisites": [
             "QEMU serial smoke evidence",
@@ -290,8 +296,8 @@ def valid_contract() -> dict[str, object]:
             "stack_initialization_evidence",
         ],
         "non_goals": [
-            "stack initialization implementation",
-            "stack allocation",
+            "dynamic stack allocation",
+            "general stack readiness",
             "memory initialization",
             "Odin runtime execution",
             "runtime progression execution",
