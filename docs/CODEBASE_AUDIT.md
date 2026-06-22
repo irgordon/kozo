@@ -721,3 +721,48 @@ The centralization is behavior-preserving:
 * Validator coverage focused tests pass.
 * Full unit discovery passes.
 * Full verification passes.
+
+---
+
+# 21. v0.6.7 Stack Initialization Evidence Planning
+
+Date: 2026-06-21
+
+Status: Completed.
+
+## 21.1 Scope
+
+This planning phase added a governed stack initialization evidence contract before any stack setup, memory initialization, Odin runtime execution, or runtime progression behavior is implemented.
+
+It did not change runtime behavior, boot assembly behavior, halt behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke evidence, marker semantics, compatibility claims, or production-readiness claims.
+
+## 21.2 Finding Status
+
+| ID | Status | Rationale |
+| --- | --- | --- |
+| AUDIT-066-001 | Extended | The progression stage model remains canonical, and `STACK_INITIALIZATION_EVIDENCE` now references `contracts/stack_initialization_evidence_contract.v0.json` as its stage authority. |
+
+## 21.3 Remediation Applied
+
+Added:
+
+```text
+contracts/stack_initialization_evidence_contract.v0.json
+schemas/stack_initialization_evidence_contract.schema.json
+harness/stack_initialization_evidence_contract.py
+harness/validators_impl/stack_initialization_evidence_contract.py
+tests/test_stack_initialization_evidence_contract.py
+```
+
+The contract reserves `KOZO_STACK_INIT_OK` as future runtime evidence, defines prerequisites and proof boundaries, maps assumptions that future stack evidence would enable, and records assumptions that remain invalid.
+
+## 21.4 Deferred Cleanup
+
+Deferred intentionally:
+
+* implementing stack setup
+* emitting `KOZO_STACK_INIT_OK`
+* adding stack evidence metadata
+* replacing or bypassing the runtime halt contract
+
+These are deferred because this phase is planning-only and the current runtime path remains boot smoke followed by the governed halt loop.

@@ -62,6 +62,8 @@ v0.6.5 adds `contracts/runtime_evidence_taxonomy.v0.json` as the governed source
 
 v0.6.6 adds `contracts/runtime_progression_stages.v0.json` as the governed source for future runtime progression stage order, prerequisites, evidence, contracts, validators, allowed next stages, and forbidden shortcuts. It is planning governance only and does not implement stack initialization, memory initialization, runtime progression, userspace execution, compatibility, or production behavior.
 
+v0.6.7 adds `contracts/stack_initialization_evidence_contract.v0.json` as the governed source for future stack initialization proof requirements. It reserves `KOZO_STACK_INIT_OK` for future runtime evidence, but the marker is not emitted and stack initialization is not proven.
+
 Current local boot blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
 
 Current release blocker for QEMU serial smoke evidence: none.
@@ -144,6 +146,8 @@ The smoke path builds freestanding x86_64 Odin kernel objects, assembles the cur
 The QEMU serial smoke target is now proven in CI. It remains a narrow smoke target and does not replace separate evidence for Odin runtime execution, stack setup, memory initialization, syscall dispatch, hardware trap execution, userspace execution, or subsystem behavior.
 
 The marker order and blocker vocabulary for QEMU serial smoke are owned by `contracts/runtime_evidence_taxonomy.v0.json` and enforced by `runtime_evidence_taxonomy`, `qemu_smoke_evidence`, and `boot_blocker_report`.
+
+Stack initialization evidence is planned, not proven. `contracts/stack_initialization_evidence_contract.v0.json` defines future proof requirements for `KOZO_STACK_INIT_OK`, controlled stack location, documented ownership, stack pointer validity, and validator evidence.
 
 ---
 

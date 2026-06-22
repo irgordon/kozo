@@ -18,6 +18,7 @@ _EXPECTED_PROGRESSION_MARKER = "KOZO_RUNTIME_PROGRESS_ENTRY"
 _EXPECTED_ENTRY_STATUS = "reserved"
 _REQUIRED_PREREQUISITES = (
     "stack initialization evidence",
+    "stack initialization evidence contract",
     "memory initialization evidence",
     "runtime initialization evidence",
     "progression path evidence",
@@ -26,6 +27,7 @@ _REQUIRED_EVIDENCE = (
     "runtime progression entry contract",
     "QEMU evidence for KOZO_RUNTIME_PROGRESS_ENTRY",
     "stack initialization evidence",
+    "stack initialization evidence contract",
     "memory initialization evidence",
     "runtime initialization evidence",
     "release evidence update",

@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.6.7 - 2026-06-21
+
+**Status:** Stack initialization evidence planning.
+
+### Added
+
+* Added `contracts/stack_initialization_evidence_contract.v0.json` and `schemas/stack_initialization_evidence_contract.schema.json` to define future stack proof requirements.
+* Added `harness/stack_initialization_evidence_contract.py` and `stack_initialization_evidence_contract` validation with focused negative tests.
+
+### Changed
+
+* Updated runtime progression contracts and planning documents so `STACK_INITIALIZATION_EVIDENCE` references the stack initialization evidence contract as its authority.
+* Reserved `KOZO_STACK_INIT_OK` as future evidence only; it is not emitted or claimed.
+
+### Notes
+
+* This change does not alter runtime behavior, boot assembly behavior, halt behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke evidence, or marker semantics.
+* This change does not add stack setup, memory initialization, Odin runtime execution, interrupt handling, scheduler behavior, userspace execution, process behavior, VFS behavior, device driver behavior, compatibility claims, or production-readiness claims.
+
 ## v0.6.6 - 2026-06-21
 
 **Status:** Runtime progression stages contract.

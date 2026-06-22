@@ -1,0 +1,76 @@
+{
+  "version": 0,
+  "architecture": "x86_64",
+  "current_state": {
+    "runtime_path": "boot_smoke_to_halt",
+    "halt_contract": "contracts/runtime_halt_contract.v0.json",
+    "progression_stages_contract": "contracts/runtime_progression_stages.v0.json",
+    "stage": "STACK_INITIALIZATION_EVIDENCE",
+    "implemented": false
+  },
+  "stack_definition": {
+    "description": "Stack initialization means runtime code has explicitly selected a controlled stack region, loaded the stack pointer with that region, proven the pointer is usable for stack-dependent control flow, and documented ownership of that region.",
+    "reserved_marker": "KOZO_STACK_INIT_OK",
+    "marker_status": "reserved",
+    "marker_emitted": false
+  },
+  "prerequisites": [
+    "QEMU serial smoke evidence",
+    "runtime halt contract",
+    "runtime progression contract",
+    "runtime progression entry contract",
+    "runtime progression stages contract"
+  ],
+  "evidence_requirements": [
+    "stack pointer initialized",
+    "stack pointer remains valid",
+    "controlled stack location",
+    "documented stack ownership",
+    "KOZO_STACK_INIT_OK marker captured from runtime code",
+    "stack initialization validator proof"
+  ],
+  "proof_boundary": [
+    "evidence must come from runtime code, not scripts",
+    "evidence must be captured through QEMU serial smoke or a successor governed runtime evidence path",
+    "evidence must preserve the existing boot smoke marker sequence until a successor evidence path is accepted",
+    "evidence must not replace the halt loop until runtime progression evidence permits it"
+  ],
+  "assumptions_enabled": [
+    "safe call instruction usage after the proven stack marker",
+    "safe function nesting after the proven stack marker",
+    "safe runtime progression entry after the proven stack marker",
+    "safe progression beyond halt only after separate progression evidence permits halt replacement"
+  ],
+  "assumptions_not_enabled": [
+    "memory initialization",
+    "Odin runtime execution",
+    "interrupt handling",
+    "scheduler behavior",
+    "userspace execution",
+    "process model behavior",
+    "VFS behavior",
+    "device driver behavior",
+    "syscall dispatch during boot",
+    "production readiness"
+  ],
+  "future_validators": [
+    "stack_initialization_evidence"
+  ],
+  "non_goals": [
+    "stack initialization implementation",
+    "stack allocation",
+    "memory initialization",
+    "Odin runtime execution",
+    "runtime progression execution",
+    "halt loop replacement",
+    "interrupt handling",
+    "scheduler behavior",
+    "userspace execution",
+    "process model behavior",
+    "VFS behavior",
+    "device driver behavior",
+    "Linux compatibility",
+    "POSIX compatibility",
+    "production readiness"
+  ]
+}

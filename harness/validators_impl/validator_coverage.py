@@ -522,6 +522,22 @@ _VALIDATOR_TEST_CONTRACTS = {
             "diagnostic_names_field",
         ),
     ),
+    "stack_initialization_evidence_contract": ValidatorTestContract(
+        "stack_initialization_evidence_contract",
+        _TESTS_DIR / "test_stack_initialization_evidence_contract.py",
+        "StackInitializationEvidenceContractValidator",
+        (
+            "missing_contract_file",
+            "invalid_contract_json",
+            "contract_schema_violation",
+            "missing_marker",
+            "missing_prerequisite",
+            "missing_assumption_mapping",
+            "missing_evidence_requirement",
+            "missing_non_goal",
+            "diagnostic_names_field",
+        ),
+    ),
     "boot_blocker_report": ValidatorTestContract(
         "boot_blocker_report",
         _TESTS_DIR / "test_boot_blocker_report.py",

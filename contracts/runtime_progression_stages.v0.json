@@ -84,18 +84,18 @@
       "status": "planned",
       "required_prerequisites": [
         "runtime progression entry evidence",
-        "stack initialization contract",
-        "stack initialization validator"
+        "stack initialization evidence contract",
+        "stack initialization evidence validator"
       ],
       "required_evidence": [
-        "QEMU evidence for stack initialization marker",
+        "QEMU evidence for KOZO_STACK_INIT_OK",
         "stack initialization metadata"
       ],
       "required_contracts": [
-        "future stack initialization contract"
+        "contracts/stack_initialization_evidence_contract.v0.json"
       ],
       "required_validators": [
-        "future stack initialization validator"
+        "stack_initialization_evidence_contract"
       ],
       "allowed_next_stages": [
         "MEMORY_INITIALIZATION_EVIDENCE"

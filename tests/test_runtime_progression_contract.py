@@ -195,6 +195,7 @@ def valid_contract() -> dict[str, object]:
         },
         "progression_prerequisites": [
             "stack initialization evidence",
+            "stack initialization evidence contract",
             "runtime initialization evidence",
             "memory initialization evidence",
             "progression path evidence",
@@ -222,6 +223,7 @@ def valid_contract() -> dict[str, object]:
         ],
         "evidence_requirements": [
             "runtime progression contract",
+            "stack initialization evidence contract",
             "focused validator coverage",
             "QEMU evidence for progression entry",
             "release evidence update",

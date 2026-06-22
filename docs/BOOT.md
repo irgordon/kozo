@@ -54,6 +54,8 @@ v0.5.4 promotes the CI-proven QEMU serial smoke evidence after CI run `278943124
 
 v0.6.0 adds a governed runtime halt contract for the immediate post-smoke path. After `_start` emits `KOZO_BOOT_SMOKE_OK`, the assembly path enters a deterministic terminal `cli`/`hlt` loop instead of falling through into unrelated bytes or continuing into ungoverned runtime work.
 
+v0.6.7 adds a governed stack initialization evidence contract for the future `STACK_INITIALIZATION_EVIDENCE` stage. It reserves `KOZO_STACK_INIT_OK` as future evidence, but it does not emit the marker, add stack setup, or change the current halt behavior.
+
 No active QEMU serial smoke blocker.
 
 Local generated blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
@@ -104,6 +106,8 @@ Current v0.6.3 runtime progression entry design: `contracts/runtime_progression_
 
 Current v0.6.6 runtime progression stage governance: `contracts/runtime_progression_stages.v0.json` is the authoritative model for the planned progression from `BOOT_SMOKE` to `USERSPACE_PLANNING`. It defines stage ordering, prerequisites, evidence, transition rules, and forbidden shortcuts. It does not implement runtime progression or replace the halt behavior.
 
+Current v0.6.7 stack initialization evidence planning: `contracts/stack_initialization_evidence_contract.v0.json` defines future proof requirements for stack initialization and reserves `KOZO_STACK_INIT_OK`. Stack setup is not implemented, the marker is not emitted, and the halt loop remains authoritative.
+
 Selected boot protocol: Limine.
 
 The current repository has a 64-bit `_start` symbol, an exported `kernel_entry`, early serial initialization, early KOZO marker strings, and runtime-adjacent object/symbol smoke evidence.
@@ -139,6 +143,12 @@ KOZO_EARLY_0_ENTRY
 KOZO_EARLY_1_SERIAL_INIT_START
 KOZO_EARLY_2_SERIAL_INIT_OK
 KOZO_BOOT_SMOKE_OK
+```
+
+The future stack initialization marker is reserved but not emitted:
+
+```text
+KOZO_STACK_INIT_OK
 ```
 
 ---

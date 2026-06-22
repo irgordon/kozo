@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KOZO stack initialization evidence contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "current_state",
+    "stack_definition",
+    "prerequisites",
+    "evidence_requirements",
+    "proof_boundary",
+    "assumptions_enabled",
+    "assumptions_not_enabled",
+    "future_validators",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {
+      "const": 0
+    },
+    "architecture": {
+      "type": "string",
+      "pattern": ".*\\S.*"
+    },
+    "current_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtime_path",
+        "halt_contract",
+        "progression_stages_contract",
+        "stage",
+        "implemented"
+      ],
+      "properties": {
+        "runtime_path": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "halt_contract": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "progression_stages_contract": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "stage": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "implemented": {
+          "type": "boolean"
+        }
+      }
+    },
+    "stack_definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "reserved_marker",
+        "marker_status",
+        "marker_emitted"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "reserved_marker": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "marker_status": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "marker_emitted": {
+          "type": "boolean"
+        }
+      }
+    },
+    "prerequisites": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    },
+    "evidence_requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    },
+    "proof_boundary": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    },
+    "assumptions_enabled": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    },
+    "assumptions_not_enabled": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    },
+    "future_validators": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    },
+    "non_goals": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": ".*\\S.*"
+      }
+    }
+  }
+}

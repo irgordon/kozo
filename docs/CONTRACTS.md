@@ -77,6 +77,7 @@ Current contract paths include:
 | Runtime progression contract | `contracts/runtime_progression_contract.v0.json` | Future halt-to-runtime transition governance |
 | Runtime progression entry contract | `contracts/runtime_progression_entry_contract.v0.json` | Future progression entry marker and readiness governance |
 | Runtime progression stages contract | `contracts/runtime_progression_stages.v0.json` | Canonical future runtime progression stage model |
+| Stack initialization evidence contract | `contracts/stack_initialization_evidence_contract.v0.json` | Future stack proof boundary and marker reservation |
 
 ---
 
@@ -178,6 +179,20 @@ This contract does not implement runtime progression, replace the halt loop, ini
 
 # 16. Generated Reports
 
+# 16. Stack Initialization Evidence Contract Role
+
+`contracts/stack_initialization_evidence_contract.v0.json` defines what KOZO must prove before claiming stack initialization.
+
+It reserves `KOZO_STACK_INIT_OK` as future runtime evidence, defines prerequisites, evidence requirements, proof boundaries, assumptions enabled by future stack evidence, assumptions that remain invalid, and non-goals.
+
+The marker is not emitted by current runtime code and must not be treated as evidence until captured from runtime code through a governed evidence path.
+
+This contract does not implement stack setup, allocate memory, execute Odin runtime code, replace the halt loop, enable interrupts, add userspace execution, or claim compatibility or production readiness.
+
+---
+
+# 17. Generated Reports
+
 Generated reports are summaries.
 
 Examples:
@@ -190,7 +205,7 @@ Generated reports do not own contract truth. If a generated report conflicts wit
 
 ---
 
-# 17. Validators as Proof Mechanisms
+# 18. Validators as Proof Mechanisms
 
 Validators prove that checked-in source, contracts, generated artifacts, and task state agree.
 
@@ -200,7 +215,7 @@ When a validator finds missing source, missing evidence, stale generated reports
 
 ---
 
-# 18. Contract Change Requirements
+# 19. Contract Change Requirements
 
 A contract change requires:
 

@@ -2053,6 +2053,52 @@
         "verification.tests_run[50]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 68,
+      "title": "Plan stack initialization evidence",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "contracts/stack_initialization_evidence_contract.v0.json",
+        "schemas/stack_initialization_evidence_contract.schema.json",
+        "harness/stack_initialization_evidence_contract.py",
+        "harness/validators_impl/stack_initialization_evidence_contract.py",
+        "tests/test_stack_initialization_evidence_contract.py",
+        "contracts/runtime_progression_stages.v0.json",
+        "contracts/runtime_progression_contract.v0.json",
+        "contracts/runtime_progression_entry_contract.v0.json",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/schema.py",
+        "harness/validators_impl/runtime_progression_stages.py",
+        "harness/validators_impl/runtime_progression_contract.py",
+        "harness/validators_impl/runtime_progression_entry_contract.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/latest_verify.schema.json",
+        "schemas/agent_context.schema.json",
+        "docs/BOOT.md",
+        "docs/CONTRACTS.md",
+        "docs/VALIDATION.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/CODEBASE_AUDIT.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/generated/governance_index.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[51]",
+        "verification.tests_run[52]",
+        "verification.tests_run[53]",
+        "verification.tests_run[54]",
+        "verification.tests_run[55]",
+        "verification.tests_run[56]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -2366,6 +2412,36 @@
         "tool": "scripts/verify.sh",
         "command": "scripts/verify.sh",
         "status": "passed"
+      },
+      {
+        "tool": "python3 -m unittest tests/test_stack_initialization_evidence_contract.py",
+        "command": "python3 -m unittest tests/test_stack_initialization_evidence_contract.py",
+        "status": "passed"
+      },
+      {
+        "tool": "python3 -m unittest tests/test_validator_coverage.py",
+        "command": "python3 -m unittest tests/test_validator_coverage.py",
+        "status": "passed"
+      },
+      {
+        "tool": "python3 -m unittest discover -s tests",
+        "command": "python3 -m unittest discover -s tests",
+        "status": "passed"
+      },
+      {
+        "tool": "python3 -m json.tool tasks/todo.json",
+        "command": "python3 -m json.tool tasks/todo.json",
+        "status": "passed"
+      },
+      {
+        "tool": "git diff --check",
+        "command": "git diff --check",
+        "status": "passed"
+      },
+      {
+        "tool": "scripts/verify.sh",
+        "command": "scripts/verify.sh",
+        "status": "passed"
       }
     ],
     "logs": [
@@ -2514,7 +2590,8 @@
       "runtime_progression_entry_contract validates current halt/progression references, progression marker reservation, prerequisites, evidence requirements, transition requirements, forbidden shortcuts, ownership, future stages, and non-goals.",
       "v0.6.4 removes two zero-byte unreferenced generator stubs, documents oversized/dead/stale/shim findings, and preserves validator outcomes through compileall, unit discovery, and full verification.",
       "v0.6.5 adds runtime_evidence_taxonomy contract, schema, loader, validator, and focused tests; QEMU smoke and boot blocker validators consume taxonomy helpers while marker strings, marker order, and pass criteria remain unchanged.",
-      "Added runtime_progression_stages contract, schema, loader, validator, focused tests, registry/schema wiring, planning/evidence documentation, audit alignment, changelog entry, and refreshed generated governance/proof state."
+      "Added runtime_progression_stages contract, schema, loader, validator, focused tests, registry/schema wiring, planning/evidence documentation, audit alignment, changelog entry, and refreshed generated governance/proof state.",
+      "Added stack_initialization_evidence_contract as the planning authority for future STACK_INITIALIZATION_EVIDENCE, reserved KOZO_STACK_INIT_OK without emitting it, aligned progression contracts, and preserved runtime behavior."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },

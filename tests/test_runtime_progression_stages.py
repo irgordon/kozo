@@ -285,7 +285,7 @@ def valid_stages() -> list[dict[str, object]]:
     prerequisites = {
         "BOOT_SMOKE": "runtime halt contract",
         "RUNTIME_PROGRESSION_ENTRY": "runtime progression entry contract",
-        "STACK_INITIALIZATION_EVIDENCE": "stack initialization contract",
+        "STACK_INITIALIZATION_EVIDENCE": "stack initialization evidence contract",
         "MEMORY_INITIALIZATION_EVIDENCE": "memory initialization contract",
         "RUNTIME_INITIALIZATION_EVIDENCE": "runtime initialization contract",
         "CONTROLLED_RUNTIME_LOOP": "halt replacement evidence",
@@ -295,7 +295,7 @@ def valid_stages() -> list[dict[str, object]]:
     evidence = {
         "BOOT_SMOKE": "artifacts/runtime/qemu_smoke.metadata.json",
         "RUNTIME_PROGRESSION_ENTRY": "QEMU evidence for KOZO_RUNTIME_PROGRESS_ENTRY",
-        "STACK_INITIALIZATION_EVIDENCE": "QEMU evidence for stack initialization marker",
+        "STACK_INITIALIZATION_EVIDENCE": "QEMU evidence for KOZO_STACK_INIT_OK",
         "MEMORY_INITIALIZATION_EVIDENCE": "QEMU evidence for memory initialization marker",
         "RUNTIME_INITIALIZATION_EVIDENCE": "QEMU evidence for runtime initialization marker",
         "CONTROLLED_RUNTIME_LOOP": "QEMU evidence for controlled runtime loop",
