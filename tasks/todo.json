@@ -2111,6 +2111,49 @@
         "verification.tests_run[56]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 69,
+      "title": "Plan memory initialization evidence",
+      "status": "done",
+      "kind": "docs",
+      "files_expected": [
+        "contracts/memory_initialization_evidence_contract.v0.json",
+        "schemas/memory_initialization_evidence_contract.schema.json",
+        "harness/memory_initialization_evidence_contract.py",
+        "harness/validators_impl/memory_initialization_evidence_contract.py",
+        "tests/test_memory_initialization_evidence_contract.py",
+        "contracts/runtime_progression_contract.v0.json",
+        "contracts/runtime_progression_stages.v0.json",
+        "harness/validators_impl/runtime_progression_contract.py",
+        "harness/validators_impl/runtime_progression_stages.py",
+        "tests/test_runtime_progression_contract.py",
+        "tests/test_runtime_progression_stages.py",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/schema.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/latest_verify.schema.json",
+        "schemas/agent_context.schema.json",
+        "docs/BOOT.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/CONTRACTS.md",
+        "docs/VALIDATION.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/CODEBASE_AUDIT.md",
+        "docs/generated/governance_index.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[0]",
+        "verification.tests_run[1]",
+        "verification.tests_run[2]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -2166,7 +2209,8 @@
     "v0.4.5 classifies Limine lower-half PHDR rejection as limine_lower_half_phdr in kernel ELF reports, QEMU smoke metadata, boot blocker reporting, focused tests, and boot evidence docs while preserving no-QEMU-boot and non-compatibility claim boundaries",
     "v0.4.6 adds docs/CODEBASE_AUDIT.md, updates phase and roadmap sequencing so v0.4.7 is the higher-half linker/entry transition, and records that no cleanup was applied during the audit phase",
     "v0.5.1 aligns governance, planning, audit, release, and evidence documents with the actual v0.5.0 outcome: local verification passes, the pushed CI run for 14fb015 failed in scripts/verify.sh, QEMU serial smoke evidence is not promoted, and the next runtime phase is CI smoke evidence triage.",
-    "v0.5.2 CI evidence access hardening prints verification, QEMU smoke, serial/stderr, and boot blocker summaries into full CI logs with if: always(), keeps artifact upload enabled, and avoids requiring gh or authenticated artifact download for first-level triage."
+    "v0.5.2 CI evidence access hardening prints verification, QEMU smoke, serial/stderr, and boot blocker summaries into full CI logs with if: always(), keeps artifact upload enabled, and avoids requiring gh or authenticated artifact download for first-level triage.",
+    "v0.7.1 adds memory_initialization_evidence_contract as the planning authority for future MEMORY_INITIALIZATION_EVIDENCE, reserves KOZO_MEMORY_INIT_OK without emitting it, aligns progression contracts, and preserves runtime behavior."
   ],
   "verification": {
     "tests_run": [
@@ -2673,6 +2717,7 @@
     "Added v0.5.1 governance planning alignment so PHASEMAP, ROADMAP, boot blockers, runtime evidence, release evidence, audit findings, changelog, and task state reflect the failed pushed v0.5.0 CI verification boundary without changing runtime, ABI, syscall, linker, QEMU smoke, compatibility, or production-readiness claims.",
     "Added v0.5.2 CI evidence access hardening so GitHub Actions logs expose first-level smoke evidence even when artifact download, API log access, or local gh tooling is unavailable.",
     "v0.5.4 promotes CI-proven QEMU serial smoke evidence, accepts pass/none boot blocker state in stale validators, and preserves all no-compatibility and no-production claim boundaries.",
-    "v0.7.0 adds stack initialization evidence through the assembly boot path and validator coverage while preserving ABI, syscall, linker, memory, Odin runtime, userspace, compatibility, and production-readiness boundaries."
+    "v0.7.0 adds stack initialization evidence through the assembly boot path and validator coverage while preserving ABI, syscall, linker, memory, Odin runtime, userspace, compatibility, and production-readiness boundaries.",
+    "v0.7.1 adds memory initialization evidence planning through a contract, schema, loader, validator, tests, and progression-stage alignment while preserving runtime behavior, ABI, syscall, linker, QEMU smoke, halt, stack evidence, compatibility, and production-readiness boundaries."
   ]
 }

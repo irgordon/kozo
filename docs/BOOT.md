@@ -56,6 +56,8 @@ v0.6.0 adds a governed runtime halt contract for the immediate post-smoke path. 
 
 v0.7.0 implements the governed stack initialization evidence path. `_start` loads `rsp` with the existing static `boot_stack_top`, performs a minimal push/pop stack-use probe, emits `KOZO_STACK_INIT_OK` through the proven assembly COM1 path, and then enters the existing halt loop.
 
+v0.7.1 adds memory initialization evidence planning through `contracts/memory_initialization_evidence_contract.v0.json`. It reserves `KOZO_MEMORY_INIT_OK` as future evidence, but the marker is not emitted and memory initialization remains unimplemented.
+
 No active QEMU serial smoke blocker.
 
 Local generated blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
@@ -107,6 +109,8 @@ Current v0.6.3 runtime progression entry design: `contracts/runtime_progression_
 Current v0.6.6 runtime progression stage governance: `contracts/runtime_progression_stages.v0.json` is the authoritative model for the planned progression from `BOOT_SMOKE` to `USERSPACE_PLANNING`. It defines stage ordering, prerequisites, evidence, transition rules, and forbidden shortcuts. It does not implement runtime progression or replace the halt behavior.
 
 Current v0.7.0 stack initialization evidence: `contracts/stack_initialization_evidence_contract.v0.json` defines the controlled boot stack proof. `_start` sets `rsp` to `boot_stack_top`, performs a bounded push/pop probe, emits `KOZO_STACK_INIT_OK`, and then enters the governed halt loop. This proves only controlled stack establishment and marker emission.
+
+Current v0.7.1 memory initialization planning: `contracts/memory_initialization_evidence_contract.v0.json` defines what future memory evidence must prove before KOZO can claim controlled memory initialization. `KOZO_MEMORY_INIT_OK` is reserved but not emitted, and no memory structures, allocator behavior, paging behavior, Odin runtime execution, userspace execution, compatibility, or production readiness are proven.
 
 Selected boot protocol: Limine.
 

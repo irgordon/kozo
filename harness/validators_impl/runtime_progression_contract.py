@@ -16,6 +16,7 @@ _EXPECTED_TERMINAL_BEHAVIOR = "halt_loop"
 _REQUIRED_PREREQUISITES = (
     "stack initialization evidence",
     "stack initialization evidence contract",
+    "memory initialization evidence contract",
     "runtime initialization evidence",
     "memory initialization evidence",
     "progression path evidence",
@@ -35,6 +36,7 @@ _REQUIRED_FORBIDDEN_SHORTCUTS = (
 _REQUIRED_EVIDENCE_REQUIREMENTS = (
     "runtime progression contract",
     "stack initialization evidence contract",
+    "memory initialization evidence contract",
     "focused validator coverage",
     "QEMU evidence for progression entry",
     "release evidence update",

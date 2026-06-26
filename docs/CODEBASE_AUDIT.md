@@ -811,3 +811,22 @@ Deferred intentionally:
 * halt loop replacement or bypass
 
 These remain deferred because v0.7.0 proves only controlled boot stack establishment and marker emission.
+
+---
+
+# 23. v0.7.1 Memory Initialization Evidence Planning
+
+## Scope
+
+This planning phase adds the governed memory initialization evidence contract before any memory setup, paging, allocator, Odin runtime execution, or runtime progression behavior is implemented.
+
+## Remediation Decision
+
+| ID | Status | Decision |
+| --- | --- | --- |
+| AUDIT-066-001 | Extended | The progression stage model now references `contracts/memory_initialization_evidence_contract.v0.json` as the authority for `MEMORY_INITIALIZATION_EVIDENCE`. |
+| AUDIT-095-005 | Deferred | Broader runtime progression state modeling remains governed by the stage model; memory implementation evidence is intentionally not added in this planning phase. |
+
+## Boundary
+
+`KOZO_MEMORY_INIT_OK` is reserved, not emitted, and not evidence. This phase changes contracts, validation, and planning documents only. It does not change runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke behavior, halt behavior, stack evidence behavior, compatibility claims, or production-readiness claims.

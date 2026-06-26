@@ -552,6 +552,23 @@ _VALIDATOR_TEST_CONTRACTS = {
             "diagnostic_names_field",
         ),
     ),
+    "memory_initialization_evidence_contract": ValidatorTestContract(
+        "memory_initialization_evidence_contract",
+        _TESTS_DIR / "test_memory_initialization_evidence_contract.py",
+        "MemoryInitializationEvidenceContractValidator",
+        (
+            "missing_contract_file",
+            "invalid_contract_json",
+            "contract_schema_violation",
+            "missing_marker",
+            "missing_prerequisite",
+            "missing_assumption_mapping",
+            "missing_evidence_requirement",
+            "missing_non_goal",
+            "marker_claimed",
+            "diagnostic_names_field",
+        ),
+    ),
     "boot_blocker_report": ValidatorTestContract(
         "boot_blocker_report",
         _TESTS_DIR / "test_boot_blocker_report.py",

@@ -136,6 +136,7 @@ Current runtime evidence and runtime contract validators include:
 * `runtime_progression_stages`
 * `stack_initialization_evidence_contract`
 * `stack_initialization_evidence`
+* `memory_initialization_evidence_contract`
 
 ---
 

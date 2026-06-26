@@ -77,7 +77,8 @@ Current contract paths include:
 | Runtime progression contract | `contracts/runtime_progression_contract.v0.json` | Future halt-to-runtime transition governance |
 | Runtime progression entry contract | `contracts/runtime_progression_entry_contract.v0.json` | Future progression entry marker and readiness governance |
 | Runtime progression stages contract | `contracts/runtime_progression_stages.v0.json` | Canonical future runtime progression stage model |
-| Stack initialization evidence contract | `contracts/stack_initialization_evidence_contract.v0.json` | Future stack proof boundary and marker reservation |
+| Stack initialization evidence contract | `contracts/stack_initialization_evidence_contract.v0.json` | Controlled stack proof boundary and marker evidence |
+| Memory initialization evidence contract | `contracts/memory_initialization_evidence_contract.v0.json` | Future memory proof boundary and marker reservation |
 
 ---
 
@@ -189,7 +190,17 @@ This contract does not allocate memory dynamically, execute Odin runtime code, r
 
 ---
 
-# 17. Generated Reports
+# 17. Memory Initialization Evidence Contract Role
+
+`contracts/memory_initialization_evidence_contract.v0.json` defines what KOZO must prove before claiming controlled memory initialization evidence.
+
+It reserves `KOZO_MEMORY_INIT_OK`, defines future memory evidence requirements, maps assumptions enabled by future memory evidence, records assumptions that remain invalid, and keeps memory initialization subordinate to the runtime halt and progression stage contracts.
+
+The marker is reserved and not emitted by current runtime code. This contract does not implement memory initialization, paging, allocator behavior, heap allocation, Odin runtime execution, halt replacement, interrupts, scheduler behavior, userspace execution, compatibility, or production readiness.
+
+---
+
+# 18. Generated Reports
 
 Generated reports are summaries.
 

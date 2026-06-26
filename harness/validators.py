@@ -38,6 +38,7 @@ from harness.validators_impl.runtime_progression_entry_contract import RuntimePr
 from harness.validators_impl.runtime_progression_stages import RuntimeProgressionStagesValidator
 from harness.validators_impl.stack_initialization_evidence_contract import StackInitializationEvidenceContractValidator
 from harness.validators_impl.stack_initialization_evidence import StackInitializationEvidenceValidator
+from harness.validators_impl.memory_initialization_evidence_contract import MemoryInitializationEvidenceContractValidator
 from harness.validators_impl.boot_blocker_report import BootBlockerReportValidator
 from harness.validators_impl.boot_protocol_decision import BootProtocolDecisionValidator
 from harness.validators_impl.boot_image_skeleton import BootImageSkeletonValidator
@@ -86,6 +87,7 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "runtime_progression_stages": RuntimeProgressionStagesValidator,
     "stack_initialization_evidence_contract": StackInitializationEvidenceContractValidator,
     "stack_initialization_evidence": StackInitializationEvidenceValidator,
+    "memory_initialization_evidence_contract": MemoryInitializationEvidenceContractValidator,
     "boot_blocker_report": BootBlockerReportValidator,
     "boot_protocol_decision": BootProtocolDecisionValidator,
     "boot_image_skeleton": BootImageSkeletonValidator,

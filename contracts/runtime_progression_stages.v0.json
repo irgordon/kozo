@@ -114,18 +114,19 @@
       "status": "planned",
       "required_prerequisites": [
         "stack initialization evidence",
-        "memory initialization contract",
-        "memory initialization validator"
+        "memory initialization evidence contract",
+        "memory initialization evidence validator"
       ],
       "required_evidence": [
-        "QEMU evidence for memory initialization marker",
+        "QEMU evidence for KOZO_MEMORY_INIT_OK",
         "memory initialization metadata"
       ],
       "required_contracts": [
-        "future memory initialization contract"
+        "contracts/memory_initialization_evidence_contract.v0.json"
       ],
       "required_validators": [
-        "future memory initialization validator"
+        "memory_initialization_evidence_contract",
+        "future memory initialization evidence validator"
       ],
       "allowed_next_stages": [
         "RUNTIME_INITIALIZATION_EVIDENCE"

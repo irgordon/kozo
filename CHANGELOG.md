@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.7.1 - 2026-06-26
+
+**Status:** Memory initialization evidence planning.
+
+### Added
+
+* Added `contracts/memory_initialization_evidence_contract.v0.json` and `schemas/memory_initialization_evidence_contract.schema.json` to define future memory proof requirements.
+* Added `harness/memory_initialization_evidence_contract.py` and `memory_initialization_evidence_contract` validation with focused negative tests.
+* Reserved `KOZO_MEMORY_INIT_OK` as future memory evidence without emitting or claiming it.
+
+### Changed
+
+* Aligned runtime progression contracts and planning docs so `MEMORY_INITIALIZATION_EVIDENCE` references the memory evidence contract.
+
+### Notes
+
+* This change does not alter runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke behavior, halt behavior, stack evidence behavior, compatibility claims, or production-readiness claims.
+
 ## v0.7.0 - 2026-06-21
 
 **Status:** Stack initialization evidence.
