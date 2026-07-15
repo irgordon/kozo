@@ -15,6 +15,15 @@
   "entry_symbol_matches_entry": true,
   "entry_is_lower_half": false,
   "entry_address_class": "higher-half",
+  "memory_evidence_region": {
+    "start_symbol": "boot_memory_region",
+    "end_symbol": "boot_memory_region_end",
+    "start_address": "0xffffffff8020a000",
+    "end_address": "0xffffffff8020b000",
+    "size_bytes": 4096,
+    "required_alignment_bytes": 4096,
+    "start_aligned": true
+  },
   "program_header_count": 7,
   "section_count": 13,
   "load_segments": [
@@ -24,8 +33,8 @@
       "offset": "0x1000",
       "virtual_address": "0xffffffff80200000",
       "physical_address": "0x200000",
-      "file_size": "0x3072",
-      "memory_size": "0x3072",
+      "file_size": "0x30f2",
+      "memory_size": "0x30f2",
       "alignment": "0x1000"
     },
     {
@@ -34,8 +43,8 @@
       "offset": "0x5000",
       "virtual_address": "0xffffffff80204000",
       "physical_address": "0x204000",
-      "file_size": "0xdac",
-      "memory_size": "0xdac",
+      "file_size": "0xdbc",
+      "memory_size": "0xdbc",
       "alignment": "0x1000"
     },
     {
@@ -55,7 +64,7 @@
       "virtual_address": "0xffffffff80206000",
       "physical_address": "0x206000",
       "file_size": "0x0",
-      "memory_size": "0x4000",
+      "memory_size": "0x5000",
       "alignment": "0x1000"
     }
   ],

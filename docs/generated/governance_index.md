@@ -12,18 +12,18 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.7.3`
+* Version: `v0.7.4`
 * Date: `2026-07-15`
-* Status: Memory evidence contract hardening.
+* Status: Memory initialization evidence implemented locally; CI acceptance pending push.
 
 ## Verification status
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 47
+* Total checks: 48
 * Failed checks: 0
-* Run ID: `verify-20260715T180050Z`
-* Generated at: `2026-07-15T18:00:50Z`
+* Run ID: `verify-20260715T212939Z`
+* Generated at: `2026-07-15T21:29:39Z`
 
 ## Registered validators
 
@@ -64,18 +64,19 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 33 | `stack_initialization_evidence_contract` |
 | 34 | `stack_initialization_evidence` |
 | 35 | `memory_initialization_evidence_contract` |
-| 36 | `boot_blocker_report` |
-| 37 | `boot_protocol_decision` |
-| 38 | `boot_image_skeleton` |
-| 39 | `boot_image_packaging` |
-| 40 | `boot_tooling` |
-| 41 | `kernel_loadability` |
-| 42 | `host_dependency_portability` |
-| 43 | `qemu_smoke_evidence` |
-| 44 | `return_path_proof` |
-| 45 | `execution_proof` |
-| 46 | `validator_coverage` |
-| 47 | `evidence` |
+| 36 | `memory_initialization_evidence` |
+| 37 | `boot_blocker_report` |
+| 38 | `boot_protocol_decision` |
+| 39 | `boot_image_skeleton` |
+| 40 | `boot_image_packaging` |
+| 41 | `boot_tooling` |
+| 42 | `kernel_loadability` |
+| 43 | `host_dependency_portability` |
+| 44 | `qemu_smoke_evidence` |
+| 45 | `return_path_proof` |
+| 46 | `execution_proof` |
+| 47 | `validator_coverage` |
+| 48 | `evidence` |
 
 ## Active contracts
 
@@ -127,7 +128,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 47
+* Check count: 48
 * Failure count: 0
 
 ## Non-goals

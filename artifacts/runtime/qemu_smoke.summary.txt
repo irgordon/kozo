@@ -10,7 +10,7 @@ Observed Markers
   - none
 
 Expected Marker
-Expected Marker: KOZO_STACK_INIT_OK
+Expected Marker: KOZO_MEMORY_INIT_OK
 
 Verifier Result
 Validator: qemu_smoke_evidence

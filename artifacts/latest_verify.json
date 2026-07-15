@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260715T191512Z",
+  "run_id": "verify-20260715T212939Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 47,
+    "total_checks": 48,
     "failed_check_count": 0
   },
   "checks": [
@@ -252,7 +252,14 @@
       "subsystem": "memory_initialization_evidence_contract",
       "status": "pass",
       "code": "OK",
-      "detail": "Memory evidence contract defines an implementation-ready future proof boundary"
+      "detail": "Memory evidence contract defines the implemented static-region proof boundary"
+    },
+    {
+      "name": "memory_initialization_evidence",
+      "subsystem": "memory_initialization_evidence",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Memory initialization evidence matches the controlled region, probe, marker, and halt path"
     },
     {
       "name": "boot_blocker_report",
@@ -353,6 +360,9 @@
   ],
   "failed_checks": [],
   "changed_files": [
+    "artifacts/runtime/kernel_elf_report.json",
+    "artifacts/runtime/qemu_smoke.metadata.json",
+    "artifacts/runtime/qemu_smoke.summary.txt",
     "docs/generated/governance_index.md"
   ],
   "evidence_files": [
@@ -370,5 +380,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-07-15T19:15:12Z"
+  "generated_at": "2026-07-15T21:29:39Z"
 }

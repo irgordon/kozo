@@ -9,13 +9,14 @@
   "boot_image": "artifacts/runtime/boot_image/kozo.iso",
   "serial_log": "artifacts/runtime/qemu_smoke.log",
   "stderr_log": "artifacts/runtime/qemu_smoke.stderr.log",
-  "expected_marker": "KOZO_STACK_INIT_OK",
+  "expected_marker": "KOZO_MEMORY_INIT_OK",
   "early_markers": [
     "KOZO_EARLY_0_ENTRY",
     "KOZO_EARLY_1_SERIAL_INIT_START",
     "KOZO_EARLY_2_SERIAL_INIT_OK",
     "KOZO_BOOT_SMOKE_OK",
-    "KOZO_STACK_INIT_OK"
+    "KOZO_STACK_INIT_OK",
+    "KOZO_MEMORY_INIT_OK"
   ],
   "observed_markers": [],
   "earliest_observed_marker": "",
@@ -39,7 +40,7 @@
     "interrupt handling",
     "Odin runtime execution",
     "general stack readiness",
-    "memory initialization",
+    "general memory management",
     "syscall dispatch",
     "Linux compatibility",
     "POSIX compatibility",
