@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.7.1`
-* Date: `2026-06-26`
-* Status: Memory initialization evidence planning.
+* Version: `v0.7.2`
+* Date: `2026-07-15`
+* Status: Runtime progression model reconciliation.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 47
 * Failed checks: 0
-* Run ID: `verify-20260626T235514Z`
-* Generated at: `2026-06-26T23:55:14Z`
+* Run ID: `verify-20260715T180050Z`
+* Generated at: `2026-07-15T18:00:50Z`
 
 ## Registered validators
 
