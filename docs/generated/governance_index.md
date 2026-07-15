@@ -12,18 +12,18 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.7.4`
+* Version: `v0.7.45`
 * Date: `2026-07-15`
-* Status: Memory initialization evidence implemented locally; CI acceptance pending push.
+* Status: Runtime progression and minimal runtime initialization implemented locally; CI acceptance pending.
 
 ## Verification status
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 48
+* Total checks: 49
 * Failed checks: 0
-* Run ID: `verify-20260715T212939Z`
-* Generated at: `2026-07-15T21:29:39Z`
+* Run ID: `verify-20260715T222153Z`
+* Generated at: `2026-07-15T22:21:53Z`
 
 ## Registered validators
 
@@ -60,23 +60,24 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 29 | `runtime_halt_contract` |
 | 30 | `runtime_progression_contract` |
 | 31 | `runtime_progression_entry_contract` |
-| 32 | `runtime_progression_stages` |
-| 33 | `stack_initialization_evidence_contract` |
-| 34 | `stack_initialization_evidence` |
-| 35 | `memory_initialization_evidence_contract` |
-| 36 | `memory_initialization_evidence` |
-| 37 | `boot_blocker_report` |
-| 38 | `boot_protocol_decision` |
-| 39 | `boot_image_skeleton` |
-| 40 | `boot_image_packaging` |
-| 41 | `boot_tooling` |
-| 42 | `kernel_loadability` |
-| 43 | `host_dependency_portability` |
-| 44 | `qemu_smoke_evidence` |
-| 45 | `return_path_proof` |
-| 46 | `execution_proof` |
-| 47 | `validator_coverage` |
-| 48 | `evidence` |
+| 32 | `runtime_progression_evidence` |
+| 33 | `runtime_progression_stages` |
+| 34 | `stack_initialization_evidence_contract` |
+| 35 | `stack_initialization_evidence` |
+| 36 | `memory_initialization_evidence_contract` |
+| 37 | `memory_initialization_evidence` |
+| 38 | `boot_blocker_report` |
+| 39 | `boot_protocol_decision` |
+| 40 | `boot_image_skeleton` |
+| 41 | `boot_image_packaging` |
+| 42 | `boot_tooling` |
+| 43 | `kernel_loadability` |
+| 44 | `host_dependency_portability` |
+| 45 | `qemu_smoke_evidence` |
+| 46 | `return_path_proof` |
+| 47 | `execution_proof` |
+| 48 | `validator_coverage` |
+| 49 | `evidence` |
 
 ## Active contracts
 
@@ -128,7 +129,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 48
+* Check count: 49
 * Failure count: 0
 
 ## Non-goals
