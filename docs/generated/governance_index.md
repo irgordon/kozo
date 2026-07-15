@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.7.2`
+* Version: `v0.7.3`
 * Date: `2026-07-15`
-* Status: Runtime progression model reconciliation.
+* Status: Memory evidence contract hardening.
 
 ## Verification status
 

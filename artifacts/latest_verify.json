@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260715T180050Z",
+  "run_id": "verify-20260715T191512Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -252,7 +252,7 @@
       "subsystem": "memory_initialization_evidence_contract",
       "status": "pass",
       "code": "OK",
-      "detail": "Memory initialization evidence contract governs the future memory proof boundary"
+      "detail": "Memory evidence contract defines an implementation-ready future proof boundary"
     },
     {
       "name": "boot_blocker_report",
@@ -370,5 +370,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-07-15T18:00:50Z"
+  "generated_at": "2026-07-15T19:15:12Z"
 }
