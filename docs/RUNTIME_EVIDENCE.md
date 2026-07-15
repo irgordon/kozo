@@ -64,7 +64,7 @@ v0.6.6 adds `contracts/runtime_progression_stages.v0.json` as the governed sourc
 
 v0.7.0 implements the governed stack initialization evidence path. `_start` sets `rsp` to the static boot stack, performs a minimal stack-use probe, emits `KOZO_STACK_INIT_OK`, and then enters the governed halt loop. This proves controlled stack establishment and stack marker emission only.
 
-v0.7.1 adds `contracts/memory_initialization_evidence_contract.v0.json` as the governed planning authority for future memory initialization evidence. It reserves `KOZO_MEMORY_INIT_OK` as a future marker, but the marker is not emitted, memory initialization is not implemented, and no memory manager, paging, allocator, Odin runtime, userspace, compatibility, or production evidence is proven.
+v0.7.3 hardens `contracts/memory_initialization_evidence_contract.v0.json` into an implementation-ready planning boundary. It fixes the future static region symbols, size, alignment, ownership, zero-fill operation, sentinel survival probe, and marker placement. `KOZO_MEMORY_INIT_OK` remains reserved and un-emitted, memory initialization is not implemented, and no physical memory discovery, paging, virtual memory management, allocator, Odin runtime, userspace, compatibility, or production evidence is proven.
 
 Current local boot blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
 
@@ -85,6 +85,8 @@ The latest inspected v0.4.8 CI artifact captured `KOZO_EARLY_0_ENTRY`, so kernel
 The expected v0.7.0 QEMU serial sequence is `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, and `KOZO_STACK_INIT_OK`.
 
 The reserved future memory evidence marker is `KOZO_MEMORY_INIT_OK`. It is not part of the current QEMU smoke pass sequence and must not be treated as evidence until runtime code emits it and governed validation captures it.
+
+The future memory proof is bounded to one static 4096-byte `.bss` region. Runtime code must zero the entire region, write the contract sentinel at the declared offset, read and compare it exactly, restore the zero fill value, and only then emit `KOZO_MEMORY_INIT_OK` before returning to the existing halt path. That future evidence will not prove physical memory discovery, paging, virtual memory management, allocator or heap behavior, general memory safety, or Odin runtime initialization.
 
 The v0.4.4 ISO path metadata may prove that the configured Limine path is present in packaged ISO contents. It does not prove Limine loaded the ELF, entered the kernel, initialized serial output, or reached `KOZO_BOOT_SMOKE_OK`.
 

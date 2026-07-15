@@ -147,8 +147,9 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 5. Keep the v0.6.2 runtime progression contract as halt-preservation governance, not a second stage-order definition.
 6. Keep the v0.6.3 runtime progression entry marker reserved until stack and memory prerequisites are proven.
 7. Keep the v0.7.0 stack evidence proof as the current highest proven progression stage.
-8. Harden the v0.7.1 memory evidence contract before scheduling memory implementation.
-9. Do not implement progression entry or replace the halt loop until memory and progression-entry evidence are separately implemented and validated.
+8. Implement only the v0.7.3 contract-defined controlled memory proof in v0.7.4.
+9. Keep physical memory discovery, paging, virtual memory management, allocators, heaps, and Odin runtime initialization outside that proof.
+10. Do not implement progression entry or replace the halt loop until memory and progression-entry evidence are separately implemented and validated.
 
 ---
 
@@ -156,8 +157,7 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 
 After CI QEMU serial smoke evidence is green, resume deferred maturity work:
 
-* harden the memory initialization evidence contract before scheduling implementation
-* implement memory initialization evidence only after the hardened contract is accepted
+* implement the hardened static memory initialization evidence boundary
 * add runtime progression entry evidence
 * add runtime initialization evidence
 * add controlled runtime loop evidence
@@ -226,6 +226,7 @@ Deferred until separately scoped runtime or cleanup phases:
 | `v0.7.1` | Memory Initialization Evidence Planning | Add a governed memory initialization evidence contract and reserve `KOZO_MEMORY_INIT_OK` as future evidence without implementing memory setup. | Runtime behavior changes, boot assembly changes, halt replacement, memory setup, allocator behavior, paging behavior, Odin runtime execution, compatibility claims, production-readiness claims. |
 | `v0.7.2` | Runtime Progression Model Reconciliation | Make the canonical stage graph acyclic, monotonic, and single-owner while aligning contracts, validation, planning, and task state. | Runtime behavior changes, marker changes, halt replacement, memory implementation, validator weakening, compatibility claims, production-readiness claims. |
 | `v0.7.3` | Memory Evidence Contract Hardening | Make the planned memory evidence boundary mechanically implementable before scheduling runtime changes. | Memory implementation, `KOZO_MEMORY_INIT_OK` emission, paging, allocator behavior, halt replacement, compatibility claims, production-readiness claims. |
+| `v0.7.4` | Memory Initialization Evidence | Implement only the contract-defined static region initialization and survival probe, emit governed evidence, and retain the halt path. | Physical memory discovery, paging, virtual memory management, allocator or heap behavior, Odin runtime initialization, halt replacement, compatibility claims, production-readiness claims. |
 | `v1.0.0-rc.1` | Release candidate hardening | Freeze scope, freeze gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | New feature scope after RC. |
 | `v1.0.0` | Scoped release | Release only evidence-backed behavior with explicit non-goals. | Any unimplemented compatibility or runtime subsystem claim. |
 

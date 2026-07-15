@@ -140,6 +140,8 @@ Current runtime evidence and runtime contract validators include:
 
 `runtime_progression_stages` performs graph-level validation. It rejects direct and indirect cycles, duplicate identifiers and names, unknown references, forward prerequisites, proven stages with unproven mandatory prerequisites, backward or skipped transitions, unknown contract or validator authorities, and transitions with missing or multiple owners. The traversal is deterministic and contract order remains authoritative.
 
+`memory_initialization_evidence_contract` validates the planned memory proof specification without claiming implementation. It requires the exact controlled-region geometry and ownership, full-region zero-fill operation, bounded sentinel probe and restoration order, and `KOZO_MEMORY_INIT_OK` placement after successful proof steps and before the existing halt loop. It rejects emitted-marker claims while the stage remains planned.
+
 ---
 
 # 11. Evidence and Logs

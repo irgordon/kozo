@@ -10,10 +10,49 @@
     "implemented": false
   },
   "memory_definition": {
-    "description": "Memory initialization means future runtime code has established documented memory structures, selected controlled memory regions, documented ownership, and emitted governed evidence from runtime code.",
+    "description": "Memory initialization means future x86_64 boot code has zero-filled the entire contract-owned static region, completed the bounded write/read survival probe, and emitted governed evidence before returning to the halt path."
+  },
+  "controlled_region": {
+    "source_file": "kernel/arch/x86_64/boot.asm",
+    "section": ".bss",
+    "start_symbol": "boot_memory_region",
+    "end_symbol": "boot_memory_region_end",
+    "size_bytes": 4096,
+    "alignment_bytes": 4096,
+    "allocation_mode": "static",
+    "owner": "x86_64 boot memory evidence path",
+    "lifetime": "entry_to_halt"
+  },
+  "initialization_operation": {
+    "operation": "zero_fill",
+    "coverage": "entire_controlled_region",
+    "fill_value": 0,
+    "width_bytes": 8,
+    "required_before_probe": true
+  },
+  "survival_probe": {
+    "offset_bytes": 0,
+    "write_width_bytes": 8,
+    "sentinel_value": "0x4b4f5a4f4d454d31",
+    "comparison": "exact_readback",
+    "required_steps": [
+      "write_sentinel",
+      "read_sentinel",
+      "compare_equal",
+      "restore_fill_value"
+    ],
+    "required_before_marker": true
+  },
+  "marker_placement": {
     "reserved_marker": "KOZO_MEMORY_INIT_OK",
     "marker_status": "reserved",
-    "marker_emitted": false
+    "marker_emitted": false,
+    "required_after": [
+      "controlled_region_zero_fill",
+      "survival_probe_success"
+    ],
+    "required_before": "runtime_halt_loop",
+    "emission_owner": "x86_64 boot memory evidence path"
   },
   "prerequisites": [
     "QEMU serial smoke evidence",
@@ -24,10 +63,10 @@
     "stack initialization evidence contract"
   ],
   "evidence_requirements": [
-    "memory structures initialized",
-    "ownership documented",
-    "controlled memory region",
-    "KOZO_MEMORY_INIT_OK marker captured from runtime code",
+    "controlled region symbols present in runtime source",
+    "entire controlled region zero-filled by runtime code",
+    "survival probe writes reads compares and restores the sentinel location",
+    "KOZO_MEMORY_INIT_OK marker captured after successful initialization and probe",
     "memory initialization validator proof"
   ],
   "proof_boundary": [
@@ -37,13 +76,14 @@
     "evidence must not replace the halt loop until runtime progression evidence permits it"
   ],
   "assumptions_enabled": [
-    "controlled memory access after the proven memory marker",
-    "eligibility for runtime progression entry after memory and progression path evidence",
-    "safe memory-dependent preparation for later runtime initialization evidence"
+    "bounded access to the contract-owned controlled region after the proven memory marker",
+    "eligibility for runtime progression entry after separate progression path evidence"
   ],
   "assumptions_not_enabled": [
+    "physical memory discovery",
     "paging enabled",
-    "allocator behavior",
+    "virtual memory management",
+    "memory allocator behavior",
     "heap allocation",
     "Odin runtime execution",
     "interrupt handling",
@@ -60,8 +100,10 @@
   ],
   "non_goals": [
     "memory initialization implementation",
+    "physical memory discovery",
     "paging implementation",
-    "allocator behavior",
+    "virtual memory management",
+    "memory allocator behavior",
     "heap allocation",
     "Odin runtime execution",
     "runtime progression execution",

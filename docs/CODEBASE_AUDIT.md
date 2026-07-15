@@ -863,3 +863,29 @@ The stage validator now rejects direct and indirect cycles, duplicate stage iden
 ## 24.4 Next Work
 
 The next phase is `v0.7.3 Memory Evidence Contract Hardening`. It must keep memory evidence planning-only and must not emit `KOZO_MEMORY_INIT_OK` or alter the halt path.
+
+---
+
+# 25. v0.7.3 Memory Evidence Contract Hardening
+
+Date: 2026-07-15
+
+Status: Completed.
+
+## 25.1 Scope
+
+This contract-hardening phase replaced generic future memory language with one exact controlled-region, initialization, survival-probe, and marker-placement specification. It changed contracts, schema, validation, tests, and descriptive planning only.
+
+It did not change assembly, linker layout, runtime behavior, marker emission, the halt loop, ABI contracts, syscall behavior, QEMU behavior, compatibility claims, or production-readiness claims.
+
+## 25.2 Finding Status
+
+| ID | Status | Rationale |
+| --- | --- | --- |
+| AUDIT-072-005 | Resolved | The memory evidence contract now fixes region symbols, 4096-byte size and alignment, static ownership, full-region zero fill, bounded sentinel write/read/compare/restore behavior, and pre-halt marker placement. |
+| AUDIT-064-002 | Deferred | Decomposition of `validator_coverage.py` remains outside the memory evidence boundary. |
+| AUDIT-073-001 | Deferred | The existing Rust package license metadata warning remains a release-hardening concern and does not block this runtime contract phase. |
+
+## 25.3 Next Work
+
+`v0.7.4 Memory Initialization Evidence` may implement only the contract-defined static proof path. Paging, virtual memory management, allocators, heaps, Odin runtime initialization, progression entry, and halt replacement remain deferred.

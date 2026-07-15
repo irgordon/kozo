@@ -8,6 +8,10 @@
     "architecture",
     "current_state",
     "memory_definition",
+    "controlled_region",
+    "initialization_operation",
+    "survival_probe",
+    "marker_placement",
     "prerequisites",
     "evidence_requirements",
     "proof_boundary",
@@ -17,13 +21,8 @@
     "non_goals"
   ],
   "properties": {
-    "version": {
-      "const": 0
-    },
-    "architecture": {
-      "type": "string",
-      "pattern": ".*\\S.*"
-    },
+    "version": {"const": 0},
+    "architecture": {"type": "string", "pattern": ".*\\S.*"},
     "current_state": {
       "type": "object",
       "additionalProperties": false,
@@ -36,113 +35,131 @@
         "implemented"
       ],
       "properties": {
-        "runtime_path": {
-          "type": "string",
-          "pattern": ".*\\S.*"
-        },
-        "halt_contract": {
-          "type": "string",
-          "pattern": ".*\\S.*"
-        },
-        "progression_stages_contract": {
-          "type": "string",
-          "pattern": ".*\\S.*"
-        },
-        "stack_initialization_evidence_contract": {
-          "type": "string",
-          "pattern": ".*\\S.*"
-        },
-        "stage": {
-          "type": "string",
-          "pattern": ".*\\S.*"
-        },
-        "implemented": {
-          "type": "boolean"
-        }
+        "runtime_path": {"type": "string", "pattern": ".*\\S.*"},
+        "halt_contract": {"type": "string", "pattern": ".*\\S.*"},
+        "progression_stages_contract": {"type": "string", "pattern": ".*\\S.*"},
+        "stack_initialization_evidence_contract": {"type": "string", "pattern": ".*\\S.*"},
+        "stage": {"type": "string", "pattern": ".*\\S.*"},
+        "implemented": {"type": "boolean"}
       }
     },
     "memory_definition": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["description"],
+      "properties": {
+        "description": {"type": "string", "pattern": ".*\\S.*"}
+      }
+    },
+    "controlled_region": {
+      "type": "object",
+      "additionalProperties": false,
       "required": [
-        "description",
-        "reserved_marker",
-        "marker_status",
-        "marker_emitted"
+        "source_file",
+        "section",
+        "start_symbol",
+        "end_symbol",
+        "size_bytes",
+        "alignment_bytes",
+        "allocation_mode",
+        "owner",
+        "lifetime"
       ],
       "properties": {
-        "description": {
-          "type": "string",
-          "pattern": ".*\\S.*"
+        "source_file": {"type": "string", "pattern": ".*\\S.*"},
+        "section": {"type": "string", "pattern": ".*\\S.*"},
+        "start_symbol": {"type": "string", "pattern": ".*\\S.*"},
+        "end_symbol": {"type": "string", "pattern": ".*\\S.*"},
+        "size_bytes": {"type": "integer", "minimum": 1},
+        "alignment_bytes": {"type": "integer", "minimum": 1},
+        "allocation_mode": {"type": "string", "pattern": ".*\\S.*"},
+        "owner": {"type": "string", "pattern": ".*\\S.*"},
+        "lifetime": {"type": "string", "pattern": ".*\\S.*"}
+      }
+    },
+    "initialization_operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "coverage",
+        "fill_value",
+        "width_bytes",
+        "required_before_probe"
+      ],
+      "properties": {
+        "operation": {"type": "string", "pattern": ".*\\S.*"},
+        "coverage": {"type": "string", "pattern": ".*\\S.*"},
+        "fill_value": {"type": "integer", "minimum": 0, "maximum": 255},
+        "width_bytes": {"type": "integer", "minimum": 1},
+        "required_before_probe": {"type": "boolean"}
+      }
+    },
+    "survival_probe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "offset_bytes",
+        "write_width_bytes",
+        "sentinel_value",
+        "comparison",
+        "required_steps",
+        "required_before_marker"
+      ],
+      "properties": {
+        "offset_bytes": {"type": "integer", "minimum": 0},
+        "write_width_bytes": {"type": "integer", "minimum": 1},
+        "sentinel_value": {"type": "string", "pattern": "^0x[0-9a-f]{16}$"},
+        "comparison": {"type": "string", "pattern": ".*\\S.*"},
+        "required_steps": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": ".*\\S.*"}
         },
-        "reserved_marker": {
-          "type": "string",
-          "pattern": ".*\\S.*"
+        "required_before_marker": {"type": "boolean"}
+      }
+    },
+    "marker_placement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reserved_marker",
+        "marker_status",
+        "marker_emitted",
+        "required_after",
+        "required_before",
+        "emission_owner"
+      ],
+      "properties": {
+        "reserved_marker": {"type": "string", "pattern": ".*\\S.*"},
+        "marker_status": {"type": "string", "pattern": ".*\\S.*"},
+        "marker_emitted": {"type": "boolean"},
+        "required_after": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": ".*\\S.*"}
         },
-        "marker_status": {
-          "type": "string",
-          "pattern": ".*\\S.*"
-        },
-        "marker_emitted": {
-          "type": "boolean"
-        }
+        "required_before": {"type": "string", "pattern": ".*\\S.*"},
+        "emission_owner": {"type": "string", "pattern": ".*\\S.*"}
       }
     },
-    "prerequisites": {
+    "prerequisites": {"$ref": "#/$defs/nonEmptyStrings"},
+    "evidence_requirements": {"$ref": "#/$defs/nonEmptyStrings"},
+    "proof_boundary": {"$ref": "#/$defs/nonEmptyStrings"},
+    "assumptions_enabled": {"$ref": "#/$defs/nonEmptyStrings"},
+    "assumptions_not_enabled": {"$ref": "#/$defs/nonEmptyStrings"},
+    "future_validators": {"$ref": "#/$defs/nonEmptyStrings"},
+    "non_goals": {"$ref": "#/$defs/nonEmptyStrings"}
+  },
+  "$defs": {
+    "nonEmptyStrings": {
       "type": "array",
       "minItems": 1,
-      "items": {
-        "type": "string",
-        "pattern": ".*\\S.*"
-      }
-    },
-    "evidence_requirements": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string",
-        "pattern": ".*\\S.*"
-      }
-    },
-    "proof_boundary": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string",
-        "pattern": ".*\\S.*"
-      }
-    },
-    "assumptions_enabled": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string",
-        "pattern": ".*\\S.*"
-      }
-    },
-    "assumptions_not_enabled": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string",
-        "pattern": ".*\\S.*"
-      }
-    },
-    "future_validators": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string",
-        "pattern": ".*\\S.*"
-      }
-    },
-    "non_goals": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string",
-        "pattern": ".*\\S.*"
-      }
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": ".*\\S.*"}
     }
   }
 }

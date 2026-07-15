@@ -110,7 +110,7 @@ Current v0.6.6 runtime progression stage governance: `contracts/runtime_progress
 
 Current v0.7.0 stack initialization evidence: `contracts/stack_initialization_evidence_contract.v0.json` defines the controlled boot stack proof. `_start` sets `rsp` to `boot_stack_top`, performs a bounded push/pop probe, emits `KOZO_STACK_INIT_OK`, and then enters the governed halt loop. This proves only controlled stack establishment and marker emission.
 
-Current v0.7.1 memory initialization planning: `contracts/memory_initialization_evidence_contract.v0.json` defines what future memory evidence must prove before KOZO can claim controlled memory initialization. `KOZO_MEMORY_INIT_OK` is reserved but not emitted, and no memory structures, allocator behavior, paging behavior, Odin runtime execution, userspace execution, compatibility, or production readiness are proven.
+Current v0.7.3 memory evidence hardening: `contracts/memory_initialization_evidence_contract.v0.json` defines the future controlled region (`boot_memory_region` through `boot_memory_region_end`), 4096-byte size and alignment, static boot-path ownership, full-region zero fill, bounded sentinel write/read/compare/restore probe, and marker placement before the unchanged halt loop. `KOZO_MEMORY_INIT_OK` remains reserved but not emitted. No memory initialization, physical memory discovery, paging, virtual memory management, allocator behavior, Odin runtime execution, userspace execution, compatibility, or production readiness is proven.
 
 Selected boot protocol: Limine.
 
@@ -203,7 +203,7 @@ The previous `missing_bootable_iso_packaging` blocker was refined to `missing_li
 
 The previous `missing_limine_iso_tooling` blocker is refined by `docs/BOOT_TOOLING.md`.
 
-The QEMU serial smoke path is now proven in CI. The next runtime work must keep that claim narrow and should define the next governed runtime evidence target before expanding behavior.
+The QEMU serial smoke and stack evidence paths are proven in CI. The next runtime phase may implement only the hardened static memory evidence boundary while preserving the existing halt path afterward.
 
 The existing QEMU smoke command writes blocked or passing metadata to `artifacts/runtime/qemu_smoke.metadata.json` and serial output to `artifacts/runtime/qemu_smoke.log`.
 

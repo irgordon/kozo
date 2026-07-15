@@ -94,7 +94,7 @@ Detailed evidence rules are owned by `docs/RELEASE_EVIDENCE.md`.
 The current local generated evidence proves:
 
 * `scripts/verify.sh` passes locally with 47 checks and 0 failures.
-* Unit discovery passes locally with 553 tests.
+* Unit discovery passes locally with 563 tests after the v0.7.3 focused coverage expansion.
 * The kernel ELF uses higher-half PT_LOAD virtual addresses.
 * Local kernel ELF loadability reports no lower-half PHDR blocker.
 * The repository source emits `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, and `KOZO_STACK_INIT_OK` from the assembly entry path.
@@ -108,8 +108,9 @@ The current local generated evidence proves:
 * `contracts/runtime_evidence_taxonomy.v0.json` governs QEMU serial smoke marker order, smoke outcomes, blocker categories, pass condition, blocked condition, and taxonomy non-goals.
 * `contracts/runtime_progression_stages.v0.json` is the sole authority for the acyclic runtime progression order, allowed transitions, and transition ownership from `BOOT_SMOKE` through `USERSPACE_PLANNING`.
 * `contracts/stack_initialization_evidence_contract.v0.json` governs controlled stack initialization evidence, and `stack_initialization_evidence` validates the source and marker evidence boundary.
-* `contracts/memory_initialization_evidence_contract.v0.json` governs future memory initialization evidence planning. `KOZO_MEMORY_INIT_OK` is reserved but not emitted.
+* `contracts/memory_initialization_evidence_contract.v0.json` now governs an implementation-ready future memory proof boundary with fixed region geometry, zero-fill semantics, a bounded survival probe, and pre-halt marker placement. `KOZO_MEMORY_INIT_OK` remains reserved but not emitted.
 * v0.7.1 is accepted by the CI validator gate; memory evidence remains planned rather than implemented.
+* v0.7.3 hardens the memory evidence contract without changing runtime behavior.
 * Local QEMU smoke evidence remains blocked by `missing_iso_generation_tooling` because the local environment does not provide the CI Limine/xorriso tooling path.
 
 ## Current Active Blocker
@@ -122,7 +123,7 @@ Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr
 
 ## Next Runtime Phase
 
-The next phase is `v0.7.3 Memory Evidence Contract Hardening`. It must strengthen the memory proof boundary and implementability requirements without implementing memory initialization or replacing the halt path.
+The next phase is `v0.7.4 Memory Initialization Evidence`. It may implement only the contract-defined static region, full-region zero fill, bounded survival probe, and `KOZO_MEMORY_INIT_OK` emission before returning to the existing halt loop.
 
 ---
 
@@ -174,6 +175,7 @@ The next phase is `v0.7.3 Memory Evidence Contract Hardening`. It must strengthe
 | `v0.7.1` | Memory Initialization Evidence Planning | Define the future evidence boundary for controlled memory initialization before any memory setup implementation. | `contracts/memory_initialization_evidence_contract.v0.json`, memory initialization evidence schema/loader/validator/tests, progression contract alignment, planning/evidence/contract docs. | `KOZO_MEMORY_INIT_OK` is reserved but not emitted, memory initialization remains unimplemented, and no runtime behavior, ABI, syscall, linker, QEMU smoke, compatibility, or production-readiness claim changes. |
 | `v0.7.2` | Runtime Progression Model Reconciliation | Remove the stack/entry dependency cycle and enforce an acyclic, monotonic, authority-backed progression graph without changing runtime behavior. | Reconciled progression contracts, graph-level stage validation, focused negative tests, aligned planning/audit/task state. | `STACK_INITIALIZATION_EVIDENCE` is proven, `MEMORY_INITIALIZATION_EVIDENCE` and `RUNTIME_PROGRESSION_ENTRY` remain planned, every prerequisite points backward, and every transition has one owner. |
 | `v0.7.3` | Memory Evidence Contract Hardening | Strengthen the planned memory evidence boundary before implementation work begins. | Hardened memory evidence contract, implementability requirements, focused validator tests, planning alignment. | Memory evidence remains planning-only, `KOZO_MEMORY_INIT_OK` remains unclaimed, and implementation is not scheduled until the proof boundary is mechanically complete. |
+| `v0.7.4` | Memory Initialization Evidence | Implement the hardened minimal controlled-memory proof without expanding into memory management. | Static controlled region, full-region zero fill, bounded sentinel probe, runtime marker emission, governed memory evidence validator. | `KOZO_MEMORY_INIT_OK` is captured after the contract-defined proof and before the unchanged halt loop; no paging, allocator, virtual-memory, Odin-runtime, userspace, compatibility, or production claim is added. |
 | `v1.0.0-rc.1` | Release candidate hardening | Freeze release scope and release gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | Release evidence bundle, completed release checklist, current generated reports, changelog/release notes dry run, all required CI checks green. | Release candidate can be reviewed without adding new scope. |
 | `v1.0.0` | Scoped production release | Release only the proven, scoped KOZO surface. | Final release evidence bundle, final changelog and release notes, passing required gates, explicit non-goals. | v1.0.0 claims only evidence-backed behavior and preserves all compatibility non-goals. |
 

@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.7.3 - 2026-07-15
+
+**Status:** Memory evidence contract hardening.
+
+### Changed
+
+* Hardened `contracts/memory_initialization_evidence_contract.v0.json` with an exact future static region, size, alignment, ownership, lifetime, initialization operation, write/read survival probe, and marker placement.
+* Extended `memory_initialization_evidence_contract` validation and focused negative coverage for region geometry, initialization completeness, probe bounds and ordering, and pre-halt marker placement.
+* Aligned runtime evidence, contract, validation, audit, phase, roadmap, and task-state documentation with the implementation-ready planning boundary.
+
+### Notes
+
+* `KOZO_MEMORY_INIT_OK` remains reserved and un-emitted; memory initialization remains planned rather than proven.
+* This change does not alter runtime behavior, boot assembly, ABI contracts, syscall behavior, linker layout, QEMU smoke behavior, stack evidence, or the authoritative halt loop.
+* This change does not add physical memory discovery, paging, virtual memory management, allocator or heap behavior, Odin runtime execution, interrupts, scheduler behavior, userspace execution, compatibility claims, or production-readiness claims.
+
 ## v0.7.2 - 2026-07-15
 
 **Status:** Runtime progression model reconciliation.

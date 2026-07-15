@@ -194,9 +194,11 @@ This contract does not allocate memory dynamically, execute Odin runtime code, r
 
 `contracts/memory_initialization_evidence_contract.v0.json` defines what KOZO must prove before claiming controlled memory initialization evidence.
 
-It reserves `KOZO_MEMORY_INIT_OK`, defines future memory evidence requirements, maps assumptions enabled by future memory evidence, records assumptions that remain invalid, and keeps memory initialization subordinate to the runtime halt and progression stage contracts.
+It reserves `KOZO_MEMORY_INIT_OK` and defines the exact future proof boundary: a 4096-byte, 4096-byte-aligned static `.bss` region owned by the x86_64 boot memory evidence path; full-region zero fill; a bounded 64-bit sentinel write/read/compare/restore probe; and marker emission only after initialization and probe success and before the halt loop.
 
-The marker is reserved and not emitted by current runtime code. This contract does not implement memory initialization, paging, allocator behavior, heap allocation, Odin runtime execution, halt replacement, interrupts, scheduler behavior, userspace execution, compatibility, or production readiness.
+The contract owns the destination-stage proof boundary. `contracts/runtime_progression_stages.v0.json` remains the sole authority for stage order and transitions. The schema and validator make the planned boundary mechanically checkable without treating planned symbols or a reserved marker as runtime evidence.
+
+The marker is reserved and not emitted by current runtime code. This contract does not implement memory initialization, physical memory discovery, paging, virtual memory management, allocator behavior, heap allocation, Odin runtime execution, halt replacement, interrupts, scheduler behavior, userspace execution, compatibility, or production readiness.
 
 ---
 
