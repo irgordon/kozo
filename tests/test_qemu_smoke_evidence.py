@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 
 from harness.codes import OK, QEMU_SMOKE_EVIDENCE_INVALID
+from harness.runtime_evidence_taxonomy import get_expected_smoke_marker, get_smoke_marker_order
 from harness.validators_impl import qemu_smoke_evidence as validator_module
 from harness.validators_impl.qemu_smoke_evidence import QemuSmokeEvidenceValidator
 
@@ -128,6 +129,30 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
 
+    def test_accepts_runtime_progression_entry_not_reached_blocker(self):
+        result = self.validate_blocked_fixture(
+            "runtime_progression_entry_not_reached",
+            "\n".join(early_markers()[:6]) + "\n",
+        )
+
+        self.assertEqual(result.status, "pass")
+
+    def test_accepts_runtime_initialization_not_proven_blocker(self):
+        result = self.validate_blocked_fixture(
+            "runtime_initialization_not_proven",
+            "\n".join(early_markers()[:7]) + "\n",
+        )
+
+        self.assertEqual(result.status, "pass")
+
+    def test_accepts_runtime_return_not_reached_blocker(self):
+        result = self.validate_blocked_fixture(
+            "runtime_return_not_reached",
+            "\n".join(early_markers()[:8]) + "\n",
+        )
+
+        self.assertEqual(result.status, "pass")
+
     def test_accepts_serial_init_start_only_as_serial_not_initialized(self):
         result = self.validate_blocked_fixture("serial_not_initialized", "KOZO_EARLY_1_SERIAL_INIT_START\n")
 
@@ -171,7 +196,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
 
     def test_fails_when_pass_metadata_has_final_marker_without_prior_markers(self):
         self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
-        final_marker_only = "Limine\nKOZO_MEMORY_INIT_OK\n"
+        final_marker_only = f"Limine\n{get_expected_smoke_marker()}\n"
         result = self.validate_fixture(
             metadata_factory=lambda: valid_metadata("pass", serial_text=final_marker_only),
             mutate_serial_log=lambda _: final_marker_only,
@@ -189,6 +214,9 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
             "KOZO_EARLY_2_SERIAL_INIT_OK\n"
             "KOZO_STACK_INIT_OK\n"
             "KOZO_MEMORY_INIT_OK\n"
+            "KOZO_RUNTIME_PROGRESS_ENTRY\n"
+            "KOZO_RUNTIME_INIT_OK\n"
+            "KOZO_RUNTIME_RETURN_OK\n"
         )
         result = self.validate_fixture(
             metadata_factory=lambda: valid_metadata("pass", serial_text=out_of_order),
@@ -332,7 +360,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
 
     def test_fails_when_summary_expected_marker_is_missing(self):
         self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
-        result = self.validate_fixture(mutate_summary=lambda text: text.replace("Expected Marker: KOZO_MEMORY_INIT_OK", "Expected Marker:"))
+        result = self.validate_fixture(mutate_summary=lambda text: text.replace(f"Expected Marker: {get_expected_smoke_marker()}", "Expected Marker:"))
 
         self.assertEqual(result.status, "fail")
         self.assert_qemu_failure(result, "summary_metadata_mismatch", "qemu_smoke.summary.expected_marker")
@@ -547,7 +575,7 @@ def valid_metadata(outcome: str, *, serial_text: str | None = None, stderr_text:
         "boot_image": "artifacts/runtime/boot_image/kozo.iso",
         "serial_log": "artifacts/runtime/qemu_smoke.log",
         "stderr_log": "artifacts/runtime/qemu_smoke.stderr.log",
-        "expected_marker": "KOZO_MEMORY_INIT_OK",
+        "expected_marker": get_expected_smoke_marker(),
         "early_markers": list(early_markers()),
         "observed_markers": observed,
         "earliest_observed_marker": observed[0] if observed else "",
@@ -565,12 +593,13 @@ def valid_metadata(outcome: str, *, serial_text: str | None = None, stderr_text:
         "proves": [
             "QEMU launched the KOZO ISO",
             "serial output was captured",
-            "the expected KOZO memory initialization marker was observed",
+            "the expected KOZO runtime return marker was observed",
         ],
         "does_not_prove": [
             "hardware trap execution",
             "interrupt handling",
-            "Odin runtime execution",
+            "complete Odin runtime readiness",
+            "dynamic initialization",
             "general stack readiness",
             "general memory management",
             "syscall dispatch",
@@ -606,6 +635,9 @@ def valid_doc_text() -> str:
             "KOZO_BOOT_SMOKE_OK",
             "KOZO_STACK_INIT_OK",
             "KOZO_MEMORY_INIT_OK",
+            "KOZO_RUNTIME_PROGRESS_ENTRY",
+            "KOZO_RUNTIME_INIT_OK",
+            "KOZO_RUNTIME_RETURN_OK",
         )
     )
 
@@ -616,15 +648,7 @@ def remove_list_value(metadata: dict[str, object], key: str, value: str) -> dict
 
 
 def default_serial_log_text() -> str:
-    return (
-        "Limine\n"
-        "KOZO_EARLY_0_ENTRY\n"
-        "KOZO_EARLY_1_SERIAL_INIT_START\n"
-        "KOZO_EARLY_2_SERIAL_INIT_OK\n"
-        "KOZO_BOOT_SMOKE_OK\n"
-        "KOZO_STACK_INIT_OK\n"
-        "KOZO_MEMORY_INIT_OK\n"
-    )
+    return "Limine\n" + "\n".join(get_smoke_marker_order()) + "\n"
 
 
 def default_stderr_log_text() -> str:
@@ -676,14 +700,7 @@ def valid_summary_text(metadata: dict[str, object]) -> str:
 
 
 def early_markers() -> tuple[str, ...]:
-    return (
-        "KOZO_EARLY_0_ENTRY",
-        "KOZO_EARLY_1_SERIAL_INIT_START",
-        "KOZO_EARLY_2_SERIAL_INIT_OK",
-        "KOZO_BOOT_SMOKE_OK",
-        "KOZO_STACK_INIT_OK",
-        "KOZO_MEMORY_INIT_OK",
-    )
+    return get_smoke_marker_order()
 
 
 def observed_markers(serial_text: str, stderr_text: str) -> list[str]:

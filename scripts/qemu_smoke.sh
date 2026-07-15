@@ -12,13 +12,16 @@ QEMU_METADATA="$RUNTIME_DIR/qemu_smoke.metadata.json"
 QEMU_STDERR_LOG="$RUNTIME_DIR/qemu_smoke.stderr.log"
 QEMU_SUMMARY="$RUNTIME_DIR/qemu_smoke.summary.txt"
 BOOT_BLOCKER_REPORT="$RUNTIME_DIR/boot_blocker_report.json"
-EXPECTED_MARKER="KOZO_MEMORY_INIT_OK"
+EXPECTED_MARKER="KOZO_RUNTIME_RETURN_OK"
 EARLY_MARKERS=(
   "KOZO_EARLY_0_ENTRY"
   "KOZO_EARLY_1_SERIAL_INIT_START"
   "KOZO_EARLY_2_SERIAL_INIT_OK"
   "KOZO_BOOT_SMOKE_OK"
   "KOZO_STACK_INIT_OK"
+  "KOZO_MEMORY_INIT_OK"
+  "KOZO_RUNTIME_PROGRESS_ENTRY"
+  "KOZO_RUNTIME_INIT_OK"
   "$EXPECTED_MARKER"
 )
 QEMU_TIMEOUT_SECONDS="${KOZO_QEMU_TIMEOUT_SECONDS:-20}"
@@ -226,6 +229,12 @@ elif markers[3] in observed and markers[4] not in observed:
     print("stack_marker_not_emitted")
 elif markers[4] in observed and markers[5] not in observed:
     print("memory_marker_not_emitted")
+elif markers[5] in observed and markers[6] not in observed:
+    print("runtime_progression_entry_not_reached")
+elif markers[6] in observed and markers[7] not in observed:
+    print("runtime_initialization_not_proven")
+elif markers[7] in observed and markers[8] not in observed:
+    print("runtime_return_not_reached")
 elif observed and observed[0] != markers[0]:
     print("qemu_timeout")
 else:
@@ -301,7 +310,7 @@ def _proves(outcome: str) -> list[str]:
         return [
             "QEMU launched the KOZO ISO",
             "serial output was captured",
-            "the expected KOZO memory initialization marker was observed",
+            "the expected KOZO runtime return marker was observed",
         ]
     return [
         "QEMU serial smoke was attempted or checked",
@@ -339,7 +348,8 @@ metadata = {
     "does_not_prove": [
         "hardware trap execution",
         "interrupt handling",
-        "Odin runtime execution",
+        "complete Odin runtime readiness",
+        "dynamic initialization",
         "general stack readiness",
         "general memory management",
         "syscall dispatch",

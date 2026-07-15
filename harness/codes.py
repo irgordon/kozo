@@ -43,6 +43,7 @@ RUNTIME_EVIDENCE_TAXONOMY_INVALID = "RUNTIME_EVIDENCE_TAXONOMY_INVALID"
 RUNTIME_HALT_CONTRACT_INVALID = "RUNTIME_HALT_CONTRACT_INVALID"
 RUNTIME_PROGRESSION_CONTRACT_INVALID = "RUNTIME_PROGRESSION_CONTRACT_INVALID"
 RUNTIME_PROGRESSION_ENTRY_CONTRACT_INVALID = "RUNTIME_PROGRESSION_ENTRY_CONTRACT_INVALID"
+RUNTIME_PROGRESSION_EVIDENCE_INVALID = "RUNTIME_PROGRESSION_EVIDENCE_INVALID"
 RUNTIME_PROGRESSION_STAGES_INVALID = "RUNTIME_PROGRESSION_STAGES_INVALID"
 STACK_INITIALIZATION_EVIDENCE_CONTRACT_INVALID = "STACK_INITIALIZATION_EVIDENCE_CONTRACT_INVALID"
 STACK_INITIALIZATION_EVIDENCE_INVALID = "STACK_INITIALIZATION_EVIDENCE_INVALID"
@@ -103,7 +104,8 @@ CODES = MappingProxyType(
         RUNTIME_EVIDENCE_TAXONOMY_INVALID: "Runtime evidence taxonomy is missing, malformed, or inconsistent with governed smoke vocabulary",
         RUNTIME_HALT_CONTRACT_INVALID: "Runtime halt contract is missing, malformed, or inconsistent with the post-smoke terminal path",
         RUNTIME_PROGRESSION_CONTRACT_INVALID: "Runtime progression contract is missing, malformed, or inconsistent with halt-to-runtime transition governance",
-        RUNTIME_PROGRESSION_ENTRY_CONTRACT_INVALID: "Runtime progression entry contract is missing, malformed, or inconsistent with future entry governance",
+        RUNTIME_PROGRESSION_ENTRY_CONTRACT_INVALID: "Runtime progression entry contract is missing, malformed, or inconsistent with the assembly-to-Odin boundary",
+        RUNTIME_PROGRESSION_EVIDENCE_INVALID: "Runtime progression evidence is missing, malformed, or inconsistent with source, symbols, markers, stages, or halt behavior",
         RUNTIME_PROGRESSION_STAGES_INVALID: "Runtime progression stages contract is missing, malformed, or inconsistent with canonical progression ordering",
         STACK_INITIALIZATION_EVIDENCE_CONTRACT_INVALID: "Stack initialization evidence contract is missing, malformed, or inconsistent with future stack proof governance",
         STACK_INITIALIZATION_EVIDENCE_INVALID: "Stack initialization evidence is missing, malformed, or inconsistent with the controlled boot stack proof",

@@ -2,10 +2,10 @@
   "version": 0,
   "architecture": "x86_64",
   "current_state": {
-    "path": "boot_smoke_to_stack_and_memory_evidence_to_halt",
+    "path": "boot_smoke_to_stack_memory_and_runtime_progression_to_halt",
     "halt_contract": "contracts/runtime_halt_contract.v0.json",
     "progression_stages_contract": "contracts/runtime_progression_stages.v0.json",
-    "final_smoke_marker": "KOZO_BOOT_SMOKE_OK",
+    "final_smoke_marker": "KOZO_RUNTIME_RETURN_OK",
     "terminal_behavior": "halt_loop"
   },
   "progression_prerequisites": [
@@ -14,8 +14,8 @@
     "progression path evidence"
   ],
   "transition_requirements": [
-    "halt loop remains authoritative until runtime progression is separately proven",
-    "runtime progression must have contract-backed evidence before halt behavior changes",
+    "halt loop remains authoritative after bounded runtime progression",
+    "runtime progression must have contract-backed evidence before stage claims change",
     "runtime progression must preserve the existing QEMU smoke marker sequence until a successor evidence path is accepted",
     "runtime progression must update release evidence and validation before claims expand"
   ],
@@ -36,7 +36,8 @@
     "planning document update"
   ],
   "non_goals": [
-    "Odin runtime execution",
+    "complete Odin runtime readiness",
+    "dynamic initialization",
     "userspace execution",
     "interrupt handling",
     "scheduler behavior",

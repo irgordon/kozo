@@ -8,6 +8,10 @@
     "architecture",
     "current_state",
     "progression_entry",
+    "calling_convention",
+    "bootstrap_context",
+    "runtime_initialization",
+    "return_boundary",
     "required_prerequisites",
     "required_evidence",
     "transition_requirements",
@@ -16,126 +20,121 @@
     "non_goals"
   ],
   "properties": {
-    "version": {
-      "const": 0
+    "version": {"const": 0},
+    "architecture": {"const": "x86_64"},
+    "current_state": {"$ref": "#/$defs/currentState"},
+    "progression_entry": {"$ref": "#/$defs/progressionEntry"},
+    "calling_convention": {"$ref": "#/$defs/callingConvention"},
+    "bootstrap_context": {"$ref": "#/$defs/bootstrapContext"},
+    "runtime_initialization": {"$ref": "#/$defs/runtimeInitialization"},
+    "return_boundary": {"$ref": "#/$defs/returnBoundary"},
+    "required_prerequisites": {"$ref": "#/$defs/nonEmptyStrings"},
+    "required_evidence": {"$ref": "#/$defs/nonEmptyStrings"},
+    "transition_requirements": {"$ref": "#/$defs/nonEmptyStrings"},
+    "forbidden_shortcuts": {"$ref": "#/$defs/nonEmptyStrings"},
+    "transition_ownership": {"$ref": "#/$defs/nonEmptyStrings"},
+    "non_goals": {"$ref": "#/$defs/nonEmptyStrings"}
+  },
+  "$defs": {
+    "nonEmptyString": {"type": "string", "pattern": ".*\\S.*"},
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/nonEmptyString"}
     },
-    "architecture": {
-      "type": "string",
-      "pattern": ".*\\S.*"
-    },
-    "current_state": {
+    "currentState": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "path",
-        "halt_contract",
-        "progression_contract",
-        "progression_stages_contract",
-        "final_smoke_marker",
-        "terminal_behavior"
-      ],
+      "required": ["path", "halt_contract", "progression_contract", "progression_stages_contract", "final_smoke_marker", "terminal_behavior"],
       "properties": {
-        "path": {
-          "type": "string",
-          "pattern": ".*\\S.*"
-        },
-        "halt_contract": {
-          "type": "string",
-          "pattern": ".*\\S.*"
-        },
-        "progression_contract": {
-          "type": "string",
-          "pattern": ".*\\S.*"
-        },
-        "progression_stages_contract": {
-          "type": "string",
-          "pattern": ".*\\S.*"
-        },
-        "final_smoke_marker": {
-          "type": "string",
-          "pattern": ".*\\S.*"
-        },
-        "terminal_behavior": {
-          "type": "string",
-          "pattern": ".*\\S.*"
-        }
+        "path": {"$ref": "#/$defs/nonEmptyString"},
+        "halt_contract": {"$ref": "#/$defs/nonEmptyString"},
+        "progression_contract": {"$ref": "#/$defs/nonEmptyString"},
+        "progression_stages_contract": {"$ref": "#/$defs/nonEmptyString"},
+        "final_smoke_marker": {"$ref": "#/$defs/nonEmptyString"},
+        "terminal_behavior": {"const": "halt_loop"}
       }
     },
-    "progression_entry": {
+    "progressionEntry": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "marker",
-        "status",
-        "emitted",
-        "entry_boundary"
-      ],
+      "required": ["marker", "status", "emitted", "entry_boundary", "source_file", "assembly_entry_symbol", "target_symbol"],
       "properties": {
-        "marker": {
-          "type": "string",
-          "pattern": ".*\\S.*"
-        },
-        "status": {
-          "type": "string",
-          "enum": [
-            "reserved"
-          ]
-        },
-        "emitted": {
-          "type": "boolean"
-        },
-        "entry_boundary": {
-          "type": "string",
-          "pattern": ".*\\S.*"
-        }
+        "marker": {"const": "KOZO_RUNTIME_PROGRESS_ENTRY"},
+        "status": {"const": "implemented"},
+        "emitted": {"const": true},
+        "entry_boundary": {"$ref": "#/$defs/nonEmptyString"},
+        "source_file": {"$ref": "#/$defs/nonEmptyString"},
+        "assembly_entry_symbol": {"const": "_start"},
+        "target_symbol": {"const": "runtime_progression_entry"}
       }
     },
-    "required_prerequisites": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string",
-        "pattern": ".*\\S.*"
+    "callingConvention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "argument_registers", "return_register", "caller_saved_registers", "callee_saved_registers", "call_site_stack_alignment_bytes", "callee_entry_stack_modulo_bytes", "red_zone_policy"],
+      "properties": {
+        "name": {"const": "System V AMD64 C"},
+        "argument_registers": {"$ref": "#/$defs/nonEmptyStrings"},
+        "return_register": {"const": "eax"},
+        "caller_saved_registers": {"$ref": "#/$defs/nonEmptyStrings"},
+        "callee_saved_registers": {"$ref": "#/$defs/nonEmptyStrings"},
+        "call_site_stack_alignment_bytes": {"const": 16},
+        "callee_entry_stack_modulo_bytes": {"const": 8},
+        "red_zone_policy": {"const": "disabled_by_freestanding_build"}
       }
     },
-    "required_evidence": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string",
-        "pattern": ".*\\S.*"
+    "contextField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "offset_bytes", "width_bytes"],
+      "properties": {
+        "name": {"$ref": "#/$defs/nonEmptyString"},
+        "offset_bytes": {"type": "integer", "minimum": 0},
+        "width_bytes": {"const": 8}
       }
     },
-    "transition_requirements": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string",
-        "pattern": ".*\\S.*"
+    "bootstrapContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "size_bytes", "symbol", "fields", "required_zero_fields", "ownership", "lifetime"],
+      "properties": {
+        "version": {"const": 1},
+        "size_bytes": {"const": 64},
+        "symbol": {"const": "runtime_bootstrap_context"},
+        "fields": {"type": "array", "minItems": 8, "maxItems": 8, "items": {"$ref": "#/$defs/contextField"}},
+        "required_zero_fields": {"$ref": "#/$defs/nonEmptyStrings"},
+        "ownership": {"$ref": "#/$defs/nonEmptyString"},
+        "lifetime": {"$ref": "#/$defs/nonEmptyString"}
       }
     },
-    "forbidden_shortcuts": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string",
-        "pattern": ".*\\S.*"
+    "runtimeInitialization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_file", "entry_symbol", "marker", "marker_emission_owner", "serial_bridge_symbol", "state_symbol", "state_sentinel", "operation", "success_status"],
+      "properties": {
+        "source_file": {"$ref": "#/$defs/nonEmptyString"},
+        "entry_symbol": {"const": "runtime_progression_entry"},
+        "marker": {"const": "KOZO_RUNTIME_INIT_OK"},
+        "marker_emission_owner": {"$ref": "#/$defs/nonEmptyString"},
+        "serial_bridge_symbol": {"const": "runtime_serial_write_init_marker"},
+        "state_symbol": {"const": "runtime_progression_state"},
+        "state_sentinel": {"type": "string", "pattern": "^0x[0-9a-f]+$"},
+        "operation": {"const": "bounded_write_read_restore"},
+        "success_status": {"const": 0}
       }
     },
-    "transition_ownership": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string",
-        "pattern": ".*\\S.*"
-      }
-    },
-    "non_goals": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string",
-        "pattern": ".*\\S.*"
+    "returnBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["marker", "status", "emitted", "required_status", "terminal_behavior"],
+      "properties": {
+        "marker": {"const": "KOZO_RUNTIME_RETURN_OK"},
+        "status": {"const": "implemented"},
+        "emitted": {"const": true},
+        "required_status": {"const": 0},
+        "terminal_behavior": {"const": "halt_loop"}
       }
     }
   }

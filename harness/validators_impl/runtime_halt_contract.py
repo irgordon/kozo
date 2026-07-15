@@ -11,7 +11,7 @@ from harness.validator import BaseValidator, ValidationResult
 _CONTRACT_PATH = runtime_halt_contract.CONTRACT_PATH
 _EXPECTED_ARCHITECTURE = "x86_64"
 _EXPECTED_ENTRY_SYMBOL = "_start"
-_EXPECTED_MARKER_TEXT = "KOZO_BOOT_SMOKE_OK"
+_EXPECTED_MARKER_TEXT = "KOZO_RUNTIME_RETURN_OK"
 _EXPECTED_TERMINAL_KIND = "halt_loop"
 _REQUIRED_NON_GOALS = (
     "hardware trap execution",
@@ -125,7 +125,7 @@ def _marker_definition_issue(context: RuntimeHaltContext) -> RuntimeHaltIssue | 
 
 def _terminal_behavior_issue(context: RuntimeHaltContext) -> RuntimeHaltIssue | None:
     marker_index = _marker_write_index(context.entry_lines, context.contract)
-    terminal = _terminal_indexes(context.entry_lines, context.contract)
+    terminal = _terminal_indexes(context.entry_lines, context.contract, marker_index)
     if marker_index is None:
         return _issue("missing_marker", "final_smoke_marker.write_macro", "Final smoke marker write is missing from entry path")
     if terminal.first_index is None:
@@ -152,9 +152,10 @@ class TerminalIndexes:
 def _terminal_indexes(
     lines: tuple[str, ...],
     contract: runtime_halt_contract.RuntimeHaltContract,
+    marker_index: int | None,
 ) -> TerminalIndexes:
     label = contract.terminal_behavior.label
-    cli_index = _line_index(lines, "cli") if contract.terminal_behavior.disable_interrupts else None
+    cli_index = _line_index_after(lines, "cli", marker_index) if contract.terminal_behavior.disable_interrupts else None
     hlt_index = _line_index_after(lines, "hlt", cli_index)
     jump_index = _line_index_after(lines, f"jmp {label}", hlt_index)
     first_candidates = [index for index in (cli_index, hlt_index, jump_index) if index is not None]
@@ -196,7 +197,12 @@ def _entry_lines(source_text: str, entry_symbol: str) -> tuple[str, ...] | None:
         start_index = lines.index(entry_label)
     except ValueError:
         return None
-    return lines[start_index + 1:]
+    body = []
+    for line in lines[start_index + 1:]:
+        if _is_global_label(line):
+            break
+        body.append(line)
+    return tuple(body)
 
 
 def _normalized_lines(source_text: str) -> list[str]:
@@ -233,6 +239,10 @@ def _expected_value_issue(
 
 def _is_label(line: str) -> bool:
     return line.endswith(":")
+
+
+def _is_global_label(line: str) -> bool:
+    return _is_label(line) and not line.startswith(".")
 
 
 def _first_issue(*issues: RuntimeHaltIssue | None) -> RuntimeHaltIssue | None:

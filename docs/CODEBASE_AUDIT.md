@@ -896,7 +896,7 @@ It did not change assembly, linker layout, runtime behavior, marker emission, th
 
 Date: 2026-07-15
 
-Status: Implemented locally; CI acceptance remains pending until push.
+Status: Accepted by CI validator gate; manual artifact inspection not completed.
 
 ## 26.1 Scope
 
@@ -912,8 +912,36 @@ This phase implements the hardened static-memory evidence boundary only. The ass
 
 ## 26.3 Boundaries
 
-The implementation does not add physical memory discovery, paging, virtual memory management, allocation, heap behavior, memory protection, Odin runtime execution, progression entry, interrupts, scheduling, userspace, compatibility, or production readiness. The halt loop remains authoritative.
+The implementation does not add physical memory discovery, paging, virtual memory management, allocation, heap behavior, memory protection, Odin runtime execution, progression entry, interrupts, scheduling, userspace, compatibility, or production readiness. The halt loop remains authoritative for the accepted v0.7.4 path.
 
 ## 26.4 Next Work
 
-The next milestone is `v0.7.5 Runtime Initialization Evidence Planning`. It must define evidence requirements before any progression-entry or runtime-initialization behavior is added.
+The next milestone became v0.7.45 bounded runtime progression after the stack and memory prerequisites were accepted.
+
+---
+
+# 27. v0.7.45 Runtime Progression Entry and Minimal Runtime Initialization
+
+Date: 2026-07-15
+
+Status: Implemented locally; CI acceptance pending.
+
+## 27.1 Scope
+
+This phase adds one fixed System V AMD64 assembly-to-Odin call after memory evidence. The context is fixed-width and boot-owned, the Odin operation is a bounded static-state write/read/restore probe, marker output uses a fixed no-input assembly bridge, exact status zero is required, and control returns to the authoritative halt path.
+
+## 27.2 Finding Status
+
+| ID | Status | Rationale |
+| --- | --- | --- |
+| AUDIT-0745-001 | Resolved locally | Calling convention, stack alignment, red-zone policy, context layout, marker ownership, return status, linked symbols, and terminal continuation are mechanically validated. CI execution evidence remains pending. |
+| AUDIT-064-002 | Deferred | `validator_coverage.py` is 1293 lines and remains above the preferred split threshold; decomposition is outside this runtime phase. |
+| AUDIT-073-001 | Deferred | The existing Rust package license metadata warning remains release-hardening work and does not affect the internal progression boundary. |
+
+## 27.3 Boundaries
+
+The internal bootstrap context is not a userspace ABI or security boundary. This phase does not add complete Odin runtime readiness, dynamic initialization, paging, allocation, interrupts, scheduling, userspace, a hardware syscall boundary, compatibility, or production readiness.
+
+## 27.4 Next Work
+
+First accept or reject v0.7.45 from CI marker and validator evidence. If accepted, the next implementation milestone is `v0.7.5 Controlled Runtime Loop`.

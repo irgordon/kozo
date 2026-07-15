@@ -2,7 +2,7 @@
   "version": 0,
   "architecture": "x86_64",
   "current_state": {
-    "path": "boot_smoke_to_stack_and_memory_evidence_to_halt",
+    "path": "boot_smoke_to_stack_memory_and_runtime_progression_to_halt",
     "halt_contract": "contracts/runtime_halt_contract.v0.json",
     "progression_contract": "contracts/runtime_progression_contract.v0.json",
     "progression_entry_contract": "contracts/runtime_progression_entry_contract.v0.json",
@@ -100,8 +100,8 @@
     {
       "stage_id": 3,
       "stage_name": "RUNTIME_PROGRESSION_ENTRY",
-      "description": "Future runtime code emits the reserved progression entry marker after stack and memory evidence and before halt replacement.",
-      "status": "planned",
+            "description": "Implemented assembly code enters the bounded Odin runtime path after stack and memory evidence; CI evidence remains required for proof.",
+            "status": "implemented_pending_ci",
       "required_prerequisites": [
         "MEMORY_INITIALIZATION_EVIDENCE"
       ],
@@ -116,8 +116,9 @@
       ],
       "required_validators": [
         "runtime_progression_contract",
-        "runtime_progression_entry_contract",
-        "qemu_smoke_evidence"
+                "runtime_progression_entry_contract",
+                "runtime_progression_evidence",
+                "qemu_smoke_evidence"
       ],
       "allowed_next_stages": [
         "RUNTIME_INITIALIZATION_EVIDENCE"
@@ -131,20 +132,20 @@
     {
       "stage_id": 4,
       "stage_name": "RUNTIME_INITIALIZATION_EVIDENCE",
-      "description": "Future evidence proves the minimal governed runtime initialization boundary after progression entry.",
-      "status": "planned",
+            "description": "Implemented Odin code validates bootstrap context and performs a bounded runtime-state probe; CI evidence remains required for proof.",
+            "status": "implemented_pending_ci",
       "required_prerequisites": [
         "RUNTIME_PROGRESSION_ENTRY"
       ],
       "required_evidence": [
-        "QEMU evidence for runtime initialization marker",
-        "runtime initialization metadata"
+                "QEMU evidence for KOZO_RUNTIME_INIT_OK",
+                "QEMU evidence for KOZO_RUNTIME_RETURN_OK"
       ],
       "required_contracts": [
-        "planned:runtime_initialization_contract"
+                "contracts/runtime_progression_entry_contract.v0.json"
       ],
       "required_validators": [
-        "planned:runtime_initialization_evidence"
+                "runtime_progression_evidence"
       ],
       "allowed_next_stages": [
         "CONTROLLED_RUNTIME_LOOP"
@@ -246,7 +247,7 @@
     {
       "from_stage": "RUNTIME_PROGRESSION_ENTRY",
       "to_stage": "RUNTIME_INITIALIZATION_EVIDENCE",
-      "owner_contract": "planned:runtime_initialization_contract"
+            "owner_contract": "contracts/runtime_progression_entry_contract.v0.json"
     },
     {
       "from_stage": "RUNTIME_INITIALIZATION_EVIDENCE",
@@ -265,12 +266,12 @@
     }
   ],
   "transition_requirements": [
-    "runtime_halt_contract remains authoritative until runtime progression entry evidence exists",
+        "runtime_halt_contract remains authoritative after bounded runtime progression",
     "runtime_progression_stages contract owns canonical stage order and allowed transitions",
     "transition owner contracts own destination-stage proof boundaries",
     "evidence contracts must not redefine canonical stage order",
     "stages must advance in declared order unless a later contract explicitly supersedes this stage model",
-    "halt replacement requires contract-backed progression entry evidence",
+        "halt replacement requires a separately governed controlled runtime loop",
     "planning stages do not constitute runtime evidence"
   ],
   "forbidden_global_shortcuts": [
@@ -282,11 +283,11 @@
     "claim production readiness from planning evidence"
   ],
   "non_goals": [
-    "runtime progression execution",
+        "runtime progression beyond the bounded entry call",
     "halt loop replacement",
     "general stack readiness",
     "general memory management",
-    "Odin runtime execution",
+        "complete Odin runtime readiness",
     "interrupt handling",
     "scheduler behavior",
     "userspace execution",

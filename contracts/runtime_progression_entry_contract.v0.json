@@ -2,62 +2,137 @@
   "version": 0,
   "architecture": "x86_64",
   "current_state": {
-    "path": "boot_smoke_to_stack_and_memory_evidence_to_halt",
+    "path": "boot_smoke_to_stack_memory_and_runtime_progression_to_halt",
     "halt_contract": "contracts/runtime_halt_contract.v0.json",
     "progression_contract": "contracts/runtime_progression_contract.v0.json",
     "progression_stages_contract": "contracts/runtime_progression_stages.v0.json",
-    "final_smoke_marker": "KOZO_BOOT_SMOKE_OK",
+    "final_smoke_marker": "KOZO_RUNTIME_RETURN_OK",
     "terminal_behavior": "halt_loop"
   },
   "progression_entry": {
     "marker": "KOZO_RUNTIME_PROGRESS_ENTRY",
-    "status": "reserved",
-    "emitted": false,
-    "entry_boundary": "after boot smoke evidence and before any halt replacement once prerequisites are proven"
+    "status": "implemented",
+    "emitted": true,
+    "entry_boundary": "after KOZO_MEMORY_INIT_OK and before the assembly-to-Odin call",
+    "source_file": "kernel/arch/x86_64/boot.asm",
+    "assembly_entry_symbol": "_start",
+    "target_symbol": "runtime_progression_entry"
+  },
+  "calling_convention": {
+    "name": "System V AMD64 C",
+    "argument_registers": [
+      "rdi"
+    ],
+    "return_register": "eax",
+    "caller_saved_registers": [
+      "rax",
+      "rcx",
+      "rdx",
+      "rsi",
+      "rdi",
+      "r8",
+      "r9",
+      "r10",
+      "r11"
+    ],
+    "callee_saved_registers": [
+      "rbx",
+      "rbp",
+      "r12",
+      "r13",
+      "r14",
+      "r15"
+    ],
+    "call_site_stack_alignment_bytes": 16,
+    "callee_entry_stack_modulo_bytes": 8,
+    "red_zone_policy": "disabled_by_freestanding_build"
+  },
+  "bootstrap_context": {
+    "version": 1,
+    "size_bytes": 64,
+    "symbol": "runtime_bootstrap_context",
+    "fields": [
+      {"name": "version", "offset_bytes": 0, "width_bytes": 8},
+      {"name": "structure_size", "offset_bytes": 8, "width_bytes": 8},
+      {"name": "stack_base", "offset_bytes": 16, "width_bytes": 8},
+      {"name": "stack_top", "offset_bytes": 24, "width_bytes": 8},
+      {"name": "memory_region_start", "offset_bytes": 32, "width_bytes": 8},
+      {"name": "memory_region_end", "offset_bytes": 40, "width_bytes": 8},
+      {"name": "flags", "offset_bytes": 48, "width_bytes": 8},
+      {"name": "reserved", "offset_bytes": 56, "width_bytes": 8}
+    ],
+    "required_zero_fields": [
+      "flags",
+      "reserved"
+    ],
+    "ownership": "x86_64 boot-to-runtime boundary",
+    "lifetime": "progression_call_to_return"
+  },
+  "runtime_initialization": {
+    "source_file": "kernel/runtime_progression.odin",
+    "entry_symbol": "runtime_progression_entry",
+    "marker": "KOZO_RUNTIME_INIT_OK",
+    "marker_emission_owner": "Odin runtime entry through fixed assembly bridge",
+    "serial_bridge_symbol": "runtime_serial_write_init_marker",
+    "state_symbol": "runtime_progression_state",
+    "state_sentinel": "0x4b4f5a4f52554e31",
+    "operation": "bounded_write_read_restore",
+    "success_status": 0
+  },
+  "return_boundary": {
+    "marker": "KOZO_RUNTIME_RETURN_OK",
+    "status": "implemented",
+    "emitted": true,
+    "required_status": 0,
+    "terminal_behavior": "halt_loop"
   },
   "required_prerequisites": [
     "stack initialization evidence",
     "stack initialization evidence contract",
     "memory initialization evidence",
-    "progression path evidence"
+    "memory initialization evidence contract"
   ],
   "required_evidence": [
     "runtime progression entry contract",
     "QEMU evidence for KOZO_RUNTIME_PROGRESS_ENTRY",
-    "stack initialization evidence",
-    "stack initialization evidence contract",
-    "memory initialization evidence",
+    "QEMU evidence for KOZO_RUNTIME_INIT_OK",
+    "QEMU evidence for KOZO_RUNTIME_RETURN_OK",
+    "runtime progression ELF symbols",
     "release evidence update"
   ],
   "transition_requirements": [
-    "runtime_halt_contract remains authoritative until runtime progression evidence exists",
+    "runtime_halt_contract remains authoritative after bounded runtime progression",
     "runtime_progression_contract defines halt-preservation requirements",
-    "KOZO_RUNTIME_PROGRESS_ENTRY must not be claimed until emitted by runtime code and captured in evidence",
-    "halt replacement requires contract-backed progression evidence"
+    "KOZO_RUNTIME_INIT_OK must originate from executed Odin code",
+    "KOZO_RUNTIME_RETURN_OK requires the exact success status",
+    "CI QEMU evidence is required before progression stages are proven"
   ],
   "forbidden_shortcuts": [
     "delete halt loop",
     "replace halt loop",
     "bypass halt loop",
-    "jump around halt loop"
+    "emit runtime initialization success entirely from assembly"
   ],
   "transition_ownership": [
-    "runtime_halt_contract owns current terminal behavior",
+    "runtime_halt_contract owns terminal behavior",
     "runtime_progression_contract owns halt-preservation governance",
     "runtime_progression_stages contract owns canonical stage order and allowed transitions",
-    "runtime_progression_entry_contract owns the MEMORY_INITIALIZATION_EVIDENCE to RUNTIME_PROGRESSION_ENTRY proof boundary"
+    "runtime_progression_entry_contract owns the MEMORY_INITIALIZATION_EVIDENCE to RUNTIME_PROGRESSION_ENTRY proof boundary",
+    "runtime_progression_entry_contract owns the RUNTIME_PROGRESSION_ENTRY to RUNTIME_INITIALIZATION_EVIDENCE proof boundary"
   ],
   "non_goals": [
-    "runtime progression execution",
+    "complete Odin runtime readiness",
+    "dynamic initialization",
     "general stack readiness",
     "general memory management",
-    "Odin runtime execution",
+    "allocator behavior",
     "userspace execution",
     "interrupt handling",
     "scheduler behavior",
     "VFS behavior",
     "process model behavior",
     "device driver behavior",
+    "hardware syscall boundary",
     "Linux compatibility",
     "POSIX compatibility",
     "production readiness"

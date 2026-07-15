@@ -83,6 +83,7 @@ prepare_directories() {
 build_kernel_objects() {
   odin build "$ROOT/kernel" \
     "-target:$BRIDGE_TARGET" \
+    -disable-red-zone \
     -build-mode:obj \
     "-out:$WORK_DIR/kernel.o"
   nasm -f elf64 "$ROOT/kernel/arch/x86_64/boot.asm" -o "$WORK_DIR/boot.o"

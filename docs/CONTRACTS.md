@@ -75,7 +75,7 @@ Current contract paths include:
 | Runtime evidence taxonomy | `contracts/runtime_evidence_taxonomy.v0.json` | Governed QEMU smoke marker, outcome, and blocker vocabulary |
 | Runtime halt contract | `contracts/runtime_halt_contract.v0.json` | Post-smoke terminal behavior after `KOZO_BOOT_SMOKE_OK` |
 | Runtime progression contract | `contracts/runtime_progression_contract.v0.json` | Future halt-to-runtime transition governance |
-| Runtime progression entry contract | `contracts/runtime_progression_entry_contract.v0.json` | Future progression entry marker and readiness governance |
+| Runtime progression entry contract | `contracts/runtime_progression_entry_contract.v0.json` | Internal assembly-to-Odin boundary, bounded initialization, and exact return governance |
 | Runtime progression stages contract | `contracts/runtime_progression_stages.v0.json` | Canonical future runtime progression stage model |
 | Stack initialization evidence contract | `contracts/stack_initialization_evidence_contract.v0.json` | Controlled stack proof boundary and marker evidence |
 | Memory initialization evidence contract | `contracts/memory_initialization_evidence_contract.v0.json` | Future memory proof boundary and marker reservation |
@@ -148,21 +148,21 @@ It does not define ABI values, syscall behavior, interrupt handling, scheduler b
 
 # 13. Runtime Progression Contract Role
 
-`contracts/runtime_progression_contract.v0.json` describes governance for a future transition from the current boot-smoke halt path to a separately proven runtime progression path.
+`contracts/runtime_progression_contract.v0.json` describes governance for the bounded transition from evidence-complete assembly boot code into a separately validated runtime progression path and back to the terminal halt path.
 
 It requires stack initialization evidence, memory initialization evidence, and progression path evidence before the halt loop can be removed, replaced, bypassed, or jumped around. It owns halt-preservation governance, not the canonical stage order.
 
-It is a planning and transition contract. It does not implement runtime progression, execute Odin runtime code, define ABI values, define syscall behavior, enable interrupt handling, initialize a scheduler, start userspace execution, or claim compatibility or production readiness.
+It owns transition governance, not implementation evidence. It does not define ABI values, define syscall behavior, enable interrupt handling, initialize a scheduler, start userspace execution, or claim compatibility or production readiness.
 
 ---
 
 # 14. Runtime Progression Entry Contract Role
 
-`contracts/runtime_progression_entry_contract.v0.json` reserves `KOZO_RUNTIME_PROGRESS_ENTRY` as the future runtime progression entry marker.
+`contracts/runtime_progression_entry_contract.v0.json` defines the implemented internal assembly-to-Odin progression boundary.
 
-It defines the planned entry proof boundary, required prerequisites, required evidence, and marker reservation. It owns the `MEMORY_INITIALIZATION_EVIDENCE` to `RUNTIME_PROGRESSION_ENTRY` proof boundary but does not define the canonical stage order. The marker is not emitted by current runtime code and is not runtime evidence until captured through a governed evidence path.
+It defines the System V AMD64 C call convention, fixed bootstrap context, Odin-owned initialization marker path, exact return status, and final assembly continuation. It owns the `MEMORY_INITIALIZATION_EVIDENCE` to `RUNTIME_PROGRESSION_ENTRY` and `RUNTIME_PROGRESSION_ENTRY` to `RUNTIME_INITIALIZATION_EVIDENCE` proof boundaries but does not define canonical stage order.
 
-It does not replace the runtime halt contract, implement stack initialization, implement memory initialization, execute Odin runtime code, enable userspace execution, or claim compatibility or production readiness.
+The contract and source structure do not prove executed Odin code by themselves. Final promotion requires passing QEMU serial evidence for `KOZO_RUNTIME_PROGRESS_ENTRY`, Odin-dependent `KOZO_RUNTIME_INIT_OK`, and `KOZO_RUNTIME_RETURN_OK`. The contract does not replace the runtime halt contract, expose a userspace ABI, enable userspace execution, or claim complete Odin runtime readiness, compatibility, or production readiness.
 
 ---
 

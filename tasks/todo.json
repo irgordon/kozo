@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO Memory Initialization Evidence v0.7.4",
+  "task_title": "KOZO Runtime Progression Entry and Minimal Runtime Initialization v0.7.45",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -9,15 +9,15 @@
   },
   "preconditions": [
     "QEMU serial smoke and stack initialization evidence are proven",
-    "The reconciled runtime progression graph is acyclic and marks stack evidence proven before memory evidence",
-    "The v0.7.3 memory initialization evidence contract defines exact region geometry and probe semantics",
+    "v0.7.4 memory initialization evidence is accepted by the CI validator gate; manual artifact inspection was not completed",
+    "The reconciled runtime progression graph is acyclic and permits progression entry only after memory evidence",
     "Odin, pinned Rust, Python, jq, and repository verification tooling are installed"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
-    "Stack initialization evidence remains proven while runtime progression entry remains planned",
-    "KOZO_MEMORY_INIT_OK is emitted only after the governed zero fill and bounded probe succeed",
-    "This phase changes only the contract-defined assembly evidence path, evidence validation, progression status, and documentation; ABI, syscalls, linker layout, and halt behavior remain unchanged"
+    "Stack and memory initialization evidence remain proven while progression and minimal runtime initialization require new CI evidence",
+    "KOZO_RUNTIME_INIT_OK must depend on executed Odin code and KOZO_RUNTIME_RETURN_OK requires exact status zero",
+    "This phase changes only the bounded internal assembly-to-Odin path, evidence validation, progression status, and documentation; public ABI, syscalls, linker layout, and terminal halt authority remain unchanged"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -2312,6 +2312,49 @@
         "verification.tests_run[84]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 73,
+      "title": "Implement governed runtime progression and minimal Odin initialization",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "kernel/arch/x86_64/boot.asm",
+        "kernel/runtime_progression.odin",
+        "contracts/runtime_progression_entry_contract.v0.json",
+        "contracts/runtime_progression_contract.v0.json",
+        "contracts/runtime_progression_stages.v0.json",
+        "contracts/runtime_halt_contract.v0.json",
+        "contracts/runtime_evidence_taxonomy.v0.json",
+        "schemas/runtime_progression_entry_contract.schema.json",
+        "harness/runtime_progression_entry_contract.py",
+        "harness/validators_impl/runtime_progression_entry_contract.py",
+        "harness/validators_impl/runtime_progression_evidence.py",
+        "tests/test_runtime_progression_entry_contract.py",
+        "tests/test_runtime_progression_evidence.py",
+        "scripts/qemu_smoke.sh",
+        "scripts/kernel_elf_report.py",
+        "docs/ARCHITECTURE.md",
+        "docs/BOOT.md",
+        "docs/CONTRACTS.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/VALIDATION.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/kernel_elf_report.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[85]",
+        "verification.tests_run[86]",
+        "verification.tests_run[87]",
+        "verification.tests_run[88]",
+        "verification.tests_run[89]",
+        "verification.tests_run[90]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -2371,7 +2414,8 @@
     "v0.7.1 adds memory_initialization_evidence_contract as the planning authority for future MEMORY_INITIALIZATION_EVIDENCE, reserves KOZO_MEMORY_INIT_OK without emitting it, aligns progression contracts, and preserves runtime behavior.",
     "v0.7.2 reconciles the authoritative progression order, removes the stack-entry-memory cycle, adds deterministic graph-level validation, aligns planning state, and preserves runtime behavior.",
     "v0.7.3 hardens the planned memory evidence contract with exact region geometry, ownership, zero-fill semantics, a bounded survival probe, and pre-halt marker placement without changing runtime behavior.",
-    "v0.7.4 implements the controlled static memory region, explicit full-region zero fill, bounded sentinel probe and restoration, KOZO_MEMORY_INIT_OK evidence, and unchanged halt path without adding paging, allocation, runtime progression, compatibility, or production claims."
+    "v0.7.4 implements the controlled static memory region, explicit full-region zero fill, bounded sentinel probe and restoration, KOZO_MEMORY_INIT_OK evidence, and unchanged halt path without adding paging, allocation, runtime progression, compatibility, or production claims.",
+    "v0.7.45 implements a fixed internal assembly-to-Odin boundary, validated bootstrap context, bounded static-state probe, Odin-dependent initialization marker, exact return status, and terminal halt continuation without expanding the public ABI or runtime claims."
   ],
   "verification": {
     "tests_run": [
@@ -2799,6 +2843,36 @@
         "tool": "verification harness",
         "command": "scripts/verify.sh",
         "status": "passed"
+      },
+      {
+        "tool": "focused Python tests",
+        "command": "python3 -m unittest tests/test_runtime_progression_entry_contract.py tests/test_runtime_progression_evidence.py tests/test_runtime_progression_stages.py tests/test_runtime_progression_contract.py tests/test_runtime_halt_contract.py tests/test_memory_initialization_evidence.py tests/test_qemu_smoke_evidence.py tests/test_runtime_evidence_taxonomy.py",
+        "status": "passed"
+      },
+      {
+        "tool": "Python unit discovery",
+        "command": "python3 -m unittest discover -s tests",
+        "status": "passed_601_tests"
+      },
+      {
+        "tool": "Odin check",
+        "command": "odin check kernel",
+        "status": "passed"
+      },
+      {
+        "tool": "pinned Rust check",
+        "command": "cargo check --manifest-path userspace/core_service/Cargo.toml",
+        "status": "passed_with_existing_warnings"
+      },
+      {
+        "tool": "boot image build",
+        "command": "scripts/build_boot_image.sh",
+        "status": "passed_with_missing_iso_generation_tooling"
+      },
+      {
+        "tool": "runtime progression validators",
+        "command": "direct RuntimeProgressionEntryContractValidator, RuntimeProgressionEvidenceValidator, and ValidatorCoverageValidator invocation",
+        "status": "passed_after_governed_elf_report_refresh"
       }
     ],
     "logs": [
@@ -2815,7 +2889,8 @@
       "The Rust heartbeat request must cross the assembly bridge through extern syscall_entry rather than a local stub",
       "The verify artifact is only authoritative when the current tree reproduces it via scripts/verify.sh",
       "runtime evidence taxonomy is authoritative for marker and blocker vocabulary; generated smoke metadata remains evidence and does not define taxonomy authority.",
-      "Runtime progression stages are authoritative planning governance only; the graph remains acyclic and monotonic, and the halt loop remains authoritative until separate progression-entry evidence exists."
+      "Runtime progression stages are authoritative stage governance; the graph remains acyclic and monotonic, and the halt loop remains authoritative after the bounded progression call.",
+      "Progression entry and runtime initialization remain implemented pending CI until the complete ordered runtime marker sequence is captured."
     ],
     "expected_behavior": [
       "verify.sh succeeds on a clean tree and prints the generated artifact JSON before VERIFY: PASS",
@@ -2870,7 +2945,7 @@
       "v0.5.0 emits KOZO_BOOT_SMOKE_OK from the proven assembly serial path after KOZO_EARLY_2_SERIAL_INIT_OK and requires QEMU smoke validation to observe the full ordered marker sequence before passing",
       "v0.6.0 governs post-smoke terminal behavior after KOZO_BOOT_SMOKE_OK without changing ABI or syscall semantics.",
       "runtime_progression_contract defines future halt-to-runtime transition governance without changing runtime behavior or weakening the runtime halt contract.",
-      "runtime_progression_entry_contract reserves KOZO_RUNTIME_PROGRESS_ENTRY as future work without changing runtime behavior or overriding the runtime halt contract.",
+      "runtime_progression_entry_contract governs the bounded internal assembly-to-Odin path without overriding terminal halt authority or creating a userspace ABI.",
       "v0.6.4 removes only proven-unused structural debris and documents deferred cleanup without changing runtime, ABI, syscall, linker, marker, halt, or progression contract behavior.",
       "v0.6.5 centralizes QEMU serial smoke marker order, expected marker, outcomes, and blocker vocabulary in a governed runtime evidence taxonomy contract without changing runtime behavior or smoke pass criteria.",
       "v0.6.6 centralizes future runtime progression stage definitions without changing runtime behavior, halt behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke behavior, compatibility claims, or production-readiness claims.",
@@ -2953,7 +3028,8 @@
       "Added stack_initialization_evidence_contract as the planning authority for future STACK_INITIALIZATION_EVIDENCE, reserved KOZO_STACK_INIT_OK without emitting it, aligned progression contracts, and preserved runtime behavior.",
       "v0.7.0 implements controlled boot stack evidence by setting rsp to boot_stack_top, probing stack use, emitting KOZO_STACK_INIT_OK, extending the governed marker sequence, and preserving no memory/runtime/userspace/compatibility/production claims.",
       "v0.7.2 orders BOOT_SMOKE, STACK_INITIALIZATION_EVIDENCE, MEMORY_INITIALIZATION_EVIDENCE, and RUNTIME_PROGRESSION_ENTRY monotonically, leaves stack proven and later stages planned, and validates graph and authority integrity.",
-      "v0.7.4 implements the contract-owned 4096-byte static memory region, explicit zero fill, bounded sentinel write/read/compare/restore probe, KOZO_MEMORY_INIT_OK marker, and unchanged terminal halt loop."
+      "v0.7.4 implements the contract-owned 4096-byte static memory region, explicit zero fill, bounded sentinel write/read/compare/restore probe, KOZO_MEMORY_INIT_OK marker, and unchanged terminal halt loop.",
+      "v0.7.45 locally implements the bounded assembly-to-Odin call, fixed bootstrap context validation, static-state probe, runtime markers, exact return status check, and preserved terminal halt; CI marker acceptance remains pending."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -3026,6 +3102,7 @@
     "v0.7.1 adds memory initialization evidence planning through a contract, schema, loader, validator, tests, and progression-stage alignment while preserving runtime behavior, ABI, syscall, linker, QEMU smoke, halt, stack evidence, compatibility, and production-readiness boundaries.",
     "v0.7.2 reconciles the progression model into an acyclic, monotonic, single-owner graph and aligns contracts, tests, planning documents, audit state, and task identity without runtime changes.",
     "v0.7.3 hardens the memory evidence boundary into an implementation-ready static-region specification without runtime, marker, halt, ABI, syscall, linker, compatibility, or production-readiness changes.",
-    "v0.7.4 implements only the governed static-region memory evidence path, adds structural and captured-evidence validation, preserves the halt loop, and does not add paging, allocation, Odin runtime execution, userspace, compatibility, or production-readiness claims."
+    "v0.7.4 implements only the governed static-region memory evidence path, adds structural and captured-evidence validation, preserves the halt loop, and does not add paging, allocation, Odin runtime execution, userspace, compatibility, or production-readiness claims.",
+    "v0.7.45 adds a governed internal assembly-to-Odin progression boundary, bounded Odin state evidence, exact return handling, linked-symbol reporting, and progression evidence validation while preserving terminal halt authority and all subsystem, compatibility, and production non-goals."
   ]
 }

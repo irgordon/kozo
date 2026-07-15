@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 
 from harness.codes import OK, STACK_INITIALIZATION_EVIDENCE_INVALID
+from harness.runtime_evidence_taxonomy import get_expected_smoke_marker, get_smoke_marker_order
 from harness.validators_impl import stack_initialization_evidence as validator_module
 from harness.validators_impl.stack_initialization_evidence import StackInitializationEvidenceValidator
 
@@ -37,9 +38,11 @@ class StackInitializationEvidenceValidatorTests(unittest.TestCase):
         self.assert_stack_failure(result, "missing_marker", "kernel.boot.asm.stack_init_marker")
 
     def test_fails_when_stack_marker_precedes_boot_marker(self):
+        markers = list(smoke_markers())
+        markers[3], markers[4] = markers[4], markers[3]
         result = self.validate_fixture(
-            mutate_serial=lambda _: "KOZO_STACK_INIT_OK\nKOZO_BOOT_SMOKE_OK\n",
-            mutate_metadata=lambda metadata: metadata | {"observed_markers": ["KOZO_STACK_INIT_OK", "KOZO_BOOT_SMOKE_OK"]},
+            mutate_serial=lambda _: "\n".join(markers) + "\n",
+            mutate_metadata=lambda metadata: metadata | {"observed_markers": markers},
         )
 
         self.assertEqual(result.status, "fail")
@@ -182,7 +185,7 @@ def valid_boot_source() -> str:
 def valid_metadata() -> dict[str, object]:
     return {
         "outcome": "pass",
-        "expected_marker": "KOZO_MEMORY_INIT_OK",
+        "expected_marker": get_expected_smoke_marker(),
         "observed_markers": list(smoke_markers()),
     }
 
@@ -192,14 +195,7 @@ def valid_serial_log() -> str:
 
 
 def smoke_markers() -> tuple[str, ...]:
-    return (
-        "KOZO_EARLY_0_ENTRY",
-        "KOZO_EARLY_1_SERIAL_INIT_START",
-        "KOZO_EARLY_2_SERIAL_INIT_OK",
-        "KOZO_BOOT_SMOKE_OK",
-        "KOZO_STACK_INIT_OK",
-        "KOZO_MEMORY_INIT_OK",
-    )
+    return get_smoke_marker_order()
 
 
 def patch_validator_paths(paths: dict[str, Path]):

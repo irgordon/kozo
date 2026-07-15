@@ -1,9 +1,12 @@
 bits 64
 
 extern kernel_entry
+extern runtime_progression_entry
 global _start
 global boot_memory_region
 global boot_memory_region_end
+global runtime_bootstrap_context
+global runtime_serial_write_init_marker
 
 %define COM1 0x03f8
 %define COM1_INTERRUPT_ENABLE 0x03f9
@@ -94,6 +97,30 @@ memory_init_marker:
     db "KOZO_MEMORY_INIT_OK", 13, 10
 memory_init_marker_end:
 
+runtime_progress_entry_marker:
+    db "KOZO_RUNTIME_PROGRESS_ENTRY", 13, 10
+runtime_progress_entry_marker_end:
+
+runtime_init_marker:
+    db "KOZO_RUNTIME_INIT_OK", 13, 10
+runtime_init_marker_end:
+
+runtime_return_marker:
+    db "KOZO_RUNTIME_RETURN_OK", 13, 10
+runtime_return_marker_end:
+
+section .data
+align 8
+runtime_bootstrap_context:
+    dq 1
+    dq 64
+    dq boot_stack
+    dq boot_stack_top
+    dq boot_memory_region
+    dq boot_memory_region_end
+    dq 0
+    dq 0
+
 section .text
 
 _start:
@@ -128,8 +155,20 @@ _start:
     cmp qword [rel boot_memory_region], 0
     jne .halt
     WRITE_COM1_MARKER memory_init_marker, memory_init_marker_end
+    test rsp, 0x0f
+    jnz .halt
+    lea rdi, [rel runtime_bootstrap_context]
+    WRITE_COM1_MARKER runtime_progress_entry_marker, runtime_progress_entry_marker_end
+    call runtime_progression_entry
+    cmp eax, 0
+    jne .halt
+    WRITE_COM1_MARKER runtime_return_marker, runtime_return_marker_end
     cli
 
 .halt:
     hlt
     jmp .halt
+
+runtime_serial_write_init_marker:
+    WRITE_COM1_MARKER runtime_init_marker, runtime_init_marker_end
+    ret

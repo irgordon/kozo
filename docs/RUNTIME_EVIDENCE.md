@@ -66,6 +66,8 @@ v0.7.0 implements the governed stack initialization evidence path. `_start` sets
 
 v0.7.3 hardens `contracts/memory_initialization_evidence_contract.v0.json` into an implementation-ready boundary. v0.7.4 implements its static region, explicit zero fill, bounded sentinel write/read/compare/restore probe, `KOZO_MEMORY_INIT_OK` emission, and unchanged terminal halt path. The generated kernel ELF report records the region symbol addresses, computed size, and required-alignment result so validation does not depend on source structure alone. This does not prove physical memory discovery, paging, virtual memory management, allocation, Odin runtime execution, progression entry, userspace, compatibility, or production readiness.
 
+v0.7.45 implements a bounded assembly-to-Odin call after memory evidence. Assembly emits `KOZO_RUNTIME_PROGRESS_ENTRY`, calls the exported Odin entry with a fixed versioned context, requires exact status zero, emits `KOZO_RUNTIME_RETURN_OK`, and enters the terminal halt path. Odin validates the context, performs a static-state write/read/restore probe, and causes `KOZO_RUNTIME_INIT_OK` to be emitted through a fixed assembly bridge. These stages remain implemented pending CI until QEMU captures the ordered sequence.
+
 Current local boot blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
 
 Current release blocker for QEMU serial smoke evidence: none.
@@ -82,7 +84,7 @@ The v0.4.8 QEMU smoke metadata records Limine entry-point evidence, expected ent
 
 The latest inspected v0.4.8 CI artifact captured `KOZO_EARLY_0_ENTRY`, so kernel entry handoff is proven for that artifact. It did not capture `KOZO_EARLY_2_SERIAL_INIT_OK`, so serial initialization remains unproven until that marker appears in captured QEMU serial output.
 
-The expected v0.7.4 QEMU serial sequence is `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, `KOZO_STACK_INIT_OK`, and `KOZO_MEMORY_INIT_OK`.
+The expected v0.7.45 QEMU serial sequence is `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, `KOZO_STACK_INIT_OK`, `KOZO_MEMORY_INIT_OK`, `KOZO_RUNTIME_PROGRESS_ENTRY`, `KOZO_RUNTIME_INIT_OK`, and `KOZO_RUNTIME_RETURN_OK`.
 
 In v0.7.1 and v0.7.3, `KOZO_MEMORY_INIT_OK` was reserved planning vocabulary and was not runtime evidence. v0.7.4 replaces that planning state: runtime assembly now emits the marker only after completing the contract-defined initialization and probe, and the governed QEMU pass sequence includes it as the final expected marker.
 
@@ -250,7 +252,7 @@ The boot tooling policy path is:
 docs/BOOT_TOOLING.md
 ```
 
-The QEMU smoke log is passing QEMU serial smoke evidence only when `qemu_smoke_evidence` validates metadata with outcome `pass` and finds the full ordered marker sequence ending in `KOZO_MEMORY_INIT_OK` in the serial log. Blocked metadata remains blocker evidence only.
+The QEMU smoke log is passing current runtime evidence only when `qemu_smoke_evidence` validates metadata with outcome `pass` and finds the full ordered marker sequence ending in `KOZO_RUNTIME_RETURN_OK` in the serial log. Blocked metadata remains blocker evidence only.
 
 The QEMU smoke summary is a reviewer convenience artifact. It is generated from the QEMU smoke metadata, serial log, stderr log, and boot blocker report. It is not authoritative and must not replace metadata or log validation.
 
@@ -296,7 +298,7 @@ The runtime progression entry validator is:
 runtime_progression_entry_contract
 ```
 
-It reserves `KOZO_RUNTIME_PROGRESS_ENTRY` as a future runtime progression marker. The marker is planned, not emitted, and must not be treated as runtime evidence until runtime code emits it and QEMU evidence captures it. The contract owns the memory-to-entry proof boundary and keeps the halt loop authoritative until stack initialization evidence, memory initialization evidence, and progression path evidence exist.
+It governs the implemented internal assembly-to-Odin boundary. `KOZO_RUNTIME_PROGRESS_ENTRY` is emitted by assembly immediately before the call, `KOZO_RUNTIME_INIT_OK` depends on executed Odin code invoking a fixed bridge after its bounded state probe, and `KOZO_RUNTIME_RETURN_OK` is emitted by assembly only after exact status zero. Source and ELF validation do not promote the stages; QEMU serial evidence must capture the ordered markers. The halt loop remains authoritative after return.
 
 The runtime progression stages contract is:
 
@@ -323,7 +325,7 @@ FIRST_GOVERNED_RUNTIME_CAPABILITY
 USERSPACE_PLANNING
 ```
 
-This stage model is not runtime evidence. It is the sole authority for stage order and allowed transitions, requires each mandatory prerequisite to be an earlier proven stage before promotion, and assigns one proof-boundary owner to every transition. The current status is stack evidence proven, memory evidence planned, and progression entry planned.
+This stage model is not runtime evidence. It is the sole authority for stage order and allowed transitions, requires each mandatory prerequisite to be an earlier proven stage before promotion, and assigns one proof-boundary owner to every transition. The current status is boot, stack, and memory evidence proven; progression entry and runtime initialization implemented pending CI; and later stages planned.
 
 The selected boot protocol is documented in:
 

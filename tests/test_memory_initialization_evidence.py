@@ -122,7 +122,7 @@ class MemoryInitializationEvidenceValidatorTests(unittest.TestCase):
         self.assert_failure(result, "halt_before_marker", "marker_placement.required_before")
 
     def test_fails_when_fallthrough_follows_halt(self):
-        result = self.validate_fixture(mutate_source=lambda source: source + "\n    nop\n")
+        result = self.validate_fixture(mutate_source=insert_instruction_after_halt_loop)
 
         self.assertEqual(result.status, "fail")
         self.assert_failure(result, "fallthrough_after_marker", "marker_placement.required_before")
@@ -249,6 +249,12 @@ def remove_memory_marker(source: str) -> str:
 def move_halt_before_marker(source: str) -> str:
     marker = "    WRITE_COM1_MARKER memory_init_marker, memory_init_marker_end\n"
     return source.replace(marker, "    hlt\n" + marker, 1)
+
+
+def insert_instruction_after_halt_loop(source: str) -> str:
+    boundary = "    jmp .halt\n\nruntime_serial_write_init_marker:"
+    replacement = "    jmp .halt\n    nop\n\nruntime_serial_write_init_marker:"
+    return source.replace(boundary, replacement)
 
 
 if __name__ == "__main__":

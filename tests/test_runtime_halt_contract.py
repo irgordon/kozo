@@ -58,7 +58,7 @@ class RuntimeHaltContractValidatorTests(unittest.TestCase):
         self.assertEqual("runtime_halt_contract", RuntimeHaltContractValidator.name)
         result = self.validate_fixture(
             mutate_source=lambda source: source.replace(
-                "    WRITE_COM1_MARKER boot_smoke_marker, boot_smoke_marker_end\n",
+                "    WRITE_COM1_MARKER runtime_return_marker, runtime_return_marker_end\n",
                 "",
             )
         )
@@ -173,8 +173,8 @@ def valid_contract() -> dict[str, object]:
             "entry_symbol": "_start",
         },
         "final_smoke_marker": {
-            "symbol": "boot_smoke_marker",
-            "text": "KOZO_BOOT_SMOKE_OK",
+            "symbol": "runtime_return_marker",
+            "text": "KOZO_RUNTIME_RETURN_OK",
             "write_macro": "WRITE_COM1_MARKER",
         },
         "terminal_behavior": {
@@ -206,13 +206,13 @@ def valid_source() -> str:
         (
             "global _start",
             "section .rodata",
-            "boot_smoke_marker:",
-            "    db \"KOZO_BOOT_SMOKE_OK\", 13, 10",
-            "boot_smoke_marker_end:",
+            "runtime_return_marker:",
+            "    db \"KOZO_RUNTIME_RETURN_OK\", 13, 10",
+            "runtime_return_marker_end:",
             "section .text",
             "_start:",
             "    WRITE_COM1_MARKER early_entry_marker, early_entry_marker_end",
-            "    WRITE_COM1_MARKER boot_smoke_marker, boot_smoke_marker_end",
+            "    WRITE_COM1_MARKER runtime_return_marker, runtime_return_marker_end",
             "    cli",
             ".halt:",
             "    hlt",
@@ -227,16 +227,16 @@ def source_with_marker_after_halt() -> str:
         (
             "global _start",
             "section .rodata",
-            "boot_smoke_marker:",
-            "    db \"KOZO_BOOT_SMOKE_OK\", 13, 10",
-            "boot_smoke_marker_end:",
+            "runtime_return_marker:",
+            "    db \"KOZO_RUNTIME_RETURN_OK\", 13, 10",
+            "runtime_return_marker_end:",
             "section .text",
             "_start:",
             "    cli",
             ".halt:",
             "    hlt",
             "    jmp .halt",
-            "    WRITE_COM1_MARKER boot_smoke_marker, boot_smoke_marker_end",
+            "    WRITE_COM1_MARKER runtime_return_marker, runtime_return_marker_end",
             "",
         )
     )

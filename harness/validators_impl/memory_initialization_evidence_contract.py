@@ -10,7 +10,7 @@ from harness.validator import BaseValidator, ValidationResult
 
 _CONTRACT_PATH = contract_module.CONTRACT_PATH
 _EXPECTED_ARCHITECTURE = "x86_64"
-_EXPECTED_RUNTIME_PATH = "boot_smoke_to_stack_and_memory_evidence_to_halt"
+_EXPECTED_RUNTIME_PATH = "boot_smoke_to_stack_memory_and_runtime_progression_to_halt"
 _EXPECTED_STAGE = "MEMORY_INITIALIZATION_EVIDENCE"
 _EXPECTED_SOURCE_FILE = "kernel/arch/x86_64/boot.asm"
 _EXPECTED_REGION_SECTION = ".bss"
@@ -20,7 +20,7 @@ _EXPECTED_REGION_SIZE = 4096
 _EXPECTED_REGION_ALIGNMENT = 4096
 _EXPECTED_ALLOCATION_MODE = "static"
 _EXPECTED_OWNER = "x86_64 boot memory evidence path"
-_EXPECTED_LIFETIME = "entry_to_halt"
+_EXPECTED_LIFETIME = "entry_to_runtime_progression_and_halt"
 _EXPECTED_OPERATION = "zero_fill"
 _EXPECTED_COVERAGE = "entire_controlled_region"
 _EXPECTED_FILL_VALUE = 0
@@ -40,7 +40,7 @@ _EXPECTED_MARKER_AFTER = (
     "controlled_region_zero_fill",
     "survival_probe_success",
 )
-_EXPECTED_MARKER_BEFORE = "runtime_halt_loop"
+_EXPECTED_MARKER_BEFORE = "runtime_progression_entry"
 _EXPECTED_FUTURE_VALIDATOR = "memory_initialization_evidence"
 
 _REQUIRED_PREREQUISITES = (
@@ -68,7 +68,7 @@ _REQUIRED_ASSUMPTIONS_NOT_ENABLED = (
     "virtual memory management",
     "memory allocator behavior",
     "heap allocation",
-    "Odin runtime execution",
+    "complete Odin runtime readiness",
     "interrupt handling",
     "scheduler behavior",
     "userspace execution",
@@ -85,8 +85,8 @@ _REQUIRED_NON_GOALS = (
     "virtual memory management",
     "memory allocator behavior",
     "heap allocation",
-    "Odin runtime execution",
-    "runtime progression execution",
+    "complete Odin runtime readiness",
+    "runtime progression beyond the governed bounded call",
     "halt loop replacement",
     "interrupt handling",
     "scheduler behavior",

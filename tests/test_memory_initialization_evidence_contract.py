@@ -27,7 +27,7 @@ KOZO_NEGATIVE_COVERAGE = {
         "probe_out_of_bounds": "test_fails_when_probe_is_out_of_bounds",
         "missing_marker": "test_fails_when_memory_marker_is_missing",
         "wrong_marker_predecessors": "test_fails_when_marker_predecessor_is_missing",
-        "wrong_marker_successor": "test_fails_when_marker_is_not_before_halt",
+        "wrong_marker_successor": "test_fails_when_marker_is_not_before_progression_entry",
         "missing_prerequisite": "test_fails_when_prerequisite_is_missing",
         "missing_evidence_requirement": "test_fails_when_evidence_requirement_is_missing",
         "missing_assumption_mapping": "test_fails_when_assumption_mapping_is_missing",
@@ -180,11 +180,11 @@ class MemoryInitializationEvidenceContractValidatorTests(unittest.TestCase):
             "marker_placement.required_after",
         )
 
-    def test_fails_when_marker_is_not_before_halt(self):
+    def test_fails_when_marker_is_not_before_progression_entry(self):
         result = self.validate_fixture(
             mutate_contract=replace_section(
                 "marker_placement",
-                required_before="runtime_progression_entry",
+                required_before="halt_loop",
             )
         )
 

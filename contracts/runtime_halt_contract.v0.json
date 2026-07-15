@@ -6,8 +6,8 @@
     "entry_symbol": "_start"
   },
   "final_smoke_marker": {
-    "symbol": "boot_smoke_marker",
-    "text": "KOZO_BOOT_SMOKE_OK",
+    "symbol": "runtime_return_marker",
+    "text": "KOZO_RUNTIME_RETURN_OK",
     "write_macro": "WRITE_COM1_MARKER"
   },
   "terminal_behavior": {

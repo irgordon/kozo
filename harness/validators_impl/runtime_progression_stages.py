@@ -12,7 +12,7 @@ from harness.validator import BaseValidator, ValidationResult
 
 _CONTRACT_PATH = runtime_progression_stages.CONTRACT_PATH
 _EXPECTED_ARCHITECTURE = "x86_64"
-_EXPECTED_RUNTIME_PATH = "boot_smoke_to_stack_and_memory_evidence_to_halt"
+_EXPECTED_RUNTIME_PATH = "boot_smoke_to_stack_memory_and_runtime_progression_to_halt"
 _EXPECTED_TERMINAL_BEHAVIOR = "halt_loop"
 _REQUIRED_STAGE_NAMES = frozenset(
     {
@@ -31,18 +31,18 @@ _REQUIRED_STAGE_EVIDENCE = {
     "STACK_INITIALIZATION_EVIDENCE": "QEMU evidence for KOZO_STACK_INIT_OK",
     "MEMORY_INITIALIZATION_EVIDENCE": "QEMU evidence for KOZO_MEMORY_INIT_OK",
     "RUNTIME_PROGRESSION_ENTRY": "QEMU evidence for KOZO_RUNTIME_PROGRESS_ENTRY",
-    "RUNTIME_INITIALIZATION_EVIDENCE": "QEMU evidence for runtime initialization marker",
+    "RUNTIME_INITIALIZATION_EVIDENCE": "QEMU evidence for KOZO_RUNTIME_INIT_OK",
     "CONTROLLED_RUNTIME_LOOP": "QEMU evidence for controlled runtime loop",
     "FIRST_GOVERNED_RUNTIME_CAPABILITY": "QEMU evidence for first governed runtime capability",
     "USERSPACE_PLANNING": "userspace planning evidence",
 }
 _REQUIRED_TRANSITION_REQUIREMENTS = (
-    "runtime_halt_contract remains authoritative until runtime progression entry evidence exists",
+    "runtime_halt_contract remains authoritative after bounded runtime progression",
     "runtime_progression_stages contract owns canonical stage order and allowed transitions",
     "transition owner contracts own destination-stage proof boundaries",
     "evidence contracts must not redefine canonical stage order",
     "stages must advance in declared order unless a later contract explicitly supersedes this stage model",
-    "halt replacement requires contract-backed progression entry evidence",
+    "halt replacement requires a separately governed controlled runtime loop",
     "planning stages do not constitute runtime evidence",
 )
 _REQUIRED_FORBIDDEN_SHORTCUTS = (
@@ -54,11 +54,11 @@ _REQUIRED_FORBIDDEN_SHORTCUTS = (
     "claim production readiness from planning evidence",
 )
 _REQUIRED_NON_GOALS = (
-    "runtime progression execution",
+    "runtime progression beyond the bounded entry call",
     "halt loop replacement",
     "general stack readiness",
     "general memory management",
-    "Odin runtime execution",
+    "complete Odin runtime readiness",
     "interrupt handling",
     "scheduler behavior",
     "userspace execution",

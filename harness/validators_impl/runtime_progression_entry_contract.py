@@ -4,63 +4,40 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from harness import runtime_progression_entry_contract
+from harness import runtime_progression_entry_contract as contract_module
 from harness.codes import OK, RUNTIME_PROGRESSION_ENTRY_CONTRACT_INVALID
 from harness.validator import BaseValidator, ValidationResult
 
-_CONTRACT_PATH = runtime_progression_entry_contract.CONTRACT_PATH
-_EXPECTED_ARCHITECTURE = "x86_64"
-_EXPECTED_RUNTIME_PATH = "boot_smoke_to_stack_and_memory_evidence_to_halt"
-_EXPECTED_HALT_CONTRACT = "contracts/runtime_halt_contract.v0.json"
-_EXPECTED_PROGRESSION_CONTRACT = "contracts/runtime_progression_contract.v0.json"
-_EXPECTED_STAGES_CONTRACT = "contracts/runtime_progression_stages.v0.json"
-_EXPECTED_FINAL_MARKER = "KOZO_BOOT_SMOKE_OK"
-_EXPECTED_TERMINAL_BEHAVIOR = "halt_loop"
-_EXPECTED_PROGRESSION_MARKER = "KOZO_RUNTIME_PROGRESS_ENTRY"
-_EXPECTED_ENTRY_STATUS = "reserved"
+_CONTRACT_PATH = contract_module.CONTRACT_PATH
+_EXPECTED_PATH = "boot_smoke_to_stack_memory_and_runtime_progression_to_halt"
+_EXPECTED_CONTEXT_FIELDS = (
+    ("version", 0),
+    ("structure_size", 8),
+    ("stack_base", 16),
+    ("stack_top", 24),
+    ("memory_region_start", 32),
+    ("memory_region_end", 40),
+    ("flags", 48),
+    ("reserved", 56),
+)
 _REQUIRED_PREREQUISITES = (
     "stack initialization evidence",
-    "stack initialization evidence contract",
     "memory initialization evidence",
-    "progression path evidence",
+    "memory initialization evidence contract",
 )
-_REQUIRED_EVIDENCE = (
-    "runtime progression entry contract",
-    "QEMU evidence for KOZO_RUNTIME_PROGRESS_ENTRY",
-    "stack initialization evidence",
-    "stack initialization evidence contract",
-    "memory initialization evidence",
-    "release evidence update",
-)
-_REQUIRED_TRANSITION_REQUIREMENTS = (
-    "runtime_halt_contract remains authoritative until runtime progression evidence exists",
-    "runtime_progression_contract defines halt-preservation requirements",
-    "KOZO_RUNTIME_PROGRESS_ENTRY must not be claimed until emitted by runtime code and captured in evidence",
-    "halt replacement requires contract-backed progression evidence",
-)
-_REQUIRED_FORBIDDEN_SHORTCUTS = (
-    "delete halt loop",
-    "replace halt loop",
-    "bypass halt loop",
-    "jump around halt loop",
-)
-_REQUIRED_OWNERSHIP = (
-    "runtime_halt_contract owns current terminal behavior",
-    "runtime_progression_contract owns halt-preservation governance",
-    "runtime_progression_stages contract owns canonical stage order and allowed transitions",
-    "runtime_progression_entry_contract owns the MEMORY_INITIALIZATION_EVIDENCE to RUNTIME_PROGRESSION_ENTRY proof boundary",
+_REQUIRED_TRANSITIONS = (
+    "runtime_halt_contract remains authoritative after bounded runtime progression",
+    "KOZO_RUNTIME_INIT_OK must originate from executed Odin code",
+    "KOZO_RUNTIME_RETURN_OK requires the exact success status",
+    "CI QEMU evidence is required before progression stages are proven",
 )
 _REQUIRED_NON_GOALS = (
-    "runtime progression execution",
-    "general stack readiness",
-    "general memory management",
-    "Odin runtime execution",
+    "complete Odin runtime readiness",
+    "allocator behavior",
     "userspace execution",
     "interrupt handling",
     "scheduler behavior",
-    "VFS behavior",
-    "process model behavior",
-    "device driver behavior",
+    "hardware syscall boundary",
     "Linux compatibility",
     "POSIX compatibility",
     "production readiness",
@@ -85,126 +62,153 @@ class RuntimeProgressionEntryContractValidator(BaseValidator):
             return _failure(issue)
         return ValidationResult.pass_(
             code=OK,
-            detail="Runtime progression entry contract reserves the future entry marker without changing the halt baseline",
+            detail="Runtime progression entry contract governs the assembly-to-Odin call and terminal return boundary",
         )
 
 
-def _runtime_progression_entry_issue(contract_path: Path) -> RuntimeProgressionEntryIssue | None:
-    contract = _load_contract(contract_path)
+def _runtime_progression_entry_issue(path: Path) -> RuntimeProgressionEntryIssue | None:
+    contract = _load_contract(path)
     if isinstance(contract, RuntimeProgressionEntryIssue):
         return contract
     return _first_issue(
         _current_state_issue(contract),
-        _contract_reference_issue(contract.current_state.halt_contract, "current_state.halt_contract"),
-        _contract_reference_issue(contract.current_state.progression_contract, "current_state.progression_contract"),
-        _contract_reference_issue(contract.current_state.progression_stages_contract, "current_state.progression_stages_contract"),
-        _progression_marker_issue(contract),
-        _required_value_issue(contract.required_prerequisites, _REQUIRED_PREREQUISITES, "missing_prerequisite", "required_prerequisites"),
-        _required_value_issue(contract.required_evidence, _REQUIRED_EVIDENCE, "missing_required_evidence", "required_evidence"),
-        _required_value_issue(contract.transition_requirements, _REQUIRED_TRANSITION_REQUIREMENTS, "missing_transition_requirement", "transition_requirements"),
-        _required_value_issue(contract.forbidden_shortcuts, _REQUIRED_FORBIDDEN_SHORTCUTS, "missing_forbidden_shortcut", "forbidden_shortcuts"),
-        _required_value_issue(contract.transition_ownership, _REQUIRED_OWNERSHIP, "missing_transition_ownership", "transition_ownership"),
-        _required_value_issue(contract.non_goals, _REQUIRED_NON_GOALS, "missing_non_goal", "non_goals"),
+        _reference_issue(contract),
+        _progression_entry_issue(contract),
+        _calling_convention_issue(contract),
+        _bootstrap_context_issue(contract),
+        _runtime_initialization_issue(contract),
+        _return_boundary_issue(contract),
+        _required_values_issue(contract.required_prerequisites, _REQUIRED_PREREQUISITES, "missing_prerequisite", "required_prerequisites"),
+        _required_values_issue(contract.transition_requirements, _REQUIRED_TRANSITIONS, "missing_transition_requirement", "transition_requirements"),
+        _required_values_issue(contract.non_goals, _REQUIRED_NON_GOALS, "missing_non_goal", "non_goals"),
     )
 
 
-def _load_contract(
-    path: Path,
-) -> runtime_progression_entry_contract.RuntimeProgressionEntryContract | RuntimeProgressionEntryIssue:
+def _load_contract(path: Path):
     if not path.is_file():
         return _issue("missing_contract_file", "contract", f"Runtime progression entry contract is missing: {path}")
     try:
-        return runtime_progression_entry_contract.load_runtime_progression_entry_contract(path)
+        return contract_module.load_runtime_progression_entry_contract(path)
     except json.JSONDecodeError as exc:
         return _issue("invalid_contract_json", "contract", f"Runtime progression entry contract is invalid JSON: {exc}")
     except (KeyError, TypeError, ValueError) as exc:
         return _issue("contract_schema_violation", "contract", f"Runtime progression entry contract schema violation: {exc}")
 
 
-def _current_state_issue(
-    contract: runtime_progression_entry_contract.RuntimeProgressionEntryContract,
-) -> RuntimeProgressionEntryIssue | None:
+def _current_state_issue(contract) -> RuntimeProgressionEntryIssue | None:
     state = contract.current_state
-    return _first_issue(
-        _expected_value_issue(contract.architecture, _EXPECTED_ARCHITECTURE, "wrong_architecture", "architecture"),
-        _expected_value_issue(state.path, _EXPECTED_RUNTIME_PATH, "wrong_runtime_path", "current_state.path"),
-        _expected_value_issue(state.halt_contract, _EXPECTED_HALT_CONTRACT, "missing_halt_reference", "current_state.halt_contract"),
-        _expected_value_issue(state.progression_contract, _EXPECTED_PROGRESSION_CONTRACT, "missing_progression_reference", "current_state.progression_contract"),
-        _expected_value_issue(state.progression_stages_contract, _EXPECTED_STAGES_CONTRACT, "missing_stages_reference", "current_state.progression_stages_contract"),
-        _expected_value_issue(state.final_smoke_marker, _EXPECTED_FINAL_MARKER, "wrong_final_marker", "current_state.final_smoke_marker"),
-        _expected_value_issue(state.terminal_behavior, _EXPECTED_TERMINAL_BEHAVIOR, "wrong_terminal_behavior", "current_state.terminal_behavior"),
+    expected = (
+        (contract.architecture, "x86_64", "architecture"),
+        (state.path, _EXPECTED_PATH, "current_state.path"),
+        (state.final_smoke_marker, "KOZO_RUNTIME_RETURN_OK", "current_state.final_smoke_marker"),
+        (state.terminal_behavior, "halt_loop", "current_state.terminal_behavior"),
     )
+    return _expected_values_issue(expected, "wrong_current_state")
 
 
-def _contract_reference_issue(contract_path: str, field: str) -> RuntimeProgressionEntryIssue | None:
-    path = runtime_progression_entry_contract.contract_repo_path(contract_path)
-    if path.is_file():
-        return None
-    return _issue("missing_contract_reference", field, f"Referenced contract is missing: {contract_path}")
-
-
-def _progression_marker_issue(
-    contract: runtime_progression_entry_contract.RuntimeProgressionEntryContract,
-) -> RuntimeProgressionEntryIssue | None:
-    entry = contract.progression_entry
-    return _first_issue(
-        _expected_value_issue(entry.marker, _EXPECTED_PROGRESSION_MARKER, "missing_progression_marker", "progression_entry.marker"),
-        _expected_value_issue(entry.status, _EXPECTED_ENTRY_STATUS, "wrong_progression_marker_status", "progression_entry.status"),
-        _marker_emission_issue(entry.emitted),
+def _reference_issue(contract) -> RuntimeProgressionEntryIssue | None:
+    references = (
+        (contract.current_state.halt_contract, "current_state.halt_contract"),
+        (contract.current_state.progression_contract, "current_state.progression_contract"),
+        (contract.current_state.progression_stages_contract, "current_state.progression_stages_contract"),
     )
-
-
-def _marker_emission_issue(emitted: bool) -> RuntimeProgressionEntryIssue | None:
-    if emitted is False:
-        return None
-    return _issue(
-        "progression_marker_claimed",
-        "progression_entry.emitted",
-        "Runtime progression marker must stay reserved and not emitted in this planning phase",
-    )
-
-
-def _required_value_issue(
-    actual_values: tuple[str, ...],
-    expected_values: tuple[str, ...],
-    reason: str,
-    field: str,
-) -> RuntimeProgressionEntryIssue | None:
-    for expected in expected_values:
-        if expected not in actual_values:
-            return _issue(reason, f"{field}.{expected}", f"Runtime progression entry contract must declare: {expected}")
+    for value, field in references:
+        if not contract_module.contract_repo_path(value).is_file():
+            return _issue("missing_contract_reference", field, f"Referenced contract is missing: {value}")
     return None
 
 
-def _expected_value_issue(
-    actual: str,
-    expected: str,
-    reason: str,
-    contract_field: str,
-) -> RuntimeProgressionEntryIssue | None:
-    if actual == expected:
-        return None
-    return _issue(reason, contract_field, f"Expected {contract_field} to be {expected}, got {actual}")
+def _progression_entry_issue(contract) -> RuntimeProgressionEntryIssue | None:
+    entry = contract.progression_entry
+    expected = (
+        (entry.marker, "KOZO_RUNTIME_PROGRESS_ENTRY", "progression_entry.marker"),
+        (entry.status, "implemented", "progression_entry.status"),
+        (entry.emitted, True, "progression_entry.emitted"),
+        (entry.source_file, "kernel/arch/x86_64/boot.asm", "progression_entry.source_file"),
+        (entry.assembly_entry_symbol, "_start", "progression_entry.assembly_entry_symbol"),
+        (entry.target_symbol, "runtime_progression_entry", "progression_entry.target_symbol"),
+    )
+    return _expected_values_issue(expected, "progression_entry_mismatch")
+
+
+def _calling_convention_issue(contract) -> RuntimeProgressionEntryIssue | None:
+    convention = contract.calling_convention
+    expected = (
+        (convention.name, "System V AMD64 C", "calling_convention.name"),
+        (convention.argument_registers, ("rdi",), "calling_convention.argument_registers"),
+        (convention.return_register, "eax", "calling_convention.return_register"),
+        (convention.call_site_stack_alignment_bytes, 16, "calling_convention.call_site_stack_alignment_bytes"),
+        (convention.callee_entry_stack_modulo_bytes, 8, "calling_convention.callee_entry_stack_modulo_bytes"),
+        (convention.red_zone_policy, "disabled_by_freestanding_build", "calling_convention.red_zone_policy"),
+    )
+    return _expected_values_issue(expected, "calling_convention_mismatch")
+
+
+def _bootstrap_context_issue(contract) -> RuntimeProgressionEntryIssue | None:
+    context = contract.bootstrap_context
+    fields = tuple((field.name, field.offset_bytes) for field in context.fields)
+    expected = (
+        (context.version, 1, "bootstrap_context.version"),
+        (context.size_bytes, 64, "bootstrap_context.size_bytes"),
+        (context.symbol, "runtime_bootstrap_context", "bootstrap_context.symbol"),
+        (fields, _EXPECTED_CONTEXT_FIELDS, "bootstrap_context.fields"),
+        (context.required_zero_fields, ("flags", "reserved"), "bootstrap_context.required_zero_fields"),
+    )
+    return _expected_values_issue(expected, "bootstrap_context_mismatch")
+
+
+def _runtime_initialization_issue(contract) -> RuntimeProgressionEntryIssue | None:
+    runtime = contract.runtime_initialization
+    expected = (
+        (runtime.source_file, "kernel/runtime_progression.odin", "runtime_initialization.source_file"),
+        (runtime.entry_symbol, "runtime_progression_entry", "runtime_initialization.entry_symbol"),
+        (runtime.marker, "KOZO_RUNTIME_INIT_OK", "runtime_initialization.marker"),
+        (runtime.serial_bridge_symbol, "runtime_serial_write_init_marker", "runtime_initialization.serial_bridge_symbol"),
+        (runtime.state_symbol, "runtime_progression_state", "runtime_initialization.state_symbol"),
+        (runtime.operation, "bounded_write_read_restore", "runtime_initialization.operation"),
+        (runtime.success_status, 0, "runtime_initialization.success_status"),
+    )
+    return _expected_values_issue(expected, "runtime_initialization_mismatch")
+
+
+def _return_boundary_issue(contract) -> RuntimeProgressionEntryIssue | None:
+    boundary = contract.return_boundary
+    expected = (
+        (boundary.marker, "KOZO_RUNTIME_RETURN_OK", "return_boundary.marker"),
+        (boundary.status, "implemented", "return_boundary.status"),
+        (boundary.emitted, True, "return_boundary.emitted"),
+        (boundary.required_status, 0, "return_boundary.required_status"),
+        (boundary.terminal_behavior, "halt_loop", "return_boundary.terminal_behavior"),
+    )
+    return _expected_values_issue(expected, "return_boundary_mismatch")
+
+
+def _expected_values_issue(expected_values, reason: str) -> RuntimeProgressionEntryIssue | None:
+    for actual, expected, field in expected_values:
+        if actual != expected:
+            return _issue(reason, field, f"Expected {field} to be {expected}, got {actual}")
+    return None
+
+
+def _required_values_issue(actual, required, reason: str, field: str) -> RuntimeProgressionEntryIssue | None:
+    for value in required:
+        if value not in actual:
+            return _issue(reason, f"{field}.{value}", f"Runtime progression entry contract must declare: {value}")
+    return None
 
 
 def _first_issue(*issues: RuntimeProgressionEntryIssue | None) -> RuntimeProgressionEntryIssue | None:
-    for issue in issues:
-        if issue is not None:
-            return issue
-    return None
+    return next((issue for issue in issues if issue is not None), None)
 
 
-def _issue(reason: str, contract_field: str, detail: str) -> RuntimeProgressionEntryIssue:
-    return RuntimeProgressionEntryIssue(reason=reason, contract_field=contract_field, detail=detail)
+def _issue(reason: str, field: str, detail: str) -> RuntimeProgressionEntryIssue:
+    return RuntimeProgressionEntryIssue(reason, field, detail)
 
 
 def _failure(issue: RuntimeProgressionEntryIssue) -> ValidationResult:
     return ValidationResult.fail(
         code=RUNTIME_PROGRESSION_ENTRY_CONTRACT_INVALID,
         detail=issue.detail,
-        action="Keep runtime progression entry planning subordinate to halt and progression contracts until entry evidence exists",
-        meta={
-            "reason": issue.reason,
-            "contract_field": issue.contract_field,
-        },
+        action="Keep the assembly-to-Odin boundary aligned with the governed progression contract",
+        meta={"reason": issue.reason, "contract_field": issue.contract_field},
     )

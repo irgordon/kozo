@@ -44,6 +44,7 @@ build_kernel_objects() {
   mkdir -p "$WORK_DIR"
   odin build "$ROOT/kernel" \
     "-target:$BRIDGE_TARGET" \
+    -disable-red-zone \
     -build-mode:obj \
     "-out:$WORK_DIR/kernel.o" >>"$LOG_FILE" 2>&1
   nasm -f elf64 "$ROOT/kernel/arch/x86_64/boot.asm" -o "$WORK_DIR/boot.o" >>"$LOG_FILE" 2>&1

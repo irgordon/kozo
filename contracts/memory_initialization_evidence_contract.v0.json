@@ -2,7 +2,7 @@
   "version": 0,
   "architecture": "x86_64",
   "current_state": {
-    "runtime_path": "boot_smoke_to_stack_and_memory_evidence_to_halt",
+    "runtime_path": "boot_smoke_to_stack_memory_and_runtime_progression_to_halt",
     "halt_contract": "contracts/runtime_halt_contract.v0.json",
     "progression_stages_contract": "contracts/runtime_progression_stages.v0.json",
     "stack_initialization_evidence_contract": "contracts/stack_initialization_evidence_contract.v0.json",
@@ -21,7 +21,7 @@
     "alignment_bytes": 4096,
     "allocation_mode": "static",
     "owner": "x86_64 boot memory evidence path",
-    "lifetime": "entry_to_halt"
+        "lifetime": "entry_to_runtime_progression_and_halt"
   },
   "initialization_operation": {
     "operation": "zero_fill",
@@ -51,7 +51,7 @@
       "controlled_region_zero_fill",
       "survival_probe_success"
     ],
-    "required_before": "runtime_halt_loop",
+    "required_before": "runtime_progression_entry",
     "emission_owner": "x86_64 boot memory evidence path"
   },
   "prerequisites": [
@@ -85,7 +85,7 @@
     "virtual memory management",
     "memory allocator behavior",
     "heap allocation",
-    "Odin runtime execution",
+    "complete Odin runtime readiness",
     "interrupt handling",
     "scheduler behavior",
     "userspace execution",
@@ -105,8 +105,8 @@
     "virtual memory management",
     "memory allocator behavior",
     "heap allocation",
-    "Odin runtime execution",
-    "runtime progression execution",
+    "complete Odin runtime readiness",
+    "runtime progression beyond the governed bounded call",
     "halt loop replacement",
     "interrupt handling",
     "scheduler behavior",

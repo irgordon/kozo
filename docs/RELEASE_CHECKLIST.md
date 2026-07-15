@@ -126,8 +126,10 @@ Required checklist:
 * QEMU smoke metadata outcome may be `blocked` with `limine_not_reached`, `kernel_not_loaded`, `kernel_entry_not_reached`, `serial_not_initialized`, `marker_not_emitted`, `qemu_timeout`, or `limine_lower_half_phdr` only as a no-boot-claim blocker.
 * QEMU smoke metadata early markers, observed markers, earliest marker, timeout state, and byte counts are reviewed when the QEMU blocker is under direct review.
 * QEMU smoke metadata outcome is `pass` before any QEMU boot claim is made.
-* Passing QEMU smoke metadata includes `KOZO_MEMORY_INIT_OK` as the expected marker.
-* Passing QEMU smoke serial output includes `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, `KOZO_STACK_INIT_OK`, and `KOZO_MEMORY_INIT_OK` in order.
+* Passing QEMU smoke metadata includes `KOZO_RUNTIME_RETURN_OK` as the expected marker.
+* Passing QEMU smoke serial output includes `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, `KOZO_STACK_INIT_OK`, `KOZO_MEMORY_INIT_OK`, `KOZO_RUNTIME_PROGRESS_ENTRY`, `KOZO_RUNTIME_INIT_OK`, and `KOZO_RUNTIME_RETURN_OK` in order.
+* `runtime_progression_entry_contract` and `runtime_progression_evidence` pass.
+* The kernel ELF report records the progression entry, bootstrap context, static state, and fixed serial bridge symbols.
 * Memory evidence review includes the contract-owned region geometry, full zero fill, bounded sentinel probe, restoration, marker order, and unchanged halt path.
 * QEMU serial smoke evidence is promoted only from a green CI run with passing metadata and the full ordered marker sequence.
 * Passing QEMU serial smoke evidence is reviewed as a narrow smoke claim, not as hardware trap, userspace, subsystem, compatibility, or production-readiness evidence.

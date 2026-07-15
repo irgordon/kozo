@@ -66,6 +66,10 @@ It is responsible for the currently implemented kernel entry and syscall dispatc
 
 The kernel must use ABI constants for governed syscall selectors and must follow declared syscall contracts.
 
+The current boot-to-runtime boundary is an internal System V AMD64 C call from `_start` to the exported Odin symbol `runtime_progression_entry`. Assembly supplies a fixed, versioned bootstrap context after controlled stack and memory evidence. Odin validates that context, performs one bounded static-state probe, emits runtime-initialization evidence through a fixed serial bridge, returns an exact status, and yields to the authoritative assembly halt path.
+
+This boundary proves only a bounded language-level call when passing QEMU evidence captures its markers. It is not a userspace ABI, security boundary, allocator, scheduler, interrupt path, dynamic runtime initialization path, or complete Odin runtime.
+
 Security boundary details are owned by `docs/SECURITY_MODEL.md`.
 
 ---

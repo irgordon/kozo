@@ -35,6 +35,7 @@ from harness.validators_impl.runtime_evidence_taxonomy import RuntimeEvidenceTax
 from harness.validators_impl.runtime_halt_contract import RuntimeHaltContractValidator
 from harness.validators_impl.runtime_progression_contract import RuntimeProgressionContractValidator
 from harness.validators_impl.runtime_progression_entry_contract import RuntimeProgressionEntryContractValidator
+from harness.validators_impl.runtime_progression_evidence import RuntimeProgressionEvidenceValidator
 from harness.validators_impl.runtime_progression_stages import RuntimeProgressionStagesValidator
 from harness.validators_impl.stack_initialization_evidence_contract import StackInitializationEvidenceContractValidator
 from harness.validators_impl.stack_initialization_evidence import StackInitializationEvidenceValidator
@@ -85,6 +86,7 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "runtime_halt_contract": RuntimeHaltContractValidator,
     "runtime_progression_contract": RuntimeProgressionContractValidator,
     "runtime_progression_entry_contract": RuntimeProgressionEntryContractValidator,
+    "runtime_progression_evidence": RuntimeProgressionEvidenceValidator,
     "runtime_progression_stages": RuntimeProgressionStagesValidator,
     "stack_initialization_evidence_contract": StackInitializationEvidenceContractValidator,
     "stack_initialization_evidence": StackInitializationEvidenceValidator,

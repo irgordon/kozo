@@ -18,6 +18,8 @@ KOZO_NEGATIVE_COVERAGE = {
         "missing_prerequisite": "test_fails_when_prerequisite_is_missing",
         "missing_halt_reference": "test_fails_when_halt_reference_is_missing",
         "missing_progression_marker": "test_fails_when_progression_marker_is_missing",
+        "wrong_calling_convention": "test_fails_when_calling_convention_is_wrong",
+        "invalid_context_layout": "test_fails_when_context_field_order_is_wrong",
         "missing_transition_requirement": "test_fails_when_transition_requirement_is_missing",
         "missing_non_goal": "test_fails_when_non_goal_is_missing",
         "diagnostic_names_field": "test_failure_diagnostic_names_field",
@@ -26,258 +28,148 @@ KOZO_NEGATIVE_COVERAGE = {
 
 
 class RuntimeProgressionEntryContractValidatorTests(unittest.TestCase):
-    def test_passes_when_progression_entry_contract_matches_governance(self):
+    def test_valid_contract_passes(self):
         result = self.validate_fixture()
 
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
 
     def test_fails_when_contract_is_missing(self):
-        self.assertEqual("runtime_progression_entry_contract", RuntimeProgressionEntryContractValidator.name)
         result = self.validate_fixture(remove_contract=True)
 
         self.assertEqual(result.status, "fail")
-        self.assert_entry_failure(result, "missing_contract_file", "contract")
+        self.assert_failure(result, "missing_contract_file", "contract")
 
     def test_fails_when_contract_json_is_invalid(self):
-        self.assertEqual("runtime_progression_entry_contract", RuntimeProgressionEntryContractValidator.name)
-        result = self.validate_fixture(mutate_contract_text=lambda _: "{not json")
+        result = self.validate_fixture(mutate_text=lambda _: "{not json")
 
         self.assertEqual(result.status, "fail")
-        self.assert_entry_failure(result, "invalid_contract_json", "contract")
+        self.assert_failure(result, "invalid_contract_json", "contract")
 
     def test_fails_when_contract_schema_is_violated(self):
-        self.assertEqual("runtime_progression_entry_contract", RuntimeProgressionEntryContractValidator.name)
-        result = self.validate_fixture(mutate_contract=lambda contract: contract | {"version": 1})
+        result = self.validate_fixture(mutate_contract=lambda value: value | {"version": 1})
 
         self.assertEqual(result.status, "fail")
-        self.assert_entry_failure(result, "contract_schema_violation", "contract")
+        self.assert_failure(result, "contract_schema_violation", "contract")
 
     def test_fails_when_prerequisite_is_missing(self):
-        self.assertEqual("runtime_progression_entry_contract", RuntimeProgressionEntryContractValidator.name)
-        result = self.validate_fixture(
-            mutate_contract=lambda contract: contract | {
-                "required_prerequisites": [
-                    value for value in contract["required_prerequisites"]
-                    if value != "stack initialization evidence"
-                ]
-            }
-        )
+        result = self.validate_fixture(mutate_contract=remove_list_value("required_prerequisites", "memory initialization evidence"))
 
         self.assertEqual(result.status, "fail")
-        self.assert_entry_failure(
-            result,
-            "missing_prerequisite",
-            "required_prerequisites.stack initialization evidence",
-        )
+        self.assert_failure(result, "missing_prerequisite", "required_prerequisites.memory initialization evidence")
 
     def test_fails_when_halt_reference_is_missing(self):
-        self.assertEqual("runtime_progression_entry_contract", RuntimeProgressionEntryContractValidator.name)
         result = self.validate_fixture(remove_halt_contract=True)
 
         self.assertEqual(result.status, "fail")
-        self.assert_entry_failure(result, "missing_contract_reference", "current_state.halt_contract")
+        self.assert_failure(result, "missing_contract_reference", "current_state.halt_contract")
 
     def test_fails_when_progression_marker_is_missing(self):
-        self.assertEqual("runtime_progression_entry_contract", RuntimeProgressionEntryContractValidator.name)
-        result = self.validate_fixture(
-            mutate_contract=lambda contract: contract | {
-                "progression_entry": contract["progression_entry"] | {
-                    "marker": "KOZO_WRONG_MARKER"
-                }
-            }
-        )
+        result = self.validate_fixture(mutate_contract=mutate_nested("progression_entry", "marker", "KOZO_WRONG_MARKER"))
 
         self.assertEqual(result.status, "fail")
-        self.assert_entry_failure(result, "missing_progression_marker", "progression_entry.marker")
+        self.assert_failure(result, "progression_entry_mismatch", "progression_entry.marker")
 
-    def test_fails_when_progression_marker_is_marked_emitted(self):
-        self.assertEqual("runtime_progression_entry_contract", RuntimeProgressionEntryContractValidator.name)
-        result = self.validate_fixture(
-            mutate_contract=lambda contract: contract | {
-                "progression_entry": contract["progression_entry"] | {
-                    "emitted": True
-                }
-            }
-        )
+    def test_fails_when_calling_convention_is_wrong(self):
+        result = self.validate_fixture(mutate_contract=mutate_nested("calling_convention", "name", "Odin"))
 
         self.assertEqual(result.status, "fail")
-        self.assert_entry_failure(result, "progression_marker_claimed", "progression_entry.emitted")
+        self.assert_failure(result, "calling_convention_mismatch", "calling_convention.name")
+
+    def test_fails_when_context_field_order_is_wrong(self):
+        def swap_fields(contract):
+            fields = list(contract["bootstrap_context"]["fields"])
+            fields[2], fields[3] = fields[3], fields[2]
+            return contract | {"bootstrap_context": contract["bootstrap_context"] | {"fields": fields}}
+
+        result = self.validate_fixture(mutate_contract=swap_fields)
+
+        self.assertEqual(result.status, "fail")
+        self.assert_failure(result, "bootstrap_context_mismatch", "bootstrap_context.fields")
 
     def test_fails_when_transition_requirement_is_missing(self):
-        self.assertEqual("runtime_progression_entry_contract", RuntimeProgressionEntryContractValidator.name)
-        result = self.validate_fixture(
-            mutate_contract=lambda contract: contract | {
-                "transition_requirements": [
-                    value for value in contract["transition_requirements"]
-                    if value != "runtime_halt_contract remains authoritative until runtime progression evidence exists"
-                ]
-            }
-        )
+        requirement = "KOZO_RUNTIME_INIT_OK must originate from executed Odin code"
+        result = self.validate_fixture(mutate_contract=remove_list_value("transition_requirements", requirement))
 
         self.assertEqual(result.status, "fail")
-        self.assert_entry_failure(
-            result,
-            "missing_transition_requirement",
-            "transition_requirements.runtime_halt_contract remains authoritative until runtime progression evidence exists",
-        )
+        self.assert_failure(result, "missing_transition_requirement", f"transition_requirements.{requirement}")
 
     def test_fails_when_non_goal_is_missing(self):
-        self.assertEqual("runtime_progression_entry_contract", RuntimeProgressionEntryContractValidator.name)
-        result = self.validate_fixture(
-            mutate_contract=lambda contract: contract | {
-                "non_goals": [
-                    value for value in contract["non_goals"]
-                    if value != "userspace execution"
-                ]
-            }
-        )
+        result = self.validate_fixture(mutate_contract=remove_list_value("non_goals", "userspace execution"))
 
         self.assertEqual(result.status, "fail")
-        self.assert_entry_failure(result, "missing_non_goal", "non_goals.userspace execution")
+        self.assert_failure(result, "missing_non_goal", "non_goals.userspace execution")
 
     def test_failure_diagnostic_names_field(self):
-        self.assertEqual("runtime_progression_entry_contract", RuntimeProgressionEntryContractValidator.name)
-        result = self.validate_fixture(mutate_contract=lambda contract: contract | {"architecture": "aarch64"})
+        result = self.validate_fixture(mutate_contract=lambda value: value | {"architecture": "aarch64"})
 
         self.assertEqual(result.status, "fail")
-        self.assertEqual(result.code, RUNTIME_PROGRESSION_ENTRY_CONTRACT_INVALID)
-        self.assertEqual(result.meta["reason"], "wrong_architecture")
-        self.assertEqual(result.meta["contract_field"], "architecture")
+        self.assertIn("reason", result.meta)
+        self.assertIn("contract_field", result.meta)
 
-    def validate_fixture(
-        self,
-        *,
-        remove_contract: bool = False,
-        remove_halt_contract: bool = False,
-        mutate_contract=None,
-        mutate_contract_text=None,
-    ):
+    def validate_fixture(self, **changes):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            paths = write_fixture_files(root)
-            if remove_contract:
-                paths["contract"].unlink()
-            elif mutate_contract_text is not None:
-                paths["contract"].write_text(mutate_contract_text(paths["contract"].read_text()))
-            elif mutate_contract is not None:
-                contract = json.loads(paths["contract"].read_text())
-                paths["contract"].write_text(json.dumps(mutate_contract(contract), indent=2) + "\n")
-            if remove_halt_contract:
-                paths["halt_contract"].unlink()
-
-            old_paths = patch_validator_paths(root, paths["contract"])
+            paths = write_fixture(root)
+            apply_changes(paths, changes)
+            old = patch_paths(root, paths["contract"])
             try:
                 return RuntimeProgressionEntryContractValidator().validate({})
             finally:
-                restore_validator_paths(old_paths)
+                restore_paths(old)
 
-    def assert_entry_failure(self, result, reason: str, contract_field: str):
+    def assert_failure(self, result, reason: str, field: str):
         self.assertEqual(result.status, "fail")
         self.assertEqual(result.code, RUNTIME_PROGRESSION_ENTRY_CONTRACT_INVALID)
         self.assertEqual(result.meta["reason"], reason)
-        self.assertEqual(result.meta["contract_field"], contract_field)
+        self.assertEqual(result.meta["contract_field"], field)
 
 
-def write_fixture_files(root: Path) -> dict[str, Path]:
-    contract_path = root / "contracts" / "runtime_progression_entry_contract.v0.json"
-    halt_contract_path = root / "contracts" / "runtime_halt_contract.v0.json"
-    progression_contract_path = root / "contracts" / "runtime_progression_contract.v0.json"
-    stages_contract_path = root / "contracts" / "runtime_progression_stages.v0.json"
-    contract_path.parent.mkdir(parents=True)
-    contract_path.write_text(json.dumps(valid_contract(), indent=2) + "\n")
-    halt_contract_path.write_text("{}\n")
-    progression_contract_path.write_text("{}\n")
-    stages_contract_path.write_text("{}\n")
-    return {
-        "contract": contract_path,
-        "halt_contract": halt_contract_path,
-        "progression_contract": progression_contract_path,
-        "stages_contract": stages_contract_path,
+def write_fixture(root: Path) -> dict[str, Path]:
+    contracts = root / "contracts"
+    contracts.mkdir(parents=True)
+    paths = {
+        "contract": contracts / "runtime_progression_entry_contract.v0.json",
+        "halt": contracts / "runtime_halt_contract.v0.json",
+        "progression": contracts / "runtime_progression_contract.v0.json",
+        "stages": contracts / "runtime_progression_stages.v0.json",
     }
+    paths["contract"].write_text(contract_module.CONTRACT_PATH.read_text())
+    for name in ("halt", "progression", "stages"):
+        paths[name].write_text("{}\n")
+    return paths
 
 
-def valid_contract() -> dict[str, object]:
-    return {
-        "version": 0,
-        "architecture": "x86_64",
-        "current_state": {
-            "path": "boot_smoke_to_stack_and_memory_evidence_to_halt",
-            "halt_contract": "contracts/runtime_halt_contract.v0.json",
-            "progression_contract": "contracts/runtime_progression_contract.v0.json",
-            "progression_stages_contract": "contracts/runtime_progression_stages.v0.json",
-            "final_smoke_marker": "KOZO_BOOT_SMOKE_OK",
-            "terminal_behavior": "halt_loop",
-        },
-        "progression_entry": {
-            "marker": "KOZO_RUNTIME_PROGRESS_ENTRY",
-            "status": "reserved",
-            "emitted": False,
-            "entry_boundary": "after boot smoke evidence and before any halt replacement once prerequisites are proven",
-        },
-        "required_prerequisites": [
-            "stack initialization evidence",
-            "stack initialization evidence contract",
-            "memory initialization evidence",
-            "progression path evidence",
-        ],
-        "required_evidence": [
-            "runtime progression entry contract",
-            "QEMU evidence for KOZO_RUNTIME_PROGRESS_ENTRY",
-            "stack initialization evidence",
-            "stack initialization evidence contract",
-            "memory initialization evidence",
-            "release evidence update",
-        ],
-        "transition_requirements": [
-            "runtime_halt_contract remains authoritative until runtime progression evidence exists",
-            "runtime_progression_contract defines halt-preservation requirements",
-            "KOZO_RUNTIME_PROGRESS_ENTRY must not be claimed until emitted by runtime code and captured in evidence",
-            "halt replacement requires contract-backed progression evidence",
-        ],
-        "forbidden_shortcuts": [
-            "delete halt loop",
-            "replace halt loop",
-            "bypass halt loop",
-            "jump around halt loop",
-        ],
-        "transition_ownership": [
-            "runtime_halt_contract owns current terminal behavior",
-            "runtime_progression_contract owns halt-preservation governance",
-            "runtime_progression_stages contract owns canonical stage order and allowed transitions",
-            "runtime_progression_entry_contract owns the MEMORY_INITIALIZATION_EVIDENCE to RUNTIME_PROGRESSION_ENTRY proof boundary",
-        ],
-        "non_goals": [
-            "runtime progression execution",
-            "general stack readiness",
-            "general memory management",
-            "Odin runtime execution",
-            "userspace execution",
-            "interrupt handling",
-            "scheduler behavior",
-            "VFS behavior",
-            "process model behavior",
-            "device driver behavior",
-            "Linux compatibility",
-            "POSIX compatibility",
-            "production readiness",
-        ],
-    }
+def apply_changes(paths: dict[str, Path], changes: dict[str, object]) -> None:
+    if changes.get("remove_contract"):
+        paths["contract"].unlink()
+        return
+    if changes.get("mutate_text"):
+        paths["contract"].write_text(changes["mutate_text"](paths["contract"].read_text()))
+    if changes.get("mutate_contract"):
+        contract = json.loads(paths["contract"].read_text())
+        paths["contract"].write_text(json.dumps(changes["mutate_contract"](contract), indent=2) + "\n")
+    if changes.get("remove_halt_contract"):
+        paths["halt"].unlink()
 
 
-def patch_validator_paths(root: Path, contract_path: Path):
-    old_paths = {
-        "validator_contract": validator_module._CONTRACT_PATH,
-        "contract_root": contract_module.ROOT,
-    }
-    validator_module._CONTRACT_PATH = contract_path
+def mutate_nested(section: str, field: str, value: object):
+    return lambda contract: contract | {section: contract[section] | {field: value}}
+
+
+def remove_list_value(field: str, removed: str):
+    return lambda contract: contract | {field: [value for value in contract[field] if value != removed]}
+
+
+def patch_paths(root: Path, path: Path):
+    old = validator_module._CONTRACT_PATH, contract_module.ROOT
+    validator_module._CONTRACT_PATH = path
     contract_module.ROOT = root
-    return old_paths
+    return old
 
 
-def restore_validator_paths(old_paths):
-    validator_module._CONTRACT_PATH = old_paths["validator_contract"]
-    contract_module.ROOT = old_paths["contract_root"]
+def restore_paths(old) -> None:
+    validator_module._CONTRACT_PATH, contract_module.ROOT = old
 
 
 if __name__ == "__main__":

@@ -228,6 +228,9 @@ def _marker_halt_sequence(context: MemoryEvidenceContext) -> tuple[str, ...]:
         "cmp rdx, rax",
         f"mov qword [rel {context.contract.controlled_region.start_symbol}], 0",
         f"WRITE_COM1_MARKER memory_init_marker, memory_init_marker_end",
+        "WRITE_COM1_MARKER runtime_progress_entry_marker, runtime_progress_entry_marker_end",
+        "call runtime_progression_entry",
+        "WRITE_COM1_MARKER runtime_return_marker, runtime_return_marker_end",
         "cli",
         ".halt:",
         "hlt",
@@ -254,6 +257,8 @@ def _fallthrough_issue(lines: tuple[str, ...]) -> MemoryInitializationEvidenceIs
     if jump is None:
         return _issue("fallthrough_after_marker", "marker_placement.required_before", "Memory evidence path must end in the halt loop back edge")
     for line in lines[jump + 1:]:
+        if line.endswith(":") and not line.startswith("."):
+            return None
         if not line.endswith(":"):
             return _issue("fallthrough_after_marker", "marker_placement.required_before", "Executable fallthrough after the memory evidence halt loop is forbidden")
     return None

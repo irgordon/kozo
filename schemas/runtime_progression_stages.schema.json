@@ -56,7 +56,7 @@
           "stage_id": { "type": "integer", "minimum": 0 },
           "stage_name": { "type": "string", "pattern": ".*\\S.*" },
           "description": { "type": "string", "pattern": ".*\\S.*" },
-          "status": { "type": "string", "enum": ["proven", "planned"] },
+          "status": { "type": "string", "enum": ["proven", "implemented_pending_ci", "planned"] },
           "required_prerequisites": {
             "type": "array",
             "uniqueItems": true,

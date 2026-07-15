@@ -6,7 +6,10 @@
     "KOZO_EARLY_2_SERIAL_INIT_OK",
     "KOZO_BOOT_SMOKE_OK",
     "KOZO_STACK_INIT_OK",
-    "KOZO_MEMORY_INIT_OK"
+        "KOZO_MEMORY_INIT_OK",
+        "KOZO_RUNTIME_PROGRESS_ENTRY",
+        "KOZO_RUNTIME_INIT_OK",
+        "KOZO_RUNTIME_RETURN_OK"
   ],
   "smoke_marker_order": [
     "KOZO_EARLY_0_ENTRY",
@@ -14,9 +17,12 @@
     "KOZO_EARLY_2_SERIAL_INIT_OK",
     "KOZO_BOOT_SMOKE_OK",
     "KOZO_STACK_INIT_OK",
-    "KOZO_MEMORY_INIT_OK"
+        "KOZO_MEMORY_INIT_OK",
+        "KOZO_RUNTIME_PROGRESS_ENTRY",
+        "KOZO_RUNTIME_INIT_OK",
+        "KOZO_RUNTIME_RETURN_OK"
   ],
-  "expected_smoke_marker": "KOZO_MEMORY_INIT_OK",
+    "expected_smoke_marker": "KOZO_RUNTIME_RETURN_OK",
   "smoke_outcomes": [
     "pass",
     "blocked"
@@ -29,7 +35,10 @@
     "serial_not_initialized": "KOZO entry was observed but serial initialization completion was absent.",
     "marker_not_emitted": "Early serial initialization was observed but the boot smoke marker was absent.",
     "stack_marker_not_emitted": "The boot smoke marker was observed but the stack initialization marker was absent.",
-    "memory_marker_not_emitted": "The stack initialization marker was observed but the memory initialization marker was absent.",
+        "memory_marker_not_emitted": "The stack initialization marker was observed but the memory initialization marker was absent.",
+        "runtime_progression_entry_not_reached": "Memory initialization evidence was observed but runtime progression entry was absent.",
+        "runtime_initialization_not_proven": "Runtime progression entry was observed but Odin runtime initialization evidence was absent.",
+        "runtime_return_not_reached": "Odin runtime initialization evidence was observed but the governed return marker was absent.",
     "qemu_timeout": "QEMU execution timed out before a passing smoke sequence was observed.",
     "missing_qemu_tooling": "QEMU tooling is unavailable.",
     "missing_boot_image": "The QEMU smoke script cannot find the boot image.",
@@ -49,7 +58,10 @@
     "serial_not_initialized",
     "marker_not_emitted",
     "stack_marker_not_emitted",
-    "memory_marker_not_emitted",
+        "memory_marker_not_emitted",
+        "runtime_progression_entry_not_reached",
+        "runtime_initialization_not_proven",
+        "runtime_return_not_reached",
     "qemu_timeout",
     "missing_qemu_tooling",
     "missing_boot_image",
@@ -67,7 +79,10 @@
     "serial_not_initialized",
     "marker_not_emitted",
     "stack_marker_not_emitted",
-    "memory_marker_not_emitted",
+        "memory_marker_not_emitted",
+        "runtime_progression_entry_not_reached",
+        "runtime_initialization_not_proven",
+        "runtime_return_not_reached",
     "qemu_timeout",
     "missing_qemu_tooling",
     "missing_boot_image",
@@ -88,7 +103,7 @@
   "pass_condition": {
     "outcome": "pass",
     "required_marker_sequence": "full_ordered_smoke_marker_sequence",
-    "expected_marker": "KOZO_MEMORY_INIT_OK"
+        "expected_marker": "KOZO_RUNTIME_RETURN_OK"
   },
   "blocked_condition": {
     "outcome": "blocked",
@@ -97,7 +112,8 @@
   "non_goals": [
     "hardware trap execution",
     "interrupt handling",
-    "Odin runtime execution",
+        "complete Odin runtime readiness",
+        "dynamic initialization",
     "general stack readiness",
     "general memory management",
     "syscall dispatch",

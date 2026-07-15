@@ -10,10 +10,10 @@ from harness.validator import BaseValidator, ValidationResult
 
 _CONTRACT_PATH = runtime_progression_contract.CONTRACT_PATH
 _EXPECTED_ARCHITECTURE = "x86_64"
-_EXPECTED_RUNTIME_PATH = "boot_smoke_to_stack_and_memory_evidence_to_halt"
+_EXPECTED_RUNTIME_PATH = "boot_smoke_to_stack_memory_and_runtime_progression_to_halt"
 _EXPECTED_HALT_CONTRACT = "contracts/runtime_halt_contract.v0.json"
 _EXPECTED_STAGES_CONTRACT = "contracts/runtime_progression_stages.v0.json"
-_EXPECTED_FINAL_MARKER = "KOZO_BOOT_SMOKE_OK"
+_EXPECTED_FINAL_MARKER = "KOZO_RUNTIME_RETURN_OK"
 _EXPECTED_TERMINAL_BEHAVIOR = "halt_loop"
 _REQUIRED_PREREQUISITES = (
     "stack initialization evidence",
@@ -21,8 +21,8 @@ _REQUIRED_PREREQUISITES = (
     "progression path evidence",
 )
 _REQUIRED_TRANSITION_REQUIREMENTS = (
-    "halt loop remains authoritative until runtime progression is separately proven",
-    "runtime progression must have contract-backed evidence before halt behavior changes",
+    "halt loop remains authoritative after bounded runtime progression",
+    "runtime progression must have contract-backed evidence before stage claims change",
     "runtime progression must preserve the existing QEMU smoke marker sequence until a successor evidence path is accepted",
     "runtime progression must update release evidence and validation before claims expand",
 )
@@ -43,7 +43,8 @@ _REQUIRED_EVIDENCE_REQUIREMENTS = (
     "planning document update",
 )
 _REQUIRED_NON_GOALS = (
-    "Odin runtime execution",
+    "complete Odin runtime readiness",
+    "dynamic initialization",
     "userspace execution",
     "interrupt handling",
     "scheduler behavior",

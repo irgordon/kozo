@@ -62,6 +62,8 @@ Payload syscalls must mutate only contract-allowed fields.
 
 Development-time proof validation must not be confused with runtime security enforcement.
 
+The v0.7.45 bootstrap context is an internal same-address-space assembly-to-Odin input. Odin validates its version, size, reserved fields, stack range, and memory range before using it, but this validation does not create a privilege boundary or userspace ABI. The fixed serial bridge accepts no caller-controlled string or length and conveys no authority.
+
 ---
 
 # 6. Opaque Handles

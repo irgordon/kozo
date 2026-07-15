@@ -17,6 +17,12 @@ LOWER_HALF_PHDR_BLOCKER = "limine_lower_half_phdr"
 MEMORY_REGION_START_SYMBOL = "boot_memory_region"
 MEMORY_REGION_END_SYMBOL = "boot_memory_region_end"
 MEMORY_REGION_ALIGNMENT = 4096
+RUNTIME_PROGRESSION_SYMBOLS = (
+    "runtime_progression_entry",
+    "runtime_bootstrap_context",
+    "runtime_progression_state",
+    "runtime_serial_write_init_marker",
+)
 
 ARCHITECTURES = {
     EM_X86_64: "x86_64",
@@ -103,7 +109,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
     load_segments = [segment for segment in program_headers if segment.header_type == PT_LOAD]
     symbols = symbol_addresses(
         kernel_elf,
-        ("_start", MEMORY_REGION_START_SYMBOL, MEMORY_REGION_END_SYMBOL),
+        ("_start", MEMORY_REGION_START_SYMBOL, MEMORY_REGION_END_SYMBOL, *RUNTIME_PROGRESSION_SYMBOLS),
     )
     symbol_address = symbols.get("_start")
     layout = load_layout(header, load_segments)
@@ -127,6 +133,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "entry_is_lower_half": layout.entry_is_lower_half,
         "entry_address_class": layout.entry_address_class,
         "memory_evidence_region": memory_evidence_region_record(symbols),
+        "runtime_progression_symbols": runtime_progression_symbol_record(symbols),
         "program_header_count": header.program_header_count,
         "section_count": header.section_header_count,
         "load_segments": [segment_record(segment) for segment in load_segments],
@@ -262,6 +269,16 @@ def memory_evidence_region_record(symbols: dict[str, int]) -> dict[str, object]:
     }
 
 
+def runtime_progression_symbol_record(symbols: dict[str, int]) -> dict[str, object]:
+    return {
+        symbol: {
+            "present": symbol in symbols,
+            "address": _hex(symbols[symbol]) if symbol in symbols else "",
+        }
+        for symbol in RUNTIME_PROGRESSION_SYMBOLS
+    }
+
+
 def load_layout(header: ElfHeader, load_segments: list[ProgramHeader]) -> LoadLayout:
     minimum_vaddr = minimum_load_virtual_address(load_segments)
     minimum_paddr = minimum_load_physical_address(load_segments)
@@ -370,6 +387,7 @@ def malformed_report(kernel_elf: Path, linker_script: Path, issue: str) -> dict[
         "entry_is_lower_half": False,
         "entry_address_class": "zero",
         "memory_evidence_region": memory_evidence_region_record({}),
+        "runtime_progression_symbols": runtime_progression_symbol_record({}),
         "program_header_count": 0,
         "section_count": 0,
         "load_segments": [],

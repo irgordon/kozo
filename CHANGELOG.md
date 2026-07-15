@@ -1,8 +1,28 @@
 # Changelog
 
+## v0.7.45 - 2026-07-15
+
+**Status:** Runtime progression and minimal runtime initialization implemented locally; CI acceptance pending.
+
+### Added
+
+* Added an explicit System V AMD64 assembly-to-Odin boundary after `KOZO_MEMORY_INIT_OK`, with a versioned fixed-width bootstrap context and disabled red-zone code generation.
+* Added a bounded Odin runtime-state write/read/restore probe and Odin-owned `KOZO_RUNTIME_INIT_OK` emission through a fixed assembly serial bridge.
+* Added `runtime_progression_evidence` validation for source ordering, context layout, linked symbols, marker evidence, stage status, exact return status, and terminal halt preservation.
+
+### Changed
+
+* Extended the governed marker sequence through `KOZO_RUNTIME_PROGRESS_ENTRY`, `KOZO_RUNTIME_INIT_OK`, and `KOZO_RUNTIME_RETURN_OK`.
+* Marked `RUNTIME_PROGRESSION_ENTRY` and `RUNTIME_INITIALIZATION_EVIDENCE` implemented pending CI while leaving `CONTROLLED_RUNTIME_LOOP` planned.
+
+### Notes
+
+* v0.7.4 memory evidence is accepted by the CI validator gate; manual artifact inspection was not completed.
+* ABI and syscall behavior are unchanged. This change adds no allocator, paging, interrupts, scheduler, userspace, hardware syscall boundary, compatibility, or production-readiness claim.
+
 ## v0.7.4 - 2026-07-15
 
-**Status:** Memory initialization evidence implemented locally; CI acceptance pending push.
+**Status:** Accepted by CI validator gate; manual artifact inspection not completed.
 
 ### Added
 

@@ -95,10 +95,11 @@ The current repository proves:
 * CI-proven QEMU serial smoke evidence with the full ordered marker sequence
 * governed post-smoke terminal behavior through `contracts/runtime_halt_contract.v0.json`
 * governed future halt-to-runtime transition planning through `contracts/runtime_progression_contract.v0.json`
-* governed future progression entry marker reservation through `contracts/runtime_progression_entry_contract.v0.json`
+* governed internal progression boundary through `contracts/runtime_progression_entry_contract.v0.json`, implemented locally and pending CI execution evidence
 * governed, acyclic runtime progression stage ordering and transition ownership through `contracts/runtime_progression_stages.v0.json`
 * governed stack initialization evidence through `contracts/stack_initialization_evidence_contract.v0.json` and `stack_initialization_evidence`
-* governed static-memory initialization evidence through `contracts/memory_initialization_evidence_contract.v0.json` and `memory_initialization_evidence`, pending post-push CI acceptance
+* governed static-memory initialization evidence through `contracts/memory_initialization_evidence_contract.v0.json` and `memory_initialization_evidence`, accepted by the CI validator gate without manual artifact inspection
+* locally implemented internal assembly-to-Odin progression boundary and bounded Odin state probe, pending CI marker evidence
 
 The latest local generated evidence may still report missing local Limine/xorriso tooling, but CI run `27894312430` proves the narrow QEMU serial smoke path.
 
@@ -108,12 +109,12 @@ The latest local generated evidence may still report missing local Limine/xorris
 
 KOZO still does not prove:
 
-* Odin runtime execution after the assembly marker sequence
+* CI-proven Odin runtime progression for v0.7.45 until the new markers are captured
+* complete Odin runtime readiness or dynamic initialization
 * general stack readiness beyond the controlled boot stack proof
 * general memory management beyond the governed static region
-* runtime progression past the governed halt loop
-* `KOZO_RUNTIME_PROGRESS_ENTRY` emission
-* progression-entry, runtime-initialization, loop, capability, or userspace progression stages beyond planning
+* runtime progression beyond the bounded call and governed halt continuation
+* controlled runtime loop, capability, or userspace progression stages
 * syscall dispatch during boot
 * hardware halt instruction semantics
 * interrupt handling
@@ -146,11 +147,11 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 3. Keep the v0.6.0 post-smoke terminal halt contract narrow and source-structural.
 4. Use `contracts/runtime_progression_stages.v0.json` as the sole authority for stage order and allowed transitions.
 5. Keep the v0.6.2 runtime progression contract as halt-preservation governance, not a second stage-order definition.
-6. Keep the v0.6.3 runtime progression entry marker reserved until stack and memory prerequisites are proven.
-7. Keep the v0.7.4 memory evidence proof as the current highest proven progression stage.
-8. Define runtime initialization evidence requirements in v0.7.5 before implementing any new progression behavior.
-9. Keep physical memory discovery, paging, virtual memory management, allocators, heaps, and Odin runtime initialization outside the current proof.
-10. Do not implement progression entry or replace the halt loop until progression-entry evidence is separately implemented and validated.
+6. Treat v0.7.4 memory evidence as accepted by the CI validator gate, while preserving the manual-artifact-inspection limitation.
+7. Validate v0.7.45 progression and runtime-initialization markers in CI before promoting either stage to proven.
+8. Keep the terminal halt path authoritative after the bounded Odin call.
+9. Keep physical memory discovery, paging, virtual memory management, allocators, heaps, dynamic Odin initialization, and userspace outside the current proof.
+10. After CI acceptance, scope v0.7.5 to a separately governed controlled runtime loop.
 
 ---
 
@@ -158,9 +159,8 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 
 After CI QEMU serial smoke evidence is green, resume deferred maturity work:
 
-* plan runtime initialization evidence without implementing progression
-* add runtime progression entry evidence
-* add runtime initialization evidence
+* accept runtime progression entry evidence through CI
+* accept bounded runtime initialization evidence through CI
 * add controlled runtime loop evidence
 * split QEMU smoke script policy from metadata rendering
 * split large validator coverage implementation layers
@@ -228,6 +228,7 @@ Deferred until separately scoped runtime or cleanup phases:
 | `v0.7.2` | Runtime Progression Model Reconciliation | Make the canonical stage graph acyclic, monotonic, and single-owner while aligning contracts, validation, planning, and task state. | Runtime behavior changes, marker changes, halt replacement, memory implementation, validator weakening, compatibility claims, production-readiness claims. |
 | `v0.7.3` | Memory Evidence Contract Hardening | Make the planned memory evidence boundary mechanically implementable before scheduling runtime changes. | Memory implementation, `KOZO_MEMORY_INIT_OK` emission, paging, allocator behavior, halt replacement, compatibility claims, production-readiness claims. |
 | `v0.7.4` | Memory Initialization Evidence | Implement only the contract-defined static region initialization and survival probe, emit governed evidence, and retain the halt path. | Physical memory discovery, paging, virtual memory management, allocator or heap behavior, Odin runtime initialization, halt replacement, compatibility claims, production-readiness claims. |
+| `v0.7.45` | Runtime Progression Entry and Minimal Runtime Initialization | Call a bounded Odin entry with a fixed validated context, prove one static-state operation, require exact return status, and retain the halt path. | Complete Odin runtime readiness, dynamic initialization, paging, allocation, interrupts, scheduling, userspace, hardware syscall boundaries, compatibility claims, production-readiness claims. |
 | `v1.0.0-rc.1` | Release candidate hardening | Freeze scope, freeze gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | New feature scope after RC. |
 | `v1.0.0` | Scoped release | Release only evidence-backed behavior with explicit non-goals. | Any unimplemented compatibility or runtime subsystem claim. |
 
