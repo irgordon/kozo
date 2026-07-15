@@ -10,7 +10,7 @@ from harness.validator import BaseValidator, ValidationResult
 
 _CONTRACT_PATH = stack_initialization_evidence_contract.CONTRACT_PATH
 _EXPECTED_ARCHITECTURE = "x86_64"
-_EXPECTED_RUNTIME_PATH = "boot_smoke_to_halt"
+_EXPECTED_RUNTIME_PATH = "boot_smoke_to_stack_evidence_to_halt"
 _EXPECTED_STAGE = "STACK_INITIALIZATION_EVIDENCE"
 _EXPECTED_MARKER = "KOZO_STACK_INIT_OK"
 _EXPECTED_MARKER_STATUS = "emitted"
@@ -24,7 +24,6 @@ _REQUIRED_PREREQUISITES = (
     "QEMU serial smoke evidence",
     "runtime halt contract",
     "runtime progression contract",
-    "runtime progression entry contract",
     "runtime progression stages contract",
 )
 _REQUIRED_EVIDENCE = (
@@ -38,7 +37,7 @@ _REQUIRED_EVIDENCE = (
 _REQUIRED_ASSUMPTIONS_ENABLED = (
     "safe call instruction usage after the proven stack marker",
     "safe function nesting after the proven stack marker",
-    "safe runtime progression entry after the proven stack marker",
+    "safe stack-dependent preparation for later progression stages after the proven stack marker",
     "safe progression beyond halt only after separate progression evidence permits halt replacement",
 )
 _REQUIRED_ASSUMPTIONS_NOT_ENABLED = (

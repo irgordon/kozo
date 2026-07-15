@@ -16,6 +16,7 @@ class CurrentRuntimeState:
     path: str
     halt_contract: str
     progression_contract: str
+    progression_stages_contract: str
     final_smoke_marker: str
     terminal_behavior: str
 
@@ -29,13 +30,6 @@ class ProgressionEntry:
 
 
 @dataclass(frozen=True)
-class RuntimeStage:
-    stage: int
-    name: str
-    status: str
-
-
-@dataclass(frozen=True)
 class RuntimeProgressionEntryContract:
     version: int
     architecture: str
@@ -46,7 +40,6 @@ class RuntimeProgressionEntryContract:
     transition_requirements: tuple[str, ...]
     forbidden_shortcuts: tuple[str, ...]
     transition_ownership: tuple[str, ...]
-    future_progression_stages: tuple[RuntimeStage, ...]
     non_goals: tuple[str, ...]
 
 
@@ -75,7 +68,6 @@ def parse_runtime_progression_entry_contract(data: dict[str, Any]) -> RuntimePro
         tuple(data["transition_requirements"]),
         tuple(data["forbidden_shortcuts"]),
         tuple(data["transition_ownership"]),
-        _runtime_stages(data),
         tuple(data["non_goals"]),
     )
 
@@ -93,6 +85,7 @@ def _current_state(data: dict[str, Any]) -> CurrentRuntimeState:
         state["path"],
         state["halt_contract"],
         state["progression_contract"],
+        state["progression_stages_contract"],
         state["final_smoke_marker"],
         state["terminal_behavior"],
     )
@@ -105,11 +98,4 @@ def _progression_entry(data: dict[str, Any]) -> ProgressionEntry:
         entry["status"],
         entry["emitted"],
         entry["entry_boundary"],
-    )
-
-
-def _runtime_stages(data: dict[str, Any]) -> tuple[RuntimeStage, ...]:
-    return tuple(
-        RuntimeStage(stage["stage"], stage["name"], stage["status"])
-        for stage in data["future_progression_stages"]
     )

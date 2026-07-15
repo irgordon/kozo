@@ -13,7 +13,6 @@
     "transition_requirements",
     "forbidden_shortcuts",
     "transition_ownership",
-    "future_progression_stages",
     "non_goals"
   ],
   "properties": {
@@ -31,6 +30,7 @@
         "path",
         "halt_contract",
         "progression_contract",
+        "progression_stages_contract",
         "final_smoke_marker",
         "terminal_behavior"
       ],
@@ -44,6 +44,10 @@
           "pattern": ".*\\S.*"
         },
         "progression_contract": {
+          "type": "string",
+          "pattern": ".*\\S.*"
+        },
+        "progression_stages_contract": {
           "type": "string",
           "pattern": ".*\\S.*"
         },
@@ -124,36 +128,6 @@
       "items": {
         "type": "string",
         "pattern": ".*\\S.*"
-      }
-    },
-    "future_progression_stages": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "stage",
-          "name",
-          "status"
-        ],
-        "properties": {
-          "stage": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "name": {
-            "type": "string",
-            "pattern": ".*\\S.*"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "proven",
-              "planned"
-            ]
-          }
-        }
       }
     },
     "non_goals": {

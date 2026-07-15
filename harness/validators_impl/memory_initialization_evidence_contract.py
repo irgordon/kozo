@@ -19,7 +19,6 @@ _REQUIRED_PREREQUISITES = (
     "QEMU serial smoke evidence",
     "runtime halt contract",
     "runtime progression contract",
-    "runtime progression entry contract",
     "runtime progression stages contract",
     "stack initialization evidence",
     "stack initialization evidence contract",
@@ -33,8 +32,8 @@ _REQUIRED_EVIDENCE = (
 )
 _REQUIRED_ASSUMPTIONS_ENABLED = (
     "controlled memory access after the proven memory marker",
-    "runtime progression beyond stack evidence after the proven memory marker",
-    "future runtime initialization after the proven memory marker",
+    "eligibility for runtime progression entry after memory and progression path evidence",
+    "safe memory-dependent preparation for later runtime initialization evidence",
 )
 _REQUIRED_ASSUMPTIONS_NOT_ENABLED = (
     "paging enabled",

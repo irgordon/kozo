@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.7.2 - 2026-07-15
+
+**Status:** Runtime progression model reconciliation.
+
+### Changed
+
+* Reordered the authoritative runtime progression model to `BOOT_SMOKE`, `STACK_INITIALIZATION_EVIDENCE`, `MEMORY_INITIALIZATION_EVIDENCE`, `RUNTIME_PROGRESSION_ENTRY`, `RUNTIME_INITIALIZATION_EVIDENCE`, `CONTROLLED_RUNTIME_LOOP`, `FIRST_GOVERNED_RUNTIME_CAPABILITY`, and `USERSPACE_PLANNING`.
+* Removed the circular dependency between progression entry, stack evidence, and memory evidence.
+* Added deterministic graph-level validation for cycles, prerequisite monotonicity, stage status, forward-only transitions, mandatory-stage skips, known authorities, and single transition ownership.
+* Aligned progression contracts, planning documents, audit state, release target numbering, and task identity with the reconciled model.
+
+### Notes
+
+* `STACK_INITIALIZATION_EVIDENCE` remains proven; `MEMORY_INITIALIZATION_EVIDENCE` and `RUNTIME_PROGRESSION_ENTRY` remain planned.
+* This change does not alter runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU marker behavior, or the authoritative halt loop.
+* This change does not add paging, allocator behavior, Odin runtime execution, interrupts, scheduler behavior, userspace execution, compatibility claims, or production-readiness claims.
+
 ## v0.7.1 - 2026-06-26
 
 **Status:** Memory initialization evidence planning.

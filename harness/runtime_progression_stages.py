@@ -35,11 +35,19 @@ class RuntimeProgressionStage:
 
 
 @dataclass(frozen=True)
+class RuntimeProgressionTransition:
+    from_stage: str
+    to_stage: str
+    owner_contract: str
+
+
+@dataclass(frozen=True)
 class RuntimeProgressionStagesContract:
     version: int
     architecture: str
     current_state: RuntimeProgressionStageState
     stages: tuple[RuntimeProgressionStage, ...]
+    transitions: tuple[RuntimeProgressionTransition, ...]
     transition_requirements: tuple[str, ...]
     forbidden_global_shortcuts: tuple[str, ...]
     non_goals: tuple[str, ...]
@@ -65,6 +73,7 @@ def parse_runtime_progression_stages_contract(data: dict[str, Any]) -> RuntimePr
         data["architecture"],
         _current_state(data),
         _stages(data),
+        _transitions(data),
         tuple(data["transition_requirements"]),
         tuple(data["forbidden_global_shortcuts"]),
         tuple(data["non_goals"]),
@@ -82,6 +91,12 @@ def stage_names(contract: RuntimeProgressionStagesContract) -> tuple[str, ...]:
     return tuple(stage.stage_name for stage in contract.stages)
 
 
+def stage_by_name(
+    contract: RuntimeProgressionStagesContract,
+) -> dict[str, RuntimeProgressionStage]:
+    return {stage.stage_name: stage for stage in contract.stages}
+
+
 def _current_state(data: dict[str, Any]) -> RuntimeProgressionStageState:
     state = data["current_state"]
     return RuntimeProgressionStageState(
@@ -97,6 +112,10 @@ def _stages(data: dict[str, Any]) -> tuple[RuntimeProgressionStage, ...]:
     return tuple(_stage(stage) for stage in data["stages"])
 
 
+def _transitions(data: dict[str, Any]) -> tuple[RuntimeProgressionTransition, ...]:
+    return tuple(_transition(transition) for transition in data["transitions"])
+
+
 def _stage(data: dict[str, Any]) -> RuntimeProgressionStage:
     return RuntimeProgressionStage(
         data["stage_id"],
@@ -109,4 +128,12 @@ def _stage(data: dict[str, Any]) -> RuntimeProgressionStage:
         tuple(data["required_validators"]),
         tuple(data["allowed_next_stages"]),
         tuple(data["forbidden_shortcuts"]),
+    )
+
+
+def _transition(data: dict[str, Any]) -> RuntimeProgressionTransition:
+    return RuntimeProgressionTransition(
+        data["from_stage"],
+        data["to_stage"],
+        data["owner_contract"],
     )

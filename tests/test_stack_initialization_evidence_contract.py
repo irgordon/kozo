@@ -238,7 +238,7 @@ def valid_contract() -> dict[str, object]:
         "version": 0,
         "architecture": "x86_64",
         "current_state": {
-            "runtime_path": "boot_smoke_to_halt",
+            "runtime_path": "boot_smoke_to_stack_evidence_to_halt",
             "halt_contract": "contracts/runtime_halt_contract.v0.json",
             "progression_stages_contract": "contracts/runtime_progression_stages.v0.json",
             "stage": "STACK_INITIALIZATION_EVIDENCE",
@@ -259,7 +259,6 @@ def valid_contract() -> dict[str, object]:
             "QEMU serial smoke evidence",
             "runtime halt contract",
             "runtime progression contract",
-            "runtime progression entry contract",
             "runtime progression stages contract",
         ],
         "evidence_requirements": [
@@ -277,7 +276,7 @@ def valid_contract() -> dict[str, object]:
         "assumptions_enabled": [
             "safe call instruction usage after the proven stack marker",
             "safe function nesting after the proven stack marker",
-            "safe runtime progression entry after the proven stack marker",
+            "safe stack-dependent preparation for later progression stages after the proven stack marker",
             "safe progression beyond halt only after separate progression evidence permits halt replacement",
         ],
         "assumptions_not_enabled": [

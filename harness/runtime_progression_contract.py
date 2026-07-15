@@ -15,15 +15,9 @@ CONTRACT_PATH = ROOT / "contracts" / "runtime_progression_contract.v0.json"
 class CurrentRuntimeState:
     path: str
     halt_contract: str
+    progression_stages_contract: str
     final_smoke_marker: str
     terminal_behavior: str
-
-
-@dataclass(frozen=True)
-class RuntimeMilestone:
-    stage: int
-    name: str
-    status: str
 
 
 @dataclass(frozen=True)
@@ -34,7 +28,6 @@ class RuntimeProgressionContract:
     progression_prerequisites: tuple[str, ...]
     transition_requirements: tuple[str, ...]
     forbidden_shortcuts: tuple[str, ...]
-    future_runtime_milestones: tuple[RuntimeMilestone, ...]
     evidence_requirements: tuple[str, ...]
     non_goals: tuple[str, ...]
 
@@ -61,7 +54,6 @@ def parse_runtime_progression_contract(data: dict[str, Any]) -> RuntimeProgressi
         tuple(data["progression_prerequisites"]),
         tuple(data["transition_requirements"]),
         tuple(data["forbidden_shortcuts"]),
-        _runtime_milestones(data),
         tuple(data["evidence_requirements"]),
         tuple(data["non_goals"]),
     )
@@ -79,13 +71,7 @@ def _current_state(data: dict[str, Any]) -> CurrentRuntimeState:
     return CurrentRuntimeState(
         state["path"],
         state["halt_contract"],
+        state["progression_stages_contract"],
         state["final_smoke_marker"],
         state["terminal_behavior"],
-    )
-
-
-def _runtime_milestones(data: dict[str, Any]) -> tuple[RuntimeMilestone, ...]:
-    return tuple(
-        RuntimeMilestone(milestone["stage"], milestone["name"], milestone["status"])
-        for milestone in data["future_runtime_milestones"]
     )

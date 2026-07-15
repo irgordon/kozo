@@ -138,6 +138,8 @@ Current runtime evidence and runtime contract validators include:
 * `stack_initialization_evidence`
 * `memory_initialization_evidence_contract`
 
+`runtime_progression_stages` performs graph-level validation. It rejects direct and indirect cycles, duplicate identifiers and names, unknown references, forward prerequisites, proven stages with unproven mandatory prerequisites, backward or skipped transitions, unknown contract or validator authorities, and transitions with missing or multiple owners. The traversal is deterministic and contract order remains authoritative.
+
 ---
 
 # 11. Evidence and Logs

@@ -260,7 +260,6 @@ def valid_contract() -> dict[str, object]:
             "QEMU serial smoke evidence",
             "runtime halt contract",
             "runtime progression contract",
-            "runtime progression entry contract",
             "runtime progression stages contract",
             "stack initialization evidence",
             "stack initialization evidence contract",
@@ -278,8 +277,8 @@ def valid_contract() -> dict[str, object]:
         ],
         "assumptions_enabled": [
             "controlled memory access after the proven memory marker",
-            "runtime progression beyond stack evidence after the proven memory marker",
-            "future runtime initialization after the proven memory marker",
+            "eligibility for runtime progression entry after memory and progression path evidence",
+            "safe memory-dependent preparation for later runtime initialization evidence",
         ],
         "assumptions_not_enabled": [
             "paging enabled",

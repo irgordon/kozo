@@ -183,14 +183,17 @@ def write_fixture_files(root: Path) -> dict[str, Path]:
     contract_path = root / "contracts" / "runtime_progression_entry_contract.v0.json"
     halt_contract_path = root / "contracts" / "runtime_halt_contract.v0.json"
     progression_contract_path = root / "contracts" / "runtime_progression_contract.v0.json"
+    stages_contract_path = root / "contracts" / "runtime_progression_stages.v0.json"
     contract_path.parent.mkdir(parents=True)
     contract_path.write_text(json.dumps(valid_contract(), indent=2) + "\n")
     halt_contract_path.write_text("{}\n")
     progression_contract_path.write_text("{}\n")
+    stages_contract_path.write_text("{}\n")
     return {
         "contract": contract_path,
         "halt_contract": halt_contract_path,
         "progression_contract": progression_contract_path,
+        "stages_contract": stages_contract_path,
     }
 
 
@@ -199,9 +202,10 @@ def valid_contract() -> dict[str, object]:
         "version": 0,
         "architecture": "x86_64",
         "current_state": {
-            "path": "boot_smoke_to_halt",
+            "path": "boot_smoke_to_stack_evidence_to_halt",
             "halt_contract": "contracts/runtime_halt_contract.v0.json",
             "progression_contract": "contracts/runtime_progression_contract.v0.json",
+            "progression_stages_contract": "contracts/runtime_progression_stages.v0.json",
             "final_smoke_marker": "KOZO_BOOT_SMOKE_OK",
             "terminal_behavior": "halt_loop",
         },
@@ -215,7 +219,6 @@ def valid_contract() -> dict[str, object]:
             "stack initialization evidence",
             "stack initialization evidence contract",
             "memory initialization evidence",
-            "runtime initialization evidence",
             "progression path evidence",
         ],
         "required_evidence": [
@@ -224,12 +227,11 @@ def valid_contract() -> dict[str, object]:
             "stack initialization evidence",
             "stack initialization evidence contract",
             "memory initialization evidence",
-            "runtime initialization evidence",
             "release evidence update",
         ],
         "transition_requirements": [
             "runtime_halt_contract remains authoritative until runtime progression evidence exists",
-            "runtime_progression_contract remains the parent transition governance contract",
+            "runtime_progression_contract defines halt-preservation requirements",
             "KOZO_RUNTIME_PROGRESS_ENTRY must not be claimed until emitted by runtime code and captured in evidence",
             "halt replacement requires contract-backed progression evidence",
         ],
@@ -241,17 +243,9 @@ def valid_contract() -> dict[str, object]:
         ],
         "transition_ownership": [
             "runtime_halt_contract owns current terminal behavior",
-            "runtime_progression_contract owns halt-to-runtime transition governance",
-            "runtime_progression_entry_contract owns future progression entry marker reservation and readiness requirements",
-        ],
-        "future_progression_stages": [
-            {"stage": 0, "name": "Boot smoke", "status": "proven"},
-            {"stage": 1, "name": "Runtime progression entry", "status": "planned"},
-            {"stage": 2, "name": "Stack initialization evidence", "status": "proven"},
-            {"stage": 3, "name": "Memory initialization evidence", "status": "planned"},
-            {"stage": 4, "name": "Runtime initialization evidence", "status": "planned"},
-            {"stage": 5, "name": "Controlled runtime loop", "status": "planned"},
-            {"stage": 6, "name": "First governed runtime capability", "status": "planned"},
+            "runtime_progression_contract owns halt-preservation governance",
+            "runtime_progression_stages contract owns canonical stage order and allowed transitions",
+            "runtime_progression_entry_contract owns the MEMORY_INITIALIZATION_EVIDENCE to RUNTIME_PROGRESSION_ENTRY proof boundary",
         ],
         "non_goals": [
             "runtime progression execution",

@@ -174,12 +174,15 @@ class RuntimeProgressionContractValidatorTests(unittest.TestCase):
 def write_fixture_files(root: Path) -> dict[str, Path]:
     contract_path = root / "contracts" / "runtime_progression_contract.v0.json"
     halt_contract_path = root / "contracts" / "runtime_halt_contract.v0.json"
+    stages_contract_path = root / "contracts" / "runtime_progression_stages.v0.json"
     contract_path.parent.mkdir(parents=True)
     contract_path.write_text(json.dumps(valid_contract(), indent=2) + "\n")
     halt_contract_path.write_text("{}\n")
+    stages_contract_path.write_text("{}\n")
     return {
         "contract": contract_path,
         "halt_contract": halt_contract_path,
+        "stages_contract": stages_contract_path,
     }
 
 
@@ -188,16 +191,14 @@ def valid_contract() -> dict[str, object]:
         "version": 0,
         "architecture": "x86_64",
         "current_state": {
-            "path": "boot_smoke_to_halt",
+            "path": "boot_smoke_to_stack_evidence_to_halt",
             "halt_contract": "contracts/runtime_halt_contract.v0.json",
+            "progression_stages_contract": "contracts/runtime_progression_stages.v0.json",
             "final_smoke_marker": "KOZO_BOOT_SMOKE_OK",
             "terminal_behavior": "halt_loop",
         },
         "progression_prerequisites": [
             "stack initialization evidence",
-            "stack initialization evidence contract",
-            "memory initialization evidence contract",
-            "runtime initialization evidence",
             "memory initialization evidence",
             "progression path evidence",
         ],
@@ -213,17 +214,9 @@ def valid_contract() -> dict[str, object]:
             "bypass halt loop",
             "jump around halt loop",
         ],
-        "future_runtime_milestones": [
-            {"stage": 0, "name": "Boot smoke", "status": "proven"},
-            {"stage": 1, "name": "Runtime progression entry", "status": "planned"},
-            {"stage": 2, "name": "Stack initialization evidence", "status": "proven"},
-            {"stage": 3, "name": "Runtime initialization evidence", "status": "planned"},
-            {"stage": 4, "name": "Controlled runtime loop", "status": "planned"},
-            {"stage": 5, "name": "First governed runtime capability", "status": "planned"},
-            {"stage": 6, "name": "Userspace planning", "status": "planned"},
-        ],
         "evidence_requirements": [
             "runtime progression contract",
+            "runtime progression stages contract",
             "stack initialization evidence contract",
             "memory initialization evidence contract",
             "focused validator coverage",

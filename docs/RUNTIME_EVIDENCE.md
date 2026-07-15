@@ -280,7 +280,7 @@ The runtime progression contract validator is:
 runtime_progression_contract
 ```
 
-It validates planning governance for a future halt-to-runtime transition. It requires stack initialization evidence, runtime initialization evidence, memory initialization evidence, and progression path evidence before the halt loop can be removed, replaced, bypassed, or jumped around. It does not prove Odin runtime execution, userspace execution, interrupt handling, scheduler behavior, VFS behavior, process model behavior, syscall dispatch during boot, memory manager behavior, hardware trap handling, device driver behavior, compatibility, or production readiness.
+It validates halt-preservation governance for a future halt-to-runtime transition. It requires stack initialization evidence, memory initialization evidence, and progression path evidence before the halt loop can be removed, replaced, bypassed, or jumped around. It does not define stage order or prove Odin runtime execution, userspace execution, interrupt handling, scheduler behavior, VFS behavior, process model behavior, syscall dispatch during boot, memory manager behavior, hardware trap handling, device driver behavior, compatibility, or production readiness.
 
 The runtime progression entry contract is:
 
@@ -294,7 +294,7 @@ The runtime progression entry validator is:
 runtime_progression_entry_contract
 ```
 
-It reserves `KOZO_RUNTIME_PROGRESS_ENTRY` as a future runtime progression marker. The marker is planned, not emitted, and must not be treated as runtime evidence until runtime code emits it and QEMU evidence captures it. The contract keeps the halt loop authoritative until stack initialization evidence, memory initialization evidence, runtime initialization evidence, and progression path evidence exist.
+It reserves `KOZO_RUNTIME_PROGRESS_ENTRY` as a future runtime progression marker. The marker is planned, not emitted, and must not be treated as runtime evidence until runtime code emits it and QEMU evidence captures it. The contract owns the memory-to-entry proof boundary and keeps the halt loop authoritative until stack initialization evidence, memory initialization evidence, and progression path evidence exist.
 
 The runtime progression stages contract is:
 
@@ -312,16 +312,16 @@ It owns the canonical planned progression sequence:
 
 ```text
 BOOT_SMOKE
-RUNTIME_PROGRESSION_ENTRY
 STACK_INITIALIZATION_EVIDENCE
 MEMORY_INITIALIZATION_EVIDENCE
+RUNTIME_PROGRESSION_ENTRY
 RUNTIME_INITIALIZATION_EVIDENCE
 CONTROLLED_RUNTIME_LOOP
 FIRST_GOVERNED_RUNTIME_CAPABILITY
 USERSPACE_PLANNING
 ```
 
-This stage model is not runtime evidence. It keeps future progression work ordered and subordinate to the halt contract until each stage has separately governed evidence.
+This stage model is not runtime evidence. It is the sole authority for stage order and allowed transitions, requires each mandatory prerequisite to be an earlier proven stage before promotion, and assigns one proof-boundary owner to every transition. The current status is stack evidence proven, memory evidence planned, and progression entry planned.
 
 The selected boot protocol is documented in:
 

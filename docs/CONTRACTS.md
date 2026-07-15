@@ -150,7 +150,7 @@ It does not define ABI values, syscall behavior, interrupt handling, scheduler b
 
 `contracts/runtime_progression_contract.v0.json` describes governance for a future transition from the current boot-smoke halt path to a separately proven runtime progression path.
 
-It requires stack initialization evidence, runtime initialization evidence, memory initialization evidence, and progression path evidence before the halt loop can be removed, replaced, bypassed, or jumped around.
+It requires stack initialization evidence, memory initialization evidence, and progression path evidence before the halt loop can be removed, replaced, bypassed, or jumped around. It owns halt-preservation governance, not the canonical stage order.
 
 It is a planning and transition contract. It does not implement runtime progression, execute Odin runtime code, define ABI values, define syscall behavior, enable interrupt handling, initialize a scheduler, start userspace execution, or claim compatibility or production readiness.
 
@@ -160,7 +160,7 @@ It is a planning and transition contract. It does not implement runtime progress
 
 `contracts/runtime_progression_entry_contract.v0.json` reserves `KOZO_RUNTIME_PROGRESS_ENTRY` as the future runtime progression entry marker.
 
-It defines the planned entry boundary, required prerequisites, required evidence, transition ownership, and future progression stages. The marker is not emitted by current runtime code and is not runtime evidence until captured through a governed evidence path.
+It defines the planned entry proof boundary, required prerequisites, required evidence, and marker reservation. It owns the `MEMORY_INITIALIZATION_EVIDENCE` to `RUNTIME_PROGRESSION_ENTRY` proof boundary but does not define the canonical stage order. The marker is not emitted by current runtime code and is not runtime evidence until captured through a governed evidence path.
 
 It does not replace the runtime halt contract, implement stack initialization, implement memory initialization, execute Odin runtime code, enable userspace execution, or claim compatibility or production readiness.
 
@@ -170,7 +170,7 @@ It does not replace the runtime halt contract, implement stack initialization, i
 
 `contracts/runtime_progression_stages.v0.json` owns the canonical stage model for future runtime progression.
 
-It defines stage order, stage prerequisites, required evidence, required contracts, required validators, allowed next stages, and forbidden shortcuts from `BOOT_SMOKE` through `USERSPACE_PLANNING`.
+It defines stage order, stage prerequisites, required evidence, required contracts, required validators, allowed next stages, transition ownership, and forbidden shortcuts from `BOOT_SMOKE` through `USERSPACE_PLANNING`. Evidence contracts own only their destination-stage proof boundaries.
 
 Planning documents may describe the stage model, but they do not define it. If planning text conflicts with this contract, this contract wins and the planning document must be corrected.
 

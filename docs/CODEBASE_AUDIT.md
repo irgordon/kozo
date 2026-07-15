@@ -830,3 +830,36 @@ This planning phase adds the governed memory initialization evidence contract be
 ## Boundary
 
 `KOZO_MEMORY_INIT_OK` is reserved, not emitted, and not evidence. This phase changes contracts, validation, and planning documents only. It does not change runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke behavior, halt behavior, stack evidence behavior, compatibility claims, or production-readiness claims.
+
+---
+
+# 24. v0.7.2 Runtime Progression Model Reconciliation
+
+Date: 2026-07-15
+
+Status: Completed.
+
+## 24.1 Scope
+
+This governance repair removed the circular progression dependency before memory evidence implementation work. It changed contracts, validators, tests, planning text, and task state only.
+
+It did not change runtime code, marker emission, stack behavior, the halt loop, ABI contracts, syscall behavior, linker layout, QEMU behavior, compatibility claims, or production-readiness claims.
+
+## 24.2 Finding Status
+
+| ID | Status | Rationale |
+| --- | --- | --- |
+| AUDIT-072-001 | Resolved | The progression cycle is removed by ordering stack evidence before memory evidence and memory evidence before progression entry. |
+| AUDIT-072-002 | Resolved | Stage monotonicity and mandatory prerequisite satisfaction are now graph-level validator rules. |
+| AUDIT-072-003 | Resolved | Canonical order, forward transitions, and transition ownership now belong only to `runtime_progression_stages.v0.json`. |
+| AUDIT-072-004 | Resolved | Planning version drift, completed-phase state, and stale task identity are aligned with v0.7.2. |
+| AUDIT-064-002 | Deferred | Decomposition of `validator_coverage.py` remains outside this focused reconciliation. |
+| AUDIT-072-005 | Open | The memory evidence contract still needs implementability hardening before memory runtime work can be scheduled. |
+
+## 24.3 Graph Validation Added
+
+The stage validator now rejects direct and indirect cycles, duplicate stage identifiers and names, unknown stage references, forward prerequisites, proven stages with unproven prerequisites, backward transitions, skipped mandatory stages, unknown contract and validator authorities, and duplicate or missing transition ownership.
+
+## 24.4 Next Work
+
+The next phase is `v0.7.3 Memory Evidence Contract Hardening`. It must keep memory evidence planning-only and must not emit `KOZO_MEMORY_INIT_OK` or alter the halt path.

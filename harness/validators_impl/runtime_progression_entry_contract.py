@@ -10,8 +10,10 @@ from harness.validator import BaseValidator, ValidationResult
 
 _CONTRACT_PATH = runtime_progression_entry_contract.CONTRACT_PATH
 _EXPECTED_ARCHITECTURE = "x86_64"
+_EXPECTED_RUNTIME_PATH = "boot_smoke_to_stack_evidence_to_halt"
 _EXPECTED_HALT_CONTRACT = "contracts/runtime_halt_contract.v0.json"
 _EXPECTED_PROGRESSION_CONTRACT = "contracts/runtime_progression_contract.v0.json"
+_EXPECTED_STAGES_CONTRACT = "contracts/runtime_progression_stages.v0.json"
 _EXPECTED_FINAL_MARKER = "KOZO_BOOT_SMOKE_OK"
 _EXPECTED_TERMINAL_BEHAVIOR = "halt_loop"
 _EXPECTED_PROGRESSION_MARKER = "KOZO_RUNTIME_PROGRESS_ENTRY"
@@ -20,7 +22,6 @@ _REQUIRED_PREREQUISITES = (
     "stack initialization evidence",
     "stack initialization evidence contract",
     "memory initialization evidence",
-    "runtime initialization evidence",
     "progression path evidence",
 )
 _REQUIRED_EVIDENCE = (
@@ -29,12 +30,11 @@ _REQUIRED_EVIDENCE = (
     "stack initialization evidence",
     "stack initialization evidence contract",
     "memory initialization evidence",
-    "runtime initialization evidence",
     "release evidence update",
 )
 _REQUIRED_TRANSITION_REQUIREMENTS = (
     "runtime_halt_contract remains authoritative until runtime progression evidence exists",
-    "runtime_progression_contract remains the parent transition governance contract",
+    "runtime_progression_contract defines halt-preservation requirements",
     "KOZO_RUNTIME_PROGRESS_ENTRY must not be claimed until emitted by runtime code and captured in evidence",
     "halt replacement requires contract-backed progression evidence",
 )
@@ -46,8 +46,9 @@ _REQUIRED_FORBIDDEN_SHORTCUTS = (
 )
 _REQUIRED_OWNERSHIP = (
     "runtime_halt_contract owns current terminal behavior",
-    "runtime_progression_contract owns halt-to-runtime transition governance",
-    "runtime_progression_entry_contract owns future progression entry marker reservation and readiness requirements",
+    "runtime_progression_contract owns halt-preservation governance",
+    "runtime_progression_stages contract owns canonical stage order and allowed transitions",
+    "runtime_progression_entry_contract owns the MEMORY_INITIALIZATION_EVIDENCE to RUNTIME_PROGRESSION_ENTRY proof boundary",
 )
 _REQUIRED_NON_GOALS = (
     "runtime progression execution",
@@ -96,13 +97,13 @@ def _runtime_progression_entry_issue(contract_path: Path) -> RuntimeProgressionE
         _current_state_issue(contract),
         _contract_reference_issue(contract.current_state.halt_contract, "current_state.halt_contract"),
         _contract_reference_issue(contract.current_state.progression_contract, "current_state.progression_contract"),
+        _contract_reference_issue(contract.current_state.progression_stages_contract, "current_state.progression_stages_contract"),
         _progression_marker_issue(contract),
         _required_value_issue(contract.required_prerequisites, _REQUIRED_PREREQUISITES, "missing_prerequisite", "required_prerequisites"),
         _required_value_issue(contract.required_evidence, _REQUIRED_EVIDENCE, "missing_required_evidence", "required_evidence"),
         _required_value_issue(contract.transition_requirements, _REQUIRED_TRANSITION_REQUIREMENTS, "missing_transition_requirement", "transition_requirements"),
         _required_value_issue(contract.forbidden_shortcuts, _REQUIRED_FORBIDDEN_SHORTCUTS, "missing_forbidden_shortcut", "forbidden_shortcuts"),
         _required_value_issue(contract.transition_ownership, _REQUIRED_OWNERSHIP, "missing_transition_ownership", "transition_ownership"),
-        _stage_issue(contract),
         _required_value_issue(contract.non_goals, _REQUIRED_NON_GOALS, "missing_non_goal", "non_goals"),
     )
 
@@ -126,8 +127,10 @@ def _current_state_issue(
     state = contract.current_state
     return _first_issue(
         _expected_value_issue(contract.architecture, _EXPECTED_ARCHITECTURE, "wrong_architecture", "architecture"),
+        _expected_value_issue(state.path, _EXPECTED_RUNTIME_PATH, "wrong_runtime_path", "current_state.path"),
         _expected_value_issue(state.halt_contract, _EXPECTED_HALT_CONTRACT, "missing_halt_reference", "current_state.halt_contract"),
         _expected_value_issue(state.progression_contract, _EXPECTED_PROGRESSION_CONTRACT, "missing_progression_reference", "current_state.progression_contract"),
+        _expected_value_issue(state.progression_stages_contract, _EXPECTED_STAGES_CONTRACT, "missing_stages_reference", "current_state.progression_stages_contract"),
         _expected_value_issue(state.final_smoke_marker, _EXPECTED_FINAL_MARKER, "wrong_final_marker", "current_state.final_smoke_marker"),
         _expected_value_issue(state.terminal_behavior, _EXPECTED_TERMINAL_BEHAVIOR, "wrong_terminal_behavior", "current_state.terminal_behavior"),
     )
@@ -171,24 +174,6 @@ def _required_value_issue(
         if expected not in actual_values:
             return _issue(reason, f"{field}.{expected}", f"Runtime progression entry contract must declare: {expected}")
     return None
-
-
-def _stage_issue(
-    contract: runtime_progression_entry_contract.RuntimeProgressionEntryContract,
-) -> RuntimeProgressionEntryIssue | None:
-    expected = (
-        (0, "Boot smoke", "proven"),
-        (1, "Runtime progression entry", "planned"),
-        (2, "Stack initialization evidence", "proven"),
-        (3, "Memory initialization evidence", "planned"),
-        (4, "Runtime initialization evidence", "planned"),
-        (5, "Controlled runtime loop", "planned"),
-        (6, "First governed runtime capability", "planned"),
-    )
-    actual = tuple((stage.stage, stage.name, stage.status) for stage in contract.future_progression_stages)
-    if actual == expected:
-        return None
-    return _issue("missing_progression_stage", "future_progression_stages", "Runtime progression stages must preserve the governed planning sequence")
 
 
 def _expected_value_issue(

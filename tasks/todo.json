@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO Return Path Proof V1",
+  "task_title": "KOZO Runtime Progression Model Reconciliation v0.7.2",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -8,12 +8,14 @@
     "status": "approved"
   },
   "preconditions": [
-    "KOZO source-level heartbeat contract is present",
-    "Odin and Rust toolchains are installed"
+    "QEMU serial smoke and stack initialization evidence are proven",
+    "Runtime progression, entry, stack, memory, and stage contracts are present",
+    "Odin, pinned Rust, Python, jq, and repository verification tooling are installed"
   ],
   "assumptions": [
-    "This phase proves that the current Rust-to-assembly-to-Odin function-call boundary returns observable payload mutations back to Rust without introducing privilege transitions or a syscall instruction",
-    "K_INVALID is the current generated error-equivalent status constant"
+    "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
+    "Stack initialization evidence remains proven while memory initialization and runtime progression entry remain planned",
+    "This phase changes governance and validation only; runtime code, markers, halt behavior, ABI, syscalls, and linker layout remain unchanged"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -2154,6 +2156,58 @@
         "verification.tests_run[2]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 70,
+      "title": "Reconcile the runtime progression model",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "contracts/runtime_progression_contract.v0.json",
+        "contracts/runtime_progression_entry_contract.v0.json",
+        "contracts/runtime_progression_stages.v0.json",
+        "contracts/stack_initialization_evidence_contract.v0.json",
+        "contracts/memory_initialization_evidence_contract.v0.json",
+        "schemas/runtime_progression_contract.schema.json",
+        "schemas/runtime_progression_entry_contract.schema.json",
+        "schemas/runtime_progression_stages.schema.json",
+        "harness/runtime_progression_contract.py",
+        "harness/runtime_progression_entry_contract.py",
+        "harness/runtime_progression_stages.py",
+        "harness/validators_impl/runtime_progression_contract.py",
+        "harness/validators_impl/runtime_progression_entry_contract.py",
+        "harness/validators_impl/runtime_progression_stages.py",
+        "harness/validators_impl/stack_initialization_evidence_contract.py",
+        "harness/validators_impl/memory_initialization_evidence_contract.py",
+        "harness/validators_impl/validator_coverage.py",
+        "tests/test_runtime_progression_contract.py",
+        "tests/test_runtime_progression_entry_contract.py",
+        "tests/test_runtime_progression_stages.py",
+        "tests/test_stack_initialization_evidence_contract.py",
+        "tests/test_memory_initialization_evidence_contract.py",
+        "docs/CONTRACTS.md",
+        "docs/VALIDATION.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/CODEBASE_AUDIT.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/generated/governance_index.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[57]",
+        "verification.tests_run[58]",
+        "verification.tests_run[59]",
+        "verification.tests_run[60]",
+        "verification.tests_run[61]",
+        "verification.tests_run[62]",
+        "verification.tests_run[63]",
+        "verification.tests_run[64]",
+        "verification.tests_run[65]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -2210,7 +2264,8 @@
     "v0.4.6 adds docs/CODEBASE_AUDIT.md, updates phase and roadmap sequencing so v0.4.7 is the higher-half linker/entry transition, and records that no cleanup was applied during the audit phase",
     "v0.5.1 aligns governance, planning, audit, release, and evidence documents with the actual v0.5.0 outcome: local verification passes, the pushed CI run for 14fb015 failed in scripts/verify.sh, QEMU serial smoke evidence is not promoted, and the next runtime phase is CI smoke evidence triage.",
     "v0.5.2 CI evidence access hardening prints verification, QEMU smoke, serial/stderr, and boot blocker summaries into full CI logs with if: always(), keeps artifact upload enabled, and avoids requiring gh or authenticated artifact download for first-level triage.",
-    "v0.7.1 adds memory_initialization_evidence_contract as the planning authority for future MEMORY_INITIALIZATION_EVIDENCE, reserves KOZO_MEMORY_INIT_OK without emitting it, aligns progression contracts, and preserves runtime behavior."
+    "v0.7.1 adds memory_initialization_evidence_contract as the planning authority for future MEMORY_INITIALIZATION_EVIDENCE, reserves KOZO_MEMORY_INIT_OK without emitting it, aligns progression contracts, and preserves runtime behavior.",
+    "v0.7.2 reconciles the authoritative progression order, removes the stack-entry-memory cycle, adds deterministic graph-level validation, aligns planning state, and preserves runtime behavior."
   ],
   "verification": {
     "tests_run": [
@@ -2498,6 +2553,51 @@
         "tool": "scripts/verify.sh",
         "command": "scripts/verify.sh",
         "status": "passed"
+      },
+      {
+        "tool": "python3 -m unittest tests/test_runtime_progression_stages.py",
+        "command": "python3 -m unittest tests/test_runtime_progression_stages.py",
+        "status": "passed"
+      },
+      {
+        "tool": "python3 -m unittest tests/test_runtime_progression_contract.py",
+        "command": "python3 -m unittest tests/test_runtime_progression_contract.py",
+        "status": "passed"
+      },
+      {
+        "tool": "python3 -m unittest tests/test_runtime_progression_entry_contract.py",
+        "command": "python3 -m unittest tests/test_runtime_progression_entry_contract.py",
+        "status": "passed"
+      },
+      {
+        "tool": "python3 -m unittest tests/test_stack_initialization_evidence_contract.py",
+        "command": "python3 -m unittest tests/test_stack_initialization_evidence_contract.py",
+        "status": "passed"
+      },
+      {
+        "tool": "python3 -m unittest tests/test_memory_initialization_evidence_contract.py",
+        "command": "python3 -m unittest tests/test_memory_initialization_evidence_contract.py",
+        "status": "passed"
+      },
+      {
+        "tool": "python3 -m unittest tests/test_validator_coverage.py",
+        "command": "python3 -m unittest tests/test_validator_coverage.py",
+        "status": "passed"
+      },
+      {
+        "tool": "python3 -m unittest discover -s tests",
+        "command": "python3 -m unittest discover -s tests",
+        "status": "passed"
+      },
+      {
+        "tool": "python3 -m json.tool tasks/todo.json",
+        "command": "python3 -m json.tool tasks/todo.json",
+        "status": "passed"
+      },
+      {
+        "tool": "git diff --check",
+        "command": "git diff --check",
+        "status": "passed"
       }
     ],
     "logs": [
@@ -2514,7 +2614,7 @@
       "The Rust heartbeat request must cross the assembly bridge through extern syscall_entry rather than a local stub",
       "The verify artifact is only authoritative when the current tree reproduces it via scripts/verify.sh",
       "runtime evidence taxonomy is authoritative for marker and blocker vocabulary; generated smoke metadata remains evidence and does not define taxonomy authority.",
-      "Runtime progression stages remain planning governance only; the halt loop remains authoritative until separate progression evidence exists."
+      "Runtime progression stages are authoritative planning governance only; the graph remains acyclic and monotonic, and the halt loop remains authoritative until separate progression-entry evidence exists."
     ],
     "expected_behavior": [
       "verify.sh succeeds on a clean tree and prints the generated artifact JSON before VERIFY: PASS",
@@ -2572,7 +2672,8 @@
       "runtime_progression_entry_contract reserves KOZO_RUNTIME_PROGRESS_ENTRY as future work without changing runtime behavior or overriding the runtime halt contract.",
       "v0.6.4 removes only proven-unused structural debris and documents deferred cleanup without changing runtime, ABI, syscall, linker, marker, halt, or progression contract behavior.",
       "v0.6.5 centralizes QEMU serial smoke marker order, expected marker, outcomes, and blocker vocabulary in a governed runtime evidence taxonomy contract without changing runtime behavior or smoke pass criteria.",
-      "v0.6.6 centralizes future runtime progression stage definitions without changing runtime behavior, halt behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke behavior, compatibility claims, or production-readiness claims."
+      "v0.6.6 centralizes future runtime progression stage definitions without changing runtime behavior, halt behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke behavior, compatibility claims, or production-readiness claims.",
+      "v0.7.2 requires an acyclic progression graph, earlier mandatory prerequisites, monotonic proven status, forward-only transitions, known authorities, and one owner per transition without changing runtime behavior."
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -2642,13 +2743,14 @@
       "v0.5.1 records ci_verification_failed_after_v0.5.0 as the active release blocker, keeps missing_iso_generation_tooling as the local generated blocker, removes stale ABI/syscall maturity next-step wording, and preserves all no-QEMU-boot, compatibility, and production-readiness claim boundaries.",
       "CI evidence access hardening adds scripts/ci_evidence_summary.sh and full-CI log summary output without changing runtime behavior, ABI contracts, syscall behavior, linker layout, QEMU marker semantics, compatibility claims, or production-readiness claims.",
       "runtime_halt_contract validates that boot.asm emits KOZO_BOOT_SMOKE_OK before entering a cli/hlt loop with structural fallthrough forbidden.",
-      "runtime_progression_contract validates prerequisites, halt contract reference, transition requirements, forbidden shortcuts, future milestones, evidence requirements, and non-goals.",
-      "runtime_progression_entry_contract validates current halt/progression references, progression marker reservation, prerequisites, evidence requirements, transition requirements, forbidden shortcuts, ownership, future stages, and non-goals.",
+      "runtime_progression_contract validates halt-preservation prerequisites, contract references, transition requirements, forbidden shortcuts, evidence requirements, and non-goals without defining stage order.",
+      "runtime_progression_entry_contract validates current contract references, progression marker reservation, prerequisites, evidence requirements, transition requirements, forbidden shortcuts, its memory-to-entry proof boundary, and non-goals without defining stage order.",
       "v0.6.4 removes two zero-byte unreferenced generator stubs, documents oversized/dead/stale/shim findings, and preserves validator outcomes through compileall, unit discovery, and full verification.",
       "v0.6.5 adds runtime_evidence_taxonomy contract, schema, loader, validator, and focused tests; QEMU smoke and boot blocker validators consume taxonomy helpers while marker strings, marker order, and pass criteria remain unchanged.",
       "Added runtime_progression_stages contract, schema, loader, validator, focused tests, registry/schema wiring, planning/evidence documentation, audit alignment, changelog entry, and refreshed generated governance/proof state.",
       "Added stack_initialization_evidence_contract as the planning authority for future STACK_INITIALIZATION_EVIDENCE, reserved KOZO_STACK_INIT_OK without emitting it, aligned progression contracts, and preserved runtime behavior.",
-      "v0.7.0 implements controlled boot stack evidence by setting rsp to boot_stack_top, probing stack use, emitting KOZO_STACK_INIT_OK, extending the governed marker sequence, and preserving no memory/runtime/userspace/compatibility/production claims."
+      "v0.7.0 implements controlled boot stack evidence by setting rsp to boot_stack_top, probing stack use, emitting KOZO_STACK_INIT_OK, extending the governed marker sequence, and preserving no memory/runtime/userspace/compatibility/production claims.",
+      "v0.7.2 orders BOOT_SMOKE, STACK_INITIALIZATION_EVIDENCE, MEMORY_INITIALIZATION_EVIDENCE, and RUNTIME_PROGRESSION_ENTRY monotonically, leaves stack proven and later stages planned, and validates graph and authority integrity."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -2718,6 +2820,7 @@
     "Added v0.5.2 CI evidence access hardening so GitHub Actions logs expose first-level smoke evidence even when artifact download, API log access, or local gh tooling is unavailable.",
     "v0.5.4 promotes CI-proven QEMU serial smoke evidence, accepts pass/none boot blocker state in stale validators, and preserves all no-compatibility and no-production claim boundaries.",
     "v0.7.0 adds stack initialization evidence through the assembly boot path and validator coverage while preserving ABI, syscall, linker, memory, Odin runtime, userspace, compatibility, and production-readiness boundaries.",
-    "v0.7.1 adds memory initialization evidence planning through a contract, schema, loader, validator, tests, and progression-stage alignment while preserving runtime behavior, ABI, syscall, linker, QEMU smoke, halt, stack evidence, compatibility, and production-readiness boundaries."
+    "v0.7.1 adds memory initialization evidence planning through a contract, schema, loader, validator, tests, and progression-stage alignment while preserving runtime behavior, ABI, syscall, linker, QEMU smoke, halt, stack evidence, compatibility, and production-readiness boundaries.",
+    "v0.7.2 reconciles the progression model into an acyclic, monotonic, single-owner graph and aligns contracts, tests, planning documents, audit state, and task identity without runtime changes."
   ]
 }
