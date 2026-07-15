@@ -142,9 +142,10 @@ def _bootstrap_context_issue(context: RuntimeProgressionContext) -> RuntimeProgr
 def _odin_boundary_issue(context: RuntimeProgressionContext) -> RuntimeProgressionEvidenceIssue | None:
     return _first_issue(
         _entry_signature_issue(context),
+        _marker_ownership_issue(context),
+        _runtime_entry_flow_issue(context.runtime_lines),
         _context_validation_issue(context.runtime_lines),
         _runtime_state_issue(context),
-        _marker_ownership_issue(context),
     )
 
 
@@ -176,13 +177,26 @@ def _context_validation_issue(lines: tuple[str, ...]) -> RuntimeProgressionEvide
     return None
 
 
-def _runtime_state_issue(context: RuntimeProgressionContext) -> RuntimeProgressionEvidenceIssue | None:
-    runtime = context.contract.runtime_initialization
+def _runtime_entry_flow_issue(lines: tuple[str, ...]) -> RuntimeProgressionEvidenceIssue | None:
     expected = (
-        f"runtime_progression_state = RUNTIME_STATE_SENTINEL",
-        "observed := runtime_progression_state",
-        "runtime_progression_state = 0",
-        "return observed == RUNTIME_STATE_SENTINEL && runtime_progression_state == 0",
+        "if !runtime_bootstrap_context_is_valid(bootstrap) {",
+        "return RUNTIME_PROGRESSION_INVALID_CONTEXT",
+        "if !runtime_state_probe_succeeds() {",
+        "return RUNTIME_PROGRESSION_STATE_FAILURE",
+        "runtime_emit_init_marker()",
+        "return RUNTIME_PROGRESSION_OK",
+    )
+    return _ordered_issue(lines, expected, "runtime_entry_flow_mismatch", "runtime_initialization.success_path")
+
+
+def _runtime_state_issue(context: RuntimeProgressionContext) -> RuntimeProgressionEvidenceIssue | None:
+    expected = (
+        'import "base:intrinsics"',
+        "intrinsics.volatile_store(&runtime_progression_state, RUNTIME_STATE_SENTINEL)",
+        "observed := intrinsics.volatile_load(&runtime_progression_state)",
+        "intrinsics.volatile_store(&runtime_progression_state, 0)",
+        "restored := intrinsics.volatile_load(&runtime_progression_state)",
+        "return observed == RUNTIME_STATE_SENTINEL && restored == 0",
     )
     return _ordered_issue(context.runtime_lines, expected, "runtime_state_probe_missing", "runtime_initialization.operation")
 

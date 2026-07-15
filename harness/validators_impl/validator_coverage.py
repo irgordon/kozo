@@ -630,6 +630,8 @@ _VALIDATOR_TEST_CONTRACTS = {
             "unknown_status_value",
             "missing_progression_marker",
             "missing_runtime_marker",
+            "nonvolatile_state_probe",
+            "success_marker_before_probe",
             "return_marker_order",
             "metadata_log_mismatch",
             "memory_prerequisite_absent",

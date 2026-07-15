@@ -8,6 +8,7 @@
 
 * Added an explicit System V AMD64 assembly-to-Odin boundary after `KOZO_MEMORY_INIT_OK`, with a versioned fixed-width bootstrap context and disabled red-zone code generation.
 * Added a bounded Odin runtime-state write/read/restore probe and Odin-owned `KOZO_RUNTIME_INIT_OK` emission through a fixed assembly serial bridge.
+* Made the state probe use volatile loads and stores so the linked kernel retains the sentinel write, readback, zero restoration, and restored-value check.
 * Added `runtime_progression_evidence` validation for source ordering, context layout, linked symbols, marker evidence, stage status, exact return status, and terminal halt preservation.
 
 ### Changed

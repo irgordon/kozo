@@ -1,5 +1,7 @@
 package kernel
 
+import "base:intrinsics"
+
 RUNTIME_BOOTSTRAP_VERSION :: u64(1)
 RUNTIME_BOOTSTRAP_SIZE :: u64(64)
 RUNTIME_BOOT_STACK_SIZE :: u64(16384)
@@ -81,8 +83,9 @@ ordered_range_has_size :: proc "contextless" (start, end, expected_size: u64) ->
 }
 
 runtime_state_probe_succeeds :: proc "contextless" () -> bool {
-	runtime_progression_state = RUNTIME_STATE_SENTINEL
-	observed := runtime_progression_state
-	runtime_progression_state = 0
-	return observed == RUNTIME_STATE_SENTINEL && runtime_progression_state == 0
+	intrinsics.volatile_store(&runtime_progression_state, RUNTIME_STATE_SENTINEL)
+	observed := intrinsics.volatile_load(&runtime_progression_state)
+	intrinsics.volatile_store(&runtime_progression_state, 0)
+	restored := intrinsics.volatile_load(&runtime_progression_state)
+	return observed == RUNTIME_STATE_SENTINEL && restored == 0
 }

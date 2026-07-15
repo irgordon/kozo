@@ -21,6 +21,8 @@ KOZO_NEGATIVE_COVERAGE = {
         "unknown_status_value": "test_fails_when_return_status_is_not_checked",
         "missing_progression_marker": "test_fails_when_progression_marker_is_missing",
         "missing_runtime_marker": "test_fails_when_odin_marker_call_is_missing",
+        "nonvolatile_state_probe": "test_fails_when_state_probe_is_not_volatile",
+        "success_marker_before_probe": "test_fails_when_runtime_marker_precedes_state_probe",
         "return_marker_order": "test_fails_when_return_marker_precedes_runtime_call",
         "metadata_log_mismatch": "test_fails_when_metadata_and_log_disagree",
         "memory_prerequisite_absent": "test_fails_when_memory_prerequisite_is_not_proven",
@@ -91,6 +93,23 @@ class RuntimeProgressionEvidenceValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "fail")
         self.assert_failure(result, "runtime_marker_not_owned_by_odin", "runtime_initialization.marker_emission_owner")
+
+    def test_fails_when_state_probe_is_not_volatile(self):
+        result = self.validate_fixture(
+            mutate_runtime=replace_text(
+                "intrinsics.volatile_store(&runtime_progression_state, RUNTIME_STATE_SENTINEL)",
+                "runtime_progression_state = RUNTIME_STATE_SENTINEL",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_failure(result, "runtime_state_probe_missing", "runtime_initialization.operation")
+
+    def test_fails_when_runtime_marker_precedes_state_probe(self):
+        result = self.validate_fixture(mutate_runtime=move_runtime_marker_before_state_probe)
+
+        self.assertEqual(result.status, "fail")
+        self.assert_failure(result, "runtime_entry_flow_mismatch", "runtime_initialization.success_path")
 
     def test_fails_when_return_marker_precedes_runtime_call(self):
         result = self.validate_fixture(mutate_boot=move_return_marker_before_call)
@@ -235,6 +254,13 @@ def move_return_marker_before_call(source: str) -> str:
     source = source.replace(marker, "")
     call = "    call runtime_progression_entry\n"
     return source.replace(call, marker + call)
+
+
+def move_runtime_marker_before_state_probe(source: str) -> str:
+    marker = "\truntime_emit_init_marker()\n"
+    source = source.replace(marker, "")
+    probe = "\tif !runtime_state_probe_succeeds() {\n"
+    return source.replace(probe, marker + probe)
 
 
 def set_stage_status(stage_name: str, status: str):

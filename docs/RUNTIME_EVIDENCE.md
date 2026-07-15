@@ -298,7 +298,7 @@ The runtime progression entry validator is:
 runtime_progression_entry_contract
 ```
 
-It governs the implemented internal assembly-to-Odin boundary. `KOZO_RUNTIME_PROGRESS_ENTRY` is emitted by assembly immediately before the call, `KOZO_RUNTIME_INIT_OK` depends on executed Odin code invoking a fixed bridge after its bounded state probe, and `KOZO_RUNTIME_RETURN_OK` is emitted by assembly only after exact status zero. Source and ELF validation do not promote the stages; QEMU serial evidence must capture the ordered markers. The halt loop remains authoritative after return.
+It governs the implemented internal assembly-to-Odin boundary. `KOZO_RUNTIME_PROGRESS_ENTRY` is emitted by assembly immediately before the call, `KOZO_RUNTIME_INIT_OK` depends on executed Odin code invoking a fixed bridge after its bounded volatile state probe, and `KOZO_RUNTIME_RETURN_OK` is emitted by assembly only after exact status zero. Volatile accesses preserve the sentinel write, readback, zero restoration, and restored-value check in the linked kernel. Source and ELF validation do not promote the stages; QEMU serial evidence must capture the ordered markers. The halt loop remains authoritative after return.
 
 The runtime progression stages contract is:
 
