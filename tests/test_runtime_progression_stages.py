@@ -329,7 +329,7 @@ def valid_contract() -> dict[str, object]:
         "version": 0,
         "architecture": "x86_64",
         "current_state": {
-            "path": "boot_smoke_to_stack_evidence_to_halt",
+            "path": "boot_smoke_to_stack_and_memory_evidence_to_halt",
             "halt_contract": "contracts/runtime_halt_contract.v0.json",
             "progression_contract": "contracts/runtime_progression_contract.v0.json",
             "progression_entry_contract": "contracts/runtime_progression_entry_contract.v0.json",
@@ -358,7 +358,7 @@ def valid_contract() -> dict[str, object]:
             "runtime progression execution",
             "halt loop replacement",
             "general stack readiness",
-            "memory initialization",
+            "general memory management",
             "Odin runtime execution",
             "interrupt handling",
             "scheduler behavior",
@@ -375,7 +375,11 @@ def valid_contract() -> dict[str, object]:
 
 def valid_stages() -> list[dict[str, object]]:
     names = stage_names()
-    statuses = {"BOOT_SMOKE": "proven", "STACK_INITIALIZATION_EVIDENCE": "proven"}
+    statuses = {
+        "BOOT_SMOKE": "proven",
+        "STACK_INITIALIZATION_EVIDENCE": "proven",
+        "MEMORY_INITIALIZATION_EVIDENCE": "proven",
+    }
     return [
         {
             "stage_id": index,
@@ -436,7 +440,7 @@ def required_validators() -> dict[str, str]:
     return {
         "BOOT_SMOKE": "qemu_smoke_evidence",
         "STACK_INITIALIZATION_EVIDENCE": "stack_initialization_evidence",
-        "MEMORY_INITIALIZATION_EVIDENCE": "memory_initialization_evidence_contract",
+        "MEMORY_INITIALIZATION_EVIDENCE": "memory_initialization_evidence",
         "RUNTIME_PROGRESSION_ENTRY": "runtime_progression_entry_contract",
         "RUNTIME_INITIALIZATION_EVIDENCE": "planned:runtime_initialization_evidence",
         "CONTROLLED_RUNTIME_LOOP": "planned:controlled_runtime_loop_evidence",

@@ -132,15 +132,15 @@ Full CI requires runtime smoke evidence because `.github/workflows/ci.yml` runs 
 
 The lint workflow does not require runtime smoke evidence because `.github/workflows/lint.yml` does not run full verification. If lint is changed to run `scripts/verify.sh`, runtime smoke evidence becomes required there through the same full-verification path.
 
-QEMU smoke evidence is required in full CI through `scripts/qemu_smoke.sh` and `qemu_smoke_evidence`. A blocked QEMU smoke result is acceptable only when metadata records an exact blocker and preserves no-QEMU-boot claims. A passing QEMU serial smoke claim requires a green full CI run, passing metadata, and the full ordered marker sequence ending in `KOZO_STACK_INIT_OK` in `artifacts/runtime/qemu_smoke.log`; that claim does not prove Odin runtime execution, general stack readiness, memory initialization, syscall dispatch, hardware trap execution, or broader boot lifecycle behavior.
+QEMU smoke evidence is required in full CI through `scripts/qemu_smoke.sh` and `qemu_smoke_evidence`. A blocked QEMU smoke result is acceptable only when metadata records an exact blocker and preserves no-QEMU-boot claims. A passing QEMU serial smoke claim requires a green full CI run, passing metadata, and the full ordered marker sequence ending in `KOZO_MEMORY_INIT_OK` in `artifacts/runtime/qemu_smoke.log`; that claim does not prove Odin runtime execution, general stack readiness, general memory management, syscall dispatch, hardware trap execution, or broader boot lifecycle behavior.
 
-If full CI fails after QEMU smoke runs, release review must treat the run as blocked even if uploaded artifacts appear promising. Passing QEMU serial smoke evidence remains a narrow smoke claim and does not prove Odin runtime execution, general stack readiness, memory initialization, syscall dispatch, hardware trap execution, compatibility, userspace behavior, or production readiness.
+If full CI fails after QEMU smoke runs, release review must treat the run as blocked even if uploaded artifacts appear promising. Passing QEMU serial smoke evidence remains a narrow smoke claim and does not prove Odin runtime execution, general stack readiness, general memory management, syscall dispatch, hardware trap execution, compatibility, userspace behavior, or production readiness.
 
 Full CI must run `scripts/ci_evidence_summary.sh` with `if: always()` so failure evidence is visible in the Actions log even when verification, artifact authentication, API log download, or local `gh` access is unavailable.
 
 The CI evidence summary is a first-level triage surface. It does not replace `artifacts/latest_verify.json`, QEMU smoke metadata, QEMU serial/stderr logs, or boot blocker reports as generated evidence.
 
-The CI-observed timeout or loader state must be narrowed when possible. QEMU smoke metadata may report `limine_not_reached`, `kernel_not_loaded`, `kernel_entry_not_reached`, `serial_not_initialized`, `marker_not_emitted`, `stack_marker_not_emitted`, `limine_lower_half_phdr`, or fallback `qemu_timeout`; all remain blockers and do not authorize a QEMU serial smoke pass.
+The CI-observed timeout or loader state must be narrowed when possible. QEMU smoke metadata may report `limine_not_reached`, `kernel_not_loaded`, `kernel_entry_not_reached`, `serial_not_initialized`, `marker_not_emitted`, `stack_marker_not_emitted`, `memory_marker_not_emitted`, `limine_lower_half_phdr`, or fallback `qemu_timeout`; all remain blockers and do not authorize a QEMU serial smoke pass.
 
 Full verification runs `scripts/build_boot_image.sh` to produce `artifacts/runtime/boot_image/package_metadata.json`; while packaging is blocked, that metadata is blocker evidence rather than boot evidence.
 

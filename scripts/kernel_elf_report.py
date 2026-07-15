@@ -14,6 +14,9 @@ ET_EXEC = 2
 ELF_MAGIC = b"\x7fELF"
 LOWER_HALF_LIMIT = 0x0000800000000000
 LOWER_HALF_PHDR_BLOCKER = "limine_lower_half_phdr"
+MEMORY_REGION_START_SYMBOL = "boot_memory_region"
+MEMORY_REGION_END_SYMBOL = "boot_memory_region_end"
+MEMORY_REGION_ALIGNMENT = 4096
 
 ARCHITECTURES = {
     EM_X86_64: "x86_64",
@@ -98,7 +101,11 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
 
     header, program_headers = parse_result
     load_segments = [segment for segment in program_headers if segment.header_type == PT_LOAD]
-    symbol_address = entry_symbol_address(kernel_elf, "_start")
+    symbols = symbol_addresses(
+        kernel_elf,
+        ("_start", MEMORY_REGION_START_SYMBOL, MEMORY_REGION_END_SYMBOL),
+    )
+    symbol_address = symbols.get("_start")
     layout = load_layout(header, load_segments)
     issues = detected_issues(header, load_segments, symbol_address, layout)
 
@@ -119,6 +126,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "entry_symbol_matches_entry": symbol_address == header.entry,
         "entry_is_lower_half": layout.entry_is_lower_half,
         "entry_address_class": layout.entry_address_class,
+        "memory_evidence_region": memory_evidence_region_record(symbols),
         "program_header_count": header.program_header_count,
         "section_count": header.section_header_count,
         "load_segments": [segment_record(segment) for segment in load_segments],
@@ -207,13 +215,25 @@ def read_program_header(elf_bytes: bytes, offset: int) -> ProgramHeader:
 
 
 def entry_symbol_address(kernel_elf: Path, symbol_name: str) -> int | None:
+    return symbol_addresses(kernel_elf, (symbol_name,)).get(symbol_name)
+
+
+def symbol_addresses(kernel_elf: Path, symbol_names: tuple[str, ...]) -> dict[str, int]:
     try:
         result = subprocess.run(["nm", str(kernel_elf)], check=False, capture_output=True, text=True)
     except OSError:
-        return None
+        return {}
     if result.returncode != 0:
-        return None
-    return parse_symbol_address(result.stdout, symbol_name)
+        return {}
+    return parse_symbol_addresses(result.stdout, set(symbol_names))
+
+
+def parse_symbol_addresses(nm_output: str, symbol_names: set[str]) -> dict[str, int]:
+    return {
+        symbol_name: address
+        for symbol_name in symbol_names
+        if (address := parse_symbol_address(nm_output, symbol_name)) is not None
+    }
 
 
 def parse_symbol_address(nm_output: str, symbol_name: str) -> int | None:
@@ -225,6 +245,21 @@ def parse_symbol_address(nm_output: str, symbol_name: str) -> int | None:
             except ValueError:
                 return None
     return None
+
+
+def memory_evidence_region_record(symbols: dict[str, int]) -> dict[str, object]:
+    start = symbols.get(MEMORY_REGION_START_SYMBOL)
+    end = symbols.get(MEMORY_REGION_END_SYMBOL)
+    size = end - start if start is not None and end is not None else None
+    return {
+        "start_symbol": MEMORY_REGION_START_SYMBOL,
+        "end_symbol": MEMORY_REGION_END_SYMBOL,
+        "start_address": _hex(start) if start is not None else "",
+        "end_address": _hex(end) if end is not None else "",
+        "size_bytes": size if size is not None and size >= 0 else -1,
+        "required_alignment_bytes": MEMORY_REGION_ALIGNMENT,
+        "start_aligned": start is not None and start % MEMORY_REGION_ALIGNMENT == 0,
+    }
 
 
 def load_layout(header: ElfHeader, load_segments: list[ProgramHeader]) -> LoadLayout:
@@ -334,6 +369,7 @@ def malformed_report(kernel_elf: Path, linker_script: Path, issue: str) -> dict[
         "entry_symbol_matches_entry": False,
         "entry_is_lower_half": False,
         "entry_address_class": "zero",
+        "memory_evidence_region": memory_evidence_region_record({}),
         "program_header_count": 0,
         "section_count": 0,
         "load_segments": [],

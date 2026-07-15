@@ -64,7 +64,7 @@ v0.6.6 adds `contracts/runtime_progression_stages.v0.json` as the governed sourc
 
 v0.7.0 implements the governed stack initialization evidence path. `_start` sets `rsp` to the static boot stack, performs a minimal stack-use probe, emits `KOZO_STACK_INIT_OK`, and then enters the governed halt loop. This proves controlled stack establishment and stack marker emission only.
 
-v0.7.3 hardens `contracts/memory_initialization_evidence_contract.v0.json` into an implementation-ready planning boundary. It fixes the future static region symbols, size, alignment, ownership, zero-fill operation, sentinel survival probe, and marker placement. `KOZO_MEMORY_INIT_OK` remains reserved and un-emitted, memory initialization is not implemented, and no physical memory discovery, paging, virtual memory management, allocator, Odin runtime, userspace, compatibility, or production evidence is proven.
+v0.7.3 hardens `contracts/memory_initialization_evidence_contract.v0.json` into an implementation-ready boundary. v0.7.4 implements its static region, explicit zero fill, bounded sentinel write/read/compare/restore probe, `KOZO_MEMORY_INIT_OK` emission, and unchanged terminal halt path. The generated kernel ELF report records the region symbol addresses, computed size, and required-alignment result so validation does not depend on source structure alone. This does not prove physical memory discovery, paging, virtual memory management, allocation, Odin runtime execution, progression entry, userspace, compatibility, or production readiness.
 
 Current local boot blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
 
@@ -82,11 +82,11 @@ The v0.4.8 QEMU smoke metadata records Limine entry-point evidence, expected ent
 
 The latest inspected v0.4.8 CI artifact captured `KOZO_EARLY_0_ENTRY`, so kernel entry handoff is proven for that artifact. It did not capture `KOZO_EARLY_2_SERIAL_INIT_OK`, so serial initialization remains unproven until that marker appears in captured QEMU serial output.
 
-The expected v0.7.0 QEMU serial sequence is `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, and `KOZO_STACK_INIT_OK`.
+The expected v0.7.4 QEMU serial sequence is `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, `KOZO_STACK_INIT_OK`, and `KOZO_MEMORY_INIT_OK`.
 
-The reserved future memory evidence marker is `KOZO_MEMORY_INIT_OK`. It is not part of the current QEMU smoke pass sequence and must not be treated as evidence until runtime code emits it and governed validation captures it.
+In v0.7.1 and v0.7.3, `KOZO_MEMORY_INIT_OK` was reserved planning vocabulary and was not runtime evidence. v0.7.4 replaces that planning state: runtime assembly now emits the marker only after completing the contract-defined initialization and probe, and the governed QEMU pass sequence includes it as the final expected marker.
 
-The future memory proof is bounded to one static 4096-byte `.bss` region. Runtime code must zero the entire region, write the contract sentinel at the declared offset, read and compare it exactly, restore the zero fill value, and only then emit `KOZO_MEMORY_INIT_OK` before returning to the existing halt path. That future evidence will not prove physical memory discovery, paging, virtual memory management, allocator or heap behavior, general memory safety, or Odin runtime initialization.
+The implemented memory proof remains bounded to one static 4096-byte `.bss` region. Runtime code zeroes the entire region, writes the contract sentinel at the declared offset, reads and compares it exactly, restores the zero fill value, and only then emits `KOZO_MEMORY_INIT_OK` before entering the existing halt path. This evidence does not prove physical memory discovery, paging, virtual memory management, allocator or heap behavior, general memory safety, or Odin runtime initialization.
 
 The v0.4.4 ISO path metadata may prove that the configured Limine path is present in packaged ISO contents. It does not prove Limine loaded the ELF, entered the kernel, initialized serial output, or reached `KOZO_BOOT_SMOKE_OK`.
 
@@ -149,7 +149,7 @@ runtime-adjacent-object-symbol-smoke
 
 The smoke path builds freestanding x86_64 Odin kernel objects, assembles the current x86_64 boot and syscall bridge objects, records `nm` and `strings` evidence, and verifies required entry, dispatcher, bridge, and serial marker surfaces.
 
-The QEMU serial smoke target is now proven in CI, and v0.7.0 extends its expected marker sequence to include stack initialization evidence. It remains a narrow smoke target and does not replace separate evidence for Odin runtime execution, general stack readiness, memory initialization, syscall dispatch, hardware trap execution, userspace execution, or subsystem behavior.
+The QEMU serial smoke target is proven in CI. v0.7.4 extends its expected sequence through controlled stack and static-region evidence. It remains a narrow target and does not replace separate evidence for Odin runtime execution, general stack readiness, general memory management, syscall dispatch, hardware trap execution, userspace execution, or subsystem behavior.
 
 The marker order and blocker vocabulary for QEMU serial smoke are owned by `contracts/runtime_evidence_taxonomy.v0.json` and enforced by `runtime_evidence_taxonomy`, `qemu_smoke_evidence`, and `boot_blocker_report`.
 
@@ -250,7 +250,7 @@ The boot tooling policy path is:
 docs/BOOT_TOOLING.md
 ```
 
-The QEMU smoke log is passing QEMU serial smoke evidence only when `qemu_smoke_evidence` validates metadata with outcome `pass` and finds the full ordered marker sequence ending in `KOZO_STACK_INIT_OK` in the serial log. Blocked metadata remains blocker evidence only.
+The QEMU smoke log is passing QEMU serial smoke evidence only when `qemu_smoke_evidence` validates metadata with outcome `pass` and finds the full ordered marker sequence ending in `KOZO_MEMORY_INIT_OK` in the serial log. Blocked metadata remains blocker evidence only.
 
 The QEMU smoke summary is a reviewer convenience artifact. It is generated from the QEMU smoke metadata, serial log, stderr log, and boot blocker report. It is not authoritative and must not replace metadata or log validation.
 

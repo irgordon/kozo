@@ -182,7 +182,7 @@ def valid_boot_source() -> str:
 def valid_metadata() -> dict[str, object]:
     return {
         "outcome": "pass",
-        "expected_marker": "KOZO_STACK_INIT_OK",
+        "expected_marker": "KOZO_MEMORY_INIT_OK",
         "observed_markers": list(smoke_markers()),
     }
 
@@ -198,6 +198,7 @@ def smoke_markers() -> tuple[str, ...]:
         "KOZO_EARLY_2_SERIAL_INIT_OK",
         "KOZO_BOOT_SMOKE_OK",
         "KOZO_STACK_INIT_OK",
+        "KOZO_MEMORY_INIT_OK",
     )
 
 

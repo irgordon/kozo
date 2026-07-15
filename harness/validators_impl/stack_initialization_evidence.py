@@ -137,9 +137,10 @@ def _load_metadata() -> dict[str, object] | StackInitializationEvidenceIssue | N
 
 
 def _expected_marker_issue(metadata: dict[str, object]) -> StackInitializationEvidenceIssue | None:
-    if metadata.get("expected_marker") == get_expected_smoke_marker() == _STACK_MARKER:
+    marker_order = get_smoke_marker_order()
+    if metadata.get("expected_marker") == get_expected_smoke_marker() and _STACK_MARKER in marker_order:
         return None
-    return _issue("contract_mismatch", "qemu_smoke.expected_marker", "QEMU smoke expected marker must be KOZO_STACK_INIT_OK")
+    return _issue("contract_mismatch", "qemu_smoke.expected_marker", "QEMU smoke expected marker must match the governed taxonomy after KOZO_STACK_INIT_OK")
 
 
 def _observed_marker_issue(metadata: dict[str, object]) -> StackInitializationEvidenceIssue | None:

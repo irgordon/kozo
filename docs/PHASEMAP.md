@@ -93,24 +93,24 @@ Detailed evidence rules are owned by `docs/RELEASE_EVIDENCE.md`.
 
 The current local generated evidence proves:
 
-* `scripts/verify.sh` passes locally with 47 checks and 0 failures.
-* Unit discovery passes locally with 563 tests after the v0.7.3 focused coverage expansion.
+* `scripts/verify.sh` passes locally with 48 checks and 0 failures.
+* Unit discovery passes locally with 581 tests after the v0.7.4 focused coverage expansion.
 * The kernel ELF uses higher-half PT_LOAD virtual addresses.
 * Local kernel ELF loadability reports no lower-half PHDR blocker.
-* The repository source emits `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, and `KOZO_STACK_INIT_OK` from the assembly entry path.
+* The repository source emits `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, `KOZO_STACK_INIT_OK`, and `KOZO_MEMORY_INIT_OK` from the assembly entry path.
 * CI run `27894312430` captured the full ordered marker sequence in QEMU serial output.
 * QEMU smoke metadata from that run reports `outcome: pass` and `blocker_category: none`.
 * QEMU serial smoke evidence is proven for the narrow smoke path.
 * The post-smoke path in `kernel/arch/x86_64/boot.asm` is governed by `contracts/runtime_halt_contract.v0.json`.
-* After `KOZO_STACK_INIT_OK`, the assembly path enters a deterministic terminal `cli`/`hlt` loop with structural fallthrough forbidden.
+* After `KOZO_MEMORY_INIT_OK`, the assembly path enters a deterministic terminal `cli`/`hlt` loop with structural fallthrough forbidden.
 * `contracts/runtime_progression_contract.v0.json` governs future halt-to-runtime transition prerequisites and forbids deleting, replacing, bypassing, or jumping around the halt loop without separate progression evidence.
 * `contracts/runtime_progression_entry_contract.v0.json` reserves the future `KOZO_RUNTIME_PROGRESS_ENTRY` marker without emitting it or changing runtime behavior.
 * `contracts/runtime_evidence_taxonomy.v0.json` governs QEMU serial smoke marker order, smoke outcomes, blocker categories, pass condition, blocked condition, and taxonomy non-goals.
 * `contracts/runtime_progression_stages.v0.json` is the sole authority for the acyclic runtime progression order, allowed transitions, and transition ownership from `BOOT_SMOKE` through `USERSPACE_PLANNING`.
 * `contracts/stack_initialization_evidence_contract.v0.json` governs controlled stack initialization evidence, and `stack_initialization_evidence` validates the source and marker evidence boundary.
-* `contracts/memory_initialization_evidence_contract.v0.json` now governs an implementation-ready future memory proof boundary with fixed region geometry, zero-fill semantics, a bounded survival probe, and pre-halt marker placement. `KOZO_MEMORY_INIT_OK` remains reserved but not emitted.
-* v0.7.1 is accepted by the CI validator gate; memory evidence remains planned rather than implemented.
-* v0.7.3 hardens the memory evidence contract without changing runtime behavior.
+* `contracts/memory_initialization_evidence_contract.v0.json` governs the implemented static-region proof boundary with fixed geometry, explicit zero-fill semantics, a bounded survival probe, and pre-halt marker placement.
+* `memory_initialization_evidence` validates the runtime source path and correlates passing QEMU metadata/log evidence or an allowed local tooling blocker.
+* v0.7.4 marks `MEMORY_INITIALIZATION_EVIDENCE` proven while `RUNTIME_PROGRESSION_ENTRY` remains planned.
 * Local QEMU smoke evidence remains blocked by `missing_iso_generation_tooling` because the local environment does not provide the CI Limine/xorriso tooling path.
 
 ## Current Active Blocker
@@ -123,7 +123,7 @@ Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr
 
 ## Next Runtime Phase
 
-The next phase is `v0.7.4 Memory Initialization Evidence`. It may implement only the contract-defined static region, full-region zero fill, bounded survival probe, and `KOZO_MEMORY_INIT_OK` emission before returning to the existing halt loop.
+The next phase is `v0.7.5 Runtime Initialization Evidence Planning`. It must define the next proof boundary without implementing progression entry, Odin runtime initialization, halt replacement, paging, allocation, userspace, compatibility, or production behavior.
 
 ---
 

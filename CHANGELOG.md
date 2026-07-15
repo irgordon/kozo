@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.7.4 - 2026-07-15
+
+**Status:** Memory initialization evidence implemented locally; CI acceptance pending push.
+
+### Added
+
+* Added the static `boot_memory_region` through `boot_memory_region_end` `.bss` region with exact 4096-byte size and alignment.
+* Explicitly zeroed the full region, performed the bounded 64-bit sentinel write/read/compare/restore probe, and emitted `KOZO_MEMORY_INIT_OK` only on success.
+* Added `memory_initialization_evidence` validation for source and ELF-reported region geometry, zero-fill coverage, probe ordering, marker ordering, halt preservation, and QEMU evidence alignment.
+
+### Changed
+
+* Extended the governed QEMU marker sequence through `KOZO_MEMORY_INIT_OK` and added `memory_marker_not_emitted` as the exact preceding-evidence blocker.
+* Marked `MEMORY_INITIALIZATION_EVIDENCE` proven while leaving `RUNTIME_PROGRESSION_ENTRY` planned and preserving the halt loop.
+
+### Notes
+
+* ABI and syscall behavior are unchanged.
+* This change does not add physical memory discovery, paging, virtual memory management, an allocator, a heap, Odin runtime initialization, progression entry, interrupts, scheduling, userspace, compatibility, or production readiness.
+
 ## v0.7.3 - 2026-07-15
 
 **Status:** Memory evidence contract hardening.

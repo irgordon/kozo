@@ -194,11 +194,11 @@ This contract does not allocate memory dynamically, execute Odin runtime code, r
 
 `contracts/memory_initialization_evidence_contract.v0.json` defines what KOZO must prove before claiming controlled memory initialization evidence.
 
-It reserves `KOZO_MEMORY_INIT_OK` and defines the exact future proof boundary: a 4096-byte, 4096-byte-aligned static `.bss` region owned by the x86_64 boot memory evidence path; full-region zero fill; a bounded 64-bit sentinel write/read/compare/restore probe; and marker emission only after initialization and probe success and before the halt loop.
+It defines `KOZO_MEMORY_INIT_OK` and the exact implemented proof boundary: a 4096-byte, 4096-byte-aligned static `.bss` region owned by the x86_64 boot memory evidence path; full-region zero fill; a bounded 64-bit sentinel write/read/compare/restore probe; and marker emission only after initialization and probe success and before the halt loop.
 
-The contract owns the destination-stage proof boundary. `contracts/runtime_progression_stages.v0.json` remains the sole authority for stage order and transitions. The schema and validator make the planned boundary mechanically checkable without treating planned symbols or a reserved marker as runtime evidence.
+The contract owns the destination-stage proof boundary. `contracts/runtime_progression_stages.v0.json` remains the sole authority for stage order and transitions. The schema and validators make the implemented source boundary and captured marker evidence mechanically checkable.
 
-The marker is reserved and not emitted by current runtime code. This contract does not implement memory initialization, physical memory discovery, paging, virtual memory management, allocator behavior, heap allocation, Odin runtime execution, halt replacement, interrupts, scheduler behavior, userspace execution, compatibility, or production readiness.
+The marker is emitted by current assembly only after the governed zero fill and probe succeed. This contract does not prove physical memory discovery, paging, virtual memory management, allocator behavior, heap allocation, Odin runtime execution, halt replacement, interrupts, scheduler behavior, userspace execution, compatibility, or production readiness.
 
 ---
 

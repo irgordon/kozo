@@ -98,6 +98,7 @@ The current repository proves:
 * governed future progression entry marker reservation through `contracts/runtime_progression_entry_contract.v0.json`
 * governed, acyclic runtime progression stage ordering and transition ownership through `contracts/runtime_progression_stages.v0.json`
 * governed stack initialization evidence through `contracts/stack_initialization_evidence_contract.v0.json` and `stack_initialization_evidence`
+* governed static-memory initialization evidence through `contracts/memory_initialization_evidence_contract.v0.json` and `memory_initialization_evidence`, pending post-push CI acceptance
 
 The latest local generated evidence may still report missing local Limine/xorriso tooling, but CI run `27894312430` proves the narrow QEMU serial smoke path.
 
@@ -109,10 +110,10 @@ KOZO still does not prove:
 
 * Odin runtime execution after the assembly marker sequence
 * general stack readiness beyond the controlled boot stack proof
-* memory initialization
+* general memory management beyond the governed static region
 * runtime progression past the governed halt loop
 * `KOZO_RUNTIME_PROGRESS_ENTRY` emission
-* memory, progression-entry, runtime-initialization, loop, capability, or userspace progression stages beyond planning
+* progression-entry, runtime-initialization, loop, capability, or userspace progression stages beyond planning
 * syscall dispatch during boot
 * hardware halt instruction semantics
 * interrupt handling
@@ -146,10 +147,10 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 4. Use `contracts/runtime_progression_stages.v0.json` as the sole authority for stage order and allowed transitions.
 5. Keep the v0.6.2 runtime progression contract as halt-preservation governance, not a second stage-order definition.
 6. Keep the v0.6.3 runtime progression entry marker reserved until stack and memory prerequisites are proven.
-7. Keep the v0.7.0 stack evidence proof as the current highest proven progression stage.
-8. Implement only the v0.7.3 contract-defined controlled memory proof in v0.7.4.
-9. Keep physical memory discovery, paging, virtual memory management, allocators, heaps, and Odin runtime initialization outside that proof.
-10. Do not implement progression entry or replace the halt loop until memory and progression-entry evidence are separately implemented and validated.
+7. Keep the v0.7.4 memory evidence proof as the current highest proven progression stage.
+8. Define runtime initialization evidence requirements in v0.7.5 before implementing any new progression behavior.
+9. Keep physical memory discovery, paging, virtual memory management, allocators, heaps, and Odin runtime initialization outside the current proof.
+10. Do not implement progression entry or replace the halt loop until progression-entry evidence is separately implemented and validated.
 
 ---
 
@@ -157,7 +158,7 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 
 After CI QEMU serial smoke evidence is green, resume deferred maturity work:
 
-* implement the hardened static memory initialization evidence boundary
+* plan runtime initialization evidence without implementing progression
 * add runtime progression entry evidence
 * add runtime initialization evidence
 * add controlled runtime loop evidence

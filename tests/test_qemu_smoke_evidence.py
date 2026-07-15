@@ -119,6 +119,15 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.code, OK)
 
+    def test_accepts_memory_marker_not_emitted_blocker(self):
+        result = self.validate_blocked_fixture(
+            "memory_marker_not_emitted",
+            "KOZO_EARLY_0_ENTRY\nKOZO_EARLY_1_SERIAL_INIT_START\nKOZO_EARLY_2_SERIAL_INIT_OK\nKOZO_BOOT_SMOKE_OK\nKOZO_STACK_INIT_OK\n",
+        )
+
+        self.assertEqual(result.status, "pass")
+        self.assertEqual(result.code, OK)
+
     def test_accepts_serial_init_start_only_as_serial_not_initialized(self):
         result = self.validate_blocked_fixture("serial_not_initialized", "KOZO_EARLY_1_SERIAL_INIT_START\n")
 
@@ -162,7 +171,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
 
     def test_fails_when_pass_metadata_has_final_marker_without_prior_markers(self):
         self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
-        final_marker_only = "Limine\nKOZO_STACK_INIT_OK\n"
+        final_marker_only = "Limine\nKOZO_MEMORY_INIT_OK\n"
         result = self.validate_fixture(
             metadata_factory=lambda: valid_metadata("pass", serial_text=final_marker_only),
             mutate_serial_log=lambda _: final_marker_only,
@@ -179,6 +188,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
             "KOZO_EARLY_1_SERIAL_INIT_START\n"
             "KOZO_EARLY_2_SERIAL_INIT_OK\n"
             "KOZO_STACK_INIT_OK\n"
+            "KOZO_MEMORY_INIT_OK\n"
         )
         result = self.validate_fixture(
             metadata_factory=lambda: valid_metadata("pass", serial_text=out_of_order),
@@ -322,7 +332,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
 
     def test_fails_when_summary_expected_marker_is_missing(self):
         self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
-        result = self.validate_fixture(mutate_summary=lambda text: text.replace("Expected Marker: KOZO_STACK_INIT_OK", "Expected Marker:"))
+        result = self.validate_fixture(mutate_summary=lambda text: text.replace("Expected Marker: KOZO_MEMORY_INIT_OK", "Expected Marker:"))
 
         self.assertEqual(result.status, "fail")
         self.assert_qemu_failure(result, "summary_metadata_mismatch", "qemu_smoke.summary.expected_marker")
@@ -537,7 +547,7 @@ def valid_metadata(outcome: str, *, serial_text: str | None = None, stderr_text:
         "boot_image": "artifacts/runtime/boot_image/kozo.iso",
         "serial_log": "artifacts/runtime/qemu_smoke.log",
         "stderr_log": "artifacts/runtime/qemu_smoke.stderr.log",
-        "expected_marker": "KOZO_STACK_INIT_OK",
+        "expected_marker": "KOZO_MEMORY_INIT_OK",
         "early_markers": list(early_markers()),
         "observed_markers": observed,
         "earliest_observed_marker": observed[0] if observed else "",
@@ -555,14 +565,14 @@ def valid_metadata(outcome: str, *, serial_text: str | None = None, stderr_text:
         "proves": [
             "QEMU launched the KOZO ISO",
             "serial output was captured",
-            "the expected KOZO stack initialization marker was observed",
+            "the expected KOZO memory initialization marker was observed",
         ],
         "does_not_prove": [
             "hardware trap execution",
             "interrupt handling",
             "Odin runtime execution",
             "general stack readiness",
-            "memory initialization",
+            "general memory management",
             "syscall dispatch",
             "Linux compatibility",
             "POSIX compatibility",
@@ -595,6 +605,7 @@ def valid_doc_text() -> str:
             "qemu_smoke_evidence",
             "KOZO_BOOT_SMOKE_OK",
             "KOZO_STACK_INIT_OK",
+            "KOZO_MEMORY_INIT_OK",
         )
     )
 
@@ -612,6 +623,7 @@ def default_serial_log_text() -> str:
         "KOZO_EARLY_2_SERIAL_INIT_OK\n"
         "KOZO_BOOT_SMOKE_OK\n"
         "KOZO_STACK_INIT_OK\n"
+        "KOZO_MEMORY_INIT_OK\n"
     )
 
 
@@ -670,6 +682,7 @@ def early_markers() -> tuple[str, ...]:
         "KOZO_EARLY_2_SERIAL_INIT_OK",
         "KOZO_BOOT_SMOKE_OK",
         "KOZO_STACK_INIT_OK",
+        "KOZO_MEMORY_INIT_OK",
     )
 
 

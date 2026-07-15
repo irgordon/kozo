@@ -889,3 +889,31 @@ It did not change assembly, linker layout, runtime behavior, marker emission, th
 ## 25.3 Next Work
 
 `v0.7.4 Memory Initialization Evidence` may implement only the contract-defined static proof path. Paging, virtual memory management, allocators, heaps, Odin runtime initialization, progression entry, and halt replacement remain deferred.
+
+---
+
+# 26. v0.7.4 Memory Initialization Evidence
+
+Date: 2026-07-15
+
+Status: Implemented locally; CI acceptance remains pending until push.
+
+## 26.1 Scope
+
+This phase implements the hardened static-memory evidence boundary only. The assembly path owns a 4096-byte, 4096-byte-aligned `.bss` region, explicitly zeroes all 4096 bytes, performs the contract-defined 64-bit write/read/compare/restore probe at offset zero, emits `KOZO_MEMORY_INIT_OK`, and enters the unchanged halt loop.
+
+## 26.2 Finding Status
+
+| ID | Status | Rationale |
+| --- | --- | --- |
+| AUDIT-072-005 | Resolved | The hardened memory contract now has source implementation, ELF-reported symbol geometry, focused structural validation, and governed marker evidence handling. |
+| AUDIT-064-002 | Deferred | `validator_coverage.py` remains above the preferred split threshold; decomposition is outside this runtime evidence phase. |
+| AUDIT-073-001 | Deferred | The existing Rust package license metadata warning remains release-hardening work and does not affect the memory proof. |
+
+## 26.3 Boundaries
+
+The implementation does not add physical memory discovery, paging, virtual memory management, allocation, heap behavior, memory protection, Odin runtime execution, progression entry, interrupts, scheduling, userspace, compatibility, or production readiness. The halt loop remains authoritative.
+
+## 26.4 Next Work
+
+The next milestone is `v0.7.5 Runtime Initialization Evidence Planning`. It must define evidence requirements before any progression-entry or runtime-initialization behavior is added.

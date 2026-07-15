@@ -58,13 +58,15 @@ v0.7.0 implements the governed stack initialization evidence path. `_start` load
 
 v0.7.1 adds memory initialization evidence planning through `contracts/memory_initialization_evidence_contract.v0.json`. It reserves `KOZO_MEMORY_INIT_OK` as future evidence, but the marker is not emitted and memory initialization remains unimplemented.
 
+v0.7.4 implements that governed boundary: `_start` explicitly zeroes a boot-owned 4096-byte, 4096-byte-aligned `.bss` region, performs the bounded 64-bit sentinel write/read/compare/restore probe, emits `KOZO_MEMORY_INIT_OK`, and then enters the existing halt loop.
+
 No active QEMU serial smoke blocker.
 
 Local generated blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
 
 If CI produces `artifacts/runtime/boot_image/kozo.iso`, the generated blocker report narrows to `missing_qemu_serial_evidence` for that run.
 
-If `scripts/qemu_smoke.sh` can run against a generated ISO, it writes `artifacts/runtime/qemu_smoke.log`, `artifacts/runtime/qemu_smoke.stderr.log`, `artifacts/runtime/qemu_smoke.metadata.json`, and `artifacts/runtime/qemu_smoke.summary.txt`. Passing QEMU serial smoke evidence requires the serial log to contain the full ordered marker sequence ending in `KOZO_STACK_INIT_OK`; blocked metadata preserves the no-QEMU-boot claim. The summary is non-authoritative reviewer convenience derived from the metadata and logs.
+If `scripts/qemu_smoke.sh` can run against a generated ISO, it writes `artifacts/runtime/qemu_smoke.log`, `artifacts/runtime/qemu_smoke.stderr.log`, `artifacts/runtime/qemu_smoke.metadata.json`, and `artifacts/runtime/qemu_smoke.summary.txt`. Passing QEMU serial smoke evidence requires the serial log to contain the full ordered marker sequence ending in `KOZO_MEMORY_INIT_OK`; blocked metadata preserves the no-QEMU-boot claim. The summary is non-authoritative reviewer convenience derived from the metadata and logs.
 
 ---
 
@@ -102,7 +104,7 @@ Latest inspected v0.5.4 CI smoke status: CI run `27894312430` produced passing Q
 
 Current v0.6.0 runtime halt baseline: `contracts/runtime_halt_contract.v0.json` and `runtime_halt_contract` validate that `kernel/arch/x86_64/boot.asm` emits `KOZO_BOOT_SMOKE_OK` before entering a deterministic `cli`/`hlt` loop with no structural fallthrough.
 
-Current runtime progression governance: `contracts/runtime_progression_stages.v0.json` owns the canonical order and allowed transitions, while `contracts/runtime_progression_contract.v0.json` owns halt-preservation requirements. The halt loop remains authoritative until stack initialization evidence, memory initialization evidence, and progression-entry evidence are separately proven. Stack evidence is proven; memory evidence and progression entry remain planned. These contracts do not implement runtime progression.
+Current runtime progression governance: `contracts/runtime_progression_stages.v0.json` owns the canonical order and allowed transitions, while `contracts/runtime_progression_contract.v0.json` owns halt-preservation requirements. Stack and controlled-memory evidence are proven; progression entry remains planned. The halt loop remains authoritative until progression-entry evidence is separately implemented and proven.
 
 Current v0.6.3 runtime progression entry design: `contracts/runtime_progression_entry_contract.v0.json` reserves the future `KOZO_RUNTIME_PROGRESS_ENTRY` marker and defines where progression evidence begins. The marker is not emitted, runtime progression is not implemented, and the halt loop remains authoritative until the required stack, memory, runtime, and progression-path evidence exists.
 
@@ -110,7 +112,7 @@ Current v0.6.6 runtime progression stage governance: `contracts/runtime_progress
 
 Current v0.7.0 stack initialization evidence: `contracts/stack_initialization_evidence_contract.v0.json` defines the controlled boot stack proof. `_start` sets `rsp` to `boot_stack_top`, performs a bounded push/pop probe, emits `KOZO_STACK_INIT_OK`, and then enters the governed halt loop. This proves only controlled stack establishment and marker emission.
 
-Current v0.7.3 memory evidence hardening: `contracts/memory_initialization_evidence_contract.v0.json` defines the future controlled region (`boot_memory_region` through `boot_memory_region_end`), 4096-byte size and alignment, static boot-path ownership, full-region zero fill, bounded sentinel write/read/compare/restore probe, and marker placement before the unchanged halt loop. `KOZO_MEMORY_INIT_OK` remains reserved but not emitted. No memory initialization, physical memory discovery, paging, virtual memory management, allocator behavior, Odin runtime execution, userspace execution, compatibility, or production readiness is proven.
+Current v0.7.4 memory initialization evidence: `boot_memory_region` through `boot_memory_region_end` defines a boot-owned 4096-byte, 4096-byte-aligned static `.bss` region. Assembly explicitly zeroes the region, verifies and restores a bounded 64-bit sentinel probe at offset zero, emits `KOZO_MEMORY_INIT_OK`, and enters the unchanged halt loop. This proves only that controlled region and probe path; it does not prove paging, general memory management, allocation, Odin runtime execution, progression entry, userspace, compatibility, or production readiness.
 
 Selected boot protocol: Limine.
 
@@ -148,6 +150,7 @@ KOZO_EARLY_1_SERIAL_INIT_START
 KOZO_EARLY_2_SERIAL_INIT_OK
 KOZO_BOOT_SMOKE_OK
 KOZO_STACK_INIT_OK
+KOZO_MEMORY_INIT_OK
 ```
 
 ---
@@ -187,9 +190,9 @@ The current source surfaces relevant to future boot work are:
 
 `artifacts/runtime/kernel_elf_report.json` records that the staged kernel ELF has an x86_64 executable format, `_start` entry alignment, PT_LOAD segments, PT_LOAD virtual and physical addresses, higher-half layout summary, and the current load-layout blocker. That report does not prove Limine has loaded the ELF or transferred control to `_start`.
 
-`kernel/arch/x86_64/boot.asm` emits `KOZO_BOOT_SMOKE_OK` after assembly-level serial initialization, establishes the controlled boot stack, and emits `KOZO_STACK_INIT_OK`. `kernel/main.odin` also keeps a later boot smoke marker path after Odin serial initialization. Passing QEMU serial smoke evidence requires the captured serial log to contain the expected marker sequence.
+`kernel/arch/x86_64/boot.asm` emits `KOZO_BOOT_SMOKE_OK` after assembly-level serial initialization, establishes the controlled boot stack, initializes and probes the governed static region, and emits `KOZO_STACK_INIT_OK` followed by `KOZO_MEMORY_INIT_OK`. `kernel/main.odin` also keeps a later boot smoke marker path after Odin serial initialization. Passing QEMU serial smoke evidence requires the captured serial log to contain the expected marker sequence.
 
-After the assembly-level `KOZO_STACK_INIT_OK` emission, `kernel/arch/x86_64/boot.asm` enters the governed terminal halt loop. That source-level terminal behavior is validated by `runtime_halt_contract` and does not prove hardware halt instruction semantics, interrupt handling, scheduler behavior, general stack readiness, Odin runtime execution, memory initialization, syscall dispatch, or production readiness.
+After the assembly-level `KOZO_MEMORY_INIT_OK` emission, `kernel/arch/x86_64/boot.asm` enters the governed terminal halt loop. That source-level terminal behavior is validated by `runtime_halt_contract` and does not prove hardware halt instruction semantics, interrupt handling, scheduler behavior, general stack readiness, general memory management, Odin runtime execution, syscall dispatch, or production readiness.
 
 `kernel/arch/x86_64/serial.odin` initializes COM1 serial output for the later Odin path. The v0.5.0 smoke marker is owned by the assembly entry path and is not Odin runtime, stack, memory, syscall, or hardware-trap evidence.
 
@@ -203,7 +206,7 @@ The previous `missing_bootable_iso_packaging` blocker was refined to `missing_li
 
 The previous `missing_limine_iso_tooling` blocker is refined by `docs/BOOT_TOOLING.md`.
 
-The QEMU serial smoke and stack evidence paths are proven in CI. The next runtime phase may implement only the hardened static memory evidence boundary while preserving the existing halt path afterward.
+The QEMU serial smoke, stack evidence, and controlled-memory evidence paths are implemented locally. The next phase is `v0.7.5 Runtime Initialization Evidence Planning`; it must define a proof boundary before any progression-entry or runtime initialization implementation.
 
 The existing QEMU smoke command writes blocked or passing metadata to `artifacts/runtime/qemu_smoke.metadata.json` and serial output to `artifacts/runtime/qemu_smoke.log`.
 

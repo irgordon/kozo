@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO Memory Evidence Contract Hardening v0.7.3",
+  "task_title": "KOZO Memory Initialization Evidence v0.7.4",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -9,15 +9,15 @@
   },
   "preconditions": [
     "QEMU serial smoke and stack initialization evidence are proven",
-    "The reconciled runtime progression graph is acyclic and marks memory evidence as planned",
-    "The v0.7.1 memory initialization evidence planning contract is present",
+    "The reconciled runtime progression graph is acyclic and marks stack evidence proven before memory evidence",
+    "The v0.7.3 memory initialization evidence contract defines exact region geometry and probe semantics",
     "Odin, pinned Rust, Python, jq, and repository verification tooling are installed"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
-    "Stack initialization evidence remains proven while memory initialization and runtime progression entry remain planned",
-    "KOZO_MEMORY_INIT_OK remains reserved and un-emitted during contract hardening",
-    "This phase changes contracts, validation, tests, and docs only; runtime code, markers, halt behavior, ABI, syscalls, and linker layout remain unchanged"
+    "Stack initialization evidence remains proven while runtime progression entry remains planned",
+    "KOZO_MEMORY_INIT_OK is emitted only after the governed zero fill and bounded probe succeed",
+    "This phase changes only the contract-defined assembly evidence path, evidence validation, progression status, and documentation; ABI, syscalls, linker layout, and halt behavior remain unchanged"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -2244,6 +2244,74 @@
         "verification.tests_run[71]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 72,
+      "title": "Implement memory initialization evidence",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "kernel/arch/x86_64/boot.asm",
+        "contracts/memory_initialization_evidence_contract.v0.json",
+        "contracts/runtime_evidence_taxonomy.v0.json",
+        "contracts/runtime_progression_stages.v0.json",
+        "contracts/runtime_progression_contract.v0.json",
+        "contracts/runtime_progression_entry_contract.v0.json",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/memory_initialization_evidence_contract.py",
+        "harness/validators_impl/memory_initialization_evidence.py",
+        "harness/validators_impl/qemu_smoke_evidence.py",
+        "harness/validators_impl/runtime_evidence_taxonomy.py",
+        "harness/validators_impl/runtime_progression_stages.py",
+        "harness/validators_impl/runtime_progression_contract.py",
+        "harness/validators_impl/runtime_progression_entry_contract.py",
+        "harness/validators_impl/stack_initialization_evidence.py",
+        "harness/validators_impl/validator_coverage.py",
+        "scripts/kernel_elf_report.py",
+        "scripts/qemu_smoke.sh",
+        "schemas/latest_verify.schema.json",
+        "schemas/agent_context.schema.json",
+        "tests/test_memory_initialization_evidence_contract.py",
+        "tests/test_memory_initialization_evidence.py",
+        "tests/test_qemu_smoke_evidence.py",
+        "tests/test_runtime_evidence_taxonomy.py",
+        "tests/test_runtime_progression_stages.py",
+        "tests/test_runtime_progression_contract.py",
+        "tests/test_runtime_progression_entry_contract.py",
+        "tests/test_stack_initialization_evidence.py",
+        "docs/BOOT.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/REQUIRED_CHECKS.md",
+        "docs/CONTRACTS.md",
+        "docs/VALIDATION.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/CODEBASE_AUDIT.md",
+        "docs/generated/governance_index.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/kernel_elf_report.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[72]",
+        "verification.tests_run[73]",
+        "verification.tests_run[74]",
+        "verification.tests_run[75]",
+        "verification.tests_run[76]",
+        "verification.tests_run[77]",
+        "verification.tests_run[78]",
+        "verification.tests_run[80]",
+        "verification.tests_run[81]",
+        "verification.tests_run[82]",
+        "verification.tests_run[83]",
+        "verification.tests_run[84]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -2302,7 +2370,8 @@
     "v0.5.2 CI evidence access hardening prints verification, QEMU smoke, serial/stderr, and boot blocker summaries into full CI logs with if: always(), keeps artifact upload enabled, and avoids requiring gh or authenticated artifact download for first-level triage.",
     "v0.7.1 adds memory_initialization_evidence_contract as the planning authority for future MEMORY_INITIALIZATION_EVIDENCE, reserves KOZO_MEMORY_INIT_OK without emitting it, aligns progression contracts, and preserves runtime behavior.",
     "v0.7.2 reconciles the authoritative progression order, removes the stack-entry-memory cycle, adds deterministic graph-level validation, aligns planning state, and preserves runtime behavior.",
-    "v0.7.3 hardens the planned memory evidence contract with exact region geometry, ownership, zero-fill semantics, a bounded survival probe, and pre-halt marker placement without changing runtime behavior."
+    "v0.7.3 hardens the planned memory evidence contract with exact region geometry, ownership, zero-fill semantics, a bounded survival probe, and pre-halt marker placement without changing runtime behavior.",
+    "v0.7.4 implements the controlled static memory region, explicit full-region zero fill, bounded sentinel probe and restoration, KOZO_MEMORY_INIT_OK evidence, and unchanged halt path without adding paging, allocation, runtime progression, compatibility, or production claims."
   ],
   "verification": {
     "tests_run": [
@@ -2665,6 +2734,71 @@
         "tool": "direct validator invocation",
         "command": "direct MemoryInitializationEvidenceContractValidator invocation",
         "status": "passed"
+      },
+      {
+        "tool": "focused Python validation",
+        "command": "python3 -m unittest tests/test_memory_initialization_evidence_contract.py tests/test_memory_initialization_evidence.py tests/test_qemu_smoke_evidence.py tests/test_runtime_halt_contract.py tests/test_runtime_progression_stages.py tests/test_runtime_progression_contract.py tests/test_runtime_progression_entry_contract.py tests/test_validator_coverage.py",
+        "status": "passed"
+      },
+      {
+        "tool": "direct validator invocation",
+        "command": "direct MemoryInitializationEvidenceValidator invocation",
+        "status": "passed"
+      },
+      {
+        "tool": "python3 -m unittest discover -s tests",
+        "command": "python3 -m unittest discover -s tests",
+        "status": "passed"
+      },
+      {
+        "tool": "python3 -m compileall",
+        "command": "python3 -m compileall harness scripts tests",
+        "status": "passed"
+      },
+      {
+        "tool": "odin check",
+        "command": "odin check kernel",
+        "status": "passed"
+      },
+      {
+        "tool": "cargo check",
+        "command": "cargo check --manifest-path userspace/core_service/Cargo.toml",
+        "status": "passed"
+      },
+      {
+        "tool": "boot image build",
+        "command": "scripts/build_boot_image.sh",
+        "status": "passed_with_missing_iso_generation_tooling"
+      },
+      {
+        "tool": "QEMU smoke",
+        "command": "scripts/qemu_smoke.sh",
+        "status": "blocked_missing_iso_generation_tooling"
+      },
+      {
+        "tool": "binary inspection",
+        "command": "nm and objdump inspection of artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf",
+        "status": "passed"
+      },
+      {
+        "tool": "JSON validation",
+        "command": "python3 -m json.tool and jq for modified JSON files",
+        "status": "passed"
+      },
+      {
+        "tool": "shell syntax",
+        "command": "bash -n scripts/qemu_smoke.sh",
+        "status": "passed"
+      },
+      {
+        "tool": "repository search",
+        "command": "rga and rg searches for KOZO_MEMORY_INIT_OK, boot_memory_region, and boot_memory_region_end",
+        "status": "passed"
+      },
+      {
+        "tool": "verification harness",
+        "command": "scripts/verify.sh",
+        "status": "passed"
       }
     ],
     "logs": [
@@ -2818,7 +2952,8 @@
       "Added runtime_progression_stages contract, schema, loader, validator, focused tests, registry/schema wiring, planning/evidence documentation, audit alignment, changelog entry, and refreshed generated governance/proof state.",
       "Added stack_initialization_evidence_contract as the planning authority for future STACK_INITIALIZATION_EVIDENCE, reserved KOZO_STACK_INIT_OK without emitting it, aligned progression contracts, and preserved runtime behavior.",
       "v0.7.0 implements controlled boot stack evidence by setting rsp to boot_stack_top, probing stack use, emitting KOZO_STACK_INIT_OK, extending the governed marker sequence, and preserving no memory/runtime/userspace/compatibility/production claims.",
-      "v0.7.2 orders BOOT_SMOKE, STACK_INITIALIZATION_EVIDENCE, MEMORY_INITIALIZATION_EVIDENCE, and RUNTIME_PROGRESSION_ENTRY monotonically, leaves stack proven and later stages planned, and validates graph and authority integrity."
+      "v0.7.2 orders BOOT_SMOKE, STACK_INITIALIZATION_EVIDENCE, MEMORY_INITIALIZATION_EVIDENCE, and RUNTIME_PROGRESSION_ENTRY monotonically, leaves stack proven and later stages planned, and validates graph and authority integrity.",
+      "v0.7.4 implements the contract-owned 4096-byte static memory region, explicit zero fill, bounded sentinel write/read/compare/restore probe, KOZO_MEMORY_INIT_OK marker, and unchanged terminal halt loop."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -2890,6 +3025,7 @@
     "v0.7.0 adds stack initialization evidence through the assembly boot path and validator coverage while preserving ABI, syscall, linker, memory, Odin runtime, userspace, compatibility, and production-readiness boundaries.",
     "v0.7.1 adds memory initialization evidence planning through a contract, schema, loader, validator, tests, and progression-stage alignment while preserving runtime behavior, ABI, syscall, linker, QEMU smoke, halt, stack evidence, compatibility, and production-readiness boundaries.",
     "v0.7.2 reconciles the progression model into an acyclic, monotonic, single-owner graph and aligns contracts, tests, planning documents, audit state, and task identity without runtime changes.",
-    "v0.7.3 hardens the memory evidence boundary into an implementation-ready static-region specification without runtime, marker, halt, ABI, syscall, linker, compatibility, or production-readiness changes."
+    "v0.7.3 hardens the memory evidence boundary into an implementation-ready static-region specification without runtime, marker, halt, ABI, syscall, linker, compatibility, or production-readiness changes.",
+    "v0.7.4 implements only the governed static-region memory evidence path, adds structural and captured-evidence validation, preserves the halt loop, and does not add paging, allocation, Odin runtime execution, userspace, compatibility, or production-readiness claims."
   ]
 }

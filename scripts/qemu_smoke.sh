@@ -12,12 +12,13 @@ QEMU_METADATA="$RUNTIME_DIR/qemu_smoke.metadata.json"
 QEMU_STDERR_LOG="$RUNTIME_DIR/qemu_smoke.stderr.log"
 QEMU_SUMMARY="$RUNTIME_DIR/qemu_smoke.summary.txt"
 BOOT_BLOCKER_REPORT="$RUNTIME_DIR/boot_blocker_report.json"
-EXPECTED_MARKER="KOZO_STACK_INIT_OK"
+EXPECTED_MARKER="KOZO_MEMORY_INIT_OK"
 EARLY_MARKERS=(
   "KOZO_EARLY_0_ENTRY"
   "KOZO_EARLY_1_SERIAL_INIT_START"
   "KOZO_EARLY_2_SERIAL_INIT_OK"
   "KOZO_BOOT_SMOKE_OK"
+  "KOZO_STACK_INIT_OK"
   "$EXPECTED_MARKER"
 )
 QEMU_TIMEOUT_SECONDS="${KOZO_QEMU_TIMEOUT_SECONDS:-20}"
@@ -223,6 +224,8 @@ elif markers[2] in observed and markers[3] not in observed:
     print("marker_not_emitted")
 elif markers[3] in observed and markers[4] not in observed:
     print("stack_marker_not_emitted")
+elif markers[4] in observed and markers[5] not in observed:
+    print("memory_marker_not_emitted")
 elif observed and observed[0] != markers[0]:
     print("qemu_timeout")
 else:
@@ -298,7 +301,7 @@ def _proves(outcome: str) -> list[str]:
         return [
             "QEMU launched the KOZO ISO",
             "serial output was captured",
-            "the expected KOZO stack initialization marker was observed",
+            "the expected KOZO memory initialization marker was observed",
         ]
     return [
         "QEMU serial smoke was attempted or checked",
@@ -338,7 +341,7 @@ metadata = {
         "interrupt handling",
         "Odin runtime execution",
         "general stack readiness",
-        "memory initialization",
+        "general memory management",
         "syscall dispatch",
         "Linux compatibility",
         "POSIX compatibility",

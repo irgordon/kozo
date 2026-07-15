@@ -10,7 +10,7 @@ from harness.validator import BaseValidator, ValidationResult
 
 _CONTRACT_PATH = runtime_progression_entry_contract.CONTRACT_PATH
 _EXPECTED_ARCHITECTURE = "x86_64"
-_EXPECTED_RUNTIME_PATH = "boot_smoke_to_stack_evidence_to_halt"
+_EXPECTED_RUNTIME_PATH = "boot_smoke_to_stack_and_memory_evidence_to_halt"
 _EXPECTED_HALT_CONTRACT = "contracts/runtime_halt_contract.v0.json"
 _EXPECTED_PROGRESSION_CONTRACT = "contracts/runtime_progression_contract.v0.json"
 _EXPECTED_STAGES_CONTRACT = "contracts/runtime_progression_stages.v0.json"
@@ -53,7 +53,7 @@ _REQUIRED_OWNERSHIP = (
 _REQUIRED_NON_GOALS = (
     "runtime progression execution",
     "general stack readiness",
-    "memory initialization",
+    "general memory management",
     "Odin runtime execution",
     "userspace execution",
     "interrupt handling",

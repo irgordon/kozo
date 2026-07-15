@@ -16,6 +16,7 @@ _REQUIRED_MARKERS = (
     "KOZO_EARLY_2_SERIAL_INIT_OK",
     "KOZO_BOOT_SMOKE_OK",
     "KOZO_STACK_INIT_OK",
+    "KOZO_MEMORY_INIT_OK",
 )
 _REQUIRED_OUTCOMES = ("pass", "blocked")
 _REQUIRED_BLOCKERS = (
@@ -26,6 +27,7 @@ _REQUIRED_BLOCKERS = (
     "serial_not_initialized",
     "marker_not_emitted",
     "stack_marker_not_emitted",
+    "memory_marker_not_emitted",
     "qemu_timeout",
     "missing_qemu_tooling",
     "missing_boot_image",
@@ -43,7 +45,7 @@ _REQUIRED_NON_GOALS = (
     "interrupt handling",
     "Odin runtime execution",
     "general stack readiness",
-    "memory initialization",
+    "general memory management",
     "syscall dispatch",
     "userspace execution",
     "process model behavior",

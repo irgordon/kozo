@@ -2,15 +2,15 @@
   "version": 0,
   "architecture": "x86_64",
   "current_state": {
-    "runtime_path": "boot_smoke_to_stack_evidence_to_halt",
+    "runtime_path": "boot_smoke_to_stack_and_memory_evidence_to_halt",
     "halt_contract": "contracts/runtime_halt_contract.v0.json",
     "progression_stages_contract": "contracts/runtime_progression_stages.v0.json",
     "stack_initialization_evidence_contract": "contracts/stack_initialization_evidence_contract.v0.json",
     "stage": "MEMORY_INITIALIZATION_EVIDENCE",
-    "implemented": false
+    "implemented": true
   },
   "memory_definition": {
-    "description": "Memory initialization means future x86_64 boot code has zero-filled the entire contract-owned static region, completed the bounded write/read survival probe, and emitted governed evidence before returning to the halt path."
+    "description": "Memory initialization means x86_64 boot code has zero-filled the entire contract-owned static region, completed the bounded write/read survival probe, and emitted governed evidence before returning to the halt path."
   },
   "controlled_region": {
     "source_file": "kernel/arch/x86_64/boot.asm",
@@ -45,8 +45,8 @@
   },
   "marker_placement": {
     "reserved_marker": "KOZO_MEMORY_INIT_OK",
-    "marker_status": "reserved",
-    "marker_emitted": false,
+    "marker_status": "emitted",
+    "marker_emitted": true,
     "required_after": [
       "controlled_region_zero_fill",
       "survival_probe_success"
@@ -99,7 +99,7 @@
     "memory_initialization_evidence"
   ],
   "non_goals": [
-    "memory initialization implementation",
+    "general memory management",
     "physical memory discovery",
     "paging implementation",
     "virtual memory management",

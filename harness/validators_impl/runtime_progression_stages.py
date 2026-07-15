@@ -12,7 +12,7 @@ from harness.validator import BaseValidator, ValidationResult
 
 _CONTRACT_PATH = runtime_progression_stages.CONTRACT_PATH
 _EXPECTED_ARCHITECTURE = "x86_64"
-_EXPECTED_RUNTIME_PATH = "boot_smoke_to_stack_evidence_to_halt"
+_EXPECTED_RUNTIME_PATH = "boot_smoke_to_stack_and_memory_evidence_to_halt"
 _EXPECTED_TERMINAL_BEHAVIOR = "halt_loop"
 _REQUIRED_STAGE_NAMES = frozenset(
     {
@@ -57,7 +57,7 @@ _REQUIRED_NON_GOALS = (
     "runtime progression execution",
     "halt loop replacement",
     "general stack readiness",
-    "memory initialization",
+    "general memory management",
     "Odin runtime execution",
     "interrupt handling",
     "scheduler behavior",

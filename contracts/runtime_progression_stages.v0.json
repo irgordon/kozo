@@ -2,7 +2,7 @@
   "version": 0,
   "architecture": "x86_64",
   "current_state": {
-    "path": "boot_smoke_to_stack_evidence_to_halt",
+    "path": "boot_smoke_to_stack_and_memory_evidence_to_halt",
     "halt_contract": "contracts/runtime_halt_contract.v0.json",
     "progression_contract": "contracts/runtime_progression_contract.v0.json",
     "progression_entry_contract": "contracts/runtime_progression_entry_contract.v0.json",
@@ -72,8 +72,8 @@
     {
       "stage_id": 2,
       "stage_name": "MEMORY_INITIALIZATION_EVIDENCE",
-      "description": "Future evidence proves the minimal governed memory initialization boundary after stack evidence.",
-      "status": "planned",
+      "description": "Evidence proves the governed static memory initialization boundary after stack evidence.",
+      "status": "proven",
       "required_prerequisites": [
         "STACK_INITIALIZATION_EVIDENCE"
       ],
@@ -86,7 +86,7 @@
       ],
       "required_validators": [
         "memory_initialization_evidence_contract",
-        "planned:memory_initialization_evidence"
+        "memory_initialization_evidence"
       ],
       "allowed_next_stages": [
         "RUNTIME_PROGRESSION_ENTRY"
@@ -285,7 +285,7 @@
     "runtime progression execution",
     "halt loop replacement",
     "general stack readiness",
-    "memory initialization",
+    "general memory management",
     "Odin runtime execution",
     "interrupt handling",
     "scheduler behavior",

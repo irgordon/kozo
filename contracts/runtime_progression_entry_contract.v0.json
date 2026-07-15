@@ -2,7 +2,7 @@
   "version": 0,
   "architecture": "x86_64",
   "current_state": {
-    "path": "boot_smoke_to_stack_evidence_to_halt",
+    "path": "boot_smoke_to_stack_and_memory_evidence_to_halt",
     "halt_contract": "contracts/runtime_halt_contract.v0.json",
     "progression_contract": "contracts/runtime_progression_contract.v0.json",
     "progression_stages_contract": "contracts/runtime_progression_stages.v0.json",
@@ -50,7 +50,7 @@
   "non_goals": [
     "runtime progression execution",
     "general stack readiness",
-    "memory initialization",
+    "general memory management",
     "Odin runtime execution",
     "userspace execution",
     "interrupt handling",

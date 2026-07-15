@@ -10,7 +10,7 @@ from harness.validator import BaseValidator, ValidationResult
 
 _CONTRACT_PATH = contract_module.CONTRACT_PATH
 _EXPECTED_ARCHITECTURE = "x86_64"
-_EXPECTED_RUNTIME_PATH = "boot_smoke_to_stack_evidence_to_halt"
+_EXPECTED_RUNTIME_PATH = "boot_smoke_to_stack_and_memory_evidence_to_halt"
 _EXPECTED_STAGE = "MEMORY_INITIALIZATION_EVIDENCE"
 _EXPECTED_SOURCE_FILE = "kernel/arch/x86_64/boot.asm"
 _EXPECTED_REGION_SECTION = ".bss"
@@ -35,7 +35,7 @@ _EXPECTED_PROBE_STEPS = (
     "restore_fill_value",
 )
 _EXPECTED_MARKER = "KOZO_MEMORY_INIT_OK"
-_EXPECTED_MARKER_STATUS = "reserved"
+_EXPECTED_MARKER_STATUS = "emitted"
 _EXPECTED_MARKER_AFTER = (
     "controlled_region_zero_fill",
     "survival_probe_success",
@@ -79,7 +79,7 @@ _REQUIRED_ASSUMPTIONS_NOT_ENABLED = (
     "production readiness",
 )
 _REQUIRED_NON_GOALS = (
-    "memory initialization implementation",
+    "general memory management",
     "physical memory discovery",
     "paging implementation",
     "virtual memory management",
@@ -118,7 +118,7 @@ class MemoryInitializationEvidenceContractValidator(BaseValidator):
             return _failure(issue)
         return ValidationResult.pass_(
             code=OK,
-            detail="Memory evidence contract defines an implementation-ready future proof boundary",
+            detail="Memory evidence contract defines the implemented static-region proof boundary",
         )
 
 
@@ -155,17 +155,17 @@ def _current_state_issue(
         _expected_issue(contract.architecture, _EXPECTED_ARCHITECTURE, "wrong_architecture", "architecture"),
         _expected_issue(state.runtime_path, _EXPECTED_RUNTIME_PATH, "wrong_runtime_path", "current_state.runtime_path"),
         _expected_issue(state.stage, _EXPECTED_STAGE, "wrong_stage", "current_state.stage"),
-        _planning_state_issue(state.implemented),
+        _implementation_state_issue(state.implemented),
     )
 
 
-def _planning_state_issue(implemented: bool) -> MemoryEvidenceIssue | None:
-    if implemented is False:
+def _implementation_state_issue(implemented: bool) -> MemoryEvidenceIssue | None:
+    if implemented is True:
         return None
     return _issue(
-        "memory_implementation_claimed",
+        "memory_implementation_missing",
         "current_state.implemented",
-        "Memory evidence must remain planned during contract hardening",
+        "Memory evidence contract must record the implemented proof path",
     )
 
 
@@ -447,9 +447,9 @@ def _marker_ownership_issue(marker: contract_module.MarkerPlacement) -> MemoryEv
 
 
 def _marker_emission_issue(emitted: bool) -> MemoryEvidenceIssue | None:
-    if emitted is False:
+    if emitted is True:
         return None
-    return _issue("marker_claimed", "marker_placement.marker_emitted", "KOZO_MEMORY_INIT_OK remains reserved in v0.7.3")
+    return _issue("marker_not_emitted", "marker_placement.marker_emitted", "KOZO_MEMORY_INIT_OK must be emitted by the governed memory evidence path")
 
 
 def _governance_lists_issue(
@@ -554,6 +554,6 @@ def _failure(issue: MemoryEvidenceIssue) -> ValidationResult:
     return ValidationResult.fail(
         code=MEMORY_INITIALIZATION_EVIDENCE_CONTRACT_INVALID,
         detail=issue.detail,
-        action="Keep memory evidence planning aligned with the hardened implementation boundary",
+        action="Keep memory evidence aligned with the implemented static-region proof boundary",
         meta={"reason": issue.reason, "contract_field": issue.contract_field},
     )

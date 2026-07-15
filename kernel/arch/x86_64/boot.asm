@@ -2,6 +2,8 @@ bits 64
 
 extern kernel_entry
 global _start
+global boot_memory_region
+global boot_memory_region_end
 
 %define COM1 0x03f8
 %define COM1_INTERRUPT_ENABLE 0x03f9
@@ -60,6 +62,11 @@ boot_stack:
     resb 16384
 boot_stack_top:
 
+align 4096
+boot_memory_region:
+    resb 4096
+boot_memory_region_end:
+
 section .note.GNU-stack
 section .rodata
 
@@ -83,6 +90,10 @@ stack_init_marker:
     db "KOZO_STACK_INIT_OK", 13, 10
 stack_init_marker_end:
 
+memory_init_marker:
+    db "KOZO_MEMORY_INIT_OK", 13, 10
+memory_init_marker_end:
+
 section .text
 
 _start:
@@ -97,6 +108,26 @@ _start:
     push rax
     pop rax
     WRITE_COM1_MARKER stack_init_marker, stack_init_marker_end
+    ; Terminal evidence path clobbers rax, rcx, rdi, rdx, and r8 before halting.
+    cld
+    lea rdi, [rel boot_memory_region]
+    xor eax, eax
+    mov ecx, 512
+    rep stosq
+    cli
+    cmp qword [rel boot_memory_region], 0
+    jne .halt
+    mov rax, 0x4b4f5a4f4d454d31
+    mov qword [rel boot_memory_region], rax
+    mov rdx, qword [rel boot_memory_region]
+    cmp rdx, rax
+    sete r8b
+    mov qword [rel boot_memory_region], 0
+    test r8b, r8b
+    jz .halt
+    cmp qword [rel boot_memory_region], 0
+    jne .halt
+    WRITE_COM1_MARKER memory_init_marker, memory_init_marker_end
     cli
 
 .halt:

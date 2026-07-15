@@ -5,16 +5,18 @@
     "KOZO_EARLY_1_SERIAL_INIT_START",
     "KOZO_EARLY_2_SERIAL_INIT_OK",
     "KOZO_BOOT_SMOKE_OK",
-    "KOZO_STACK_INIT_OK"
+    "KOZO_STACK_INIT_OK",
+    "KOZO_MEMORY_INIT_OK"
   ],
   "smoke_marker_order": [
     "KOZO_EARLY_0_ENTRY",
     "KOZO_EARLY_1_SERIAL_INIT_START",
     "KOZO_EARLY_2_SERIAL_INIT_OK",
     "KOZO_BOOT_SMOKE_OK",
-    "KOZO_STACK_INIT_OK"
+    "KOZO_STACK_INIT_OK",
+    "KOZO_MEMORY_INIT_OK"
   ],
-  "expected_smoke_marker": "KOZO_STACK_INIT_OK",
+  "expected_smoke_marker": "KOZO_MEMORY_INIT_OK",
   "smoke_outcomes": [
     "pass",
     "blocked"
@@ -27,6 +29,7 @@
     "serial_not_initialized": "KOZO entry was observed but serial initialization completion was absent.",
     "marker_not_emitted": "Early serial initialization was observed but the boot smoke marker was absent.",
     "stack_marker_not_emitted": "The boot smoke marker was observed but the stack initialization marker was absent.",
+    "memory_marker_not_emitted": "The stack initialization marker was observed but the memory initialization marker was absent.",
     "qemu_timeout": "QEMU execution timed out before a passing smoke sequence was observed.",
     "missing_qemu_tooling": "QEMU tooling is unavailable.",
     "missing_boot_image": "The QEMU smoke script cannot find the boot image.",
@@ -46,6 +49,7 @@
     "serial_not_initialized",
     "marker_not_emitted",
     "stack_marker_not_emitted",
+    "memory_marker_not_emitted",
     "qemu_timeout",
     "missing_qemu_tooling",
     "missing_boot_image",
@@ -63,6 +67,7 @@
     "serial_not_initialized",
     "marker_not_emitted",
     "stack_marker_not_emitted",
+    "memory_marker_not_emitted",
     "qemu_timeout",
     "missing_qemu_tooling",
     "missing_boot_image",
@@ -83,7 +88,7 @@
   "pass_condition": {
     "outcome": "pass",
     "required_marker_sequence": "full_ordered_smoke_marker_sequence",
-    "expected_marker": "KOZO_STACK_INIT_OK"
+    "expected_marker": "KOZO_MEMORY_INIT_OK"
   },
   "blocked_condition": {
     "outcome": "blocked",
@@ -94,7 +99,7 @@
     "interrupt handling",
     "Odin runtime execution",
     "general stack readiness",
-    "memory initialization",
+    "general memory management",
     "syscall dispatch",
     "userspace execution",
     "process model behavior",

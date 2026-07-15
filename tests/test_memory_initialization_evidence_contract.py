@@ -32,7 +32,8 @@ KOZO_NEGATIVE_COVERAGE = {
         "missing_evidence_requirement": "test_fails_when_evidence_requirement_is_missing",
         "missing_assumption_mapping": "test_fails_when_assumption_mapping_is_missing",
         "missing_non_goal": "test_fails_when_non_goal_is_missing",
-        "marker_claimed": "test_fails_when_memory_marker_is_marked_emitted",
+        "marker_not_emitted": "test_fails_when_memory_marker_is_not_marked_emitted",
+        "memory_implementation_missing": "test_fails_when_memory_implementation_is_not_recorded",
         "diagnostic_names_field": "test_failure_diagnostic_names_field",
     }
 }
@@ -194,13 +195,21 @@ class MemoryInitializationEvidenceContractValidatorTests(unittest.TestCase):
             "marker_placement.required_before",
         )
 
-    def test_fails_when_memory_marker_is_marked_emitted(self):
+    def test_fails_when_memory_marker_is_not_marked_emitted(self):
         result = self.validate_fixture(
-            mutate_contract=replace_section("marker_placement", marker_emitted=True)
+            mutate_contract=replace_section("marker_placement", marker_emitted=False)
         )
 
         self.assertEqual(result.status, "fail")
-        self.assert_memory_failure(result, "marker_claimed", "marker_placement.marker_emitted")
+        self.assert_memory_failure(result, "marker_not_emitted", "marker_placement.marker_emitted")
+
+    def test_fails_when_memory_implementation_is_not_recorded(self):
+        result = self.validate_fixture(
+            mutate_contract=replace_section("current_state", implemented=False)
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_memory_failure(result, "memory_implementation_missing", "current_state.implemented")
 
     def test_fails_when_prerequisite_is_missing(self):
         result = self.validate_fixture(
