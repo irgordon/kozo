@@ -2852,7 +2852,7 @@
       {
         "tool": "Python unit discovery",
         "command": "python3 -m unittest discover -s tests",
-        "status": "passed_601_tests"
+        "status": "passed_603_tests"
       },
       {
         "tool": "Odin check",
@@ -2890,7 +2890,7 @@
       "The verify artifact is only authoritative when the current tree reproduces it via scripts/verify.sh",
       "runtime evidence taxonomy is authoritative for marker and blocker vocabulary; generated smoke metadata remains evidence and does not define taxonomy authority.",
       "Runtime progression stages are authoritative stage governance; the graph remains acyclic and monotonic, and the halt loop remains authoritative after the bounded progression call.",
-      "Progression entry and runtime initialization remain implemented pending CI until the complete ordered runtime marker sequence is captured."
+      "Hosted CI run 29459278491 captured the complete ordered runtime marker sequence and passed runtime_progression_evidence."
     ],
     "expected_behavior": [
       "verify.sh succeeds on a clean tree and prints the generated artifact JSON before VERIFY: PASS",
@@ -3029,7 +3029,7 @@
       "v0.7.0 implements controlled boot stack evidence by setting rsp to boot_stack_top, probing stack use, emitting KOZO_STACK_INIT_OK, extending the governed marker sequence, and preserving no memory/runtime/userspace/compatibility/production claims.",
       "v0.7.2 orders BOOT_SMOKE, STACK_INITIALIZATION_EVIDENCE, MEMORY_INITIALIZATION_EVIDENCE, and RUNTIME_PROGRESSION_ENTRY monotonically, leaves stack proven and later stages planned, and validates graph and authority integrity.",
       "v0.7.4 implements the contract-owned 4096-byte static memory region, explicit zero fill, bounded sentinel write/read/compare/restore probe, KOZO_MEMORY_INIT_OK marker, and unchanged terminal halt loop.",
-      "v0.7.45 locally implements the bounded assembly-to-Odin call, fixed bootstrap context validation, static-state probe, runtime markers, exact return status check, and preserved terminal halt; CI marker acceptance remains pending."
+      "v0.7.45 is accepted by hosted CI marker and validator evidence for the bounded assembly-to-Odin call, fixed bootstrap context validation, volatile static-state probe, exact return status, and preserved terminal halt."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },

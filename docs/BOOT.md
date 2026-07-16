@@ -106,9 +106,9 @@ Latest inspected v0.5.4 CI smoke status: CI run `27894312430` produced passing Q
 
 Current v0.6.0 runtime halt baseline: `contracts/runtime_halt_contract.v0.json` and `runtime_halt_contract` validate that `kernel/arch/x86_64/boot.asm` emits `KOZO_BOOT_SMOKE_OK` before entering a deterministic `cli`/`hlt` loop with no structural fallthrough.
 
-Current runtime progression governance: `contracts/runtime_progression_stages.v0.json` owns the canonical order and allowed transitions, while `contracts/runtime_progression_contract.v0.json` owns halt-preservation requirements. Stack and controlled-memory evidence are proven. Progression entry and minimal runtime initialization are implemented locally and remain pending CI evidence. The halt loop remains authoritative after the bounded call.
+Current runtime progression governance: `contracts/runtime_progression_stages.v0.json` owns the canonical order and allowed transitions, while `contracts/runtime_progression_contract.v0.json` owns halt-preservation requirements. Stack, controlled-memory, progression-entry, and minimal runtime-initialization evidence are proven by hosted CI run `29459278491`. The halt loop remains authoritative after the bounded call.
 
-Current v0.7.45 runtime progression entry: `contracts/runtime_progression_entry_contract.v0.json` governs the implemented assembly-to-Odin boundary, bootstrap context, marker ownership, exact success status, and return continuation. Source and ELF validation prove the structure exists locally; progression remains unproven until CI captures the ordered runtime markers.
+Current v0.7.45 runtime progression entry: `contracts/runtime_progression_entry_contract.v0.json` governs the assembly-to-Odin boundary, bootstrap context, marker ownership, exact success status, and return continuation. Hosted CI captured the ordered runtime markers and passed the progression validator. This proves only the bounded governed path described by the contract.
 
 Current v0.6.6 runtime progression stage governance: `contracts/runtime_progression_stages.v0.json` is the authoritative model for the planned progression from `BOOT_SMOKE` to `USERSPACE_PLANNING`. It defines stage ordering, prerequisites, evidence, transition rules, and forbidden shortcuts. It does not implement runtime progression or replace the halt behavior.
 
@@ -210,7 +210,7 @@ The previous `missing_bootable_iso_packaging` blocker was refined to `missing_li
 
 The previous `missing_limine_iso_tooling` blocker is refined by `docs/BOOT_TOOLING.md`.
 
-The QEMU serial smoke, stack evidence, and controlled-memory evidence paths are proven. The bounded progression-entry and minimal Odin initialization paths are implemented locally pending CI marker evidence. If CI accepts v0.7.45, the next implementation phase is `v0.7.5 Controlled Runtime Loop`.
+The QEMU serial smoke, stack evidence, controlled-memory evidence, bounded progression entry, and minimal Odin initialization paths are proven. The next implementation phase is `v0.7.5 Controlled Runtime Loop`.
 
 The existing QEMU smoke command writes blocked or passing metadata to `artifacts/runtime/qemu_smoke.metadata.json` and serial output to `artifacts/runtime/qemu_smoke.log`.
 

@@ -2,7 +2,7 @@
 
 ## v0.7.45 - 2026-07-15
 
-**Status:** Runtime progression and minimal runtime initialization implemented locally; CI acceptance pending.
+**Status:** Accepted by hosted CI marker and validator evidence.
 
 ### Added
 
@@ -14,7 +14,7 @@
 ### Changed
 
 * Extended the governed marker sequence through `KOZO_RUNTIME_PROGRESS_ENTRY`, `KOZO_RUNTIME_INIT_OK`, and `KOZO_RUNTIME_RETURN_OK`.
-* Marked `RUNTIME_PROGRESSION_ENTRY` and `RUNTIME_INITIALIZATION_EVIDENCE` implemented pending CI while leaving `CONTROLLED_RUNTIME_LOOP` planned.
+* Marked `RUNTIME_PROGRESSION_ENTRY` and `RUNTIME_INITIALIZATION_EVIDENCE` proven after hosted CI run `29459278491` captured the exact nine-marker sequence and passed `runtime_progression_evidence`; `CONTROLLED_RUNTIME_LOOP` remains planned.
 
 ### Notes
 

@@ -100,8 +100,8 @@
     {
       "stage_id": 3,
       "stage_name": "RUNTIME_PROGRESSION_ENTRY",
-            "description": "Implemented assembly code enters the bounded Odin runtime path after stack and memory evidence; CI evidence remains required for proof.",
-            "status": "implemented_pending_ci",
+            "description": "Hosted QEMU evidence proves assembly enters the bounded Odin runtime path after stack and memory evidence.",
+            "status": "proven",
       "required_prerequisites": [
         "MEMORY_INITIALIZATION_EVIDENCE"
       ],
@@ -132,8 +132,8 @@
     {
       "stage_id": 4,
       "stage_name": "RUNTIME_INITIALIZATION_EVIDENCE",
-            "description": "Implemented Odin code validates bootstrap context and performs a bounded runtime-state probe; CI evidence remains required for proof.",
-            "status": "implemented_pending_ci",
+            "description": "Hosted QEMU evidence proves Odin validates the bootstrap context, completes the bounded volatile runtime-state probe, and returns through the governed continuation.",
+            "status": "proven",
       "required_prerequisites": [
         "RUNTIME_PROGRESSION_ENTRY"
       ],

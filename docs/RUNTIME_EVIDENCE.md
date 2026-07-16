@@ -66,7 +66,7 @@ v0.7.0 implements the governed stack initialization evidence path. `_start` sets
 
 v0.7.3 hardens `contracts/memory_initialization_evidence_contract.v0.json` into an implementation-ready boundary. v0.7.4 implements its static region, explicit zero fill, bounded sentinel write/read/compare/restore probe, `KOZO_MEMORY_INIT_OK` emission, and unchanged terminal halt path. The generated kernel ELF report records the region symbol addresses, computed size, and required-alignment result so validation does not depend on source structure alone. This does not prove physical memory discovery, paging, virtual memory management, allocation, Odin runtime execution, progression entry, userspace, compatibility, or production readiness.
 
-v0.7.45 implements a bounded assembly-to-Odin call after memory evidence. Assembly emits `KOZO_RUNTIME_PROGRESS_ENTRY`, calls the exported Odin entry with a fixed versioned context, requires exact status zero, emits `KOZO_RUNTIME_RETURN_OK`, and enters the terminal halt path. Odin validates the context, performs a static-state write/read/restore probe, and causes `KOZO_RUNTIME_INIT_OK` to be emitted through a fixed assembly bridge. These stages remain implemented pending CI until QEMU captures the ordered sequence.
+v0.7.45 implements a bounded assembly-to-Odin call after memory evidence. Assembly emits `KOZO_RUNTIME_PROGRESS_ENTRY`, calls the exported Odin entry with a fixed versioned context, requires exact status zero, emits `KOZO_RUNTIME_RETURN_OK`, and enters the terminal halt path. Odin validates the context, performs a volatile static-state write/read/restore probe, and causes `KOZO_RUNTIME_INIT_OK` to be emitted through a fixed assembly bridge. Hosted CI run `29459278491` captured the exact ordered sequence and passed `runtime_progression_evidence`, proving these two bounded stages.
 
 Current local boot blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
 
@@ -325,7 +325,7 @@ FIRST_GOVERNED_RUNTIME_CAPABILITY
 USERSPACE_PLANNING
 ```
 
-This stage model is not runtime evidence. It is the sole authority for stage order and allowed transitions, requires each mandatory prerequisite to be an earlier proven stage before promotion, and assigns one proof-boundary owner to every transition. The current status is boot, stack, and memory evidence proven; progression entry and runtime initialization implemented pending CI; and later stages planned.
+This stage model is not runtime evidence. It is the sole authority for stage order and allowed transitions, requires each mandatory prerequisite to be an earlier proven stage before promotion, and assigns one proof-boundary owner to every transition. The current status is boot, stack, memory, progression-entry, and runtime-initialization evidence proven; later stages remain planned.
 
 The selected boot protocol is documented in:
 

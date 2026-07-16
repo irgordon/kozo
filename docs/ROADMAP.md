@@ -95,11 +95,11 @@ The current repository proves:
 * CI-proven QEMU serial smoke evidence with the full ordered marker sequence
 * governed post-smoke terminal behavior through `contracts/runtime_halt_contract.v0.json`
 * governed future halt-to-runtime transition planning through `contracts/runtime_progression_contract.v0.json`
-* governed internal progression boundary through `contracts/runtime_progression_entry_contract.v0.json`, implemented locally and pending CI execution evidence
+* governed internal progression boundary through `contracts/runtime_progression_entry_contract.v0.json`, proven by hosted CI marker and validator evidence
 * governed, acyclic runtime progression stage ordering and transition ownership through `contracts/runtime_progression_stages.v0.json`
 * governed stack initialization evidence through `contracts/stack_initialization_evidence_contract.v0.json` and `stack_initialization_evidence`
 * governed static-memory initialization evidence through `contracts/memory_initialization_evidence_contract.v0.json` and `memory_initialization_evidence`, accepted by the CI validator gate without manual artifact inspection
-* locally implemented internal assembly-to-Odin progression boundary and bounded Odin state probe, pending CI marker evidence
+* hosted-CI-proven internal assembly-to-Odin progression boundary and bounded volatile Odin state probe
 
 The latest local generated evidence may still report missing local Limine/xorriso tooling, but CI run `27894312430` proves the narrow QEMU serial smoke path.
 
@@ -109,7 +109,7 @@ The latest local generated evidence may still report missing local Limine/xorris
 
 KOZO still does not prove:
 
-* CI-proven Odin runtime progression for v0.7.45 until the new markers are captured
+* controlled runtime-loop behavior beyond the proven bounded v0.7.45 progression path
 * complete Odin runtime readiness or dynamic initialization
 * general stack readiness beyond the controlled boot stack proof
 * general memory management beyond the governed static region
@@ -148,7 +148,7 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 4. Use `contracts/runtime_progression_stages.v0.json` as the sole authority for stage order and allowed transitions.
 5. Keep the v0.6.2 runtime progression contract as halt-preservation governance, not a second stage-order definition.
 6. Treat v0.7.4 memory evidence as accepted by the CI validator gate, while preserving the manual-artifact-inspection limitation.
-7. Validate v0.7.45 progression and runtime-initialization markers in CI before promoting either stage to proven.
+7. Preserve the accepted v0.7.45 progression and runtime-initialization evidence while governing `v0.7.5 Controlled Runtime Loop` separately.
 8. Keep the terminal halt path authoritative after the bounded Odin call.
 9. Keep physical memory discovery, paging, virtual memory management, allocators, heaps, dynamic Odin initialization, and userspace outside the current proof.
 10. After CI acceptance, scope v0.7.5 to a separately governed controlled runtime loop.

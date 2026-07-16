@@ -924,7 +924,7 @@ The next milestone became v0.7.45 bounded runtime progression after the stack an
 
 Date: 2026-07-15
 
-Status: Implemented locally; CI acceptance pending.
+Status: Accepted by hosted CI marker and validator evidence.
 
 ## 27.1 Scope
 
@@ -934,7 +934,7 @@ This phase adds one fixed System V AMD64 assembly-to-Odin call after memory evid
 
 | ID | Status | Rationale |
 | --- | --- | --- |
-| AUDIT-0745-001 | Resolved locally | Calling convention, stack alignment, red-zone policy, context layout, marker ownership, return status, linked symbols, and terminal continuation are mechanically validated. CI execution evidence remains pending. |
+| AUDIT-0745-001 | Resolved | Calling convention, stack alignment, red-zone policy, context layout, marker ownership, return status, linked symbols, volatile state-probe semantics, and terminal continuation are mechanically validated; hosted CI captured the governed marker path. |
 | AUDIT-064-002 | Deferred | `validator_coverage.py` is 1293 lines and remains above the preferred split threshold; decomposition is outside this runtime phase. |
 | AUDIT-073-001 | Deferred | The existing Rust package license metadata warning remains release-hardening work and does not affect the internal progression boundary. |
 
@@ -944,4 +944,4 @@ The internal bootstrap context is not a userspace ABI or security boundary. This
 
 ## 27.4 Next Work
 
-First accept or reject v0.7.45 from CI marker and validator evidence. If accepted, the next implementation milestone is `v0.7.5 Controlled Runtime Loop`.
+The next implementation milestone is `v0.7.5 Controlled Runtime Loop`.

@@ -94,7 +94,7 @@ Detailed evidence rules are owned by `docs/RELEASE_EVIDENCE.md`.
 The current local generated evidence proves:
 
 * `scripts/verify.sh` passes locally with 49 checks and 0 failures.
-* Unit discovery passes locally with 601 tests after the v0.7.45 coverage expansion.
+* Unit discovery passes locally with 603 tests after the v0.7.45 probe-hardening coverage expansion.
 * The kernel ELF uses higher-half PT_LOAD virtual addresses.
 * Local kernel ELF loadability reports no lower-half PHDR blocker.
 * The repository source defines the ordered evidence path through `KOZO_RUNTIME_PROGRESS_ENTRY`, Odin-dependent `KOZO_RUNTIME_INIT_OK`, and `KOZO_RUNTIME_RETURN_OK` after the existing boot, stack, and memory markers.
@@ -111,7 +111,7 @@ The current local generated evidence proves:
 * `contracts/memory_initialization_evidence_contract.v0.json` governs the implemented static-region proof boundary with fixed geometry, explicit zero-fill semantics, a bounded survival probe, and pre-halt marker placement.
 * `memory_initialization_evidence` validates the runtime source path and correlates passing QEMU metadata/log evidence or an allowed local tooling blocker.
 * v0.7.4 memory evidence is accepted by the CI validator gate; manual artifact inspection was not completed.
-* v0.7.45 marks `RUNTIME_PROGRESSION_ENTRY` and `RUNTIME_INITIALIZATION_EVIDENCE` implemented pending CI. `CONTROLLED_RUNTIME_LOOP` remains planned.
+* v0.7.45 is accepted by hosted CI run `29459278491`; `RUNTIME_PROGRESSION_ENTRY` and `RUNTIME_INITIALIZATION_EVIDENCE` are proven. `CONTROLLED_RUNTIME_LOOP` remains planned.
 * Local QEMU smoke evidence remains blocked by `missing_iso_generation_tooling` because the local environment does not provide the CI Limine/xorriso tooling path.
 
 ## Current Active Blocker
@@ -124,7 +124,7 @@ Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr
 
 ## Next Runtime Phase
 
-The immediate gate is v0.7.45 CI acceptance. If CI captures the full sequence through `KOZO_RUNTIME_RETURN_OK` and all validators pass, the next runtime phase is `v0.7.5 Controlled Runtime Loop`. It must replace neither evidence authority nor security boundaries and must remain separately governed.
+The next runtime phase is `v0.7.5 Controlled Runtime Loop`. It must replace neither evidence authority nor security boundaries and must remain separately governed.
 
 ---
 

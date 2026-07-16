@@ -234,8 +234,8 @@ def _stage_status_issue() -> RuntimeProgressionEvidenceIssue | None:
     statuses = {stage.get("stage_name"): stage.get("status") for stage in document.get("stages", []) if isinstance(stage, dict)}
     expected = {
         "MEMORY_INITIALIZATION_EVIDENCE": "proven",
-        "RUNTIME_PROGRESSION_ENTRY": "implemented_pending_ci",
-        "RUNTIME_INITIALIZATION_EVIDENCE": "implemented_pending_ci",
+        "RUNTIME_PROGRESSION_ENTRY": "proven",
+        "RUNTIME_INITIALIZATION_EVIDENCE": "proven",
         "CONTROLLED_RUNTIME_LOOP": "planned",
     }
     for stage, status in expected.items():
