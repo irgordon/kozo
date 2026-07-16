@@ -14,7 +14,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Version: `v0.7.45`
 * Date: `2026-07-15`
-* Status: Runtime progression and minimal runtime initialization implemented locally; CI acceptance pending.
+* Status: Accepted by hosted CI marker and validator evidence.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 49
 * Failed checks: 0
-* Run ID: `verify-20260715T231000Z`
-* Generated at: `2026-07-15T23:10:00Z`
+* Run ID: `verify-20260715T234051Z`
+* Generated at: `2026-07-15T23:40:51Z`
 
 ## Registered validators
 
