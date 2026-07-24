@@ -148,7 +148,31 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_runtime_return_not_reached_blocker(self):
         result = self.validate_blocked_fixture(
             "runtime_return_not_reached",
+            "\n".join(early_markers()[:16]) + "\n",
+        )
+
+        self.assertEqual(result.status, "pass")
+
+    def test_accepts_capability_dispatch_not_reached_blocker(self):
+        result = self.validate_blocked_fixture(
+            "capability_dispatch_not_reached",
             "\n".join(early_markers()[:13]) + "\n",
+        )
+
+        self.assertEqual(result.status, "pass")
+
+    def test_accepts_runtime_status_query_not_completed_blocker(self):
+        result = self.validate_blocked_fixture(
+            "runtime_status_query_not_completed",
+            "\n".join(early_markers()[:14]) + "\n",
+        )
+
+        self.assertEqual(result.status, "pass")
+
+    def test_accepts_first_governed_capability_not_proven_blocker(self):
+        result = self.validate_blocked_fixture(
+            "first_governed_capability_not_proven",
+            "\n".join(early_markers()[:15]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -658,6 +682,9 @@ def valid_doc_text() -> str:
             "KOZO_RUNTIME_LOOP_ITER_2",
             "KOZO_RUNTIME_LOOP_ITER_3",
             "KOZO_RUNTIME_LOOP_EXIT_OK",
+            "KOZO_CAPABILITY_DISPATCH_ENTER",
+            "KOZO_RUNTIME_STATUS_QUERY_OK",
+            "KOZO_FIRST_CAPABILITY_OK",
             "KOZO_RUNTIME_RETURN_OK",
         )
     )

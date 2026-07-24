@@ -28,6 +28,7 @@ _SCHEMA_PATHS = {
     "stack_initialization_evidence_contract": _SCHEMA_DIR / "stack_initialization_evidence_contract.schema.json",
     "memory_initialization_evidence_contract": _SCHEMA_DIR / "memory_initialization_evidence_contract.schema.json",
     "controlled_runtime_loop_contract": _SCHEMA_DIR / "controlled_runtime_loop_contract.schema.json",
+    "first_governed_runtime_capability": _SCHEMA_DIR / "first_governed_runtime_capability.schema.json",
 }
 
 

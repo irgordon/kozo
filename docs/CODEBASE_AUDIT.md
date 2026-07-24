@@ -952,7 +952,7 @@ The next implementation milestone is `v0.7.5 Controlled Runtime Loop`.
 
 Date: 2026-07-23
 
-Status: Implemented locally; hosted CI evidence pending.
+Status: Accepted by hosted CI marker and validator evidence.
 
 ## 28.1 Scope
 
@@ -962,10 +962,35 @@ This phase adds one bounded three-iteration Odin loop after the proven runtime i
 
 | ID | Status | Rationale |
 | --- | --- | --- |
-| AUDIT-075-001 | Resolved locally | Loop ownership, state geometry, iteration bound, accumulator result, marker order, failure ordering, ELF backward edge, terminal comparison, and halt continuation are mechanically validated. |
+| AUDIT-075-001 | Resolved | Loop ownership, state geometry, iteration bound, accumulator result, marker order, failure ordering, ELF backward edge, terminal comparison, and halt continuation are mechanically validated; hosted CI run `30057826315` captured the complete sequence. |
 | AUDIT-064-002 | Deferred | `validator_coverage.py` remains above the preferred split threshold; decomposition is outside this runtime phase. |
 | AUDIT-073-001 | Deferred | The existing Rust package license metadata warning remains release-hardening work. |
 
 ## 28.3 Boundaries
 
-This loop is not a scheduler or general runtime loop. It adds no interrupts, concurrency, userspace, allocation, process, VFS, file descriptor, compatibility, or production behavior. Hosted QEMU marker evidence is still required before the stage is proven.
+This loop is not a scheduler or general runtime loop. It adds no interrupts, concurrency, userspace, allocation, process, VFS, file descriptor, compatibility, or production behavior.
+
+---
+
+# 29. v0.8.0 First Governed Runtime Capability
+
+Date: 2026-07-23
+
+Status: Implemented locally; hosted CI evidence pending.
+
+## 29.1 Scope
+
+This phase adds one explicit internal `RUNTIME_STATUS_QUERY` after the accepted controlled loop. The path uses a fixed request, fixed response, direct switch, one handler, deterministic values, fixed marker bridges, exact statuses, linked-symbol evidence, and the existing return-to-halt continuation.
+
+## 29.2 Finding Status
+
+| ID | Status | Rationale |
+| --- | --- | --- |
+| AUDIT-080-001 | Resolved locally | Request and response geometry, field validation, unknown-capability rejection, response clearing, stage-mask limits, handler completion, marker order, ELF symbols, call edge, and halt continuation are mechanically validated. |
+| AUDIT-080-002 | Resolved locally | The primary Odin path reads top-down without a registry, function table, reflection, callbacks, variable-length input, allocation, or generalized capability framework. |
+| AUDIT-064-002 | Deferred | `validator_coverage.py` is 1379 lines and remains above the preferred split threshold; decomposition is outside this capability phase. |
+| AUDIT-073-001 | Deferred | The existing Rust package license metadata warning remains release-hardening work. |
+
+## 29.3 Boundaries
+
+The capability is same-address-space kernel execution. It is not a userspace service, privilege boundary, authentication boundary, hardware syscall path, scheduler, process model, allocator, compatibility layer, or production interface.

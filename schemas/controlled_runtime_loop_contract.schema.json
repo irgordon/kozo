@@ -53,7 +53,7 @@
       ],
       "properties": {
         "stage": {"const": "CONTROLLED_RUNTIME_LOOP"},
-        "status": {"const": "implemented_pending_ci"},
+        "status": {"const": "proven"},
         "source_file": {"const": "kernel/runtime_progression.odin"},
         "entry_symbol": {"const": "controlled_runtime_loop"},
         "predecessor_stage": {"const": "RUNTIME_INITIALIZATION_EVIDENCE"},
@@ -129,7 +129,7 @@
       "required": ["required_after", "required_before", "emission_owner", "ordered_sequence"],
       "properties": {
         "required_after": {"const": "KOZO_RUNTIME_INIT_OK"},
-        "required_before": {"const": "KOZO_RUNTIME_RETURN_OK"},
+        "required_before": {"const": "KOZO_CAPABILITY_DISPATCH_ENTER"},
         "emission_owner": {"$ref": "#/$defs/nonEmptyString"},
         "ordered_sequence": {
           "type": "array",

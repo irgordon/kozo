@@ -379,6 +379,12 @@ def _expected_blocker_from_logs(metadata: dict[str, object]) -> str | None:
     if _EARLY_MARKERS[11] in observed and _EARLY_MARKERS[12] not in observed:
         return "runtime_loop_exit_not_reached"
     if _EARLY_MARKERS[12] in observed and _EARLY_MARKERS[13] not in observed:
+        return "capability_dispatch_not_reached"
+    if _EARLY_MARKERS[13] in observed and _EARLY_MARKERS[14] not in observed:
+        return "runtime_status_query_not_completed"
+    if _EARLY_MARKERS[14] in observed and _EARLY_MARKERS[15] not in observed:
+        return "first_governed_capability_not_proven"
+    if _EARLY_MARKERS[15] in observed and _EARLY_MARKERS[16] not in observed:
         return "runtime_return_not_reached"
     if observed and observed[0] != _EARLY_MARKERS[0]:
         return "qemu_timeout"

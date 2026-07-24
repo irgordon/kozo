@@ -1,0 +1,145 @@
+{
+  "version": 0,
+  "architecture": "x86_64",
+  "capability": {
+    "canonical_name": "RUNTIME_STATUS_QUERY",
+    "canonical_identifier": "FIRST_GOVERNED_RUNTIME_CAPABILITY",
+    "numeric_identifier": 1,
+    "stage_id": 6,
+    "status": "implemented_pending_ci",
+    "source_file": "kernel/runtime_capability.odin",
+    "entry_symbol": "execute_first_governed_capability",
+    "dispatcher_symbol": "dispatch_runtime_capability",
+    "handler_symbol": "query_runtime_status"
+  },
+  "request": {
+    "version": 1,
+    "size_bytes": 16,
+    "alignment_bytes": 4,
+    "supported_flags": 0,
+    "aliasing_policy": "request_response_ranges_must_not_overlap",
+    "fields": [
+      {"name": "version", "offset_bytes": 0, "width_bytes": 4},
+      {"name": "capability_id", "offset_bytes": 4, "width_bytes": 4},
+      {"name": "flags", "offset_bytes": 8, "width_bytes": 4},
+      {"name": "reserved", "offset_bytes": 12, "width_bytes": 4}
+    ],
+    "required_zero_fields": [
+      "flags",
+      "reserved"
+    ]
+  },
+  "response": {
+    "version": 1,
+    "size_bytes": 64,
+    "alignment_bytes": 8,
+    "reported_progression_stage": 5,
+    "proven_stage_mask": 63,
+    "fields": [
+      {"name": "version", "offset_bytes": 0, "width_bytes": 4},
+      {"name": "capability_id", "offset_bytes": 4, "width_bytes": 4},
+      {"name": "status", "offset_bytes": 8, "width_bytes": 4},
+      {"name": "current_progression_stage", "offset_bytes": 12, "width_bytes": 4},
+      {"name": "proven_stage_mask", "offset_bytes": 16, "width_bytes": 8},
+      {"name": "boot_memory_region_size", "offset_bytes": 24, "width_bytes": 8},
+      {"name": "controlled_loop_iteration_limit", "offset_bytes": 32, "width_bytes": 8},
+      {"name": "controlled_loop_final_count", "offset_bytes": 40, "width_bytes": 8},
+      {"name": "controlled_loop_accumulator", "offset_bytes": 48, "width_bytes": 8},
+      {"name": "reserved", "offset_bytes": 56, "width_bytes": 8}
+    ],
+    "expected_values": {
+      "status": 0,
+      "boot_memory_region_size": 4096,
+      "controlled_loop_iteration_limit": 3,
+      "controlled_loop_final_count": 3,
+      "controlled_loop_accumulator": 6,
+      "reserved": 0
+    }
+  },
+  "statuses": {
+    "success": 0,
+    "invalid_request_pointer": 9,
+    "invalid_response_pointer": 10,
+    "unsupported_request_version": 11,
+    "unsupported_capability": 12,
+    "unsupported_flags": 13,
+    "invalid_reserved_field": 14,
+    "response_validation_failure": 15,
+    "capability_execution_failure": 16
+  },
+  "markers": {
+    "required_after": "KOZO_RUNTIME_LOOP_EXIT_OK",
+    "required_before": "KOZO_RUNTIME_RETURN_OK",
+    "emission_owner": "executed Odin code through fixed assembly bridges",
+    "ordered_sequence": [
+      "KOZO_CAPABILITY_DISPATCH_ENTER",
+      "KOZO_RUNTIME_STATUS_QUERY_OK",
+      "KOZO_FIRST_CAPABILITY_OK"
+    ]
+  },
+  "execution_order": [
+    "validate request and response boundary",
+    "clear response",
+    "emit capability dispatch entry",
+    "dispatch exact runtime status capability",
+    "validate controlled loop state",
+    "populate deterministic response",
+    "validate populated response",
+    "emit runtime status query success",
+    "validate complete capability result",
+    "emit first capability success",
+    "return exact success status"
+  ],
+  "terminal_behavior": {
+    "required_return_status": 0,
+    "return_marker": "KOZO_RUNTIME_RETURN_OK",
+    "halt_contract": "contracts/runtime_halt_contract.v0.json",
+    "fallthrough_forbidden": true
+  },
+  "required_evidence": [
+    "first governed runtime capability contract validation",
+    "fixed request and response source layout",
+    "linked dispatcher, handler, and marker bridge symbols",
+    "runtime progression call to execute_first_governed_capability",
+    "ordered QEMU evidence through KOZO_FIRST_CAPABILITY_OK",
+    "KOZO_RUNTIME_RETURN_OK after exact capability success status",
+    "runtime halt contract remains valid"
+  ],
+  "transition_ownership": [
+    "runtime_progression_stages contract owns canonical stage order and allowed transitions",
+    "first_governed_runtime_capability contract owns the CONTROLLED_RUNTIME_LOOP to FIRST_GOVERNED_RUNTIME_CAPABILITY proof boundary",
+    "runtime_halt_contract owns terminal behavior"
+  ],
+  "claim_boundary": {
+    "proves": [
+      "one versioned internal runtime status request is validated and dispatched",
+      "one fixed deterministic runtime status response is populated and validated",
+      "the response reports the accepted controlled runtime loop baseline",
+      "the governed runtime return and halt paths remain connected"
+    ],
+    "does_not_prove": [
+      "userspace capability access",
+      "privilege separation",
+      "hardware syscall entry",
+      "scheduler behavior",
+      "process model behavior",
+      "production readiness"
+    ]
+  },
+  "non_goals": [
+    "userspace execution",
+    "public userspace ABI",
+    "privilege separation",
+    "hardware syscall entry",
+    "scheduler behavior",
+    "interrupt handling",
+    "allocator behavior",
+    "general memory management",
+    "process model behavior",
+    "VFS behavior",
+    "file descriptor behavior",
+    "Linux compatibility",
+    "POSIX compatibility",
+    "production readiness"
+  ]
+}

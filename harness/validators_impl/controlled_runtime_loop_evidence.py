@@ -121,7 +121,9 @@ def _runtime_structure_issue(context: ControlledRuntimeLoopContext) -> Controlle
 def _entry_issue(lines: tuple[str, ...]) -> ControlledRuntimeLoopEvidenceIssue | None:
     expected = (
         "runtime_emit_init_marker()",
-        "return controlled_runtime_loop()",
+        "loop_status := controlled_runtime_loop()",
+        "if loop_status != RUNTIME_PROGRESSION_OK {",
+        "return loop_status",
         '@(export)',
         'controlled_runtime_loop :: proc "contextless" () -> u32 {',
         "runtime_loop_reset_state()",
@@ -263,10 +265,8 @@ def _stage_status_issue() -> ControlledRuntimeLoopEvidenceIssue | None:
         for stage in document.get("stages", [])
         if isinstance(stage, dict)
     }
-    if statuses.get("CONTROLLED_RUNTIME_LOOP") != "implemented_pending_ci":
-        return _issue("stage_status_mismatch", "runtime_progression_stages.CONTROLLED_RUNTIME_LOOP.status", "Controlled runtime loop must remain implemented_pending_ci before hosted acceptance")
-    if statuses.get("FIRST_GOVERNED_RUNTIME_CAPABILITY") != "planned":
-        return _issue("stage_status_mismatch", "runtime_progression_stages.FIRST_GOVERNED_RUNTIME_CAPABILITY.status", "First governed runtime capability must remain planned")
+    if statuses.get("CONTROLLED_RUNTIME_LOOP") != "proven":
+        return _issue("stage_status_mismatch", "runtime_progression_stages.CONTROLLED_RUNTIME_LOOP.status", "Controlled runtime loop must remain proven after hosted acceptance")
     return None
 
 

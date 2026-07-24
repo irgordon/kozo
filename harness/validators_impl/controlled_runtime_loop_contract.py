@@ -93,8 +93,8 @@ def _load_contract(path: Path):
 
 
 def _loop_issue(contract) -> ControlledRuntimeLoopContractIssue | None:
-    if contract.current_state.status != "implemented_pending_ci":
-        return _issue("wrong_stage_status", "current_state.status", "Controlled runtime loop must remain implemented_pending_ci before hosted acceptance")
+    if contract.current_state.status != "proven":
+        return _issue("wrong_stage_status", "current_state.status", "Controlled runtime loop must remain proven after hosted acceptance")
     if contract.loop.iteration_limit != 3:
         return _issue("wrong_iteration_limit", "loop.iteration_limit", "Controlled runtime loop must execute exactly three iterations")
     if not contract.loop.backward_edge_required:
@@ -119,8 +119,8 @@ def _marker_issue(contract) -> ControlledRuntimeLoopContractIssue | None:
         return _issue("wrong_marker_order", "markers.ordered_sequence", "Controlled runtime loop markers must use the governed order")
     if contract.markers.required_after != "KOZO_RUNTIME_INIT_OK":
         return _issue("wrong_marker_predecessor", "markers.required_after", "Loop entry evidence must follow runtime initialization evidence")
-    if contract.markers.required_before != "KOZO_RUNTIME_RETURN_OK":
-        return _issue("wrong_marker_successor", "markers.required_before", "Loop exit evidence must precede runtime return evidence")
+    if contract.markers.required_before != "KOZO_CAPABILITY_DISPATCH_ENTER":
+        return _issue("wrong_marker_successor", "markers.required_before", "Loop exit evidence must precede capability dispatch evidence")
     return None
 
 

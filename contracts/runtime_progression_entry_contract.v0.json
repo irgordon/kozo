@@ -104,6 +104,7 @@
     "runtime_halt_contract remains authoritative after bounded runtime progression",
     "runtime_progression_contract defines halt-preservation requirements",
     "KOZO_RUNTIME_INIT_OK must originate from executed Odin code",
+    "first governed runtime capability execution must follow controlled runtime loop completion",
     "KOZO_RUNTIME_RETURN_OK requires the exact success status",
     "CI QEMU evidence is required before progression stages are proven"
   ],

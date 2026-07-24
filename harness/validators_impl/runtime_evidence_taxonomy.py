@@ -24,6 +24,9 @@ _REQUIRED_MARKERS = (
     "KOZO_RUNTIME_LOOP_ITER_2",
     "KOZO_RUNTIME_LOOP_ITER_3",
     "KOZO_RUNTIME_LOOP_EXIT_OK",
+    "KOZO_CAPABILITY_DISPATCH_ENTER",
+    "KOZO_RUNTIME_STATUS_QUERY_OK",
+    "KOZO_FIRST_CAPABILITY_OK",
     "KOZO_RUNTIME_RETURN_OK",
 )
 _REQUIRED_OUTCOMES = ("pass", "blocked")
@@ -41,6 +44,9 @@ _REQUIRED_BLOCKERS = (
     "runtime_loop_entry_not_reached",
     "runtime_loop_iteration_incomplete",
     "runtime_loop_exit_not_reached",
+    "capability_dispatch_not_reached",
+    "runtime_status_query_not_completed",
+    "first_governed_capability_not_proven",
     "runtime_return_not_reached",
     "qemu_timeout",
     "missing_qemu_tooling",

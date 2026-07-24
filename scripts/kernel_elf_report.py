@@ -33,6 +33,14 @@ CONTROLLED_RUNTIME_LOOP_SYMBOLS = (
     "runtime_serial_write_loop_iter_3_marker",
     "runtime_serial_write_loop_exit_marker",
 )
+FIRST_CAPABILITY_SYMBOLS = (
+    "execute_first_governed_capability",
+    "dispatch_runtime_capability",
+    "query_runtime_status",
+    "runtime_serial_write_capability_dispatch_marker",
+    "runtime_serial_write_status_query_marker",
+    "runtime_serial_write_first_capability_marker",
+)
 BRANCH_MNEMONIC = re.compile(r"^j[a-z]+$")
 INSTRUCTION_LINE = re.compile(
     r"^\s*([0-9a-fA-F]+):\s+(?:(?:[0-9a-fA-F]{2})\s+)+([a-zA-Z][a-zA-Z0-9.]*)\s*(.*)$"
@@ -130,6 +138,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
             MEMORY_REGION_END_SYMBOL,
             *RUNTIME_PROGRESSION_SYMBOLS,
             *CONTROLLED_RUNTIME_LOOP_SYMBOLS,
+            *FIRST_CAPABILITY_SYMBOLS,
         ),
     )
     symbol_address = symbols.get("_start")
@@ -156,6 +165,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "memory_evidence_region": memory_evidence_region_record(symbols),
         "runtime_progression_symbols": runtime_progression_symbol_record(symbols),
         "controlled_runtime_loop": controlled_runtime_loop_record(kernel_elf, symbols),
+        "first_governed_runtime_capability": first_capability_record(kernel_elf, symbols),
         "program_header_count": header.program_header_count,
         "section_count": header.section_header_count,
         "load_segments": [segment_record(segment) for segment in load_segments],
@@ -317,6 +327,32 @@ def controlled_runtime_loop_record(
     }
 
 
+def first_capability_record(
+    kernel_elf: Path,
+    symbols: dict[str, int],
+) -> dict[str, object]:
+    instructions = parse_disassembly_instructions(
+        disassemble_symbol(kernel_elf, "runtime_progression_entry")
+    )
+    entry_address = symbols.get("execute_first_governed_capability")
+    return {
+        "symbols": symbol_record(symbols, FIRST_CAPABILITY_SYMBOLS),
+        "progression_call_present": _calls_address(instructions, entry_address),
+    }
+
+
+def _calls_address(
+    instructions: list[tuple[int, str, str]],
+    target_address: int | None,
+) -> bool:
+    if target_address is None:
+        return False
+    return any(
+        mnemonic.startswith("call") and instruction_target(operands) == target_address
+        for _, mnemonic, operands in instructions
+    )
+
+
 def symbol_record(
     symbols: dict[str, int],
     names: tuple[str, ...],
@@ -373,6 +409,10 @@ def backward_branch_records(
 def branch_target(mnemonic: str, operands: str) -> int | None:
     if BRANCH_MNEMONIC.fullmatch(mnemonic) is None:
         return None
+    return instruction_target(operands)
+
+
+def instruction_target(operands: str) -> int | None:
     match = HEX_OPERAND.search(operands)
     return int(match.group(1), 16) if match is not None else None
 
@@ -487,6 +527,7 @@ def malformed_report(kernel_elf: Path, linker_script: Path, issue: str) -> dict[
         "memory_evidence_region": memory_evidence_region_record({}),
         "runtime_progression_symbols": runtime_progression_symbol_record({}),
         "controlled_runtime_loop": controlled_runtime_loop_record(kernel_elf, {}),
+        "first_governed_runtime_capability": first_capability_record(kernel_elf, {}),
         "program_header_count": 0,
         "section_count": 0,
         "load_segments": [],

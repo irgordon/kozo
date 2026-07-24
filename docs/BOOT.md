@@ -62,7 +62,9 @@ v0.7.4 implements that governed boundary: `_start` explicitly zeroes a boot-owne
 
 v0.7.45 adds a bounded progression path after memory evidence. Assembly verifies call-site stack alignment, emits `KOZO_RUNTIME_PROGRESS_ENTRY`, calls the exported Odin `runtime_progression_entry` symbol with a fixed bootstrap context, requires exact status zero, emits `KOZO_RUNTIME_RETURN_OK`, and enters the existing halt loop. Odin validates the context, performs a static-state write/read/restore probe, and invokes a fixed assembly bridge that emits `KOZO_RUNTIME_INIT_OK` from the Odin execution path.
 
-v0.7.5 extends that bounded Odin path with `controlled_runtime_loop`. After `KOZO_RUNTIME_INIT_OK`, Odin initializes static volatile loop state, executes exactly three iterations, accumulates `1 + 2 + 3`, validates the terminal count, accumulator, status, and reserved field, and causes fixed assembly bridges to emit `KOZO_RUNTIME_LOOP_ENTER`, three ordered iteration markers, and `KOZO_RUNTIME_LOOP_EXIT_OK`. Exact status zero still controls `KOZO_RUNTIME_RETURN_OK`, after which the existing `cli`/`hlt` loop remains the only terminal path. This is implemented pending hosted CI marker evidence.
+v0.7.5 extends that bounded Odin path with `controlled_runtime_loop`. After `KOZO_RUNTIME_INIT_OK`, Odin initializes static volatile loop state, executes exactly three iterations, accumulates `1 + 2 + 3`, validates the terminal count, accumulator, status, and reserved field, and causes fixed assembly bridges to emit `KOZO_RUNTIME_LOOP_ENTER`, three ordered iteration markers, and `KOZO_RUNTIME_LOOP_EXIT_OK`. Hosted CI run `30057826315` captured that ordered sequence and passed `controlled_runtime_loop_evidence`.
+
+v0.8.0 executes one versioned internal `RUNTIME_STATUS_QUERY` after controlled-loop success. Odin validates a fixed 16-byte request and non-overlapping 64-byte response, clears the response, dispatches capability ID 1, reports only the accepted stage 0 through 5 baseline, validates every response field, and emits three fixed capability markers before exact status zero permits `KOZO_RUNTIME_RETURN_OK`. This remains same-address-space kernel execution and is implemented pending hosted CI marker evidence.
 
 No active QEMU serial smoke blocker.
 
@@ -196,9 +198,9 @@ The current source surfaces relevant to future boot work are:
 
 `artifacts/runtime/kernel_elf_report.json` records that the staged kernel ELF has an x86_64 executable format, `_start` entry alignment, PT_LOAD segments, PT_LOAD virtual and physical addresses, higher-half layout summary, and the current load-layout blocker. That report does not prove Limine has loaded the ELF or transferred control to `_start`.
 
-`kernel/arch/x86_64/boot.asm` emits `KOZO_BOOT_SMOKE_OK` after assembly-level serial initialization, establishes the controlled boot stack, initializes and probes the governed static region, and emits `KOZO_STACK_INIT_OK` followed by `KOZO_MEMORY_INIT_OK`. It then emits `KOZO_RUNTIME_PROGRESS_ENTRY`, calls the bounded Odin entry, receives the Odin-dependent `KOZO_RUNTIME_INIT_OK` through the fixed bridge, requires exact status zero, emits `KOZO_RUNTIME_RETURN_OK`, and enters the terminal halt path. Passing current QEMU evidence requires the captured serial log to contain the full expected sequence.
+`kernel/arch/x86_64/boot.asm` emits `KOZO_BOOT_SMOKE_OK` after assembly-level serial initialization, establishes the controlled boot stack, initializes and probes the governed static region, and emits `KOZO_STACK_INIT_OK` followed by `KOZO_MEMORY_INIT_OK`. It then emits `KOZO_RUNTIME_PROGRESS_ENTRY`, calls the bounded Odin entry, receives Odin-owned runtime, loop, and capability evidence through fixed bridges, requires exact status zero, emits `KOZO_RUNTIME_RETURN_OK`, and enters the terminal halt path. Passing current QEMU evidence requires the captured serial log to contain the full expected sequence.
 
-After the assembly-level `KOZO_MEMORY_INIT_OK` emission, `kernel/arch/x86_64/boot.asm` enters the governed terminal halt loop. That source-level terminal behavior is validated by `runtime_halt_contract` and does not prove hardware halt instruction semantics, interrupt handling, scheduler behavior, general stack readiness, general memory management, Odin runtime execution, syscall dispatch, or production readiness.
+After the Odin path returns exact status zero and assembly emits `KOZO_RUNTIME_RETURN_OK`, `kernel/arch/x86_64/boot.asm` enters the governed terminal halt loop. That source-level terminal behavior is validated by `runtime_halt_contract` and does not prove hardware halt instruction semantics, interrupt handling, scheduler behavior, general stack readiness, general memory management, userspace execution, syscall dispatch, or production readiness.
 
 `kernel/arch/x86_64/serial.odin` initializes COM1 serial output for the later Odin path. The v0.5.0 smoke marker is owned by the assembly entry path and is not Odin runtime, stack, memory, syscall, or hardware-trap evidence.
 
@@ -212,7 +214,7 @@ The previous `missing_bootable_iso_packaging` blocker was refined to `missing_li
 
 The previous `missing_limine_iso_tooling` blocker is refined by `docs/BOOT_TOOLING.md`.
 
-The QEMU serial smoke, stack evidence, controlled-memory evidence, bounded progression entry, and minimal Odin initialization paths are proven. The next implementation phase is `v0.7.5 Controlled Runtime Loop`.
+The QEMU serial smoke, stack evidence, controlled-memory evidence, bounded progression entry, minimal Odin initialization, and controlled runtime loop paths are proven. v0.8.0 adds the first governed internal capability locally; hosted capability marker evidence is required before promotion.
 
 The existing QEMU smoke command writes blocked or passing metadata to `artifacts/runtime/qemu_smoke.metadata.json` and serial output to `artifacts/runtime/qemu_smoke.log`.
 

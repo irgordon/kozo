@@ -16,7 +16,7 @@ KOZO_NEGATIVE_COVERAGE = {
         "missing_contract_file": "test_fails_when_contract_is_missing",
         "invalid_contract_json": "test_fails_when_contract_json_is_invalid",
         "contract_schema_violation": "test_fails_when_contract_schema_is_violated",
-        "wrong_stage_status": "test_fails_when_stage_status_is_proven_before_ci",
+        "wrong_stage_status": "test_fails_when_stage_status_is_not_proven",
         "wrong_iteration_limit": "test_fails_when_iteration_limit_is_wrong",
         "missing_backward_edge_requirement": "test_fails_when_backward_edge_is_not_required",
         "invalid_state_definition": "test_fails_when_state_definition_is_wrong",
@@ -55,8 +55,8 @@ class ControlledRuntimeLoopContractValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
         self.assert_failure(result, "contract_schema_violation", "contract")
 
-    def test_fails_when_stage_status_is_proven_before_ci(self):
-        result = self.validate_fixture(replace_section("current_state", status="proven"))
+    def test_fails_when_stage_status_is_not_proven(self):
+        result = self.validate_fixture(replace_section("current_state", status="implemented_pending_ci"))
 
         self.assertEqual(result.status, "fail")
         self.assert_failure(result, "wrong_stage_status", "current_state.status")

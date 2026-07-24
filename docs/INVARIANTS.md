@@ -90,6 +90,14 @@ Pointer forgery must not become an authority path.
 
 ---
 
+## 4.5 Internal capabilities do not imply isolation
+
+A same-address-space kernel capability may organize internal runtime behavior only within its explicit contract.
+
+Its existence must not be described as a userspace boundary, privilege separation, authentication, sandboxing, process isolation, or hardware syscall enforcement.
+
+---
+
 # 5. Contract Invariants
 
 ## 5.1 System boundaries must be contract-backed

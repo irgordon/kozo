@@ -17,6 +17,7 @@
     "halt loop remains authoritative after bounded runtime progression",
     "runtime progression must have contract-backed evidence before stage claims change",
     "runtime progression must preserve the existing QEMU smoke marker sequence until a successor evidence path is accepted",
+    "first governed runtime capability evidence must follow controlled runtime loop evidence",
     "runtime progression must update release evidence and validation before claims expand"
   ],
   "forbidden_shortcuts": [
@@ -32,6 +33,8 @@
     "memory initialization evidence contract",
     "focused validator coverage",
     "QEMU evidence for progression entry",
+    "controlled runtime loop evidence before first governed capability evidence",
+    "first governed runtime capability contract before capability stage promotion",
     "release evidence update",
     "planning document update"
   ],

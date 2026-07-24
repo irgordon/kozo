@@ -40,7 +40,10 @@ class ControlledRuntimeLoopEvidenceValidatorTests(unittest.TestCase):
 
     def test_fails_when_loop_entry_is_missing(self):
         result = self.validate_fixture(
-            mutate_runtime=lambda text: text.replace("return controlled_runtime_loop()", "return RUNTIME_PROGRESSION_OK")
+            mutate_runtime=lambda text: text.replace(
+                "loop_status := controlled_runtime_loop()",
+                "loop_status := RUNTIME_PROGRESSION_OK",
+            )
         )
 
         self.assertEqual(result.status, "fail")
@@ -149,18 +152,6 @@ class ControlledRuntimeLoopEvidenceValidatorTests(unittest.TestCase):
             result,
             "stage_status_mismatch",
             "runtime_progression_stages.CONTROLLED_RUNTIME_LOOP.status",
-        )
-
-    def test_fails_when_first_capability_is_advanced(self):
-        result = self.validate_fixture(
-            mutate_stages=replace_stage_status("FIRST_GOVERNED_RUNTIME_CAPABILITY", "implemented_pending_ci")
-        )
-
-        self.assertEqual(result.status, "fail")
-        self.assert_failure(
-            result,
-            "stage_status_mismatch",
-            "runtime_progression_stages.FIRST_GOVERNED_RUNTIME_CAPABILITY.status",
         )
 
     def test_fails_when_qemu_does_not_pass(self):

@@ -130,6 +130,8 @@ Move details into named functions.
 
 Do not force the reader to assemble behavior from scattered helpers.
 
+Runtime capability paths must remain readable as direct top-down control flow. Use intention-revealing names and isolate validation, dispatch, handling, and evidence emission only when responsibility changes. Introduce abstractions only when they remove real duplication or isolate a governed boundary; tests should target consequential failure behavior rather than incidental syntax.
+
 Good:
 
 ```python

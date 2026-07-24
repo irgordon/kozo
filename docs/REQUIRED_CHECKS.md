@@ -141,7 +141,7 @@ Full CI must run `scripts/ci_evidence_summary.sh` with `if: always()` so failure
 
 The CI evidence summary is a first-level triage surface. It does not replace `artifacts/latest_verify.json`, QEMU smoke metadata, QEMU serial/stderr logs, or boot blocker reports as generated evidence.
 
-The CI-observed timeout or loader state must be narrowed when possible. QEMU smoke metadata may report `limine_not_reached`, `kernel_not_loaded`, `kernel_entry_not_reached`, `serial_not_initialized`, `marker_not_emitted`, `stack_marker_not_emitted`, `memory_marker_not_emitted`, `runtime_progression_entry_not_reached`, `runtime_initialization_not_proven`, `runtime_loop_entry_not_reached`, `runtime_loop_iteration_incomplete`, `runtime_loop_exit_not_reached`, `runtime_return_not_reached`, `limine_lower_half_phdr`, or fallback `qemu_timeout`; all remain blockers and do not authorize a pass.
+The CI-observed timeout or runtime state must be narrowed when possible. QEMU smoke metadata blocker vocabulary is owned by `contracts/runtime_evidence_taxonomy.v0.json`, including the distinguishable capability states `capability_dispatch_not_reached`, `runtime_status_query_not_completed`, and `first_governed_capability_not_proven`; all blocked states remain evidence limitations and do not authorize a pass.
 
 Full verification runs `scripts/build_boot_image.sh` to produce `artifacts/runtime/boot_image/package_metadata.json`; while packaging is blocked, that metadata is blocker evidence rather than boot evidence.
 
@@ -175,3 +175,5 @@ Do not ignore a failing required check because generated reports look current.
 Do not treat generated reports as source truth.
 
 Do not downgrade required checks without a governance update.
+
+For v0.8.0, full CI must run `first_governed_runtime_capability` and `first_governed_runtime_capability_evidence`. Passing capability evidence requires the full taxonomy marker sequence, matching metadata/logs, linked dispatcher/handler/bridge symbols, a recorded progression call edge, and the unchanged runtime halt contract. The check proves only one internal same-address-space status query.

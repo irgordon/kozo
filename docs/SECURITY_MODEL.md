@@ -170,3 +170,5 @@ A passing proof means the current repository state satisfies governed checks. It
 `COMPATIBILITY.md` owns compatibility claim limits.
 
 The v0.7.5 controlled runtime loop introduces no new trust boundary or authority. Its state and marker bridges are boot-owned, fixed-size, and accept no userspace or externally controlled input. Successful loop evidence does not establish isolation, concurrency safety, scheduler policy, interrupt safety, userspace execution, or production security.
+
+The v0.8.0 runtime status capability remains at the same privilege level and in the same kernel address space as its caller. Its request and response validation reduce internal interface drift; they do not create authentication, authorization, isolation, a userspace boundary, or a hardware syscall boundary. The fixed response exposes no general pointers and accepts no variable-length or externally supplied data.

@@ -150,6 +150,8 @@ Current runtime evidence and runtime contract validators include:
 
 `controlled_runtime_loop_contract` validates the three-iteration state model, deterministic accumulator, marker order, exact statuses, transition ownership, and terminal continuation. `controlled_runtime_loop_evidence` separately validates volatile source operations, failure-before-success ordering, fixed marker bridges, linked symbols, retained ELF backward branch, terminal comparison, stage status, QEMU metadata/log agreement, and the unchanged halt path. Hosted QEMU evidence is required before `CONTROLLED_RUNTIME_LOOP` becomes proven.
 
+`first_governed_runtime_capability` validates capability identity, fixed request and response geometry, stage-mask meaning, status values, marker boundaries, transition ownership, claim limits, and halt continuation. `first_governed_runtime_capability_evidence` separately validates top-down source ordering, request and response defense, explicit dispatch, response population and validation, success-marker exclusion from failure paths, fixed bridges, linked symbols and call edge, stage state, and QEMU metadata/log agreement. Hosted QEMU evidence is required before `FIRST_GOVERNED_RUNTIME_CAPABILITY` becomes proven.
+
 ---
 
 # 11. Evidence and Logs

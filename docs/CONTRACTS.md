@@ -78,6 +78,7 @@ Current contract paths include:
 | Runtime progression entry contract | `contracts/runtime_progression_entry_contract.v0.json` | Internal assembly-to-Odin boundary, bounded initialization, and exact return governance |
 | Runtime progression stages contract | `contracts/runtime_progression_stages.v0.json` | Canonical future runtime progression stage model |
 | Controlled runtime loop contract | `contracts/controlled_runtime_loop_contract.v0.json` | Bounded Odin loop state, marker, status, evidence, transition, and halt-continuation boundary |
+| First governed runtime capability | `contracts/first_governed_runtime_capability.v0.json` | Versioned internal runtime status request, fixed response, dispatch, marker, claim, and halt-continuation boundary |
 | Stack initialization evidence contract | `contracts/stack_initialization_evidence_contract.v0.json` | Controlled stack proof boundary and marker evidence |
 | Memory initialization evidence contract | `contracts/memory_initialization_evidence_contract.v0.json` | Future memory proof boundary and marker reservation |
 
@@ -261,3 +262,11 @@ A contract change requires:
 `contracts/controlled_runtime_loop_contract.v0.json` owns the `RUNTIME_INITIALIZATION_EVIDENCE` to `CONTROLLED_RUNTIME_LOOP` proof boundary. It fixes the loop at three iterations, defines the static volatile state layout and final values, governs loop markers and internal statuses, requires linked ELF symbols plus a retained binary backward edge, and preserves the runtime halt contract after exact success.
 
 The contract does not authorize a scheduler, interrupts, allocation, userspace, process, VFS, file descriptor, compatibility, or production behavior.
+
+---
+
+# 21. First Governed Runtime Capability Role
+
+`contracts/first_governed_runtime_capability.v0.json` owns the `CONTROLLED_RUNTIME_LOOP` to `FIRST_GOVERNED_RUNTIME_CAPABILITY` proof boundary. It defines capability ID 1 (`RUNTIME_STATUS_QUERY`), request version 1 with a 16-byte/4-byte-aligned layout, response version 1 with a 64-byte/8-byte-aligned layout, exact status values, validation requirements, marker ownership, and terminal continuation.
+
+The response reports the last accepted baseline, stage 5 with mask `0x3f`, plus the governed 4096-byte memory-region size and executed loop values 3, 3, and 6. It does not report the capability stage as already proven. The contract creates no public ABI, userspace access, privilege separation, hardware syscall entry, scheduler, process, allocation, compatibility, or production claim.

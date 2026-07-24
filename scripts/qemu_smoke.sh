@@ -27,6 +27,9 @@ EARLY_MARKERS=(
   "KOZO_RUNTIME_LOOP_ITER_2"
   "KOZO_RUNTIME_LOOP_ITER_3"
   "KOZO_RUNTIME_LOOP_EXIT_OK"
+  "KOZO_CAPABILITY_DISPATCH_ENTER"
+  "KOZO_RUNTIME_STATUS_QUERY_OK"
+  "KOZO_FIRST_CAPABILITY_OK"
   "$EXPECTED_MARKER"
 )
 QEMU_TIMEOUT_SECONDS="${KOZO_QEMU_TIMEOUT_SECONDS:-20}"
@@ -153,7 +156,17 @@ PY
 }
 
 serial_marker_was_observed() {
-  grep -F "$EXPECTED_MARKER" "$QEMU_LOG" >/dev/null 2>&1
+  python3 - "$QEMU_LOG" "${EARLY_MARKERS[@]}" <<'PY'
+import sys
+from pathlib import Path
+
+text = Path(sys.argv[1]).read_text(errors="replace")
+position = -1
+for marker in sys.argv[2:]:
+    position = text.find(marker, position + 1)
+    if position < 0:
+        raise SystemExit(1)
+PY
 }
 
 record_qemu_blocker() {
@@ -245,6 +258,12 @@ elif markers[8] in observed and markers[11] not in observed:
 elif markers[11] in observed and markers[12] not in observed:
     print("runtime_loop_exit_not_reached")
 elif markers[12] in observed and markers[13] not in observed:
+    print("capability_dispatch_not_reached")
+elif markers[13] in observed and markers[14] not in observed:
+    print("runtime_status_query_not_completed")
+elif markers[14] in observed and markers[15] not in observed:
+    print("first_governed_capability_not_proven")
+elif markers[15] in observed and markers[16] not in observed:
     print("runtime_return_not_reached")
 elif observed and observed[0] != markers[0]:
     print("qemu_timeout")

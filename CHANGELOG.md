@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.8.0 - 2026-07-23
+
+* Implemented the versioned internal `RUNTIME_STATUS_QUERY` request and fixed-size response in Odin.
+* Added explicit request, response, dispatch, handler, stage-mask, ELF-symbol, marker-order, and halt-continuation validation.
+* Added one bounded capability dispatcher and one runtime status handler without allocation, registration, discovery, or variable-length input.
+* Emitted `KOZO_CAPABILITY_DISPATCH_ENTER`, `KOZO_RUNTIME_STATUS_QUERY_OK`, and `KOZO_FIRST_CAPABILITY_OK` only from the executed Odin path through fixed assembly bridges.
+* Recorded hosted CI acceptance of the v0.7.5 controlled runtime loop and marked the first governed capability implemented pending hosted CI evidence.
+* Preserved the controlled return and assembly halt path.
+* Added no userspace, scheduler, allocator, interrupt, ABI, syscall, compatibility, isolation, or production-readiness claim.
+
 ## v0.7.5 - 2026-07-23
 
 **Status:** Implemented locally; hosted CI evidence pending.

@@ -68,7 +68,9 @@ v0.7.3 hardens `contracts/memory_initialization_evidence_contract.v0.json` into 
 
 v0.7.45 implements a bounded assembly-to-Odin call after memory evidence. Assembly emits `KOZO_RUNTIME_PROGRESS_ENTRY`, calls the exported Odin entry with a fixed versioned context, requires exact status zero, emits `KOZO_RUNTIME_RETURN_OK`, and enters the terminal halt path. Odin validates the context, performs a volatile static-state write/read/restore probe, and causes `KOZO_RUNTIME_INIT_OK` to be emitted through a fixed assembly bridge. Hosted CI run `29459278491` captured the exact ordered sequence and passed `runtime_progression_evidence`, proving these two bounded stages.
 
-v0.7.5 implements a three-iteration controlled loop inside the already-proven Odin boundary. Local source and ELF evidence prove the contract-owned static state, volatile accesses, deterministic accumulator target, linked marker bridges, a retained binary backward branch, terminal comparisons, exact return handling, and unchanged halt continuation. `CONTROLLED_RUNTIME_LOOP` remains implemented pending CI until hosted QEMU evidence captures the five loop markers between `KOZO_RUNTIME_INIT_OK` and `KOZO_RUNTIME_RETURN_OK`.
+v0.7.5 implements a three-iteration controlled loop inside the already-proven Odin boundary. Hosted CI run `30057826315` captured the five loop markers between `KOZO_RUNTIME_INIT_OK` and `KOZO_RUNTIME_RETURN_OK`, passed 51 checks with 0 failures, and passed `controlled_runtime_loop_evidence`; `CONTROLLED_RUNTIME_LOOP` is proven.
+
+v0.8.0 adds one internal `RUNTIME_STATUS_QUERY`. Odin validates a versioned fixed request, clears a non-overlapping fixed response, emits dispatch evidence, selects one exact capability ID, validates accepted loop state, populates and validates only the accepted stage 0 through 5 baseline, emits handler and capability success evidence, and returns exact status zero to the existing assembly return-to-halt path. Local contract, source, and ELF evidence establish implementation readiness only; hosted CI must capture the three capability markers before `FIRST_GOVERNED_RUNTIME_CAPABILITY` becomes proven.
 
 Current local boot blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
 
@@ -86,7 +88,7 @@ The v0.4.8 QEMU smoke metadata records Limine entry-point evidence, expected ent
 
 The latest inspected v0.4.8 CI artifact captured `KOZO_EARLY_0_ENTRY`, so kernel entry handoff is proven for that artifact. It did not capture `KOZO_EARLY_2_SERIAL_INIT_OK`, so serial initialization remains unproven until that marker appears in captured QEMU serial output.
 
-The expected v0.7.5 QEMU serial sequence is `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, `KOZO_STACK_INIT_OK`, `KOZO_MEMORY_INIT_OK`, `KOZO_RUNTIME_PROGRESS_ENTRY`, `KOZO_RUNTIME_INIT_OK`, `KOZO_RUNTIME_LOOP_ENTER`, `KOZO_RUNTIME_LOOP_ITER_1`, `KOZO_RUNTIME_LOOP_ITER_2`, `KOZO_RUNTIME_LOOP_ITER_3`, `KOZO_RUNTIME_LOOP_EXIT_OK`, and `KOZO_RUNTIME_RETURN_OK`.
+The expected v0.8.0 QEMU serial sequence is `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, `KOZO_STACK_INIT_OK`, `KOZO_MEMORY_INIT_OK`, `KOZO_RUNTIME_PROGRESS_ENTRY`, `KOZO_RUNTIME_INIT_OK`, `KOZO_RUNTIME_LOOP_ENTER`, `KOZO_RUNTIME_LOOP_ITER_1`, `KOZO_RUNTIME_LOOP_ITER_2`, `KOZO_RUNTIME_LOOP_ITER_3`, `KOZO_RUNTIME_LOOP_EXIT_OK`, `KOZO_CAPABILITY_DISPATCH_ENTER`, `KOZO_RUNTIME_STATUS_QUERY_OK`, `KOZO_FIRST_CAPABILITY_OK`, and `KOZO_RUNTIME_RETURN_OK`.
 
 In v0.7.1 and v0.7.3, `KOZO_MEMORY_INIT_OK` was reserved planning vocabulary and was not runtime evidence. v0.7.4 replaces that planning state: runtime assembly now emits the marker only after completing the contract-defined initialization and probe, and the governed QEMU pass sequence includes it as the final expected marker.
 
@@ -327,7 +329,22 @@ FIRST_GOVERNED_RUNTIME_CAPABILITY
 USERSPACE_PLANNING
 ```
 
-This stage model is not runtime evidence. It is the sole authority for stage order and allowed transitions, requires each mandatory prerequisite to be an earlier proven stage before promotion, and assigns one proof-boundary owner to every transition. The current status is boot, stack, memory, progression-entry, and runtime-initialization evidence proven; later stages remain planned.
+This stage model is not runtime evidence. It is the sole authority for stage order and allowed transitions, requires each mandatory prerequisite to be an earlier proven stage before promotion, and assigns one proof-boundary owner to every transition. The current status is boot, stack, memory, progression-entry, runtime-initialization, and controlled-loop evidence proven; the first capability is implemented pending hosted CI, and userspace planning remains planned.
+
+The first governed runtime capability contract is:
+
+```text
+contracts/first_governed_runtime_capability.v0.json
+```
+
+Its contract and evidence validators are:
+
+```text
+first_governed_runtime_capability
+first_governed_runtime_capability_evidence
+```
+
+The contract owns request/response geometry, numeric identity, status values, stage-mask meaning, marker ownership, claim limits, and halt continuation. The evidence validator correlates source ordering, response defense, ELF symbols and call edge, stage state, and QEMU metadata/logs. This evidence does not prove userspace capability access, privilege separation, a hardware syscall entry, scheduler or process behavior, allocation, compatibility, or production readiness.
 
 The selected boot protocol is documented in:
 

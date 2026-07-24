@@ -123,11 +123,11 @@ Required checklist:
 * `artifacts/runtime/qemu_smoke.log` is reviewed when the QEMU blocker is under direct review.
 * `artifacts/runtime/qemu_smoke.stderr.log` is reviewed when the QEMU blocker is under direct review.
 * `artifacts/runtime/qemu_smoke.metadata.json` is reviewed when the QEMU blocker is under direct review.
-* QEMU smoke metadata outcome may be `blocked` with `limine_not_reached`, `kernel_not_loaded`, `kernel_entry_not_reached`, `serial_not_initialized`, `marker_not_emitted`, `qemu_timeout`, or `limine_lower_half_phdr` only as a no-boot-claim blocker.
+* QEMU smoke metadata outcome may use only a blocker governed by `contracts/runtime_evidence_taxonomy.v0.json`; capability blockers do not authorize a pass or broaden runtime claims.
 * QEMU smoke metadata early markers, observed markers, earliest marker, timeout state, and byte counts are reviewed when the QEMU blocker is under direct review.
 * QEMU smoke metadata outcome is `pass` before any QEMU boot claim is made.
 * Passing QEMU smoke metadata includes `KOZO_RUNTIME_RETURN_OK` as the expected marker.
-* Passing QEMU smoke serial output includes `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, `KOZO_STACK_INIT_OK`, `KOZO_MEMORY_INIT_OK`, `KOZO_RUNTIME_PROGRESS_ENTRY`, `KOZO_RUNTIME_INIT_OK`, and `KOZO_RUNTIME_RETURN_OK` in order.
+* Passing QEMU smoke serial output includes the taxonomy-owned sequence through `KOZO_RUNTIME_LOOP_EXIT_OK`, `KOZO_CAPABILITY_DISPATCH_ENTER`, `KOZO_RUNTIME_STATUS_QUERY_OK`, `KOZO_FIRST_CAPABILITY_OK`, and `KOZO_RUNTIME_RETURN_OK` in order.
 * `runtime_progression_entry_contract` and `runtime_progression_evidence` pass.
 * The kernel ELF report records the progression entry, bootstrap context, static state, and fixed serial bridge symbols.
 * Memory evidence review includes the contract-owned region geometry, full zero fill, bounded sentinel probe, restoration, marker order, and unchanged halt path.
@@ -282,6 +282,8 @@ Required checklist:
 The release evidence bundle shape is owned by `docs/RELEASE_EVIDENCE.md`.
 
 For v0.7.5 and later, confirm the controlled runtime loop contract and evidence validators pass, the ELF report records the linked loop symbols and backward branch, hosted QEMU evidence contains the ordered loop markers, exact return evidence follows loop exit, and the halt contract still passes. Do not promote the loop stage from local source or ELF evidence alone.
+
+For v0.8.0 and later, confirm the first capability contract and evidence validators pass, request and response validation remain explicit, the ELF report records dispatcher/handler/bridge symbols and the progression call edge, hosted QEMU evidence contains all three capability markers before runtime return, and failure paths cannot emit success markers. Do not promote the capability from local source or ELF evidence alone.
 
 ---
 

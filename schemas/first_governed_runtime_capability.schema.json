@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KOZO first governed runtime capability",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "capability",
+    "request",
+    "response",
+    "statuses",
+    "markers",
+    "execution_order",
+    "terminal_behavior",
+    "required_evidence",
+    "transition_ownership",
+    "claim_boundary",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {"const": 0},
+    "architecture": {"const": "x86_64"},
+    "capability": {"$ref": "#/$defs/capability"},
+    "request": {"$ref": "#/$defs/request"},
+    "response": {"$ref": "#/$defs/response"},
+    "statuses": {"$ref": "#/$defs/statuses"},
+    "markers": {"$ref": "#/$defs/markers"},
+    "execution_order": {"$ref": "#/$defs/nonEmptyStrings"},
+    "terminal_behavior": {"$ref": "#/$defs/terminalBehavior"},
+    "required_evidence": {"$ref": "#/$defs/nonEmptyStrings"},
+    "transition_ownership": {"$ref": "#/$defs/nonEmptyStrings"},
+    "claim_boundary": {"$ref": "#/$defs/claimBoundary"},
+    "non_goals": {"$ref": "#/$defs/nonEmptyStrings"}
+  },
+  "$defs": {
+    "nonEmptyString": {"type": "string", "pattern": ".*\\S.*"},
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/nonEmptyString"}
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_name",
+        "canonical_identifier",
+        "numeric_identifier",
+        "stage_id",
+        "status",
+        "source_file",
+        "entry_symbol",
+        "dispatcher_symbol",
+        "handler_symbol"
+      ],
+      "properties": {
+        "canonical_name": {"const": "RUNTIME_STATUS_QUERY"},
+        "canonical_identifier": {"const": "FIRST_GOVERNED_RUNTIME_CAPABILITY"},
+        "numeric_identifier": {"const": 1},
+        "stage_id": {"const": 6},
+        "status": {"const": "implemented_pending_ci"},
+        "source_file": {"const": "kernel/runtime_capability.odin"},
+        "entry_symbol": {"const": "execute_first_governed_capability"},
+        "dispatcher_symbol": {"const": "dispatch_runtime_capability"},
+        "handler_symbol": {"const": "query_runtime_status"}
+      }
+    },
+    "layoutField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "offset_bytes", "width_bytes"],
+      "properties": {
+        "name": {"$ref": "#/$defs/nonEmptyString"},
+        "offset_bytes": {"type": "integer"},
+        "width_bytes": {"type": "integer"}
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "size_bytes",
+        "alignment_bytes",
+        "supported_flags",
+        "aliasing_policy",
+        "fields",
+        "required_zero_fields"
+      ],
+      "properties": {
+        "version": {"const": 1},
+        "size_bytes": {"const": 16},
+        "alignment_bytes": {"const": 4},
+        "supported_flags": {"const": 0},
+        "aliasing_policy": {"const": "request_response_ranges_must_not_overlap"},
+        "fields": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {"$ref": "#/$defs/layoutField"}
+        },
+        "required_zero_fields": {"$ref": "#/$defs/nonEmptyStrings"}
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "size_bytes",
+        "alignment_bytes",
+        "reported_progression_stage",
+        "proven_stage_mask",
+        "fields",
+        "expected_values"
+      ],
+      "properties": {
+        "version": {"const": 1},
+        "size_bytes": {"const": 64},
+        "alignment_bytes": {"const": 8},
+        "reported_progression_stage": {"const": 5},
+        "proven_stage_mask": {"const": 63},
+        "fields": {
+          "type": "array",
+          "minItems": 10,
+          "maxItems": 10,
+          "items": {"$ref": "#/$defs/layoutField"}
+        },
+        "expected_values": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "boot_memory_region_size",
+            "controlled_loop_iteration_limit",
+            "controlled_loop_final_count",
+            "controlled_loop_accumulator",
+            "reserved"
+          ],
+          "properties": {
+            "status": {"const": 0},
+            "boot_memory_region_size": {"const": 4096},
+            "controlled_loop_iteration_limit": {"const": 3},
+            "controlled_loop_final_count": {"const": 3},
+            "controlled_loop_accumulator": {"const": 6},
+            "reserved": {"const": 0}
+          }
+        }
+      }
+    },
+    "statuses": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "success",
+        "invalid_request_pointer",
+        "invalid_response_pointer",
+        "unsupported_request_version",
+        "unsupported_capability",
+        "unsupported_flags",
+        "invalid_reserved_field",
+        "response_validation_failure",
+        "capability_execution_failure"
+      ],
+      "properties": {
+        "success": {"const": 0},
+        "invalid_request_pointer": {"const": 9},
+        "invalid_response_pointer": {"const": 10},
+        "unsupported_request_version": {"const": 11},
+        "unsupported_capability": {"const": 12},
+        "unsupported_flags": {"const": 13},
+        "invalid_reserved_field": {"const": 14},
+        "response_validation_failure": {"const": 15},
+        "capability_execution_failure": {"const": 16}
+      }
+    },
+    "markers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_after", "required_before", "emission_owner", "ordered_sequence"],
+      "properties": {
+        "required_after": {"const": "KOZO_RUNTIME_LOOP_EXIT_OK"},
+        "required_before": {"const": "KOZO_RUNTIME_RETURN_OK"},
+        "emission_owner": {"$ref": "#/$defs/nonEmptyString"},
+        "ordered_sequence": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {"$ref": "#/$defs/nonEmptyString"}
+        }
+      }
+    },
+    "terminalBehavior": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_return_status", "return_marker", "halt_contract", "fallthrough_forbidden"],
+      "properties": {
+        "required_return_status": {"const": 0},
+        "return_marker": {"const": "KOZO_RUNTIME_RETURN_OK"},
+        "halt_contract": {"const": "contracts/runtime_halt_contract.v0.json"},
+        "fallthrough_forbidden": {"const": true}
+      }
+    },
+    "claimBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proves", "does_not_prove"],
+      "properties": {
+        "proves": {"$ref": "#/$defs/nonEmptyStrings"},
+        "does_not_prove": {"$ref": "#/$defs/nonEmptyStrings"}
+      }
+    }
+  }
+}

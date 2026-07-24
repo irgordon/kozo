@@ -236,7 +236,7 @@ def _stage_status_issue() -> RuntimeProgressionEvidenceIssue | None:
         "MEMORY_INITIALIZATION_EVIDENCE": "proven",
         "RUNTIME_PROGRESSION_ENTRY": "proven",
         "RUNTIME_INITIALIZATION_EVIDENCE": "proven",
-        "CONTROLLED_RUNTIME_LOOP": "implemented_pending_ci",
+        "CONTROLLED_RUNTIME_LOOP": "proven",
     }
     for stage, status in expected.items():
         if statuses.get(stage) != status:

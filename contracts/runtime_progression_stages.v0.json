@@ -158,8 +158,8 @@
     {
       "stage_id": 5,
       "stage_name": "CONTROLLED_RUNTIME_LOOP",
-      "description": "A bounded three-iteration Odin loop is implemented after runtime initialization and before the governed return-to-halt continuation; hosted evidence remains pending.",
-      "status": "implemented_pending_ci",
+      "description": "Hosted QEMU evidence proves the bounded three-iteration Odin loop completed after runtime initialization and before the governed capability boundary.",
+      "status": "proven",
       "required_prerequisites": [
         "RUNTIME_INITIALIZATION_EVIDENCE"
       ],
@@ -185,8 +185,8 @@
     {
       "stage_id": 6,
       "stage_name": "FIRST_GOVERNED_RUNTIME_CAPABILITY",
-      "description": "Future evidence proves the first narrow runtime capability after controlled runtime progression.",
-      "status": "planned",
+      "description": "A bounded internal runtime status query is implemented after the accepted controlled loop; hosted evidence remains pending.",
+      "status": "implemented_pending_ci",
       "required_prerequisites": [
         "CONTROLLED_RUNTIME_LOOP"
       ],
@@ -195,10 +195,11 @@
         "release evidence update"
       ],
       "required_contracts": [
-        "planned:first_governed_runtime_capability_contract"
+        "contracts/first_governed_runtime_capability.v0.json"
       ],
       "required_validators": [
-        "planned:first_governed_runtime_capability_evidence"
+        "first_governed_runtime_capability",
+        "first_governed_runtime_capability_evidence"
       ],
       "allowed_next_stages": [
         "USERSPACE_PLANNING"
@@ -259,7 +260,7 @@
     {
       "from_stage": "CONTROLLED_RUNTIME_LOOP",
       "to_stage": "FIRST_GOVERNED_RUNTIME_CAPABILITY",
-      "owner_contract": "planned:first_governed_runtime_capability_contract"
+      "owner_contract": "contracts/first_governed_runtime_capability.v0.json"
     },
     {
       "from_stage": "FIRST_GOVERNED_RUNTIME_CAPABILITY",

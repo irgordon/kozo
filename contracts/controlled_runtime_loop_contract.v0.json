@@ -3,7 +3,7 @@
   "architecture": "x86_64",
   "current_state": {
     "stage": "CONTROLLED_RUNTIME_LOOP",
-    "status": "implemented_pending_ci",
+    "status": "proven",
     "source_file": "kernel/runtime_progression.odin",
     "entry_symbol": "controlled_runtime_loop",
     "predecessor_stage": "RUNTIME_INITIALIZATION_EVIDENCE",
@@ -67,7 +67,7 @@
   },
   "markers": {
     "required_after": "KOZO_RUNTIME_INIT_OK",
-    "required_before": "KOZO_RUNTIME_RETURN_OK",
+    "required_before": "KOZO_CAPABILITY_DISPATCH_ENTER",
     "emission_owner": "Odin runtime through fixed assembly bridges",
     "ordered_sequence": [
       "KOZO_RUNTIME_LOOP_ENTER",
@@ -97,7 +97,7 @@
     "linked controlled_runtime_loop and runtime_loop_state symbols",
     "kernel ELF backward branch in controlled_runtime_loop",
     "ordered QEMU evidence through KOZO_RUNTIME_LOOP_EXIT_OK",
-    "KOZO_RUNTIME_RETURN_OK after exact loop success status",
+    "KOZO_CAPABILITY_DISPATCH_ENTER after exact loop success status",
     "runtime halt contract remains valid"
   ],
   "transition_ownership": [
