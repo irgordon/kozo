@@ -139,12 +139,16 @@ Current runtime evidence and runtime contract validators include:
 * `memory_initialization_evidence_contract`
 * `memory_initialization_evidence`
 * `runtime_progression_evidence`
+* `controlled_runtime_loop_contract`
+* `controlled_runtime_loop_evidence`
 
 `runtime_progression_stages` performs graph-level validation. It rejects direct and indirect cycles, duplicate identifiers and names, unknown references, forward prerequisites, proven stages with unproven mandatory prerequisites, backward or skipped transitions, unknown contract or validator authorities, and transitions with missing or multiple owners. The traversal is deterministic and contract order remains authoritative.
 
 `memory_initialization_evidence_contract` validates the implemented memory proof specification. `memory_initialization_evidence` separately validates assembly region geometry, exact full-region zero fill, bounded 64-bit probe and restoration order, marker placement, terminal halt structure, and passing QEMU metadata/log alignment or an allowed local tooling blocker.
 
 `runtime_progression_entry_contract` validates the internal calling convention, fixed bootstrap context, bounded Odin operation, marker ownership, exact return boundary, and preserved halt authority. `runtime_progression_evidence` separately validates source ordering, linked symbols, stage status, QEMU metadata/log agreement, and the terminal halt continuation. Only passing QEMU evidence can promote the implemented runtime stages to proven.
+
+`controlled_runtime_loop_contract` validates the three-iteration state model, deterministic accumulator, marker order, exact statuses, transition ownership, and terminal continuation. `controlled_runtime_loop_evidence` separately validates volatile source operations, failure-before-success ordering, fixed marker bridges, linked symbols, retained ELF backward branch, terminal comparison, stage status, QEMU metadata/log agreement, and the unchanged halt path. Hosted QEMU evidence is required before `CONTROLLED_RUNTIME_LOOP` becomes proven.
 
 ---
 

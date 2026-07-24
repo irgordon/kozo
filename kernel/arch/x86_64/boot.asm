@@ -7,6 +7,11 @@ global boot_memory_region
 global boot_memory_region_end
 global runtime_bootstrap_context
 global runtime_serial_write_init_marker
+global runtime_serial_write_loop_enter_marker
+global runtime_serial_write_loop_iter_1_marker
+global runtime_serial_write_loop_iter_2_marker
+global runtime_serial_write_loop_iter_3_marker
+global runtime_serial_write_loop_exit_marker
 
 %define COM1 0x03f8
 %define COM1_INTERRUPT_ENABLE 0x03f9
@@ -105,6 +110,26 @@ runtime_init_marker:
     db "KOZO_RUNTIME_INIT_OK", 13, 10
 runtime_init_marker_end:
 
+runtime_loop_enter_marker:
+    db "KOZO_RUNTIME_LOOP_ENTER", 13, 10
+runtime_loop_enter_marker_end:
+
+runtime_loop_iter_1_marker:
+    db "KOZO_RUNTIME_LOOP_ITER_1", 13, 10
+runtime_loop_iter_1_marker_end:
+
+runtime_loop_iter_2_marker:
+    db "KOZO_RUNTIME_LOOP_ITER_2", 13, 10
+runtime_loop_iter_2_marker_end:
+
+runtime_loop_iter_3_marker:
+    db "KOZO_RUNTIME_LOOP_ITER_3", 13, 10
+runtime_loop_iter_3_marker_end:
+
+runtime_loop_exit_marker:
+    db "KOZO_RUNTIME_LOOP_EXIT_OK", 13, 10
+runtime_loop_exit_marker_end:
+
 runtime_return_marker:
     db "KOZO_RUNTIME_RETURN_OK", 13, 10
 runtime_return_marker_end:
@@ -171,4 +196,24 @@ _start:
 
 runtime_serial_write_init_marker:
     WRITE_COM1_MARKER runtime_init_marker, runtime_init_marker_end
+    ret
+
+runtime_serial_write_loop_enter_marker:
+    WRITE_COM1_MARKER runtime_loop_enter_marker, runtime_loop_enter_marker_end
+    ret
+
+runtime_serial_write_loop_iter_1_marker:
+    WRITE_COM1_MARKER runtime_loop_iter_1_marker, runtime_loop_iter_1_marker_end
+    ret
+
+runtime_serial_write_loop_iter_2_marker:
+    WRITE_COM1_MARKER runtime_loop_iter_2_marker, runtime_loop_iter_2_marker_end
+    ret
+
+runtime_serial_write_loop_iter_3_marker:
+    WRITE_COM1_MARKER runtime_loop_iter_3_marker, runtime_loop_iter_3_marker_end
+    ret
+
+runtime_serial_write_loop_exit_marker:
+    WRITE_COM1_MARKER runtime_loop_exit_marker, runtime_loop_exit_marker_end
     ret

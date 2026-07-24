@@ -281,6 +281,8 @@ Required checklist:
 
 The release evidence bundle shape is owned by `docs/RELEASE_EVIDENCE.md`.
 
+For v0.7.5 and later, confirm the controlled runtime loop contract and evidence validators pass, the ELF report records the linked loop symbols and backward branch, hosted QEMU evidence contains the ordered loop markers, exact return evidence follows loop exit, and the halt contract still passes. Do not promote the loop stage from local source or ELF evidence alone.
+
 ---
 
 # 14. Release Decision

@@ -148,7 +148,31 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_runtime_return_not_reached_blocker(self):
         result = self.validate_blocked_fixture(
             "runtime_return_not_reached",
+            "\n".join(early_markers()[:13]) + "\n",
+        )
+
+        self.assertEqual(result.status, "pass")
+
+    def test_accepts_runtime_loop_entry_not_reached_blocker(self):
+        result = self.validate_blocked_fixture(
+            "runtime_loop_entry_not_reached",
             "\n".join(early_markers()[:8]) + "\n",
+        )
+
+        self.assertEqual(result.status, "pass")
+
+    def test_accepts_runtime_loop_iteration_incomplete_blocker(self):
+        result = self.validate_blocked_fixture(
+            "runtime_loop_iteration_incomplete",
+            "\n".join(early_markers()[:10]) + "\n",
+        )
+
+        self.assertEqual(result.status, "pass")
+
+    def test_accepts_runtime_loop_exit_not_reached_blocker(self):
+        result = self.validate_blocked_fixture(
+            "runtime_loop_exit_not_reached",
+            "\n".join(early_markers()[:12]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -207,17 +231,9 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
 
     def test_fails_when_marker_order_is_wrong(self):
         self.assertEqual("qemu_smoke_evidence", QemuSmokeEvidenceValidator.name)
-        out_of_order = (
-            "KOZO_EARLY_0_ENTRY\n"
-            "KOZO_BOOT_SMOKE_OK\n"
-            "KOZO_EARLY_1_SERIAL_INIT_START\n"
-            "KOZO_EARLY_2_SERIAL_INIT_OK\n"
-            "KOZO_STACK_INIT_OK\n"
-            "KOZO_MEMORY_INIT_OK\n"
-            "KOZO_RUNTIME_PROGRESS_ENTRY\n"
-            "KOZO_RUNTIME_INIT_OK\n"
-            "KOZO_RUNTIME_RETURN_OK\n"
-        )
+        markers = list(early_markers())
+        markers[1], markers[3] = markers[3], markers[1]
+        out_of_order = "\n".join(markers) + "\n"
         result = self.validate_fixture(
             metadata_factory=lambda: valid_metadata("pass", serial_text=out_of_order),
             mutate_serial_log=lambda _: out_of_order,
@@ -637,6 +653,11 @@ def valid_doc_text() -> str:
             "KOZO_MEMORY_INIT_OK",
             "KOZO_RUNTIME_PROGRESS_ENTRY",
             "KOZO_RUNTIME_INIT_OK",
+            "KOZO_RUNTIME_LOOP_ENTER",
+            "KOZO_RUNTIME_LOOP_ITER_1",
+            "KOZO_RUNTIME_LOOP_ITER_2",
+            "KOZO_RUNTIME_LOOP_ITER_3",
+            "KOZO_RUNTIME_LOOP_EXIT_OK",
             "KOZO_RUNTIME_RETURN_OK",
         )
     )

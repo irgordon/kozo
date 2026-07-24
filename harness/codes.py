@@ -49,6 +49,8 @@ STACK_INITIALIZATION_EVIDENCE_CONTRACT_INVALID = "STACK_INITIALIZATION_EVIDENCE_
 STACK_INITIALIZATION_EVIDENCE_INVALID = "STACK_INITIALIZATION_EVIDENCE_INVALID"
 MEMORY_INITIALIZATION_EVIDENCE_CONTRACT_INVALID = "MEMORY_INITIALIZATION_EVIDENCE_CONTRACT_INVALID"
 MEMORY_INITIALIZATION_EVIDENCE_INVALID = "MEMORY_INITIALIZATION_EVIDENCE_INVALID"
+CONTROLLED_RUNTIME_LOOP_CONTRACT_INVALID = "CONTROLLED_RUNTIME_LOOP_CONTRACT_INVALID"
+CONTROLLED_RUNTIME_LOOP_EVIDENCE_INVALID = "CONTROLLED_RUNTIME_LOOP_EVIDENCE_INVALID"
 BOOT_BLOCKER_REPORT_INVALID = "BOOT_BLOCKER_REPORT_INVALID"
 BOOT_PROTOCOL_DECISION_INVALID = "BOOT_PROTOCOL_DECISION_INVALID"
 BOOT_IMAGE_SKELETON_INVALID = "BOOT_IMAGE_SKELETON_INVALID"
@@ -111,6 +113,8 @@ CODES = MappingProxyType(
         STACK_INITIALIZATION_EVIDENCE_INVALID: "Stack initialization evidence is missing, malformed, or inconsistent with the controlled boot stack proof",
         MEMORY_INITIALIZATION_EVIDENCE_CONTRACT_INVALID: "Memory initialization evidence contract is missing, malformed, or inconsistent with future memory proof governance",
         MEMORY_INITIALIZATION_EVIDENCE_INVALID: "Memory initialization evidence is missing, malformed, or inconsistent with the controlled static-region proof",
+        CONTROLLED_RUNTIME_LOOP_CONTRACT_INVALID: "Controlled runtime loop contract is missing, malformed, or inconsistent with bounded loop governance",
+        CONTROLLED_RUNTIME_LOOP_EVIDENCE_INVALID: "Controlled runtime loop evidence is missing, malformed, or inconsistent with source, ELF, QEMU, stage, or halt state",
         BOOT_BLOCKER_REPORT_INVALID: "Boot blocker report is missing, malformed, or inconsistent with boot baseline policy",
         BOOT_PROTOCOL_DECISION_INVALID: "Boot protocol decision is missing, incomplete, or inconsistent with boot blocker policy",
         BOOT_IMAGE_SKELETON_INVALID: "Boot image skeleton is missing, incomplete, or inconsistent with boot blocker state",

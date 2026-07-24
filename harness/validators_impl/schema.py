@@ -27,6 +27,7 @@ _SCHEMA_PATHS = {
     "runtime_progression_stages": _SCHEMA_DIR / "runtime_progression_stages.schema.json",
     "stack_initialization_evidence_contract": _SCHEMA_DIR / "stack_initialization_evidence_contract.schema.json",
     "memory_initialization_evidence_contract": _SCHEMA_DIR / "memory_initialization_evidence_contract.schema.json",
+    "controlled_runtime_loop_contract": _SCHEMA_DIR / "controlled_runtime_loop_contract.schema.json",
 }
 
 

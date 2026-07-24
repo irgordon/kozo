@@ -77,6 +77,7 @@ Current contract paths include:
 | Runtime progression contract | `contracts/runtime_progression_contract.v0.json` | Future halt-to-runtime transition governance |
 | Runtime progression entry contract | `contracts/runtime_progression_entry_contract.v0.json` | Internal assembly-to-Odin boundary, bounded initialization, and exact return governance |
 | Runtime progression stages contract | `contracts/runtime_progression_stages.v0.json` | Canonical future runtime progression stage model |
+| Controlled runtime loop contract | `contracts/controlled_runtime_loop_contract.v0.json` | Bounded Odin loop state, marker, status, evidence, transition, and halt-continuation boundary |
 | Stack initialization evidence contract | `contracts/stack_initialization_evidence_contract.v0.json` | Controlled stack proof boundary and marker evidence |
 | Memory initialization evidence contract | `contracts/memory_initialization_evidence_contract.v0.json` | Future memory proof boundary and marker reservation |
 
@@ -252,3 +253,11 @@ A contract change requires:
 `GENERATED_ARTIFACTS.md` owns generated-file edit policy.
 
 `ADR_POLICY.md` owns decision-record requirements.
+
+---
+
+# 20. Controlled Runtime Loop Contract Role
+
+`contracts/controlled_runtime_loop_contract.v0.json` owns the `RUNTIME_INITIALIZATION_EVIDENCE` to `CONTROLLED_RUNTIME_LOOP` proof boundary. It fixes the loop at three iterations, defines the static volatile state layout and final values, governs loop markers and internal statuses, requires linked ELF symbols plus a retained binary backward edge, and preserves the runtime halt contract after exact success.
+
+The contract does not authorize a scheduler, interrupts, allocation, userspace, process, VFS, file descriptor, compatibility, or production behavior.

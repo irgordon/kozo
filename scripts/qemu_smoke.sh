@@ -22,6 +22,11 @@ EARLY_MARKERS=(
   "KOZO_MEMORY_INIT_OK"
   "KOZO_RUNTIME_PROGRESS_ENTRY"
   "KOZO_RUNTIME_INIT_OK"
+  "KOZO_RUNTIME_LOOP_ENTER"
+  "KOZO_RUNTIME_LOOP_ITER_1"
+  "KOZO_RUNTIME_LOOP_ITER_2"
+  "KOZO_RUNTIME_LOOP_ITER_3"
+  "KOZO_RUNTIME_LOOP_EXIT_OK"
   "$EXPECTED_MARKER"
 )
 QEMU_TIMEOUT_SECONDS="${KOZO_QEMU_TIMEOUT_SECONDS:-20}"
@@ -234,6 +239,12 @@ elif markers[5] in observed and markers[6] not in observed:
 elif markers[6] in observed and markers[7] not in observed:
     print("runtime_initialization_not_proven")
 elif markers[7] in observed and markers[8] not in observed:
+    print("runtime_loop_entry_not_reached")
+elif markers[8] in observed and markers[11] not in observed:
+    print("runtime_loop_iteration_incomplete")
+elif markers[11] in observed and markers[12] not in observed:
+    print("runtime_loop_exit_not_reached")
+elif markers[12] in observed and markers[13] not in observed:
     print("runtime_return_not_reached")
 elif observed and observed[0] != markers[0]:
     print("qemu_timeout")

@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KOZO controlled runtime loop contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "current_state",
+    "loop",
+    "state",
+    "accumulator",
+    "markers",
+    "statuses",
+    "terminal_behavior",
+    "required_evidence",
+    "transition_ownership",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {"const": 0},
+    "architecture": {"const": "x86_64"},
+    "current_state": {"$ref": "#/$defs/currentState"},
+    "loop": {"$ref": "#/$defs/loop"},
+    "state": {"$ref": "#/$defs/state"},
+    "accumulator": {"$ref": "#/$defs/accumulator"},
+    "markers": {"$ref": "#/$defs/markers"},
+    "statuses": {"$ref": "#/$defs/statuses"},
+    "terminal_behavior": {"$ref": "#/$defs/terminalBehavior"},
+    "required_evidence": {"$ref": "#/$defs/nonEmptyStrings"},
+    "transition_ownership": {"$ref": "#/$defs/nonEmptyStrings"},
+    "non_goals": {"$ref": "#/$defs/nonEmptyStrings"}
+  },
+  "$defs": {
+    "nonEmptyString": {"type": "string", "pattern": ".*\\S.*"},
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/nonEmptyString"}
+    },
+    "currentState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stage",
+        "status",
+        "source_file",
+        "entry_symbol",
+        "predecessor_stage",
+        "successor_stage",
+        "halt_contract",
+        "progression_stages_contract"
+      ],
+      "properties": {
+        "stage": {"const": "CONTROLLED_RUNTIME_LOOP"},
+        "status": {"const": "implemented_pending_ci"},
+        "source_file": {"const": "kernel/runtime_progression.odin"},
+        "entry_symbol": {"const": "controlled_runtime_loop"},
+        "predecessor_stage": {"const": "RUNTIME_INITIALIZATION_EVIDENCE"},
+        "successor_stage": {"const": "FIRST_GOVERNED_RUNTIME_CAPABILITY"},
+        "halt_contract": {"const": "contracts/runtime_halt_contract.v0.json"},
+        "progression_stages_contract": {"const": "contracts/runtime_progression_stages.v0.json"}
+      }
+    },
+    "loop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "iteration_limit",
+        "iteration_index_origin",
+        "completion_condition",
+        "backward_edge_required",
+        "binary_evidence"
+      ],
+      "properties": {
+        "iteration_limit": {"const": 3},
+        "iteration_index_origin": {"const": 1},
+        "completion_condition": {"const": "iteration_count_equals_iteration_limit"},
+        "backward_edge_required": {"const": true},
+        "binary_evidence": {"const": "artifacts/runtime/kernel_elf_report.json"}
+      }
+    },
+    "stateField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "width_bits", "initial_value", "final_value"],
+      "properties": {
+        "name": {"$ref": "#/$defs/nonEmptyString"},
+        "width_bits": {"type": "integer"},
+        "initial_value": {"type": "integer"},
+        "final_value": {"type": "integer"}
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["symbol", "storage", "owner", "volatile_access_required", "fields"],
+      "properties": {
+        "symbol": {"const": "runtime_loop_state"},
+        "storage": {"const": "static"},
+        "owner": {"$ref": "#/$defs/nonEmptyString"},
+        "volatile_access_required": {"const": true},
+        "fields": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": {"$ref": "#/$defs/stateField"}
+        }
+      }
+    },
+    "accumulator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "expected_sequence", "expected_final_value"],
+      "properties": {
+        "operation": {"const": "add_one_based_iteration_index"},
+        "expected_sequence": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {"type": "integer"}
+        },
+        "expected_final_value": {"const": 6}
+      }
+    },
+    "markers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_after", "required_before", "emission_owner", "ordered_sequence"],
+      "properties": {
+        "required_after": {"const": "KOZO_RUNTIME_INIT_OK"},
+        "required_before": {"const": "KOZO_RUNTIME_RETURN_OK"},
+        "emission_owner": {"$ref": "#/$defs/nonEmptyString"},
+        "ordered_sequence": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": {"$ref": "#/$defs/nonEmptyString"}
+        }
+      }
+    },
+    "statuses": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "success",
+        "invalid_limit",
+        "invalid_initial_state",
+        "iteration_state_mismatch",
+        "accumulator_mismatch",
+        "terminal_count_mismatch",
+        "terminal_status_mismatch"
+      ],
+      "properties": {
+        "success": {"const": 0},
+        "invalid_limit": {"const": 3},
+        "invalid_initial_state": {"const": 4},
+        "iteration_state_mismatch": {"const": 5},
+        "accumulator_mismatch": {"const": 6},
+        "terminal_count_mismatch": {"const": 7},
+        "terminal_status_mismatch": {"const": 8}
+      }
+    },
+    "terminalBehavior": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_return_status",
+        "return_marker",
+        "halt_contract",
+        "fallthrough_forbidden"
+      ],
+      "properties": {
+        "required_return_status": {"const": 0},
+        "return_marker": {"const": "KOZO_RUNTIME_RETURN_OK"},
+        "halt_contract": {"const": "contracts/runtime_halt_contract.v0.json"},
+        "fallthrough_forbidden": {"const": true}
+      }
+    }
+  }
+}

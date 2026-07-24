@@ -413,3 +413,5 @@ P0 and P1 issues block v1.0.0 release.
 P2 issues block release candidate promotion unless explicitly waived through governance.
 
 P3 issues may be deferred when they do not weaken release claims or evidence.
+
+For v0.7.5, release review must include `contracts/controlled_runtime_loop_contract.v0.json`, `controlled_runtime_loop_contract`, `controlled_runtime_loop_evidence`, the kernel ELF report, and QEMU metadata/logs. Local contract, source, and ELF checks establish only implementation readiness. The stage is proven only after hosted CI captures the ordered loop entry, three iteration, exit, and return markers and all validators pass.

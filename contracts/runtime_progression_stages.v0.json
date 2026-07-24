@@ -100,8 +100,8 @@
     {
       "stage_id": 3,
       "stage_name": "RUNTIME_PROGRESSION_ENTRY",
-            "description": "Hosted QEMU evidence proves assembly enters the bounded Odin runtime path after stack and memory evidence.",
-            "status": "proven",
+      "description": "Hosted QEMU evidence proves assembly enters the bounded Odin runtime path after stack and memory evidence.",
+      "status": "proven",
       "required_prerequisites": [
         "MEMORY_INITIALIZATION_EVIDENCE"
       ],
@@ -116,9 +116,9 @@
       ],
       "required_validators": [
         "runtime_progression_contract",
-                "runtime_progression_entry_contract",
-                "runtime_progression_evidence",
-                "qemu_smoke_evidence"
+        "runtime_progression_entry_contract",
+        "runtime_progression_evidence",
+        "qemu_smoke_evidence"
       ],
       "allowed_next_stages": [
         "RUNTIME_INITIALIZATION_EVIDENCE"
@@ -132,20 +132,20 @@
     {
       "stage_id": 4,
       "stage_name": "RUNTIME_INITIALIZATION_EVIDENCE",
-            "description": "Hosted QEMU evidence proves Odin validates the bootstrap context, completes the bounded volatile runtime-state probe, and returns through the governed continuation.",
-            "status": "proven",
+      "description": "Hosted QEMU evidence proves Odin validates the bootstrap context, completes the bounded volatile runtime-state probe, and returns through the governed continuation.",
+      "status": "proven",
       "required_prerequisites": [
         "RUNTIME_PROGRESSION_ENTRY"
       ],
       "required_evidence": [
-                "QEMU evidence for KOZO_RUNTIME_INIT_OK",
-                "QEMU evidence for KOZO_RUNTIME_RETURN_OK"
+        "QEMU evidence for KOZO_RUNTIME_INIT_OK",
+        "QEMU evidence for KOZO_RUNTIME_RETURN_OK"
       ],
       "required_contracts": [
-                "contracts/runtime_progression_entry_contract.v0.json"
+        "contracts/runtime_progression_entry_contract.v0.json"
       ],
       "required_validators": [
-                "runtime_progression_evidence"
+        "runtime_progression_evidence"
       ],
       "allowed_next_stages": [
         "CONTROLLED_RUNTIME_LOOP"
@@ -158,20 +158,22 @@
     {
       "stage_id": 5,
       "stage_name": "CONTROLLED_RUNTIME_LOOP",
-      "description": "Future evidence proves a bounded runtime loop that replaces the halt baseline only after prerequisites are proven.",
-      "status": "planned",
+      "description": "A bounded three-iteration Odin loop is implemented after runtime initialization and before the governed return-to-halt continuation; hosted evidence remains pending.",
+      "status": "implemented_pending_ci",
       "required_prerequisites": [
         "RUNTIME_INITIALIZATION_EVIDENCE"
       ],
       "required_evidence": [
-        "QEMU evidence for controlled runtime loop",
+        "QEMU evidence through KOZO_RUNTIME_LOOP_EXIT_OK",
+        "kernel ELF evidence for a backward branch in controlled_runtime_loop",
         "release evidence update"
       ],
       "required_contracts": [
-        "planned:controlled_runtime_loop_contract"
+        "contracts/controlled_runtime_loop_contract.v0.json"
       ],
       "required_validators": [
-        "planned:controlled_runtime_loop_evidence"
+        "controlled_runtime_loop_contract",
+        "controlled_runtime_loop_evidence"
       ],
       "allowed_next_stages": [
         "FIRST_GOVERNED_RUNTIME_CAPABILITY"
@@ -247,12 +249,12 @@
     {
       "from_stage": "RUNTIME_PROGRESSION_ENTRY",
       "to_stage": "RUNTIME_INITIALIZATION_EVIDENCE",
-            "owner_contract": "contracts/runtime_progression_entry_contract.v0.json"
+      "owner_contract": "contracts/runtime_progression_entry_contract.v0.json"
     },
     {
       "from_stage": "RUNTIME_INITIALIZATION_EVIDENCE",
       "to_stage": "CONTROLLED_RUNTIME_LOOP",
-      "owner_contract": "planned:controlled_runtime_loop_contract"
+      "owner_contract": "contracts/controlled_runtime_loop_contract.v0.json"
     },
     {
       "from_stage": "CONTROLLED_RUNTIME_LOOP",
@@ -266,12 +268,12 @@
     }
   ],
   "transition_requirements": [
-        "runtime_halt_contract remains authoritative after bounded runtime progression",
+    "runtime_halt_contract remains authoritative after bounded runtime progression",
     "runtime_progression_stages contract owns canonical stage order and allowed transitions",
     "transition owner contracts own destination-stage proof boundaries",
     "evidence contracts must not redefine canonical stage order",
     "stages must advance in declared order unless a later contract explicitly supersedes this stage model",
-        "halt replacement requires a separately governed controlled runtime loop",
+    "halt replacement requires a separately governed controlled runtime loop",
     "planning stages do not constitute runtime evidence"
   ],
   "forbidden_global_shortcuts": [
@@ -283,11 +285,11 @@
     "claim production readiness from planning evidence"
   ],
   "non_goals": [
-        "runtime progression beyond the bounded entry call",
+    "runtime progression beyond the bounded entry call",
     "halt loop replacement",
     "general stack readiness",
     "general memory management",
-        "complete Odin runtime readiness",
+    "complete Odin runtime readiness",
     "interrupt handling",
     "scheduler behavior",
     "userspace execution",

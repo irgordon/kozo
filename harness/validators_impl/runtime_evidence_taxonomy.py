@@ -19,6 +19,11 @@ _REQUIRED_MARKERS = (
     "KOZO_MEMORY_INIT_OK",
     "KOZO_RUNTIME_PROGRESS_ENTRY",
     "KOZO_RUNTIME_INIT_OK",
+    "KOZO_RUNTIME_LOOP_ENTER",
+    "KOZO_RUNTIME_LOOP_ITER_1",
+    "KOZO_RUNTIME_LOOP_ITER_2",
+    "KOZO_RUNTIME_LOOP_ITER_3",
+    "KOZO_RUNTIME_LOOP_EXIT_OK",
     "KOZO_RUNTIME_RETURN_OK",
 )
 _REQUIRED_OUTCOMES = ("pass", "blocked")
@@ -33,6 +38,9 @@ _REQUIRED_BLOCKERS = (
     "memory_marker_not_emitted",
     "runtime_progression_entry_not_reached",
     "runtime_initialization_not_proven",
+    "runtime_loop_entry_not_reached",
+    "runtime_loop_iteration_incomplete",
+    "runtime_loop_exit_not_reached",
     "runtime_return_not_reached",
     "qemu_timeout",
     "missing_qemu_tooling",

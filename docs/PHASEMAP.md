@@ -93,8 +93,8 @@ Detailed evidence rules are owned by `docs/RELEASE_EVIDENCE.md`.
 
 The current local generated evidence proves:
 
-* `scripts/verify.sh` passes locally with 49 checks and 0 failures.
-* Unit discovery passes locally with 603 tests after the v0.7.45 probe-hardening coverage expansion.
+* `scripts/verify.sh` passes locally with 51 checks and 0 failures.
+* Unit discovery passes locally with 635 tests after the v0.7.5 controlled-loop coverage expansion.
 * The kernel ELF uses higher-half PT_LOAD virtual addresses.
 * Local kernel ELF loadability reports no lower-half PHDR blocker.
 * The repository source defines the ordered evidence path through `KOZO_RUNTIME_PROGRESS_ENTRY`, Odin-dependent `KOZO_RUNTIME_INIT_OK`, and `KOZO_RUNTIME_RETURN_OK` after the existing boot, stack, and memory markers.
@@ -111,7 +111,8 @@ The current local generated evidence proves:
 * `contracts/memory_initialization_evidence_contract.v0.json` governs the implemented static-region proof boundary with fixed geometry, explicit zero-fill semantics, a bounded survival probe, and pre-halt marker placement.
 * `memory_initialization_evidence` validates the runtime source path and correlates passing QEMU metadata/log evidence or an allowed local tooling blocker.
 * v0.7.4 memory evidence is accepted by the CI validator gate; manual artifact inspection was not completed.
-* v0.7.45 is accepted by hosted CI run `29459278491`; `RUNTIME_PROGRESSION_ENTRY` and `RUNTIME_INITIALIZATION_EVIDENCE` are proven. `CONTROLLED_RUNTIME_LOOP` remains planned.
+* v0.7.45 is accepted by hosted CI run `29459278491`; `RUNTIME_PROGRESSION_ENTRY` and `RUNTIME_INITIALIZATION_EVIDENCE` are proven.
+* v0.7.5 implements the contract-backed three-iteration Odin loop locally. `CONTROLLED_RUNTIME_LOOP` remains implemented pending hosted CI evidence, and `FIRST_GOVERNED_RUNTIME_CAPABILITY` remains planned.
 * Local QEMU smoke evidence remains blocked by `missing_iso_generation_tooling` because the local environment does not provide the CI Limine/xorriso tooling path.
 
 ## Current Active Blocker
@@ -124,7 +125,7 @@ Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr
 
 ## Next Runtime Phase
 
-The next runtime phase is `v0.7.5 Controlled Runtime Loop`. It must replace neither evidence authority nor security boundaries and must remain separately governed.
+The current runtime phase is `v0.7.5 Controlled Runtime Loop`. Its next phase must be selected from hosted CI evidence; local source and ELF validation do not promote the stage to proven.
 
 ---
 
@@ -178,6 +179,7 @@ The next runtime phase is `v0.7.5 Controlled Runtime Loop`. It must replace neit
 | `v0.7.3` | Memory Evidence Contract Hardening | Strengthen the planned memory evidence boundary before implementation work begins. | Hardened memory evidence contract, implementability requirements, focused validator tests, planning alignment. | Memory evidence remains planning-only, `KOZO_MEMORY_INIT_OK` remains unclaimed, and implementation is not scheduled until the proof boundary is mechanically complete. |
 | `v0.7.4` | Memory Initialization Evidence | Implement the hardened minimal controlled-memory proof without expanding into memory management. | Static controlled region, full-region zero fill, bounded sentinel probe, runtime marker emission, governed memory evidence validator. | `KOZO_MEMORY_INIT_OK` is captured after the contract-defined proof and before the unchanged halt loop; no paging, allocator, virtual-memory, Odin-runtime, userspace, compatibility, or production claim is added. |
 | `v0.7.45` | Runtime Progression Entry and Minimal Runtime Initialization | Add a bounded internal assembly-to-Odin call after memory evidence and return to the authoritative halt path. | Calling-convention contract, fixed bootstrap context, bounded Odin state probe, fixed serial bridge, progression evidence validator, ordered CI markers. | CI captures `KOZO_RUNTIME_PROGRESS_ENTRY`, Odin-dependent `KOZO_RUNTIME_INIT_OK`, and `KOZO_RUNTIME_RETURN_OK`; exact status zero returns to the terminal halt path without allocator, scheduler, userspace, interrupt, compatibility, or production claims. |
+| `v0.7.5` | Controlled Runtime Loop | Add a contract-backed, bounded three-iteration Odin loop between runtime initialization and the exact return-to-halt continuation. | Controlled loop contract/schema/validators, static volatile state, fixed loop markers, ELF backward-edge evidence, QEMU classification, docs and tests. | Hosted CI captures loop entry, iterations 1-3, loop exit, and runtime return in order; validators pass; the halt loop remains authoritative; no scheduler, userspace, allocator, interrupt, compatibility, or production claim is added. |
 | `v1.0.0-rc.1` | Release candidate hardening | Freeze release scope and release gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | Release evidence bundle, completed release checklist, current generated reports, changelog/release notes dry run, all required CI checks green. | Release candidate can be reviewed without adding new scope. |
 | `v1.0.0` | Scoped production release | Release only the proven, scoped KOZO surface. | Final release evidence bundle, final changelog and release notes, passing required gates, explicit non-goals. | v1.0.0 claims only evidence-backed behavior and preserves all compatibility non-goals. |
 

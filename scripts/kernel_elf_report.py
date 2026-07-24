@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 import struct
 import subprocess
 import sys
@@ -23,6 +24,20 @@ RUNTIME_PROGRESSION_SYMBOLS = (
     "runtime_progression_state",
     "runtime_serial_write_init_marker",
 )
+CONTROLLED_RUNTIME_LOOP_SYMBOLS = (
+    "controlled_runtime_loop",
+    "runtime_loop_state",
+    "runtime_serial_write_loop_enter_marker",
+    "runtime_serial_write_loop_iter_1_marker",
+    "runtime_serial_write_loop_iter_2_marker",
+    "runtime_serial_write_loop_iter_3_marker",
+    "runtime_serial_write_loop_exit_marker",
+)
+BRANCH_MNEMONIC = re.compile(r"^j[a-z]+$")
+INSTRUCTION_LINE = re.compile(
+    r"^\s*([0-9a-fA-F]+):\s+(?:(?:[0-9a-fA-F]{2})\s+)+([a-zA-Z][a-zA-Z0-9.]*)\s*(.*)$"
+)
+HEX_OPERAND = re.compile(r"(?:0x)?([0-9a-fA-F]{6,16})")
 
 ARCHITECTURES = {
     EM_X86_64: "x86_64",
@@ -109,7 +124,13 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
     load_segments = [segment for segment in program_headers if segment.header_type == PT_LOAD]
     symbols = symbol_addresses(
         kernel_elf,
-        ("_start", MEMORY_REGION_START_SYMBOL, MEMORY_REGION_END_SYMBOL, *RUNTIME_PROGRESSION_SYMBOLS),
+        (
+            "_start",
+            MEMORY_REGION_START_SYMBOL,
+            MEMORY_REGION_END_SYMBOL,
+            *RUNTIME_PROGRESSION_SYMBOLS,
+            *CONTROLLED_RUNTIME_LOOP_SYMBOLS,
+        ),
     )
     symbol_address = symbols.get("_start")
     layout = load_layout(header, load_segments)
@@ -134,6 +155,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "entry_address_class": layout.entry_address_class,
         "memory_evidence_region": memory_evidence_region_record(symbols),
         "runtime_progression_symbols": runtime_progression_symbol_record(symbols),
+        "controlled_runtime_loop": controlled_runtime_loop_record(kernel_elf, symbols),
         "program_header_count": header.program_header_count,
         "section_count": header.section_header_count,
         "load_segments": [segment_record(segment) for segment in load_segments],
@@ -279,6 +301,82 @@ def runtime_progression_symbol_record(symbols: dict[str, int]) -> dict[str, obje
     }
 
 
+def controlled_runtime_loop_record(
+    kernel_elf: Path,
+    symbols: dict[str, int],
+) -> dict[str, object]:
+    disassembly = disassemble_symbol(kernel_elf, "controlled_runtime_loop")
+    instructions = parse_disassembly_instructions(disassembly)
+    back_edges = backward_branch_records(instructions)
+    return {
+        "symbols": symbol_record(symbols, CONTROLLED_RUNTIME_LOOP_SYMBOLS),
+        "disassembly_available": bool(instructions),
+        "backward_branch_present": bool(back_edges),
+        "backward_branches": back_edges,
+        "terminal_comparison_present": any(mnemonic.startswith("cmp") for _, mnemonic, _ in instructions),
+    }
+
+
+def symbol_record(
+    symbols: dict[str, int],
+    names: tuple[str, ...],
+) -> dict[str, object]:
+    return {
+        symbol: {
+            "present": symbol in symbols,
+            "address": _hex(symbols[symbol]) if symbol in symbols else "",
+        }
+        for symbol in names
+    }
+
+
+def disassemble_symbol(kernel_elf: Path, symbol: str) -> str:
+    commands = (
+        ["objdump", f"--disassemble-symbols={symbol}", str(kernel_elf)],
+        ["objdump", f"--disassemble={symbol}", str(kernel_elf)],
+    )
+    for command in commands:
+        output = run_text_command(command)
+        if output:
+            return output
+    return ""
+
+
+def run_text_command(command: list[str]) -> str:
+    try:
+        result = subprocess.run(command, check=False, capture_output=True, text=True)
+    except OSError:
+        return ""
+    return result.stdout if result.returncode == 0 else ""
+
+
+def parse_disassembly_instructions(text: str) -> list[tuple[int, str, str]]:
+    instructions = []
+    for line in text.splitlines():
+        match = INSTRUCTION_LINE.match(line)
+        if match is not None:
+            instructions.append((int(match.group(1), 16), match.group(2).lower(), match.group(3)))
+    return instructions
+
+
+def backward_branch_records(
+    instructions: list[tuple[int, str, str]],
+) -> list[dict[str, str]]:
+    records = []
+    for address, mnemonic, operands in instructions:
+        target = branch_target(mnemonic, operands)
+        if target is not None and target < address:
+            records.append({"instruction_address": _hex(address), "target_address": _hex(target)})
+    return records
+
+
+def branch_target(mnemonic: str, operands: str) -> int | None:
+    if BRANCH_MNEMONIC.fullmatch(mnemonic) is None:
+        return None
+    match = HEX_OPERAND.search(operands)
+    return int(match.group(1), 16) if match is not None else None
+
+
 def load_layout(header: ElfHeader, load_segments: list[ProgramHeader]) -> LoadLayout:
     minimum_vaddr = minimum_load_virtual_address(load_segments)
     minimum_paddr = minimum_load_physical_address(load_segments)
@@ -388,6 +486,7 @@ def malformed_report(kernel_elf: Path, linker_script: Path, issue: str) -> dict[
         "entry_address_class": "zero",
         "memory_evidence_region": memory_evidence_region_record({}),
         "runtime_progression_symbols": runtime_progression_symbol_record({}),
+        "controlled_runtime_loop": controlled_runtime_loop_record(kernel_elf, {}),
         "program_header_count": 0,
         "section_count": 0,
         "load_segments": [],

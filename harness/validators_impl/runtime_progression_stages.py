@@ -32,7 +32,7 @@ _REQUIRED_STAGE_EVIDENCE = {
     "MEMORY_INITIALIZATION_EVIDENCE": "QEMU evidence for KOZO_MEMORY_INIT_OK",
     "RUNTIME_PROGRESSION_ENTRY": "QEMU evidence for KOZO_RUNTIME_PROGRESS_ENTRY",
     "RUNTIME_INITIALIZATION_EVIDENCE": "QEMU evidence for KOZO_RUNTIME_INIT_OK",
-    "CONTROLLED_RUNTIME_LOOP": "QEMU evidence for controlled runtime loop",
+    "CONTROLLED_RUNTIME_LOOP": "QEMU evidence through KOZO_RUNTIME_LOOP_EXIT_OK",
     "FIRST_GOVERNED_RUNTIME_CAPABILITY": "QEMU evidence for first governed runtime capability",
     "USERSPACE_PLANNING": "userspace planning evidence",
 }

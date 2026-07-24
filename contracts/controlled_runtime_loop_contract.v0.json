@@ -1,0 +1,122 @@
+{
+  "version": 0,
+  "architecture": "x86_64",
+  "current_state": {
+    "stage": "CONTROLLED_RUNTIME_LOOP",
+    "status": "implemented_pending_ci",
+    "source_file": "kernel/runtime_progression.odin",
+    "entry_symbol": "controlled_runtime_loop",
+    "predecessor_stage": "RUNTIME_INITIALIZATION_EVIDENCE",
+    "successor_stage": "FIRST_GOVERNED_RUNTIME_CAPABILITY",
+    "halt_contract": "contracts/runtime_halt_contract.v0.json",
+    "progression_stages_contract": "contracts/runtime_progression_stages.v0.json"
+  },
+  "loop": {
+    "iteration_limit": 3,
+    "iteration_index_origin": 1,
+    "completion_condition": "iteration_count_equals_iteration_limit",
+    "backward_edge_required": true,
+    "binary_evidence": "artifacts/runtime/kernel_elf_report.json"
+  },
+  "state": {
+    "symbol": "runtime_loop_state",
+    "storage": "static",
+    "owner": "bounded Odin runtime loop",
+    "volatile_access_required": true,
+    "fields": [
+      {
+        "name": "iteration_limit",
+        "width_bits": 64,
+        "initial_value": 3,
+        "final_value": 3
+      },
+      {
+        "name": "iteration_count",
+        "width_bits": 64,
+        "initial_value": 0,
+        "final_value": 3
+      },
+      {
+        "name": "accumulator",
+        "width_bits": 64,
+        "initial_value": 0,
+        "final_value": 6
+      },
+      {
+        "name": "status",
+        "width_bits": 32,
+        "initial_value": 0,
+        "final_value": 2
+      },
+      {
+        "name": "reserved",
+        "width_bits": 32,
+        "initial_value": 0,
+        "final_value": 0
+      }
+    ]
+  },
+  "accumulator": {
+    "operation": "add_one_based_iteration_index",
+    "expected_sequence": [
+      1,
+      3,
+      6
+    ],
+    "expected_final_value": 6
+  },
+  "markers": {
+    "required_after": "KOZO_RUNTIME_INIT_OK",
+    "required_before": "KOZO_RUNTIME_RETURN_OK",
+    "emission_owner": "Odin runtime through fixed assembly bridges",
+    "ordered_sequence": [
+      "KOZO_RUNTIME_LOOP_ENTER",
+      "KOZO_RUNTIME_LOOP_ITER_1",
+      "KOZO_RUNTIME_LOOP_ITER_2",
+      "KOZO_RUNTIME_LOOP_ITER_3",
+      "KOZO_RUNTIME_LOOP_EXIT_OK"
+    ]
+  },
+  "statuses": {
+    "success": 0,
+    "invalid_limit": 3,
+    "invalid_initial_state": 4,
+    "iteration_state_mismatch": 5,
+    "accumulator_mismatch": 6,
+    "terminal_count_mismatch": 7,
+    "terminal_status_mismatch": 8
+  },
+  "terminal_behavior": {
+    "required_return_status": 0,
+    "return_marker": "KOZO_RUNTIME_RETURN_OK",
+    "halt_contract": "contracts/runtime_halt_contract.v0.json",
+    "fallthrough_forbidden": true
+  },
+  "required_evidence": [
+    "controlled runtime loop contract validation",
+    "linked controlled_runtime_loop and runtime_loop_state symbols",
+    "kernel ELF backward branch in controlled_runtime_loop",
+    "ordered QEMU evidence through KOZO_RUNTIME_LOOP_EXIT_OK",
+    "KOZO_RUNTIME_RETURN_OK after exact loop success status",
+    "runtime halt contract remains valid"
+  ],
+  "transition_ownership": [
+    "runtime_progression_stages contract owns canonical stage order and allowed transitions",
+    "controlled_runtime_loop_contract owns the RUNTIME_INITIALIZATION_EVIDENCE to CONTROLLED_RUNTIME_LOOP proof boundary",
+    "runtime_halt_contract owns terminal behavior"
+  ],
+  "non_goals": [
+    "first governed runtime capability",
+    "userspace execution",
+    "scheduler behavior",
+    "interrupt handling",
+    "general memory management",
+    "allocator behavior",
+    "process model behavior",
+    "VFS behavior",
+    "file descriptor behavior",
+    "Linux compatibility",
+    "POSIX compatibility",
+    "production readiness"
+  ]
+}

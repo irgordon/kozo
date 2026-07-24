@@ -321,6 +321,7 @@ def required_contract_files() -> tuple[str, ...]:
         "runtime_progression_entry_contract.v0.json",
         "stack_initialization_evidence_contract.v0.json",
         "memory_initialization_evidence_contract.v0.json",
+        "controlled_runtime_loop_contract.v0.json",
     )
 
 
@@ -417,7 +418,7 @@ def required_evidence() -> dict[str, str]:
         "MEMORY_INITIALIZATION_EVIDENCE": "QEMU evidence for KOZO_MEMORY_INIT_OK",
         "RUNTIME_PROGRESSION_ENTRY": "QEMU evidence for KOZO_RUNTIME_PROGRESS_ENTRY",
         "RUNTIME_INITIALIZATION_EVIDENCE": "QEMU evidence for KOZO_RUNTIME_INIT_OK",
-        "CONTROLLED_RUNTIME_LOOP": "QEMU evidence for controlled runtime loop",
+        "CONTROLLED_RUNTIME_LOOP": "QEMU evidence through KOZO_RUNTIME_LOOP_EXIT_OK",
         "FIRST_GOVERNED_RUNTIME_CAPABILITY": "QEMU evidence for first governed runtime capability",
         "USERSPACE_PLANNING": "userspace planning evidence",
     }
@@ -430,7 +431,7 @@ def required_contracts() -> dict[str, str]:
         "MEMORY_INITIALIZATION_EVIDENCE": "contracts/memory_initialization_evidence_contract.v0.json",
         "RUNTIME_PROGRESSION_ENTRY": "contracts/runtime_progression_entry_contract.v0.json",
         "RUNTIME_INITIALIZATION_EVIDENCE": "planned:runtime_initialization_contract",
-        "CONTROLLED_RUNTIME_LOOP": "planned:controlled_runtime_loop_contract",
+        "CONTROLLED_RUNTIME_LOOP": "contracts/controlled_runtime_loop_contract.v0.json",
         "FIRST_GOVERNED_RUNTIME_CAPABILITY": "planned:first_governed_runtime_capability_contract",
         "USERSPACE_PLANNING": "planned:userspace_planning_contract",
     }
@@ -443,7 +444,7 @@ def required_validators() -> dict[str, str]:
         "MEMORY_INITIALIZATION_EVIDENCE": "memory_initialization_evidence",
         "RUNTIME_PROGRESSION_ENTRY": "runtime_progression_entry_contract",
         "RUNTIME_INITIALIZATION_EVIDENCE": "planned:runtime_initialization_evidence",
-        "CONTROLLED_RUNTIME_LOOP": "planned:controlled_runtime_loop_evidence",
+        "CONTROLLED_RUNTIME_LOOP": "controlled_runtime_loop_contract",
         "FIRST_GOVERNED_RUNTIME_CAPABILITY": "planned:first_governed_runtime_capability_evidence",
         "USERSPACE_PLANNING": "planned:userspace_planning",
     }
@@ -455,7 +456,7 @@ def valid_transitions() -> list[dict[str, str]]:
         "contracts/memory_initialization_evidence_contract.v0.json",
         "contracts/runtime_progression_entry_contract.v0.json",
         "planned:runtime_initialization_contract",
-        "planned:controlled_runtime_loop_contract",
+        "contracts/controlled_runtime_loop_contract.v0.json",
         "planned:first_governed_runtime_capability_contract",
         "planned:userspace_planning_contract",
     )

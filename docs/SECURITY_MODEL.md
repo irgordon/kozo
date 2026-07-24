@@ -168,3 +168,5 @@ A passing proof means the current repository state satisfies governed checks. It
 `CODING_STYLE.md` owns how code should express these rules.
 
 `COMPATIBILITY.md` owns compatibility claim limits.
+
+The v0.7.5 controlled runtime loop introduces no new trust boundary or authority. Its state and marker bridges are boot-owned, fixed-size, and accept no userspace or externally controlled input. Successful loop evidence does not establish isolation, concurrency safety, scheduler policy, interrupt safety, userspace execution, or production security.

@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.7.5 - 2026-07-23
+
+**Status:** Implemented locally; hosted CI evidence pending.
+
+* Added `contracts/controlled_runtime_loop_contract.v0.json` as the authority for a bounded three-iteration Odin runtime loop.
+* Added static volatile loop state, deterministic `1 + 2 + 3 = 6` accumulation, exact failure statuses, and runtime-owned entry, iteration, and exit markers.
+* Extended kernel ELF reporting and validation to require linked loop symbols, a retained backward branch, and a terminal comparison.
+* Preserved the exact-success assembly continuation and the existing non-fallthrough `cli`/`hlt` loop.
+* Marked `CONTROLLED_RUNTIME_LOOP` implemented pending hosted CI evidence; `FIRST_GOVERNED_RUNTIME_CAPABILITY` remains planned.
+* Added no scheduler, interrupts, userspace, allocator, process, VFS, file descriptor, compatibility, or production-readiness claim.
+* ABI contracts and syscall behavior are unchanged.
+
 ## v0.7.45 - 2026-07-15
 
 **Status:** Accepted by hosted CI marker and validator evidence.

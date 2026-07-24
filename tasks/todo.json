@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO Runtime Progression Entry and Minimal Runtime Initialization v0.7.45",
+  "task_title": "KOZO Controlled Runtime Loop v0.7.5",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -10,14 +10,15 @@
   "preconditions": [
     "QEMU serial smoke and stack initialization evidence are proven",
     "v0.7.4 memory initialization evidence is accepted by the CI validator gate; manual artifact inspection was not completed",
-    "The reconciled runtime progression graph is acyclic and permits progression entry only after memory evidence",
+    "v0.7.45 runtime progression entry and runtime initialization evidence are accepted by hosted CI",
+    "The reconciled runtime progression graph is acyclic and permits controlled loop evidence only after runtime initialization evidence",
     "Odin, pinned Rust, Python, jq, and repository verification tooling are installed"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
-    "Stack and memory initialization evidence remain proven while progression and minimal runtime initialization require new CI evidence",
-    "KOZO_RUNTIME_INIT_OK must depend on executed Odin code and KOZO_RUNTIME_RETURN_OK requires exact status zero",
-    "This phase changes only the bounded internal assembly-to-Odin path, evidence validation, progression status, and documentation; public ABI, syscalls, linker layout, and terminal halt authority remain unchanged"
+    "Stack, memory, progression-entry, and runtime-initialization evidence remain proven while controlled-loop evidence requires new CI evidence",
+    "KOZO_RUNTIME_LOOP_EXIT_OK requires three validated Odin iterations and KOZO_RUNTIME_RETURN_OK still requires exact status zero",
+    "This phase changes only the bounded Odin loop, fixed marker bridges, evidence validation, progression status, and documentation; public ABI, syscalls, linker layout, and terminal halt authority remain unchanged"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -2355,6 +2356,71 @@
         "verification.tests_run[90]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 74,
+      "title": "Implement the governed controlled Odin runtime loop",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "kernel/arch/x86_64/boot.asm",
+        "kernel/runtime_progression.odin",
+        "contracts/controlled_runtime_loop_contract.v0.json",
+        "contracts/runtime_evidence_taxonomy.v0.json",
+        "contracts/runtime_progression_stages.v0.json",
+        "schemas/controlled_runtime_loop_contract.schema.json",
+        "schemas/latest_verify.schema.json",
+        "schemas/agent_context.schema.json",
+        "harness/controlled_runtime_loop_contract.py",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/controlled_runtime_loop_contract.py",
+        "harness/validators_impl/controlled_runtime_loop_evidence.py",
+        "harness/validators_impl/qemu_smoke_evidence.py",
+        "harness/validators_impl/runtime_evidence_taxonomy.py",
+        "harness/validators_impl/runtime_progression_evidence.py",
+        "harness/validators_impl/runtime_progression_stages.py",
+        "harness/validators_impl/schema.py",
+        "harness/validators_impl/validator_coverage.py",
+        "scripts/kernel_elf_report.py",
+        "scripts/qemu_smoke.sh",
+        "tests/test_controlled_runtime_loop_contract.py",
+        "tests/test_controlled_runtime_loop_evidence.py",
+        "tests/test_qemu_smoke_evidence.py",
+        "tests/test_runtime_evidence_taxonomy.py",
+        "tests/test_runtime_progression_stages.py",
+        "docs/ARCHITECTURE.md",
+        "docs/BOOT.md",
+        "docs/BOOT_BLOCKERS.md",
+        "docs/CODEBASE_AUDIT.md",
+        "docs/CONTRACTS.md",
+        "docs/PHASEMAP.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/REQUIRED_CHECKS.md",
+        "docs/ROADMAP.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/SECURITY_MODEL.md",
+        "docs/VALIDATION.md",
+        "docs/generated/governance_index.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/kernel_elf_report.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[91]",
+        "verification.tests_run[92]",
+        "verification.tests_run[93]",
+        "verification.tests_run[94]",
+        "verification.tests_run[95]",
+        "verification.tests_run[96]",
+        "verification.tests_run[97]",
+        "verification.tests_run[98]",
+        "verification.tests_run[99]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -2415,7 +2481,8 @@
     "v0.7.2 reconciles the authoritative progression order, removes the stack-entry-memory cycle, adds deterministic graph-level validation, aligns planning state, and preserves runtime behavior.",
     "v0.7.3 hardens the planned memory evidence contract with exact region geometry, ownership, zero-fill semantics, a bounded survival probe, and pre-halt marker placement without changing runtime behavior.",
     "v0.7.4 implements the controlled static memory region, explicit full-region zero fill, bounded sentinel probe and restoration, KOZO_MEMORY_INIT_OK evidence, and unchanged halt path without adding paging, allocation, runtime progression, compatibility, or production claims.",
-    "v0.7.45 implements a fixed internal assembly-to-Odin boundary, validated bootstrap context, bounded static-state probe, Odin-dependent initialization marker, exact return status, and terminal halt continuation without expanding the public ABI or runtime claims."
+    "v0.7.45 implements a fixed internal assembly-to-Odin boundary, validated bootstrap context, bounded static-state probe, Odin-dependent initialization marker, exact return status, and terminal halt continuation without expanding the public ABI or runtime claims.",
+    "v0.7.5 implements a bounded three-iteration Odin loop with volatile boot-owned state, ordered iteration evidence, linked backward-edge proof, exact return status, and the unchanged terminal halt continuation without adding scheduler, userspace, compatibility, or production claims."
   ],
   "verification": {
     "tests_run": [
@@ -2873,6 +2940,51 @@
         "tool": "runtime progression validators",
         "command": "direct RuntimeProgressionEntryContractValidator, RuntimeProgressionEvidenceValidator, and ValidatorCoverageValidator invocation",
         "status": "passed_after_governed_elf_report_refresh"
+      },
+      {
+        "tool": "focused controlled runtime loop tests",
+        "command": "python3 -m unittest tests/test_controlled_runtime_loop_contract.py tests/test_controlled_runtime_loop_evidence.py tests/test_validator_coverage.py",
+        "status": "passed_49_tests"
+      },
+      {
+        "tool": "focused runtime evidence regression tests",
+        "command": "python3 -m unittest tests/test_runtime_evidence_taxonomy.py tests/test_qemu_smoke_evidence.py tests/test_runtime_progression_stages.py tests/test_runtime_progression_evidence.py tests/test_runtime_halt_contract.py tests/test_validator_coverage.py",
+        "status": "passed_131_tests"
+      },
+      {
+        "tool": "Python unit discovery",
+        "command": "python3 -m unittest discover -s tests",
+        "status": "passed_635_tests"
+      },
+      {
+        "tool": "Odin check",
+        "command": "odin check kernel",
+        "status": "passed"
+      },
+      {
+        "tool": "kernel build and binary inspection",
+        "command": "scripts/build_boot_image.sh; nm and objdump inspection of artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf",
+        "status": "passed_with_missing_iso_generation_tooling"
+      },
+      {
+        "tool": "pinned Rust check",
+        "command": "cargo check --manifest-path userspace/core_service/Cargo.toml",
+        "status": "passed_with_existing_warnings"
+      },
+      {
+        "tool": "shell and QEMU smoke validation",
+        "command": "bash -n scripts/qemu_smoke.sh; scripts/qemu_smoke.sh",
+        "status": "blocked_missing_iso_generation_tooling"
+      },
+      {
+        "tool": "JSON and repository consistency",
+        "command": "python3 -m json.tool and jq for modified JSON files; rga and rg searches; git diff --check",
+        "status": "passed"
+      },
+      {
+        "tool": "verification harness",
+        "command": "scripts/verify.sh",
+        "status": "passed_51_checks_0_failures"
       }
     ],
     "logs": [
@@ -3103,6 +3215,7 @@
     "v0.7.2 reconciles the progression model into an acyclic, monotonic, single-owner graph and aligns contracts, tests, planning documents, audit state, and task identity without runtime changes.",
     "v0.7.3 hardens the memory evidence boundary into an implementation-ready static-region specification without runtime, marker, halt, ABI, syscall, linker, compatibility, or production-readiness changes.",
     "v0.7.4 implements only the governed static-region memory evidence path, adds structural and captured-evidence validation, preserves the halt loop, and does not add paging, allocation, Odin runtime execution, userspace, compatibility, or production-readiness claims.",
-    "v0.7.45 adds a governed internal assembly-to-Odin progression boundary, bounded Odin state evidence, exact return handling, linked-symbol reporting, and progression evidence validation while preserving terminal halt authority and all subsystem, compatibility, and production non-goals."
+    "v0.7.45 adds a governed internal assembly-to-Odin progression boundary, bounded Odin state evidence, exact return handling, linked-symbol reporting, and progression evidence validation while preserving terminal halt authority and all subsystem, compatibility, and production non-goals.",
+    "v0.7.5 adds a contract-backed three-iteration Odin loop with volatile state mutation, ordered marker bridges, deterministic status handling, ELF backward-edge reporting, and the unchanged exact return-to-halt boundary while leaving hosted runtime-loop evidence pending."
   ]
 }

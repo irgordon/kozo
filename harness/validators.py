@@ -41,6 +41,8 @@ from harness.validators_impl.stack_initialization_evidence_contract import Stack
 from harness.validators_impl.stack_initialization_evidence import StackInitializationEvidenceValidator
 from harness.validators_impl.memory_initialization_evidence_contract import MemoryInitializationEvidenceContractValidator
 from harness.validators_impl.memory_initialization_evidence import MemoryInitializationEvidenceValidator
+from harness.validators_impl.controlled_runtime_loop_contract import ControlledRuntimeLoopContractValidator
+from harness.validators_impl.controlled_runtime_loop_evidence import ControlledRuntimeLoopEvidenceValidator
 from harness.validators_impl.boot_blocker_report import BootBlockerReportValidator
 from harness.validators_impl.boot_protocol_decision import BootProtocolDecisionValidator
 from harness.validators_impl.boot_image_skeleton import BootImageSkeletonValidator
@@ -92,6 +94,8 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "stack_initialization_evidence": StackInitializationEvidenceValidator,
     "memory_initialization_evidence_contract": MemoryInitializationEvidenceContractValidator,
     "memory_initialization_evidence": MemoryInitializationEvidenceValidator,
+    "controlled_runtime_loop_contract": ControlledRuntimeLoopContractValidator,
+    "controlled_runtime_loop_evidence": ControlledRuntimeLoopEvidenceValidator,
     "boot_blocker_report": BootBlockerReportValidator,
     "boot_protocol_decision": BootProtocolDecisionValidator,
     "boot_image_skeleton": BootImageSkeletonValidator,

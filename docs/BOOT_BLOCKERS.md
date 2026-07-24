@@ -54,6 +54,8 @@ v0.5.0 adds `KOZO_BOOT_SMOKE_OK` directly in `_start` after the serial initializ
 
 v0.5.4 promotes QEMU serial smoke evidence after CI run `27894312430` captured the full ordered marker sequence and QEMU smoke metadata reported `outcome: pass` with `blocker_category: none`.
 
+v0.7.5 extends runtime evidence classification beyond the accepted v0.7.45 sequence. `runtime_loop_entry_not_reached`, `runtime_loop_iteration_incomplete`, and `runtime_loop_exit_not_reached` distinguish missing controlled-loop evidence before the existing `runtime_return_not_reached` boundary. These are runtime evidence blockers, not broad boot or production claims.
+
 ---
 
 # 2. Verified Blocker
@@ -109,18 +111,28 @@ If `KOZO_EARLY_0_ENTRY` appears without `KOZO_EARLY_2_SERIAL_INIT_OK`, the gener
 
 If `KOZO_EARLY_2_SERIAL_INIT_OK` appears without `KOZO_BOOT_SMOKE_OK`, the generated blocker report narrows to `marker_not_emitted`.
 
-For v0.5.0 and later, passing QEMU smoke evidence requires this full ordered marker sequence:
+For v0.7.5, passing QEMU smoke evidence requires this full ordered marker sequence:
 
 ```text
 KOZO_EARLY_0_ENTRY
 KOZO_EARLY_1_SERIAL_INIT_START
 KOZO_EARLY_2_SERIAL_INIT_OK
 KOZO_BOOT_SMOKE_OK
+KOZO_STACK_INIT_OK
+KOZO_MEMORY_INIT_OK
+KOZO_RUNTIME_PROGRESS_ENTRY
+KOZO_RUNTIME_INIT_OK
+KOZO_RUNTIME_LOOP_ENTER
+KOZO_RUNTIME_LOOP_ITER_1
+KOZO_RUNTIME_LOOP_ITER_2
+KOZO_RUNTIME_LOOP_ITER_3
+KOZO_RUNTIME_LOOP_EXIT_OK
+KOZO_RUNTIME_RETURN_OK
 ```
 
 CI run `27894312430` satisfies the QEMU serial smoke promotion condition for the smoke path.
 
-`scripts/qemu_smoke.sh` writes `artifacts/runtime/qemu_smoke.metadata.json`, `artifacts/runtime/qemu_smoke.log`, and `artifacts/runtime/qemu_smoke.stderr.log`. The expected kernel-emitted serial marker is `KOZO_BOOT_SMOKE_OK`.
+`scripts/qemu_smoke.sh` writes `artifacts/runtime/qemu_smoke.metadata.json`, `artifacts/runtime/qemu_smoke.log`, and `artifacts/runtime/qemu_smoke.stderr.log`. The current expected final marker is `KOZO_RUNTIME_RETURN_OK`; the boot-smoke claim itself remains bounded by `KOZO_BOOT_SMOKE_OK`.
 
 Therefore the repository can claim passing QEMU serial smoke evidence only. It still cannot claim broad QEMU boot execution, hardware trap execution, userspace execution, subsystem behavior, compatibility, or production readiness.
 

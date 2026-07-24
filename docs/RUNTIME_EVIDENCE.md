@@ -68,6 +68,8 @@ v0.7.3 hardens `contracts/memory_initialization_evidence_contract.v0.json` into 
 
 v0.7.45 implements a bounded assembly-to-Odin call after memory evidence. Assembly emits `KOZO_RUNTIME_PROGRESS_ENTRY`, calls the exported Odin entry with a fixed versioned context, requires exact status zero, emits `KOZO_RUNTIME_RETURN_OK`, and enters the terminal halt path. Odin validates the context, performs a volatile static-state write/read/restore probe, and causes `KOZO_RUNTIME_INIT_OK` to be emitted through a fixed assembly bridge. Hosted CI run `29459278491` captured the exact ordered sequence and passed `runtime_progression_evidence`, proving these two bounded stages.
 
+v0.7.5 implements a three-iteration controlled loop inside the already-proven Odin boundary. Local source and ELF evidence prove the contract-owned static state, volatile accesses, deterministic accumulator target, linked marker bridges, a retained binary backward branch, terminal comparisons, exact return handling, and unchanged halt continuation. `CONTROLLED_RUNTIME_LOOP` remains implemented pending CI until hosted QEMU evidence captures the five loop markers between `KOZO_RUNTIME_INIT_OK` and `KOZO_RUNTIME_RETURN_OK`.
+
 Current local boot blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
 
 Current release blocker for QEMU serial smoke evidence: none.
@@ -84,7 +86,7 @@ The v0.4.8 QEMU smoke metadata records Limine entry-point evidence, expected ent
 
 The latest inspected v0.4.8 CI artifact captured `KOZO_EARLY_0_ENTRY`, so kernel entry handoff is proven for that artifact. It did not capture `KOZO_EARLY_2_SERIAL_INIT_OK`, so serial initialization remains unproven until that marker appears in captured QEMU serial output.
 
-The expected v0.7.45 QEMU serial sequence is `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, `KOZO_STACK_INIT_OK`, `KOZO_MEMORY_INIT_OK`, `KOZO_RUNTIME_PROGRESS_ENTRY`, `KOZO_RUNTIME_INIT_OK`, and `KOZO_RUNTIME_RETURN_OK`.
+The expected v0.7.5 QEMU serial sequence is `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, `KOZO_STACK_INIT_OK`, `KOZO_MEMORY_INIT_OK`, `KOZO_RUNTIME_PROGRESS_ENTRY`, `KOZO_RUNTIME_INIT_OK`, `KOZO_RUNTIME_LOOP_ENTER`, `KOZO_RUNTIME_LOOP_ITER_1`, `KOZO_RUNTIME_LOOP_ITER_2`, `KOZO_RUNTIME_LOOP_ITER_3`, `KOZO_RUNTIME_LOOP_EXIT_OK`, and `KOZO_RUNTIME_RETURN_OK`.
 
 In v0.7.1 and v0.7.3, `KOZO_MEMORY_INIT_OK` was reserved planning vocabulary and was not runtime evidence. v0.7.4 replaces that planning state: runtime assembly now emits the marker only after completing the contract-defined initialization and probe, and the governed QEMU pass sequence includes it as the final expected marker.
 

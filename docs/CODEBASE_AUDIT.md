@@ -945,3 +945,27 @@ The internal bootstrap context is not a userspace ABI or security boundary. This
 ## 27.4 Next Work
 
 The next implementation milestone is `v0.7.5 Controlled Runtime Loop`.
+
+---
+
+# 28. v0.7.5 Controlled Runtime Loop
+
+Date: 2026-07-23
+
+Status: Implemented locally; hosted CI evidence pending.
+
+## 28.1 Scope
+
+This phase adds one bounded three-iteration Odin loop after the proven runtime initialization marker. It uses static volatile state, deterministic arithmetic, fixed marker bridges, exact failure statuses, linked-symbol and disassembly evidence, and the existing return-to-halt continuation.
+
+## 28.2 Finding Status
+
+| ID | Status | Rationale |
+| --- | --- | --- |
+| AUDIT-075-001 | Resolved locally | Loop ownership, state geometry, iteration bound, accumulator result, marker order, failure ordering, ELF backward edge, terminal comparison, and halt continuation are mechanically validated. |
+| AUDIT-064-002 | Deferred | `validator_coverage.py` remains above the preferred split threshold; decomposition is outside this runtime phase. |
+| AUDIT-073-001 | Deferred | The existing Rust package license metadata warning remains release-hardening work. |
+
+## 28.3 Boundaries
+
+This loop is not a scheduler or general runtime loop. It adds no interrupts, concurrency, userspace, allocation, process, VFS, file descriptor, compatibility, or production behavior. Hosted QEMU marker evidence is still required before the stage is proven.

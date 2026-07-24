@@ -182,3 +182,5 @@ The Python harness is development-time validation only.
 Contracts define boundaries.
 
 Generated reports and diagrams explain but do not govern.
+
+The v0.7.5 controlled runtime loop is a bounded internal Odin operation inside the existing boot-owned address space. It uses static volatile state, fixed no-input marker bridges, exact internal statuses, and the existing assembly return-to-halt continuation. It is not a scheduler, event loop, userspace execution path, allocator, interrupt path, or production runtime.

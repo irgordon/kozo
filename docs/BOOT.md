@@ -62,6 +62,8 @@ v0.7.4 implements that governed boundary: `_start` explicitly zeroes a boot-owne
 
 v0.7.45 adds a bounded progression path after memory evidence. Assembly verifies call-site stack alignment, emits `KOZO_RUNTIME_PROGRESS_ENTRY`, calls the exported Odin `runtime_progression_entry` symbol with a fixed bootstrap context, requires exact status zero, emits `KOZO_RUNTIME_RETURN_OK`, and enters the existing halt loop. Odin validates the context, performs a static-state write/read/restore probe, and invokes a fixed assembly bridge that emits `KOZO_RUNTIME_INIT_OK` from the Odin execution path.
 
+v0.7.5 extends that bounded Odin path with `controlled_runtime_loop`. After `KOZO_RUNTIME_INIT_OK`, Odin initializes static volatile loop state, executes exactly three iterations, accumulates `1 + 2 + 3`, validates the terminal count, accumulator, status, and reserved field, and causes fixed assembly bridges to emit `KOZO_RUNTIME_LOOP_ENTER`, three ordered iteration markers, and `KOZO_RUNTIME_LOOP_EXIT_OK`. Exact status zero still controls `KOZO_RUNTIME_RETURN_OK`, after which the existing `cli`/`hlt` loop remains the only terminal path. This is implemented pending hosted CI marker evidence.
+
 No active QEMU serial smoke blocker.
 
 Local generated blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
