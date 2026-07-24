@@ -683,6 +683,9 @@ _VALIDATOR_TEST_CONTRACTS = {
         (
             "capability_path_missing",
             "source_layout_mismatch",
+            "unsupported_runtime_initialization",
+            "response_scalar_clear_missing",
+            "unsafe_range_geometry",
             "request_validation_missing",
             "dispatcher_sequence_mismatch",
             "handler_sequence_mismatch",
@@ -828,6 +831,7 @@ _VALIDATOR_TEST_CONTRACTS = {
             "missing_ci_xorriso_install",
             "missing_ci_limine_acquisition",
             "missing_ci_qemu_install",
+            "missing_qemu_override",
             "missing_rust_toolchain_selection",
             "diagnostic_names_field",
         ),

@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import json
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
-from harness.codes import SCHEMA_INVALID
-from harness.validators_impl.schema import SchemaValidator
+from harness.aggregator import run_aggregator
+from harness.codes import CODES, MEMORY_INITIALIZATION_EVIDENCE_INVALID, OK, SCHEMA_INVALID
+from harness.validator import ValidationResult
+from harness.validators_impl.schema import SchemaValidator, validate_named_document
 
 KOZO_NEGATIVE_COVERAGE = {
     "schema": {
@@ -18,6 +23,55 @@ class SchemaValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "fail")
         self.assertEqual(result.code, SCHEMA_INVALID)
+
+    def test_latest_verify_schema_contains_every_canonical_code(self):
+        schema = json.loads(latest_verify_schema_path().read_text())
+
+        for code_enum in verification_code_enums(schema):
+            expected_codes = set(CODES)
+            if OK not in code_enum:
+                expected_codes.remove(OK)
+            self.assertTrue(expected_codes.issubset(code_enum))
+
+    def test_memory_evidence_failure_remains_visible_in_aggregate_report(self):
+        result = ValidationResult.fail(
+            code=MEMORY_INITIALIZATION_EVIDENCE_INVALID,
+            detail="Memory evidence failed for regression coverage",
+        )
+        collected = [("memory_initialization_evidence", "memory_initialization_evidence", result)]
+
+        with patch("harness.aggregator._collect_results", return_value=collected):
+            artifact = run_aggregator(
+                {},
+                changed_files=[],
+                evidence_files=[],
+                run_id="memory-evidence-schema-regression",
+                generated_at="2026-07-24T00:00:00Z",
+            )
+
+        validate_named_document("latest_verify", artifact)
+        self.assertEqual(artifact["status"], "fail")
+        self.assertEqual(artifact["summary_code"], MEMORY_INITIALIZATION_EVIDENCE_INVALID)
+        self.assertEqual(artifact["checks"][0]["code"], MEMORY_INITIALIZATION_EVIDENCE_INVALID)
+        self.assertEqual(artifact["failed_checks"][0]["code"], MEMORY_INITIALIZATION_EVIDENCE_INVALID)
+
+
+def latest_verify_schema_path() -> Path:
+    return Path(__file__).resolve().parents[1] / "schemas" / "latest_verify.schema.json"
+
+
+def verification_code_enums(value) -> list[set[str]]:
+    enums: list[set[str]] = []
+    if isinstance(value, dict):
+        enum = value.get("enum")
+        if isinstance(enum, list) and SCHEMA_INVALID in enum:
+            enums.append(set(enum))
+        for child in value.values():
+            enums.extend(verification_code_enums(child))
+    elif isinstance(value, list):
+        for child in value:
+            enums.extend(verification_code_enums(child))
+    return enums
 
 
 if __name__ == "__main__":

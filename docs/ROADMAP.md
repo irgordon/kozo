@@ -101,7 +101,7 @@ The current repository proves:
 * governed static-memory initialization evidence through `contracts/memory_initialization_evidence_contract.v0.json` and `memory_initialization_evidence`, accepted by the CI validator gate without manual artifact inspection
 * hosted-CI-proven internal assembly-to-Odin progression boundary and bounded volatile Odin state probe
 * hosted-CI-proven contract-backed three-iteration controlled Odin loop with linked-symbol, backward-edge, terminal-comparison, marker-order, and halt-continuation validation
-* locally implemented versioned internal runtime status query with fixed request/response geometry, explicit dispatch, response validation, linked-symbol evidence, and governed capability markers
+* locally QEMU-evidenced versioned internal runtime status query with fixed request/response geometry, explicit dispatch, response validation, linked-symbol evidence, and governed capability markers
 
 The latest local generated evidence may still report missing local Limine/xorriso tooling, but CI run `27894312430` proves the narrow QEMU serial smoke path.
 
@@ -111,7 +111,7 @@ The latest local generated evidence may still report missing local Limine/xorris
 
 KOZO still does not prove:
 
-* hosted QEMU proof of the v0.8.0 capability markers
+* hosted QEMU proof of the corrected v0.8.0 capability markers
 * complete Odin runtime readiness or dynamic initialization
 * general stack readiness beyond the controlled boot stack proof
 * general memory management beyond the governed static region
@@ -134,9 +134,10 @@ KOZO still does not prove:
 
 # 9. Current Active Blocker
 
-Current QEMU serial smoke blocker: none.
-
-Local generated evidence still reports `missing_iso_generation_tooling`, which is a local environment blocker and not the CI/Linux portability state.
+The first hosted v0.8.0 attempt reported `capability_dispatch_not_reached`
+after `KOZO_RUNTIME_LOOP_EXIT_OK`. Local QEMU evidence confirms the scalar
+initialization correction reaches the complete capability suffix, but hosted
+CI confirmation remains required.
 
 ---
 
@@ -153,7 +154,8 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 7. Preserve the accepted v0.7.45 progression/runtime-initialization evidence and the hosted-CI-proven v0.7.5 controlled loop.
 8. Keep the terminal halt path authoritative after the bounded Odin call.
 9. Keep physical memory discovery, paging, virtual memory management, allocators, heaps, dynamic Odin initialization, and userspace outside the current proof.
-10. Accept v0.8.0 only from hosted capability marker and validator evidence, then select another real bounded capability or a separately governed first userspace boundary.
+10. Accept v0.8.0 only after hosted CI confirms the corrected capability marker suffix, passing capability evidence, and successful verification aggregation.
+11. Do not begin v0.8.1 while the v0.8.0 hosted acceptance gate remains open.
 
 ---
 

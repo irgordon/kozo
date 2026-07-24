@@ -34,6 +34,7 @@ EARLY_MARKERS=(
 )
 QEMU_TIMEOUT_SECONDS="${KOZO_QEMU_TIMEOUT_SECONDS:-20}"
 QEMU_EXIT_CODE=0
+QEMU_BIN=""
 
 main() {
   prepare_runtime_directory
@@ -95,12 +96,37 @@ PY
 }
 
 ensure_qemu_available() {
-  if command -v qemu-system-x86_64 >/dev/null 2>&1; then
+  QEMU_BIN="$(resolve_qemu_bin)"
+  if [[ -n "$QEMU_BIN" ]]; then
     return
   fi
 
   write_blocked_metadata "missing_qemu_tooling"
-  print_blocker "missing_qemu_tooling" "Missing command: qemu-system-x86_64"
+  print_blocker "missing_qemu_tooling" "Missing QEMU binary: set KOZO_QEMU_BIN or install qemu-system-x86_64"
+}
+
+resolve_qemu_bin() {
+  local discovered
+
+  if [[ -n "${KOZO_QEMU_BIN:-}" ]]; then
+    [[ -x "$KOZO_QEMU_BIN" ]] && printf "%s\n" "$KOZO_QEMU_BIN"
+    return
+  fi
+  if discovered="$(command -v qemu-system-x86_64 2>/dev/null)"; then
+    printf "%s\n" "$discovered"
+    return
+  fi
+  homebrew_qemu_bin
+}
+
+homebrew_qemu_bin() {
+  local brew_prefix
+  local candidate
+
+  command -v brew >/dev/null 2>&1 || return
+  brew_prefix="$(brew --prefix qemu 2>/dev/null || true)"
+  candidate="$brew_prefix/bin/qemu-system-x86_64"
+  [[ -x "$candidate" ]] && printf "%s\n" "$candidate"
 }
 
 run_qemu_and_record_evidence() {
@@ -121,7 +147,7 @@ run_qemu_and_record_evidence() {
 
 run_qemu_with_timeout() {
   python3 - "$QEMU_TIMEOUT_SECONDS" "$QEMU_STDERR_LOG" -- \
-    qemu-system-x86_64 \
+    "$QEMU_BIN" \
       -machine q35 \
       -accel tcg \
       -m 256M \

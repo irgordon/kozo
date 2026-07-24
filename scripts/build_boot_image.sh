@@ -234,7 +234,7 @@ PY
 }
 
 write_package_metadata() {
-  python3 - "$PACKAGE_METADATA" "$BLOCKER_CATEGORY" "$BOOT_ISO" "$ROOT/boot/limine.conf" "$ISO_CONTENTS" "${MISSING_COMPONENTS[@]}" <<'PY'
+  python3 - "$PACKAGE_METADATA" "$BLOCKER_CATEGORY" "$BOOT_ISO" "$ROOT/boot/limine.conf" "$ISO_CONTENTS" ${MISSING_COMPONENTS[@]+"${MISSING_COMPONENTS[@]}"} <<'PY'
 import json
 import sys
 from pathlib import Path

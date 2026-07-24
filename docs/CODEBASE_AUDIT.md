@@ -994,3 +994,16 @@ This phase adds one explicit internal `RUNTIME_STATUS_QUERY` after the accepted 
 ## 29.3 Boundaries
 
 The capability is same-address-space kernel execution. It is not a userspace service, privilege boundary, authentication boundary, hardware syscall path, scheduler, process model, allocator, compatibility layer, or production interface.
+
+## 29.4 Corrective Continuation
+
+The first hosted v0.8.0 run stopped after `KOZO_RUNTIME_LOOP_EXIT_OK`.
+Instruction tracing identified an unsupported `xorps` emitted for aggregate
+response initialization before request/response validation and before
+`KOZO_CAPABILITY_DISPATCH_ENTER`.
+
+| ID | Status | Rationale |
+| --- | --- | --- |
+| AUDIT-080-003 | Resolved locally; hosted confirmation pending | The capability response now uses explicit scalar initialization, the linked capability path no longer contains the faulting pre-dispatch SIMD initialization, and local QEMU captures the complete capability suffix. |
+| AUDIT-080-004 | Resolved | `latest_verify` verification-code enums now include `MEMORY_INITIALIZATION_EVIDENCE_INVALID`, with an aggregation regression test that preserves the failure in the report. |
+| AUDIT-080-005 | Resolved | QEMU discovery supports an executable `KOZO_QEMU_BIN` override, `PATH`, and a Homebrew package prefix without requiring a developer-specific absolute path. |

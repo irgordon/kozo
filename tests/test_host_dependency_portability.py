@@ -16,6 +16,7 @@ KOZO_NEGATIVE_COVERAGE = {
         "missing_ci_xorriso_install": "test_fails_when_ci_xorriso_install_is_missing",
         "missing_ci_limine_acquisition": "test_fails_when_ci_limine_acquisition_is_missing",
         "missing_ci_qemu_install": "test_fails_when_ci_qemu_install_is_missing",
+        "missing_qemu_override": "test_fails_when_qemu_override_is_missing",
         "missing_rust_toolchain_selection": "test_fails_when_verify_script_does_not_select_rust_toolchain",
         "diagnostic_names_field": "test_failure_diagnostic_names_field",
     }
@@ -78,6 +79,18 @@ class HostDependencyPortabilityValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
         self.assert_portability_failure(result, "missing_anchor", "host_dependency_portability.verify.rust_toolchain.rustup which --toolchain")
 
+    def test_fails_when_qemu_override_is_missing(self):
+        result = self.validate_fixture(
+            mutate_qemu=lambda text: text.replace("${KOZO_QEMU_BIN:-}", "${QEMU_BIN:-}")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_portability_failure(
+            result,
+            "missing_anchor",
+            "host_dependency_portability.qemu_smoke.fail_closed.${KOZO_QEMU_BIN:-}",
+        )
+
     def test_does_not_fail_when_changelog_contains_historical_host_reference(self):
         self.assertEqual("host_dependency_portability", HostDependencyPortabilityValidator.name)
         result = self.validate_fixture(extra_file=("CHANGELOG.md", "Historical /Users/godzilla/local note"))
@@ -100,6 +113,7 @@ class HostDependencyPortabilityValidatorTests(unittest.TestCase):
         mutate_ci=None,
         mutate_verify=None,
         mutate_build=None,
+        mutate_qemu=None,
         extra_file: tuple[str, str] | None = None,
     ):
         with tempfile.TemporaryDirectory() as tmp:
@@ -112,6 +126,8 @@ class HostDependencyPortabilityValidatorTests(unittest.TestCase):
                 paths["verify"].write_text(mutate_verify(paths["verify"].read_text()))
             if mutate_build is not None:
                 paths["build"].write_text(mutate_build(paths["build"].read_text()))
+            if mutate_qemu is not None:
+                paths["qemu"].write_text(mutate_qemu(paths["qemu"].read_text()))
             if extra_file is not None:
                 path = root / extra_file[0]
                 path.parent.mkdir(parents=True, exist_ok=True)
@@ -224,7 +240,9 @@ def valid_build_text() -> str:
 def valid_qemu_text() -> str:
     return "\n".join(
         (
+            "${KOZO_QEMU_BIN:-}",
             "command -v qemu-system-x86_64",
+            "brew --prefix qemu",
             'write_blocked_metadata "missing_qemu_tooling"',
             'print_blocker "missing_qemu_tooling"',
         )

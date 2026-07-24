@@ -72,6 +72,15 @@ v0.7.5 implements a three-iteration controlled loop inside the already-proven Od
 
 v0.8.0 adds one internal `RUNTIME_STATUS_QUERY`. Odin validates a versioned fixed request, clears a non-overlapping fixed response, emits dispatch evidence, selects one exact capability ID, validates accepted loop state, populates and validates only the accepted stage 0 through 5 baseline, emits handler and capability success evidence, and returns exact status zero to the existing assembly return-to-halt path. Local contract, source, and ELF evidence establish implementation readiness only; hosted CI must capture the three capability markers before `FIRST_GOVERNED_RUNTIME_CAPABILITY` becomes proven.
 
+The first hosted v0.8.0 attempt reached `KOZO_RUNTIME_LOOP_EXIT_OK` and
+triple-faulted on a generated `xorps` instruction before
+`KOZO_CAPABILITY_DISPATCH_ENTER`. Aggregate response initialization was the
+fault boundary; pointer validation and dispatch had not executed. The
+corrective path uses explicit scalar response stores and subtraction-based
+range overlap checks. Local QEMU evidence captures the full ordered sequence
+through `KOZO_RUNTIME_RETURN_OK` and reports `outcome: pass`, but v0.8.0
+remains pending until hosted CI confirms the same evidence and aggregation.
+
 Current local boot blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.
 
 Current release blocker for QEMU serial smoke evidence: none.

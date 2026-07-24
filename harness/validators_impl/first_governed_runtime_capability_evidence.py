@@ -32,6 +32,28 @@ _REQUIRED_SYMBOLS = (
     "runtime_serial_write_status_query_marker",
     "runtime_serial_write_first_capability_marker",
 )
+_FORBIDDEN_RESPONSE_INITIALIZERS = {
+    "response := Runtime_Status_Response{}",
+    "response^ = Runtime_Status_Response{}",
+}
+_REQUIRED_RESPONSE_INITIALIZATION = (
+    "response: Runtime_Status_Response = ---",
+    "response.version = 0",
+    "response.capability_id = 0",
+    "response.status = 0",
+    "response.current_progression_stage = 0",
+    "response.proven_stage_mask = 0",
+    "response.boot_memory_region_size = 0",
+    "response.controlled_loop_iteration_limit = 0",
+    "response.controlled_loop_final_count = 0",
+    "response.controlled_loop_accumulator = 0",
+    "response.reserved = 0",
+)
+_REQUIRED_RANGE_GEOMETRY = (
+    "if first_start <= second_start {",
+    "return second_start - first_start < first_size",
+    "return first_start - second_start < second_size",
+)
 
 
 @dataclass(frozen=True)
@@ -70,6 +92,8 @@ def _evidence_issue() -> FirstCapabilityEvidenceIssue | None:
     checks = (
         lambda: _progression_issue(context),
         lambda: _layout_issue(context),
+        lambda: _initialization_issue(context),
+        lambda: _range_geometry_issue(context),
         lambda: _request_issue(context),
         lambda: _dispatcher_issue(context),
         lambda: _handler_issue(context),
@@ -152,6 +176,30 @@ def _layout_issue(context: FirstCapabilityContext) -> FirstCapabilityEvidenceIss
         expected,
         "source_layout_mismatch",
         "request_response_layout",
+    )
+
+
+def _initialization_issue(context: FirstCapabilityContext) -> FirstCapabilityEvidenceIssue | None:
+    if _FORBIDDEN_RESPONSE_INITIALIZERS.intersection(context.capability_lines):
+        return _issue(
+            "unsupported_runtime_initialization",
+            "response.initialization",
+            "Capability response initialization must not lower to unsupported SIMD before CPU feature setup",
+        )
+    return _ordered_issue(
+        context.capability_lines,
+        _REQUIRED_RESPONSE_INITIALIZATION,
+        "response_scalar_clear_missing",
+        "response.initialization",
+    )
+
+
+def _range_geometry_issue(context: FirstCapabilityContext) -> FirstCapabilityEvidenceIssue | None:
+    return _ordered_issue(
+        context.capability_lines,
+        _REQUIRED_RANGE_GEOMETRY,
+        "unsafe_range_geometry",
+        "request.aliasing_policy",
     )
 
 

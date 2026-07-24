@@ -55,7 +55,7 @@ execute_first_governed_capability :: proc "contextless" () -> u32 {
 		flags = RUNTIME_STATUS_SUPPORTED_FLAGS,
 		reserved = 0,
 	}
-	response := Runtime_Status_Response{}
+	response: Runtime_Status_Response = ---
 	status := dispatch_runtime_capability(&request, &response)
 	if status != RUNTIME_PROGRESSION_OK {
 		return status
@@ -129,12 +129,23 @@ runtime_status_response_pointer_is_valid :: proc "contextless" (
 memory_ranges_overlap :: proc "contextless" (
 	first_start, first_size, second_start, second_size: uintptr,
 ) -> bool {
-	return first_start < second_start + second_size &&
-	       second_start < first_start + first_size
+	if first_start <= second_start {
+		return second_start - first_start < first_size
+	}
+	return first_start - second_start < second_size
 }
 
 clear_runtime_status_response :: proc "contextless" (response: ^Runtime_Status_Response) {
-	response^ = Runtime_Status_Response{}
+	response.version = 0
+	response.capability_id = 0
+	response.status = 0
+	response.current_progression_stage = 0
+	response.proven_stage_mask = 0
+	response.boot_memory_region_size = 0
+	response.controlled_loop_iteration_limit = 0
+	response.controlled_loop_final_count = 0
+	response.controlled_loop_accumulator = 0
+	response.reserved = 0
 }
 
 @(export)

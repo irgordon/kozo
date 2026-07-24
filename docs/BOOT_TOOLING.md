@@ -122,8 +122,14 @@ Install xorriso from the platform package manager.
 Confirm limine or limine-deploy is on PATH.
 Confirm xorriso is on PATH.
 Optionally set LIMINE_DIR, LIMINE_INSTALL, LIMINE, or XORRISO for explicit tool paths.
+Resolve QEMU from KOZO_QEMU_BIN, qemu-system-x86_64 on PATH, or the platform package-manager prefix.
 Run scripts/build_boot_image.sh.
 ```
+
+`KOZO_QEMU_BIN` is the explicit local override. The smoke script rejects a
+non-executable override, then checks `PATH`, then checks a Homebrew package
+prefix when Homebrew is available. No user-specific absolute path is a
+required or authoritative tool location.
 
 CI installation path:
 

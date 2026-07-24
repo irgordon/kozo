@@ -16,6 +16,9 @@ KOZO_NEGATIVE_COVERAGE = {
     "first_governed_runtime_capability_evidence": {
         "capability_path_missing": "test_fails_when_progression_does_not_call_capability",
         "source_layout_mismatch": "test_fails_when_response_layout_assertion_is_missing",
+        "unsupported_runtime_initialization": "test_fails_when_response_uses_aggregate_zero_initialization",
+        "response_scalar_clear_missing": "test_fails_when_response_scalar_clear_is_incomplete",
+        "unsafe_range_geometry": "test_fails_when_overlap_uses_end_address_addition",
         "request_validation_missing": "test_fails_when_request_version_validation_is_missing",
         "dispatcher_sequence_mismatch": "test_fails_when_response_is_not_cleared_before_dispatch",
         "handler_sequence_mismatch": "test_fails_when_controlled_loop_state_is_not_validated",
@@ -73,6 +76,52 @@ class FirstGovernedRuntimeCapabilityEvidenceValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "fail")
         self.assert_failure(result, "request_validation_missing", "request")
+
+    def test_fails_when_response_uses_aggregate_zero_initialization(self):
+        result = self.validate_fixture(
+            mutate_capability=lambda text: text.replace(
+                "response: Runtime_Status_Response = ---",
+                "response := Runtime_Status_Response{}",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_failure(
+            result,
+            "unsupported_runtime_initialization",
+            "response.initialization",
+        )
+
+    def test_fails_when_response_scalar_clear_is_incomplete(self):
+        result = self.validate_fixture(
+            mutate_capability=lambda text: text.replace(
+                "response.controlled_loop_accumulator = 0",
+                "",
+                1,
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_failure(
+            result,
+            "response_scalar_clear_missing",
+            "response.initialization",
+        )
+
+    def test_fails_when_overlap_uses_end_address_addition(self):
+        result = self.validate_fixture(
+            mutate_capability=lambda text: text.replace(
+                "if first_start <= second_start {\n"
+                "\t\treturn second_start - first_start < first_size\n"
+                "\t}\n"
+                "\treturn first_start - second_start < second_size",
+                "return first_start < second_start + second_size &&\n"
+                "\t       second_start < first_start + first_size",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_failure(result, "unsafe_range_geometry", "request.aliasing_policy")
 
     def test_fails_when_unknown_capability_validation_is_missing(self):
         result = self.validate_fixture(

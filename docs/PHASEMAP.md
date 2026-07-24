@@ -94,7 +94,7 @@ Detailed evidence rules are owned by `docs/RELEASE_EVIDENCE.md`.
 The current local generated evidence proves:
 
 * `scripts/verify.sh` passes locally with 53 checks and 0 failures.
-* Unit discovery passes locally with 676 tests after the v0.8.0 capability coverage expansion.
+* Unit discovery passes locally with 682 tests after the v0.8.0 capability correction coverage expansion.
 * The kernel ELF uses higher-half PT_LOAD virtual addresses.
 * Local kernel ELF loadability reports no lower-half PHDR blocker.
 * The repository source defines the ordered evidence path through `KOZO_RUNTIME_PROGRESS_ENTRY`, Odin-dependent `KOZO_RUNTIME_INIT_OK`, and `KOZO_RUNTIME_RETURN_OK` after the existing boot, stack, and memory markers.
@@ -113,20 +113,25 @@ The current local generated evidence proves:
 * v0.7.4 memory evidence is accepted by the CI validator gate; manual artifact inspection was not completed.
 * v0.7.45 is accepted by hosted CI run `29459278491`; `RUNTIME_PROGRESSION_ENTRY` and `RUNTIME_INITIALIZATION_EVIDENCE` are proven.
 * Hosted CI run `30057826315` accepted v0.7.5 with verification at 51 checks and 0 failures, passing `controlled_runtime_loop_evidence`, and the complete ordered controlled-loop marker sequence. Lint run `30057826311` also passed.
-* v0.8.0 implements one versioned internal `RUNTIME_STATUS_QUERY` capability after the accepted loop. `CONTROLLED_RUNTIME_LOOP` is proven, `FIRST_GOVERNED_RUNTIME_CAPABILITY` is implemented pending hosted CI evidence, and `USERSPACE_PLANNING` remains planned.
-* Local QEMU smoke evidence remains blocked by `missing_iso_generation_tooling` because the local environment does not provide the CI Limine/xorriso tooling path.
+* The first hosted v0.8.0 attempt reached `KOZO_RUNTIME_LOOP_EXIT_OK` and then faulted on an unsupported generated `xorps` instruction before capability dispatch.
+* The corrective v0.8.0 implementation uses scalar response initialization and locally captures the complete sequence through `KOZO_RUNTIME_RETURN_OK` with QEMU `outcome: pass`.
+* `CONTROLLED_RUNTIME_LOOP` is proven, `FIRST_GOVERNED_RUNTIME_CAPABILITY` is implemented and locally evidenced pending hosted CI confirmation, and `USERSPACE_PLANNING` remains planned.
 
 ## Current Active Blocker
 
-There is no active QEMU serial smoke blocker.
-
-The active local generated blocker remains `missing_iso_generation_tooling`.
+The first hosted v0.8.0 attempt recorded `capability_dispatch_not_reached`.
+The exact local correction now passes QEMU; hosted confirmation of the
+corrective commit remains the active v0.8.0 acceptance gate.
 
 Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr`, `kernel_entry_not_reached`, `serial_not_initialized`, and `marker_not_emitted` are retained only as resolved historical evidence states unless a future CI artifact reintroduces one.
 
 ## Next Runtime Phase
 
-The current runtime phase is `v0.8.0 First Governed Runtime Capability`. Hosted CI must capture the three capability markers before the stage becomes proven. The next milestone must add another real bounded runtime capability or a separately governed first userspace boundary; it must not be planning-only.
+The current runtime phase remains `v0.8.0 First Governed Runtime Capability`.
+Do not start v0.8.1 until hosted CI captures
+`KOZO_CAPABILITY_DISPATCH_ENTER`, `KOZO_RUNTIME_STATUS_QUERY_OK`,
+`KOZO_FIRST_CAPABILITY_OK`, and `KOZO_RUNTIME_RETURN_OK` after
+`KOZO_RUNTIME_LOOP_EXIT_OK`, with verification aggregation completing.
 
 ---
 

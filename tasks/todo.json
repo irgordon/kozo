@@ -2475,6 +2475,46 @@
         "verification.tests_run[108]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 76,
+      "title": "Correct the first governed capability entry fault",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "kernel/runtime_capability.odin",
+        "harness/validators_impl/first_governed_runtime_capability_evidence.py",
+        "harness/validators_impl/host_dependency_portability.py",
+        "harness/validators_impl/validator_coverage.py",
+        "schemas/latest_verify.schema.json",
+        "scripts/build_boot_image.sh",
+        "scripts/qemu_smoke.sh",
+        "tests/test_first_governed_runtime_capability_evidence.py",
+        "tests/test_host_dependency_portability.py",
+        "tests/test_schema.py",
+        "docs/BOOT_TOOLING.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/CODEBASE_AUDIT.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "docs/generated/governance_index.md",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.summary.txt"
+      ],
+      "verification_refs": [
+        "verification.tests_run[109]",
+        "verification.tests_run[110]",
+        "verification.tests_run[111]",
+        "verification.tests_run[112]",
+        "verification.tests_run[113]",
+        "verification.tests_run[114]",
+        "verification.tests_run[115]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -2537,7 +2577,8 @@
     "v0.7.4 implements the controlled static memory region, explicit full-region zero fill, bounded sentinel probe and restoration, KOZO_MEMORY_INIT_OK evidence, and unchanged halt path without adding paging, allocation, runtime progression, compatibility, or production claims.",
     "v0.7.45 implements a fixed internal assembly-to-Odin boundary, validated bootstrap context, bounded static-state probe, Odin-dependent initialization marker, exact return status, and terminal halt continuation without expanding the public ABI or runtime claims.",
     "v0.7.5 implements a bounded three-iteration Odin loop with volatile boot-owned state, ordered iteration evidence, linked backward-edge proof, exact return status, and the unchanged terminal halt continuation without adding scheduler, userspace, compatibility, or production claims.",
-    "v0.8.0 implements one versioned internal runtime status request with explicit field validation, one direct dispatcher, one deterministic response handler, response validation, governed capability evidence, and the unchanged return-to-halt path without adding userspace, isolation, scheduler, allocator, interrupt, ABI, syscall, compatibility, or production claims."
+    "v0.8.0 implements one versioned internal runtime status request with explicit field validation, one direct dispatcher, one deterministic response handler, response validation, governed capability evidence, and the unchanged return-to-halt path without adding userspace, isolation, scheduler, allocator, interrupt, ABI, syscall, compatibility, or production claims.",
+    "The v0.8.0 corrective continuation replaces faulting aggregate response initialization with scalar stores, preserves strict pointer validation, hardens overlap arithmetic, restores local QEMU evidence through KOZO_RUNTIME_RETURN_OK, and leaves hosted acceptance pending."
   ],
   "verification": {
     "tests_run": [
@@ -3085,6 +3126,41 @@
         "tool": "verification harness",
         "command": "scripts/verify.sh",
         "status": "passed_53_checks_0_failures_after_recording_verification_refs_and_regenerating_governance_index"
+      },
+      {
+        "tool": "hosted CI and failure-boundary inspection",
+        "command": "gh auth status; gh run inspection; artifact download; QEMU instruction tracing against the hosted v0.8.0 ISO",
+        "status": "passed_diagnosed_unsupported_xorps_before_capability_dispatch"
+      },
+      {
+        "tool": "focused corrective tests",
+        "command": "python3 -m unittest tests/test_first_governed_runtime_capability_evidence.py tests/test_host_dependency_portability.py tests/test_qemu_smoke_evidence.py tests/test_schema.py tests/test_validator_coverage.py",
+        "status": "passed_110_tests"
+      },
+      {
+        "tool": "Python unit discovery",
+        "command": "python3 -m unittest discover -s tests",
+        "status": "passed_682_tests"
+      },
+      {
+        "tool": "local boot image and QEMU evidence",
+        "command": "scripts/build_boot_image.sh; scripts/qemu_smoke.sh with pinned Limine v12.3.3, xorriso, and KOZO_QEMU_BIN",
+        "status": "passed_17_ordered_markers_outcome_pass"
+      },
+      {
+        "tool": "shell, Odin, Rust, and binary validation",
+        "command": "bash -n scripts/build_boot_image.sh scripts/qemu_smoke.sh; odin check kernel; cargo check --manifest-path userspace/core_service/Cargo.toml; nm and objdump capability-boundary inspection",
+        "status": "passed_with_existing_rust_style_warnings"
+      },
+      {
+        "tool": "JSON schema validation",
+        "command": "python3 -m json.tool schemas/latest_verify.schema.json; jq . schemas/latest_verify.schema.json",
+        "status": "passed"
+      },
+      {
+        "tool": "verification harness with local ISO and QEMU tooling",
+        "command": "scripts/verify.sh with pinned Limine v12.3.3, xorriso, and KOZO_QEMU_BIN",
+        "status": "passed_53_checks_0_failures_qemu_outcome_pass"
       }
     ],
     "logs": [
@@ -3317,6 +3393,7 @@
     "v0.7.4 implements only the governed static-region memory evidence path, adds structural and captured-evidence validation, preserves the halt loop, and does not add paging, allocation, Odin runtime execution, userspace, compatibility, or production-readiness claims.",
     "v0.7.45 adds a governed internal assembly-to-Odin progression boundary, bounded Odin state evidence, exact return handling, linked-symbol reporting, and progression evidence validation while preserving terminal halt authority and all subsystem, compatibility, and production non-goals.",
     "v0.7.5 adds a contract-backed three-iteration Odin loop with volatile state mutation, ordered marker bridges, deterministic status handling, ELF backward-edge reporting, the unchanged exact return-to-halt boundary, and hosted CI acceptance.",
-    "v0.8.0 adds one explicit internal runtime status request, fixed response, direct dispatcher, bounded handler, source and ELF evidence validation, fixed capability markers, and the unchanged exact return-to-halt boundary while leaving hosted capability evidence pending."
+    "v0.8.0 adds one explicit internal runtime status request, fixed response, direct dispatcher, bounded handler, source and ELF evidence validation, fixed capability markers, and the unchanged exact return-to-halt boundary while leaving hosted capability evidence pending.",
+    "The first hosted v0.8.0 attempt faulted on unsupported generated SIMD before dispatch; scalar response initialization now passes the complete local QEMU marker sequence while hosted correction evidence remains pending."
   ]
 }

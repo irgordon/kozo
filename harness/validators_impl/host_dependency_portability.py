@@ -80,7 +80,9 @@ _BUILD_SCRIPT_ENV_ANCHORS = (
 )
 
 _QEMU_FAIL_CLOSED_ANCHORS = (
+    "${KOZO_QEMU_BIN:-}",
     "command -v qemu-system-x86_64",
+    "brew --prefix qemu",
     'write_blocked_metadata "missing_qemu_tooling"',
     'print_blocker "missing_qemu_tooling"',
 )
