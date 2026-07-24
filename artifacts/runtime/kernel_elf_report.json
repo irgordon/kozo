@@ -27,7 +27,7 @@
   "runtime_progression_symbols": {
     "runtime_progression_entry": {
       "present": true,
-      "address": "0xffffffff80200660"
+      "address": "0xffffffff80200750"
     },
     "runtime_bootstrap_context": {
       "present": true,
@@ -46,7 +46,7 @@
     "symbols": {
       "controlled_runtime_loop": {
         "present": true,
-        "address": "0xffffffff802006b0"
+        "address": "0xffffffff80200800"
       },
       "runtime_loop_state": {
         "present": true,
@@ -77,23 +77,52 @@
     "backward_branch_present": true,
     "backward_branches": [
       {
-        "instruction_address": "0xffffffff802006ec",
-        "target_address": "0xffffffff802006d0"
+        "instruction_address": "0xffffffff8020083c",
+        "target_address": "0xffffffff80200820"
       },
       {
-        "instruction_address": "0xffffffff80200725",
-        "target_address": "0xffffffff802006d0"
+        "instruction_address": "0xffffffff80200875",
+        "target_address": "0xffffffff80200820"
       },
       {
-        "instruction_address": "0xffffffff80200727",
-        "target_address": "0xffffffff802006fd"
+        "instruction_address": "0xffffffff80200877",
+        "target_address": "0xffffffff8020084d"
       },
       {
-        "instruction_address": "0xffffffff80200732",
-        "target_address": "0xffffffff802006d0"
+        "instruction_address": "0xffffffff80200882",
+        "target_address": "0xffffffff80200820"
       }
     ],
     "terminal_comparison_present": true
+  },
+  "first_governed_runtime_capability": {
+    "symbols": {
+      "execute_first_governed_capability": {
+        "present": true,
+        "address": "0xffffffff802006c0"
+      },
+      "dispatch_runtime_capability": {
+        "present": true,
+        "address": "0xffffffff802007a0"
+      },
+      "query_runtime_status": {
+        "present": true,
+        "address": "0xffffffff80200b90"
+      },
+      "runtime_serial_write_capability_dispatch_marker": {
+        "present": true,
+        "address": "0xffffffff80200297"
+      },
+      "runtime_serial_write_status_query_marker": {
+        "present": true,
+        "address": "0xffffffff802002b6"
+      },
+      "runtime_serial_write_first_capability_marker": {
+        "present": true,
+        "address": "0xffffffff802002d5"
+      }
+    },
+    "progression_call_present": true
   },
   "program_header_count": 7,
   "section_count": 13,
@@ -104,8 +133,8 @@
       "offset": "0x1000",
       "virtual_address": "0xffffffff80200000",
       "physical_address": "0x200000",
-      "file_size": "0x3882",
-      "memory_size": "0x3882",
+      "file_size": "0x3d62",
+      "memory_size": "0x3d62",
       "alignment": "0x1000"
     },
     {
@@ -114,8 +143,8 @@
       "offset": "0x5000",
       "virtual_address": "0xffffffff80204000",
       "physical_address": "0x204000",
-      "file_size": "0x10cc",
-      "memory_size": "0x10cc",
+      "file_size": "0x122c",
+      "memory_size": "0x122c",
       "alignment": "0x1000"
     },
     {

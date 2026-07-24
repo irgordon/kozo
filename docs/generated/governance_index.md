@@ -20,10 +20,10 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 51
+* Total checks: 53
 * Failed checks: 0
-* Run ID: `verify-20260724T004930Z`
-* Generated at: `2026-07-24T00:49:30Z`
+* Run ID: `verify-20260724T014356Z`
+* Generated at: `2026-07-24T01:43:56Z`
 
 ## Registered validators
 
@@ -68,24 +68,27 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 37 | `memory_initialization_evidence` |
 | 38 | `controlled_runtime_loop_contract` |
 | 39 | `controlled_runtime_loop_evidence` |
-| 40 | `boot_blocker_report` |
-| 41 | `boot_protocol_decision` |
-| 42 | `boot_image_skeleton` |
-| 43 | `boot_image_packaging` |
-| 44 | `boot_tooling` |
-| 45 | `kernel_loadability` |
-| 46 | `host_dependency_portability` |
-| 47 | `qemu_smoke_evidence` |
-| 48 | `return_path_proof` |
-| 49 | `execution_proof` |
-| 50 | `validator_coverage` |
-| 51 | `evidence` |
+| 40 | `first_governed_runtime_capability` |
+| 41 | `first_governed_runtime_capability_evidence` |
+| 42 | `boot_blocker_report` |
+| 43 | `boot_protocol_decision` |
+| 44 | `boot_image_skeleton` |
+| 45 | `boot_image_packaging` |
+| 46 | `boot_tooling` |
+| 47 | `kernel_loadability` |
+| 48 | `host_dependency_portability` |
+| 49 | `qemu_smoke_evidence` |
+| 50 | `return_path_proof` |
+| 51 | `execution_proof` |
+| 52 | `validator_coverage` |
+| 53 | `evidence` |
 
 ## Active contracts
 
 | Path | Version | Role |
 | --- | --- | --- |
 | `contracts/controlled_runtime_loop_contract.v0.json` | `0` | controlled runtime loop contract.v0 |
+| `contracts/first_governed_runtime_capability.v0.json` | `0` | first governed runtime capability.v0 |
 | `contracts/kozo_abi_manifest.json` | `0` | ABI manifest |
 | `contracts/memory_initialization_evidence_contract.v0.json` | `0` | memory initialization evidence contract.v0 |
 | `contracts/runtime_evidence_taxonomy.v0.json` | `0` | runtime evidence taxonomy.v0 |
@@ -105,6 +108,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | --- | --- |
 | `schemas/agent_context.schema.json` | agent_context.schema.json |
 | `schemas/controlled_runtime_loop_contract.schema.json` | KOZO controlled runtime loop contract |
+| `schemas/first_governed_runtime_capability.schema.json` | KOZO first governed runtime capability |
 | `schemas/kozo_abi_manifest.schema.json` | kozo_abi_manifest.schema.json |
 | `schemas/latest_verify.schema.json` | latest_verify.schema.json |
 | `schemas/memory_initialization_evidence_contract.schema.json` | KOZO memory initialization evidence contract |
@@ -133,7 +137,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 51
+* Check count: 53
 * Failure count: 0
 
 ## Non-goals
