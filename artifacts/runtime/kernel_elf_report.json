@@ -18,8 +18,8 @@
   "memory_evidence_region": {
     "start_symbol": "boot_memory_region",
     "end_symbol": "boot_memory_region_end",
-    "start_address": "0xffffffff8020a000",
-    "end_address": "0xffffffff8020b000",
+    "start_address": "0xffffffff8020b000",
+    "end_address": "0xffffffff8020c000",
     "size_bytes": 4096,
     "required_alignment_bytes": 4096,
     "start_aligned": true
@@ -27,20 +27,73 @@
   "runtime_progression_symbols": {
     "runtime_progression_entry": {
       "present": true,
-      "address": "0xffffffff802002d0"
+      "address": "0xffffffff80200660"
     },
     "runtime_bootstrap_context": {
       "present": true,
-      "address": "0xffffffff80205000"
+      "address": "0xffffffff80206000"
     },
     "runtime_progression_state": {
       "present": true,
-      "address": "0xffffffff8020b000"
+      "address": "0xffffffff8020c000"
     },
     "runtime_serial_write_init_marker": {
       "present": true,
       "address": "0xffffffff802001dd"
     }
+  },
+  "controlled_runtime_loop": {
+    "symbols": {
+      "controlled_runtime_loop": {
+        "present": true,
+        "address": "0xffffffff802006b0"
+      },
+      "runtime_loop_state": {
+        "present": true,
+        "address": "0xffffffff8020c008"
+      },
+      "runtime_serial_write_loop_enter_marker": {
+        "present": true,
+        "address": "0xffffffff802001fc"
+      },
+      "runtime_serial_write_loop_iter_1_marker": {
+        "present": true,
+        "address": "0xffffffff8020021b"
+      },
+      "runtime_serial_write_loop_iter_2_marker": {
+        "present": true,
+        "address": "0xffffffff8020023a"
+      },
+      "runtime_serial_write_loop_iter_3_marker": {
+        "present": true,
+        "address": "0xffffffff80200259"
+      },
+      "runtime_serial_write_loop_exit_marker": {
+        "present": true,
+        "address": "0xffffffff80200278"
+      }
+    },
+    "disassembly_available": true,
+    "backward_branch_present": true,
+    "backward_branches": [
+      {
+        "instruction_address": "0xffffffff802006ec",
+        "target_address": "0xffffffff802006d0"
+      },
+      {
+        "instruction_address": "0xffffffff80200725",
+        "target_address": "0xffffffff802006d0"
+      },
+      {
+        "instruction_address": "0xffffffff80200727",
+        "target_address": "0xffffffff802006fd"
+      },
+      {
+        "instruction_address": "0xffffffff80200732",
+        "target_address": "0xffffffff802006d0"
+      }
+    ],
+    "terminal_comparison_present": true
   },
   "program_header_count": 7,
   "section_count": 13,
@@ -51,8 +104,8 @@
       "offset": "0x1000",
       "virtual_address": "0xffffffff80200000",
       "physical_address": "0x200000",
-      "file_size": "0x33e2",
-      "memory_size": "0x33e2",
+      "file_size": "0x3882",
+      "memory_size": "0x3882",
       "alignment": "0x1000"
     },
     {
@@ -61,18 +114,8 @@
       "offset": "0x5000",
       "virtual_address": "0xffffffff80204000",
       "physical_address": "0x204000",
-      "file_size": "0xf04",
-      "memory_size": "0xf04",
-      "alignment": "0x1000"
-    },
-    {
-      "type": "PT_LOAD",
-      "flags": "rw-",
-      "offset": "0x6000",
-      "virtual_address": "0xffffffff80205000",
-      "physical_address": "0x205000",
-      "file_size": "0x50",
-      "memory_size": "0x50",
+      "file_size": "0x10cc",
+      "memory_size": "0x10cc",
       "alignment": "0x1000"
     },
     {
@@ -81,8 +124,18 @@
       "offset": "0x7000",
       "virtual_address": "0xffffffff80206000",
       "physical_address": "0x206000",
+      "file_size": "0x50",
+      "memory_size": "0x50",
+      "alignment": "0x1000"
+    },
+    {
+      "type": "PT_LOAD",
+      "flags": "rw-",
+      "offset": "0x8000",
+      "virtual_address": "0xffffffff80207000",
+      "physical_address": "0x207000",
       "file_size": "0x0",
-      "memory_size": "0x5008",
+      "memory_size": "0x5028",
       "alignment": "0x1000"
     }
   ],
