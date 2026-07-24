@@ -1,13 +1,29 @@
 QEMU Smoke Summary
 
 Outcome
-Outcome: blocked
+Outcome: pass
 
 Blocker Category
-Blocker: missing_iso_generation_tooling
+Blocker: none
 
 Observed Markers
-  - none
+  - KOZO_EARLY_0_ENTRY
+  - KOZO_EARLY_1_SERIAL_INIT_START
+  - KOZO_EARLY_2_SERIAL_INIT_OK
+  - KOZO_BOOT_SMOKE_OK
+  - KOZO_STACK_INIT_OK
+  - KOZO_MEMORY_INIT_OK
+  - KOZO_RUNTIME_PROGRESS_ENTRY
+  - KOZO_RUNTIME_INIT_OK
+  - KOZO_RUNTIME_LOOP_ENTER
+  - KOZO_RUNTIME_LOOP_ITER_1
+  - KOZO_RUNTIME_LOOP_ITER_2
+  - KOZO_RUNTIME_LOOP_ITER_3
+  - KOZO_RUNTIME_LOOP_EXIT_OK
+  - KOZO_CAPABILITY_DISPATCH_ENTER
+  - KOZO_RUNTIME_STATUS_QUERY_OK
+  - KOZO_FIRST_CAPABILITY_OK
+  - KOZO_RUNTIME_RETURN_OK
 
 Expected Marker
 Expected Marker: KOZO_RUNTIME_RETURN_OK
@@ -16,10 +32,10 @@ Verifier Result
 Validator: qemu_smoke_evidence
 
 Metadata
-QEMU exit code: 0
-Timed out: False
-Serial log bytes: 0
-Stderr log bytes: 0
+QEMU exit code: 124
+Timed out: True
+Serial log bytes: 1654
+Stderr log bytes: 80
 
 Evidence References
 artifacts/runtime/qemu_smoke.log
@@ -28,7 +44,56 @@ artifacts/runtime/qemu_smoke.metadata.json
 artifacts/runtime/boot_blocker_report.json
 
 Last 50 serial lines
-(empty)
+vbe: Graphics vendor: SeaBIOS Developers
+vbe: Product name: SeaBIOS VBE Adapter
+vbe: Product revision: Rev. 1
+edid: Success.
+vbe: EDID detected screen resolution of 1280x800
+vbe: Found matching mode 0x17a, attempting to set...
+vbe: Framebuffer address: 0xfd000000
+edid: Success.
+limine: Loading executable `boot():/boot/kozo/kozo-kernel.elf`...
+limine: Physical base:   0xff37000
+limine: Virtual base:    0xffffffff80200000
+limine: Slide:           0x0
+limine: ELF entry point: 0xffffffff80200000
+limine: Base revision:   0
+limine: Requests count:  0
+limine: Top of HHDM:     0x10000000000
+vbe: Initialising...
+vbe: Version: 3.0
+vbe: OEM: SeaBIOS VBE(C) 2011
+vbe: Graphics vendor: SeaBIOS Developers
+vbe: Product name: SeaBIOS VBE Adapter
+vbe: Product revision: Rev. 1
+edid: Success.
+vbe: EDID detected screen resolution of 1280x800
+vbe: Found matching mode 0x17a, attempting to set...
+vbe: Mode was already set, perfect!
+vbe: Framebuffer address: 0xfd000000
+edid: Success.
+paging: 1GiB pages are not supported!
+acpi: Found RSDP at 0xf52e0
+acpi: "DMAR" not found
+acpi: Found RSDP at 0xf52e0
+acpi: "IVRS" not found
+KOZO_EARLY_0_ENTRY
+KOZO_EARLY_1_SERIAL_INIT_START
+KOZO_EARLY_2_SERIAL_INIT_OK
+KOZO_BOOT_SMOKE_OK
+KOZO_STACK_INIT_OK
+KOZO_MEMORY_INIT_OK
+KOZO_RUNTIME_PROGRESS_ENTRY
+KOZO_RUNTIME_INIT_OK
+KOZO_RUNTIME_LOOP_ENTER
+KOZO_RUNTIME_LOOP_ITER_1
+KOZO_RUNTIME_LOOP_ITER_2
+KOZO_RUNTIME_LOOP_ITER_3
+KOZO_RUNTIME_LOOP_EXIT_OK
+KOZO_CAPABILITY_DISPATCH_ENTER
+KOZO_RUNTIME_STATUS_QUERY_OK
+KOZO_FIRST_CAPABILITY_OK
+KOZO_RUNTIME_RETURN_OK
 
 Last 50 stderr lines
-(empty)
+qemu-system-x86_64: terminating on signal 15 from pid 22033 (<unknown process>)

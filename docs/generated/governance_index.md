@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.7.5`
+* Version: `v0.8.0`
 * Date: `2026-07-23`
-* Status: Implemented locally; hosted CI evidence pending.
+* Status: Corrected locally; hosted CI acceptance pending.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 53
 * Failed checks: 0
-* Run ID: `verify-20260724T014356Z`
-* Generated at: `2026-07-24T01:43:56Z`
+* Run ID: `verify-20260724T032202Z`
+* Generated at: `2026-07-24T03:22:02Z`
 
 ## Registered validators
 

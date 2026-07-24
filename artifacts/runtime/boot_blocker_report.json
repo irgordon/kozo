@@ -1,18 +1,12 @@
 {
   "version": 0,
   "phase": "v0.4.2",
-  "outcome": "blocked",
+  "outcome": "pass",
   "evidence_type": "boot-blocker-report",
   "generated_by": "scripts/boot_blocker_report.sh",
   "validator": "boot_blocker_report",
-  "blocker_category": "missing_iso_generation_tooling",
-  "missing_components": [
-    "Limine executable",
-    "xorriso executable",
-    "Limine bootloader artifacts",
-    "bootable ISO artifact",
-    "validated QEMU serial smoke execution"
-  ],
+  "blocker_category": "none",
+  "missing_components": [],
   "current_surfaces": [
     "kernel/arch/x86_64/boot.asm defines a 64-bit _start symbol",
     "kernel/main.odin exports kernel_entry",
@@ -26,7 +20,8 @@
     "artifacts/runtime/kernel_elf_report.json records kernel ELF loadability evidence",
     "scripts/qemu_smoke.sh fails closed until kozo.iso exists",
     "scripts/runtime_smoke.sh proves runtime-adjacent object and symbol evidence",
-    "scripts/build_boot_image.sh writes package metadata for the blocked ISO tooling attempt"
+    "scripts/qemu_smoke.sh captured artifacts/runtime/qemu_smoke.log",
+    "artifacts/runtime/qemu_smoke.metadata.json records passing QEMU serial smoke metadata"
   ],
   "cannot_claim": [
     "QEMU boot",
@@ -41,7 +36,7 @@
     "file descriptor behavior",
     "production readiness"
   ],
-  "next_required_fix": "Install or provide the documented Limine executable, Limine bootloader artifacts, and xorriso executable so scripts/build_boot_image.sh can create artifacts/runtime/boot_image/kozo.iso, then run scripts/qemu_smoke.sh to capture serial output before claiming QEMU boot evidence.",
+  "next_required_fix": "Do not expand runtime claims beyond QEMU serial smoke until separate hardware trap, userspace, or subsystem evidence exists.",
   "inspected_paths": [
     "kernel/arch/x86_64/boot.asm",
     "kernel/main.odin",

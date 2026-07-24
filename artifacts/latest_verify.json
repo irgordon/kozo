@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260724T014531Z",
+  "run_id": "verify-20260724T032230Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -70,7 +70,7 @@
       "subsystem": "odin",
       "status": "pass",
       "code": "OK",
-      "detail": "No Odin kernel changes require validation in this bootstrap loop"
+      "detail": "Odin changes are backed by declared odin check evidence"
     },
     {
       "name": "abi",
@@ -395,9 +395,28 @@
   ],
   "failed_checks": [],
   "changed_files": [
+    "CHANGELOG.md",
+    "artifacts/runtime/boot_blocker_report.json",
     "artifacts/runtime/kernel_elf_report.json",
     "artifacts/runtime/qemu_smoke.metadata.json",
-    "docs/generated/governance_index.md"
+    "artifacts/runtime/qemu_smoke.summary.txt",
+    "docs/BOOT_TOOLING.md",
+    "docs/CODEBASE_AUDIT.md",
+    "docs/PHASEMAP.md",
+    "docs/ROADMAP.md",
+    "docs/RUNTIME_EVIDENCE.md",
+    "docs/generated/governance_index.md",
+    "harness/validators_impl/first_governed_runtime_capability_evidence.py",
+    "harness/validators_impl/host_dependency_portability.py",
+    "harness/validators_impl/validator_coverage.py",
+    "kernel/runtime_capability.odin",
+    "schemas/latest_verify.schema.json",
+    "scripts/build_boot_image.sh",
+    "scripts/qemu_smoke.sh",
+    "tasks/todo.json",
+    "tests/test_first_governed_runtime_capability_evidence.py",
+    "tests/test_host_dependency_portability.py",
+    "tests/test_schema.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -414,5 +433,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-07-24T01:45:31Z"
+  "generated_at": "2026-07-24T03:22:30Z"
 }

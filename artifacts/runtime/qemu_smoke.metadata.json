@@ -2,7 +2,7 @@
   "version": 0,
   "phase": "v0.4.1",
   "evidence_type": "qemu-serial-smoke",
-  "outcome": "blocked",
+  "outcome": "pass",
   "boot_protocol": "Limine",
   "architecture": "x86_64",
   "generated_by": "scripts/qemu_smoke.sh",
@@ -29,22 +29,41 @@
     "KOZO_FIRST_CAPABILITY_OK",
     "KOZO_RUNTIME_RETURN_OK"
   ],
-  "observed_markers": [],
-  "earliest_observed_marker": "",
-  "limine_entry_point_observed": false,
+  "observed_markers": [
+    "KOZO_EARLY_0_ENTRY",
+    "KOZO_EARLY_1_SERIAL_INIT_START",
+    "KOZO_EARLY_2_SERIAL_INIT_OK",
+    "KOZO_BOOT_SMOKE_OK",
+    "KOZO_STACK_INIT_OK",
+    "KOZO_MEMORY_INIT_OK",
+    "KOZO_RUNTIME_PROGRESS_ENTRY",
+    "KOZO_RUNTIME_INIT_OK",
+    "KOZO_RUNTIME_LOOP_ENTER",
+    "KOZO_RUNTIME_LOOP_ITER_1",
+    "KOZO_RUNTIME_LOOP_ITER_2",
+    "KOZO_RUNTIME_LOOP_ITER_3",
+    "KOZO_RUNTIME_LOOP_EXIT_OK",
+    "KOZO_CAPABILITY_DISPATCH_ENTER",
+    "KOZO_RUNTIME_STATUS_QUERY_OK",
+    "KOZO_FIRST_CAPABILITY_OK",
+    "KOZO_RUNTIME_RETURN_OK"
+  ],
+  "earliest_observed_marker": "KOZO_EARLY_0_ENTRY",
+  "limine_entry_point_observed": true,
   "expected_entry_symbol": "_start",
   "entry_marker_expected": "KOZO_EARLY_0_ENTRY",
-  "entry_marker_observed": false,
+  "entry_marker_observed": true,
   "entry_fault_signal": "",
-  "qemu_exit_code": 0,
-  "timed_out": false,
+  "qemu_exit_code": 124,
+  "timed_out": true,
   "timeout_seconds": 20,
-  "serial_log_bytes": 0,
-  "stderr_log_bytes": 0,
+  "serial_log_bytes": 1654,
+  "stderr_log_bytes": 80,
   "validator": "qemu_smoke_evidence",
   "proves": [
-    "QEMU serial smoke was attempted or checked",
-    "QEMU boot evidence remains unclaimed"
+    "QEMU launched the KOZO ISO",
+    "serial output was captured",
+    "the expected KOZO runtime return marker was observed"
   ],
   "does_not_prove": [
     "hardware trap execution",
@@ -63,6 +82,5 @@
     "ELF loading",
     "file descriptor behavior",
     "production readiness"
-  ],
-  "blocker_category": "missing_iso_generation_tooling"
+  ]
 }
