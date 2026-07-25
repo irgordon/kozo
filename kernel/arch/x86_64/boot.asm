@@ -26,6 +26,9 @@ global runtime_serial_write_loop_exit_marker
 global runtime_serial_write_capability_dispatch_marker
 global runtime_serial_write_status_query_marker
 global runtime_serial_write_first_capability_marker
+global runtime_serial_write_state_update_enter_marker
+global runtime_serial_write_state_update_ok_marker
+global runtime_serial_write_second_capability_marker
 
 %define COM1 0x03f8
 %define COM1_INTERRUPT_ENABLE 0x03f9
@@ -189,6 +192,18 @@ runtime_status_query_marker_end:
 first_capability_marker:
     db "KOZO_FIRST_CAPABILITY_OK", 13, 10
 first_capability_marker_end:
+
+runtime_state_update_enter_marker:
+    db "KOZO_RUNTIME_STATE_UPDATE_ENTER", 13, 10
+runtime_state_update_enter_marker_end:
+
+runtime_state_update_ok_marker:
+    db "KOZO_RUNTIME_STATE_UPDATE_OK", 13, 10
+runtime_state_update_ok_marker_end:
+
+second_capability_marker:
+    db "KOZO_SECOND_CAPABILITY_OK", 13, 10
+second_capability_marker_end:
 
 runtime_return_marker:
     db "KOZO_RUNTIME_RETURN_OK", 13, 10
@@ -438,4 +453,16 @@ runtime_serial_write_status_query_marker:
 
 runtime_serial_write_first_capability_marker:
     WRITE_COM1_MARKER first_capability_marker, first_capability_marker_end
+    ret
+
+runtime_serial_write_state_update_enter_marker:
+    WRITE_COM1_MARKER runtime_state_update_enter_marker, runtime_state_update_enter_marker_end
+    ret
+
+runtime_serial_write_state_update_ok_marker:
+    WRITE_COM1_MARKER runtime_state_update_ok_marker, runtime_state_update_ok_marker_end
+    ret
+
+runtime_serial_write_second_capability_marker:
+    WRITE_COM1_MARKER second_capability_marker, second_capability_marker_end
     ret

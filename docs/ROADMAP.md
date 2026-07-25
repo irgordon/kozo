@@ -102,7 +102,8 @@ The current repository proves:
 * hosted-CI-proven internal assembly-to-Odin progression boundary and bounded volatile Odin state probe
 * hosted-CI-proven contract-backed three-iteration controlled Odin loop with linked-symbol, backward-edge, terminal-comparison, marker-order, and halt-continuation validation
 * hosted-CI-proven versioned internal runtime status query with fixed request/response geometry, explicit dispatch, response validation, linked-symbol evidence, and governed capability markers
-* locally evidenced boot-CPU x87/SSE initialization with CPUID checks, CR0/CR4 readback, x87/MXCSR validation, and one bounded SSE2 probe before Odin entry
+* hosted-CI-proven boot-CPU x87/SSE initialization with CPUID checks, CR0/CR4 readback, x87/MXCSR validation, and one bounded SSE2 probe before Odin entry
+* locally evidenced capability ID 2 path for one fixed boot-owned READY/0-to-ACTIVE/1 volatile state transition and validated response
 
 The latest local generated evidence may still report missing local Limine/xorriso tooling, but CI run `27894312430` proves the narrow QEMU serial smoke path.
 
@@ -112,7 +113,7 @@ The latest local generated evidence may still report missing local Limine/xorris
 
 KOZO still does not prove:
 
-* hosted QEMU proof of the v0.8.1 CPU-state marker sequence and binary-policy checks
+* hosted QEMU proof of the v0.8.2 state-transition marker sequence and evidence checks
 * complete Odin runtime readiness or dynamic initialization
 * general stack readiness beyond the controlled boot stack proof
 * general memory management beyond the governed static region
@@ -136,9 +137,10 @@ KOZO still does not prove:
 
 # 9. Current Active Blocker
 
-No local v0.8.1 runtime blocker is active. Hosted CI confirmation of the
-CPU-state markers, CPU-state validators, preserved runtime suffix, and AVX
-prohibition remains required before phase acceptance.
+No local v0.8.2 runtime blocker is active. Hosted CI confirmation of the
+state-transition markers, both capability validators, focused ELF evidence,
+preserved first capability, governed return, and halt remains required before
+phase acceptance.
 
 ---
 
@@ -155,8 +157,9 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 7. Preserve the accepted v0.7.45 progression/runtime-initialization evidence and the hosted-CI-proven v0.7.5 controlled loop.
 8. Keep the terminal halt path authoritative after the bounded Odin call.
 9. Keep physical memory discovery, paging, virtual memory management, allocators, heaps, dynamic Odin initialization, and userspace outside the current proof.
-10. Accept v0.8.1 only after hosted CI confirms CPU-state initialization and SIMD probe markers before runtime progression, passing CPU-state evidence, and the unchanged capability and halt suffix.
-11. Keep AVX, XSAVE, XCR0, per-task state ownership, and exception recovery outside the current runtime scope.
+10. Preserve the hosted-accepted v0.8.1 CPU-state boundary before all Odin capability work.
+11. Accept v0.8.2 only after hosted CI confirms the complete state-transition suffix, both validators, and the unchanged return-to-halt path.
+12. Keep arbitrary writes, concurrency, userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
 
 ---
 
@@ -237,6 +240,7 @@ Deferred until separately scoped runtime or cleanup phases:
 | `v0.7.5` | Controlled Runtime Loop | Execute exactly three Odin-owned iterations with static volatile state, deterministic accumulation, fixed evidence markers, exact status handling, and the unchanged halt continuation. | Scheduler semantics, interrupts, concurrency, unbounded execution, allocation, userspace, process/VFS/fd behavior, compatibility claims, production-readiness claims. |
 | `v0.8.0` | First Governed Runtime Capability | Validate and dispatch one internal versioned runtime status request, validate a deterministic response, and preserve governed return-to-halt behavior. | Userspace access, privilege separation, hardware syscall entry, scheduler/process/VFS/fd behavior, allocation, compatibility claims, production-readiness claims. |
 | `v0.8.1` | CPU Extended-State Initialization | Detect and configure the boot CPU x87/SSE state, validate x87/MXCSR control state, and prove one bounded SIMD result before Odin. | AVX/XSAVE/XCR0, per-task extended-state ownership, context switching, exception recovery, complete CPU initialization, compatibility, production readiness. |
+| `v0.8.2` | Governed Runtime State Transition Capability | Validate and dispatch one fixed internal READY/0-to-ACTIVE/1 state mutation, read it back through volatile accesses, validate its response, and preserve return-to-halt. | Arbitrary memory writes, general state machines, dynamic capability registration, concurrency, userspace access, authorization, persistence, compatibility, production readiness. |
 | `v1.0.0-rc.1` | Release candidate hardening | Freeze scope, freeze gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | New feature scope after RC. |
 | `v1.0.0` | Scoped release | Release only evidence-backed behavior with explicit non-goals. | Any unimplemented compatibility or runtime subsystem claim. |
 

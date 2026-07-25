@@ -36,6 +36,9 @@ foreign runtime_boot_bridge {
 	runtime_serial_write_capability_dispatch_marker :: proc "c" () ---
 	runtime_serial_write_status_query_marker :: proc "c" () ---
 	runtime_serial_write_first_capability_marker :: proc "c" () ---
+	runtime_serial_write_state_update_enter_marker :: proc "c" () ---
+	runtime_serial_write_state_update_ok_marker :: proc "c" () ---
+	runtime_serial_write_second_capability_marker :: proc "c" () ---
 }
 
 Runtime_Bootstrap_Context :: struct {
@@ -71,12 +74,19 @@ runtime_progression_entry :: proc "c" (bootstrap: ^Runtime_Bootstrap_Context) ->
 	if !runtime_state_probe_succeeds() {
 		return RUNTIME_PROGRESSION_STATE_FAILURE
 	}
+	if !initialize_runtime_state_transition_cell() {
+		return RUNTIME_PROGRESSION_STATE_FAILURE
+	}
 	runtime_emit_init_marker()
 	loop_status := controlled_runtime_loop()
 	if loop_status != RUNTIME_PROGRESSION_OK {
 		return loop_status
 	}
-	return execute_first_governed_capability()
+	first_capability_status := execute_first_governed_capability()
+	if first_capability_status != RUNTIME_PROGRESSION_OK {
+		return first_capability_status
+	}
+	return execute_second_governed_capability()
 }
 
 @(export)

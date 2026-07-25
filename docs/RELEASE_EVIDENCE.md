@@ -426,3 +426,12 @@ the bounded SIMD probe, subsequent runtime progression, the existing capability
 suffix, and the halt contract. This proves no AVX/XSAVE, per-task state
 ownership, context switching, exception recovery, compatibility, or production
 readiness.
+
+For v0.8.2, release review must include
+`contracts/runtime_state_transition_capability.v0.json`, both state-transition
+validators, the kernel ELF report, and QEMU metadata/logs. Acceptance requires
+the unchanged first-capability suffix followed by update entry, update
+completion, second-capability success, governed return, and the halt contract.
+This proves one bounded boot-owned READY/0-to-ACTIVE/1 mutation only; it does
+not prove arbitrary writes, concurrency, userspace access, authorization,
+persistent state, isolation, compatibility, or production readiness.

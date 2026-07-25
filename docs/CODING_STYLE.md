@@ -874,3 +874,8 @@ hardware responsibility, control-register changes preserve unrelated bits, and
 hardware success markers follow readback or behavioral validation. Tests should
 cover consequential architectural failures instead of mirroring every
 instruction.
+
+Runtime capability paths must also read top-down. Keep one direct dispatcher,
+separate boundary validation from state mutation and evidence emission, and
+prefer the smallest consequential malformed-request and failure-path tests
+over exhaustive field permutations.

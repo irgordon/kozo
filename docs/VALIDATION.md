@@ -141,6 +141,10 @@ Current runtime evidence and runtime contract validators include:
 * `runtime_progression_evidence`
 * `controlled_runtime_loop_contract`
 * `controlled_runtime_loop_evidence`
+* `first_governed_runtime_capability`
+* `first_governed_runtime_capability_evidence`
+* `runtime_state_transition_capability`
+* `runtime_state_transition_capability_evidence`
 
 `runtime_progression_stages` performs graph-level validation. It rejects direct and indirect cycles, duplicate identifiers and names, unknown references, forward prerequisites, proven stages with unproven mandatory prerequisites, backward or skipped transitions, unknown contract or validator authorities, and transitions with missing or multiple owners. The traversal is deterministic and contract order remains authoritative.
 
@@ -151,6 +155,16 @@ Current runtime evidence and runtime contract validators include:
 `controlled_runtime_loop_contract` validates the three-iteration state model, deterministic accumulator, marker order, exact statuses, transition ownership, and terminal continuation. `controlled_runtime_loop_evidence` separately validates volatile source operations, failure-before-success ordering, fixed marker bridges, linked symbols, retained ELF backward branch, terminal comparison, stage status, QEMU metadata/log agreement, and the unchanged halt path. Hosted QEMU evidence is required before `CONTROLLED_RUNTIME_LOOP` becomes proven.
 
 `first_governed_runtime_capability` validates capability identity, fixed request and response geometry, stage-mask meaning, status values, marker boundaries, transition ownership, claim limits, and halt continuation. `first_governed_runtime_capability_evidence` separately validates top-down source ordering, request and response defense, explicit dispatch, response population and validation, success-marker exclusion from failure paths, fixed bridges, linked symbols and call edge, stage state, and QEMU metadata/log agreement. Hosted QEMU evidence is required before `FIRST_GOVERNED_RUNTIME_CAPABILITY` becomes proven.
+
+`runtime_state_transition_capability` validates capability ID 2, fixed request,
+response, and state geometry, the sole READY/0-to-ACTIVE/1 transition, status
+stability, volatile-readback and rollback policy, marker ownership, claims, and
+halt authority. `runtime_state_transition_capability_evidence` separately
+validates explicit state initialization, overflow-safe request geometry,
+direct dispatcher routing, volatile mutation/readback, response validation,
+fixed bridges, focused ELF symbols and call edges, full QEMU marker order, and
+the existing return-to-halt continuation. Hosted QEMU evidence is required for
+phase acceptance.
 
 ---
 

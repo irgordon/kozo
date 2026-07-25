@@ -47,6 +47,8 @@ from harness.validators_impl.first_governed_runtime_capability import FirstGover
 from harness.validators_impl.first_governed_runtime_capability_evidence import FirstGovernedRuntimeCapabilityEvidenceValidator
 from harness.validators_impl.cpu_extended_state_initialization_contract import CpuExtendedStateInitializationContractValidator
 from harness.validators_impl.cpu_extended_state_initialization_evidence import CpuExtendedStateInitializationEvidenceValidator
+from harness.validators_impl.runtime_state_transition_capability import RuntimeStateTransitionCapabilityValidator
+from harness.validators_impl.runtime_state_transition_capability_evidence import RuntimeStateTransitionCapabilityEvidenceValidator
 from harness.validators_impl.boot_blocker_report import BootBlockerReportValidator
 from harness.validators_impl.boot_protocol_decision import BootProtocolDecisionValidator
 from harness.validators_impl.boot_image_skeleton import BootImageSkeletonValidator
@@ -104,6 +106,8 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "first_governed_runtime_capability_evidence": FirstGovernedRuntimeCapabilityEvidenceValidator,
     "cpu_extended_state_initialization_contract": CpuExtendedStateInitializationContractValidator,
     "cpu_extended_state_initialization_evidence": CpuExtendedStateInitializationEvidenceValidator,
+    "runtime_state_transition_capability": RuntimeStateTransitionCapabilityValidator,
+    "runtime_state_transition_capability_evidence": RuntimeStateTransitionCapabilityEvidenceValidator,
     "boot_blocker_report": BootBlockerReportValidator,
     "boot_protocol_decision": BootProtocolDecisionValidator,
     "boot_image_skeleton": BootImageSkeletonValidator,

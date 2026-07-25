@@ -71,6 +71,7 @@ No build or verification script may depend on user-specific absolute paths.
 | CI ISO tooling install | GitHub Actions `ci / full verification` | `docs/BOOT_TOOLING.md` | Yes | Yes | CI output, `artifacts/runtime/boot_image/package_metadata.json`, `artifacts/runtime/boot_image/kozo.iso` when produced |
 | QEMU smoke evidence | `scripts/qemu_smoke.sh` and `qemu_smoke_evidence` | `docs/BOOT.md` | Yes, through full verification | Yes, when the QEMU blocker is under direct review | `artifacts/runtime/qemu_smoke.log`, `artifacts/runtime/qemu_smoke.stderr.log`, `artifacts/runtime/qemu_smoke.metadata.json`, `artifacts/runtime/qemu_smoke.summary.txt` |
 | Runtime progression evidence | `runtime_progression_entry_contract` and `runtime_progression_evidence` through `scripts/verify.sh` | `docs/RUNTIME_EVIDENCE.md` | Yes, through full verification | Yes | contract, source, ELF report, QEMU metadata/log evidence |
+| Runtime state transition capability | `runtime_state_transition_capability` and `runtime_state_transition_capability_evidence` through `scripts/verify.sh` | `docs/RUNTIME_CAPABILITIES.md` | Yes, through full verification | Yes | contract, source, focused ELF report, QEMU metadata/log evidence |
 | CI workflow | GitHub Actions `ci / full verification` | `docs/REQUIRED_CHECKS.md` | Yes | Yes | GitHub Actions status |
 | Lint workflow | GitHub Actions `lint / static checks` | `docs/REQUIRED_CHECKS.md` | Yes | Yes | GitHub Actions status |
 
@@ -141,7 +142,14 @@ Full CI must run `scripts/ci_evidence_summary.sh` with `if: always()` so failure
 
 The CI evidence summary is a first-level triage surface. It does not replace `artifacts/latest_verify.json`, QEMU smoke metadata, QEMU serial/stderr logs, or boot blocker reports as generated evidence.
 
-The CI-observed timeout or runtime state must be narrowed when possible. QEMU smoke metadata blocker vocabulary is owned by `contracts/runtime_evidence_taxonomy.v0.json`, including the distinguishable capability states `capability_dispatch_not_reached`, `runtime_status_query_not_completed`, and `first_governed_capability_not_proven`; all blocked states remain evidence limitations and do not authorize a pass.
+The CI-observed timeout or runtime state must be narrowed when possible. QEMU
+smoke metadata blocker vocabulary is owned by
+`contracts/runtime_evidence_taxonomy.v0.json`, including
+`capability_dispatch_not_reached`, `runtime_status_query_not_completed`,
+`first_governed_capability_not_proven`, `runtime_state_update_not_reached`,
+`runtime_state_update_not_completed`, and
+`second_governed_capability_not_proven`; all blocked states remain evidence
+limitations and do not authorize a pass.
 
 Full verification runs `scripts/build_boot_image.sh` to produce `artifacts/runtime/boot_image/package_metadata.json`; while packaging is blocked, that metadata is blocker evidence rather than boot evidence.
 
@@ -184,3 +192,10 @@ For v0.8.1, full CI must also run
 feature checks, preserved and read-back CR0/CR4 policy, x87/MXCSR validation,
 the bounded SIMD probe, no prohibited AVX state or instructions, complete
 metadata/log agreement, the unchanged runtime suffix, and the halt contract.
+
+For v0.8.2, full CI must also run
+`runtime_state_transition_capability` and
+`runtime_state_transition_capability_evidence`. Passing evidence requires
+fixed geometry, exact direct dispatch, volatile READY/0-to-ACTIVE/1 mutation
+and readback, response validation before success, complete metadata/log
+agreement, the unchanged first capability, exact return, and halt convergence.

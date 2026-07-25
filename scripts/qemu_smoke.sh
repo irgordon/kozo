@@ -33,6 +33,9 @@ EARLY_MARKERS=(
   "KOZO_CAPABILITY_DISPATCH_ENTER"
   "KOZO_RUNTIME_STATUS_QUERY_OK"
   "KOZO_FIRST_CAPABILITY_OK"
+  "KOZO_RUNTIME_STATE_UPDATE_ENTER"
+  "KOZO_RUNTIME_STATE_UPDATE_OK"
+  "KOZO_SECOND_CAPABILITY_OK"
   "$EXPECTED_MARKER"
 )
 QEMU_TIMEOUT_SECONDS="${KOZO_QEMU_TIMEOUT_SECONDS:-20}"
@@ -299,6 +302,12 @@ elif markers[16] in observed and markers[17] not in observed:
 elif markers[17] in observed and markers[18] not in observed:
     print("first_governed_capability_not_proven")
 elif markers[18] in observed and markers[19] not in observed:
+    print("runtime_state_update_not_reached")
+elif markers[19] in observed and markers[20] not in observed:
+    print("runtime_state_update_not_completed")
+elif markers[20] in observed and markers[21] not in observed:
+    print("second_governed_capability_not_proven")
+elif markers[21] in observed and markers[22] not in observed:
     print("runtime_return_not_reached")
 elif observed and observed[0] != markers[0]:
     print("qemu_timeout")
@@ -417,6 +426,12 @@ metadata = {
         "dynamic initialization",
         "general stack readiness",
         "general memory management",
+        "arbitrary kernel memory writes",
+        "concurrent execution",
+        "persistent state",
+        "authentication",
+        "authorization",
+        "privilege separation",
         "syscall dispatch",
         "Linux compatibility",
         "POSIX compatibility",

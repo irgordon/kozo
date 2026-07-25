@@ -48,8 +48,8 @@ class FirstGovernedRuntimeCapabilityEvidenceValidatorTests(unittest.TestCase):
     def test_fails_when_progression_does_not_call_capability(self):
         result = self.validate_fixture(
             mutate_progression=lambda text: text.replace(
-                "return execute_first_governed_capability()",
-                "return RUNTIME_PROGRESSION_OK",
+                "first_capability_status := execute_first_governed_capability()",
+                "first_capability_status := RUNTIME_PROGRESSION_OK",
             )
         )
 

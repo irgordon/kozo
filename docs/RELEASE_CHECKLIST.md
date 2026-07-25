@@ -291,6 +291,13 @@ instructions, no governed AVX/YMM/ZMM/`xsetbv` use exists, hosted QEMU contains
 the three CPU-state markers before runtime progression, the full capability
 suffix remains present, and the terminal halt contract still passes.
 
+For v0.8.2 and later, confirm both state-transition validators pass, capability
+ID 1 behavior remains unchanged, ELF evidence records the state cell, direct
+ID 2 route, handler, accessors, and fixed bridges, and hosted QEMU contains the
+ordered update-entry, update-success, second-capability, return, and halt
+evidence. Reject any release evidence that implies arbitrary memory writes,
+concurrency, userspace access, authorization, persistence, or isolation.
+
 ---
 
 # 14. Release Decision

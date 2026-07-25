@@ -149,7 +149,10 @@ def _progression_issue(context: FirstCapabilityContext) -> FirstCapabilityEviden
         "loop_status := controlled_runtime_loop()",
         "if loop_status != RUNTIME_PROGRESSION_OK {",
         "return loop_status",
-        "return execute_first_governed_capability()",
+        "first_capability_status := execute_first_governed_capability()",
+        "if first_capability_status != RUNTIME_PROGRESSION_OK {",
+        "return first_capability_status",
+        "return execute_second_governed_capability()",
     )
     return _ordered_issue(context.progression_lines, expected, "capability_path_missing", "execution_order")
 
@@ -223,16 +226,23 @@ def _request_issue(context: FirstCapabilityContext) -> FirstCapabilityEvidenceIs
 
 def _dispatcher_issue(context: FirstCapabilityContext) -> FirstCapabilityEvidenceIssue | None:
     expected = (
+        "header_status := validate_runtime_capability_header(request)",
+        "if header_status != RUNTIME_PROGRESSION_OK {",
+        "return header_status",
+        "header := cast(^Runtime_Capability_Header)(request)",
+        "switch header.capability_id {",
+        "case RUNTIME_STATUS_QUERY_CAPABILITY_ID:",
+        "return dispatch_runtime_status_query(",
+        "case RUNTIME_STATE_TRANSITION_CAPABILITY_ID:",
+        "return dispatch_runtime_state_transition(",
+        "case:",
+        "return RUNTIME_CAPABILITY_UNSUPPORTED_CAPABILITY",
         "validation_status := validate_runtime_status_request(request, response)",
         "if validation_status != RUNTIME_PROGRESSION_OK {",
         "return validation_status",
         "clear_runtime_status_response(response)",
         "runtime_serial_write_capability_dispatch_marker()",
-        "switch request.capability_id {",
-        "case RUNTIME_STATUS_QUERY_CAPABILITY_ID:",
         "return query_runtime_status(response)",
-        "case:",
-        "return RUNTIME_CAPABILITY_UNSUPPORTED_CAPABILITY",
     )
     return _ordered_issue(context.capability_lines, expected, "dispatcher_sequence_mismatch", "execution_order")
 
@@ -289,7 +299,7 @@ def _response_validation_issue(context: FirstCapabilityContext) -> FirstCapabili
 
 def _success_marker_issue(context: FirstCapabilityContext) -> FirstCapabilityEvidenceIssue | None:
     expected = (
-        "status := dispatch_runtime_capability(&request, &response)",
+        "status := dispatch_runtime_capability(cast(rawptr)(&request), cast(rawptr)(&response))",
         "if status != RUNTIME_PROGRESSION_OK {",
         "return status",
         "if !validate_runtime_status_response(&response) {",

@@ -178,3 +178,11 @@ and SSE does not provide process isolation, and no exception recovery or
 per-task extended-state ownership exists. AVX remains prohibited because
 OSXSAVE, XCR0 policy, XSAVE geometry, and save/restore ownership are not
 implemented.
+
+The v0.8.2 runtime state transition remains a same-address-space,
+kernel-constructed operation. The request is not reachable from userspace and
+does not cross an authentication, authorization, privilege, isolation, or
+hardware syscall boundary. The capability can mutate only the named
+boot-owned state cell from READY/0 to ACTIVE/1. It exposes no arbitrary target
+address, dynamic registration, concurrency guarantee, atomic multi-thread
+semantics, or persistent state.

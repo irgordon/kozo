@@ -214,7 +214,12 @@ The previous `missing_bootable_iso_packaging` blocker was refined to `missing_li
 
 The previous `missing_limine_iso_tooling` blocker is refined by `docs/BOOT_TOOLING.md`.
 
-The QEMU serial smoke, stack evidence, controlled-memory evidence, bounded progression entry, minimal Odin initialization, controlled runtime loop, and first governed internal capability paths are proven. v0.8.1 adds locally evidenced CPU extended-state initialization before Odin; hosted marker and validator evidence is required before promotion.
+The QEMU serial smoke, stack evidence, controlled-memory evidence, bounded
+progression entry, minimal Odin initialization, controlled runtime loop, first
+governed internal capability, and v0.8.1 CPU extended-state paths are proven.
+v0.8.2 locally adds one bounded second capability that transitions a boot-owned
+state cell from READY/0 to ACTIVE/1. Hosted marker and validator evidence is
+required before v0.8.2 acceptance.
 
 The existing QEMU smoke command writes blocked or passing metadata to `artifacts/runtime/qemu_smoke.metadata.json` and serial output to `artifacts/runtime/qemu_smoke.log`.
 
@@ -320,3 +325,23 @@ descriptive boundary; the contract under `contracts/` is authoritative.
 
 This gate does not enable AVX/XSAVE, context switching, exception recovery,
 userspace, or production behavior.
+
+## Governed State Transition
+
+After `KOZO_FIRST_CAPABILITY_OK`, executed Odin code constructs the fixed
+capability ID 2 request, validates exact pointer and field constraints, and
+transitions only `runtime_state_transition_cell`. The local ordered suffix is:
+
+```text
+KOZO_FIRST_CAPABILITY_OK
+KOZO_RUNTIME_STATE_UPDATE_ENTER
+KOZO_RUNTIME_STATE_UPDATE_OK
+KOZO_SECOND_CAPABILITY_OK
+KOZO_RUNTIME_RETURN_OK
+```
+
+The transition uses volatile write/readback, restores the prior state and
+generation on readback failure, validates the fixed response before success,
+and preserves the assembly terminal halt path. It is not userspace access,
+general memory management, concurrency, authorization, or production
+readiness.

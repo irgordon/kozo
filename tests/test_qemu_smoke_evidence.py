@@ -148,7 +148,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_runtime_return_not_reached_blocker(self):
         result = self.validate_blocked_fixture(
             "runtime_return_not_reached",
-            "\n".join(early_markers()[:19]) + "\n",
+            "\n".join(early_markers()[:22]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -173,6 +173,30 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
         result = self.validate_blocked_fixture(
             "first_governed_capability_not_proven",
             "\n".join(early_markers()[:18]) + "\n",
+        )
+
+        self.assertEqual(result.status, "pass")
+
+    def test_accepts_runtime_state_update_not_reached_blocker(self):
+        result = self.validate_blocked_fixture(
+            "runtime_state_update_not_reached",
+            "\n".join(early_markers()[:19]) + "\n",
+        )
+
+        self.assertEqual(result.status, "pass")
+
+    def test_accepts_runtime_state_update_not_completed_blocker(self):
+        result = self.validate_blocked_fixture(
+            "runtime_state_update_not_completed",
+            "\n".join(early_markers()[:20]) + "\n",
+        )
+
+        self.assertEqual(result.status, "pass")
+
+    def test_accepts_second_governed_capability_not_proven_blocker(self):
+        result = self.validate_blocked_fixture(
+            "second_governed_capability_not_proven",
+            "\n".join(early_markers()[:21]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")

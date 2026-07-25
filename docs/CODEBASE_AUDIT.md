@@ -1045,3 +1045,23 @@ The script currently uses fixed artifact paths and checks ISO existence but not
 nonzero size immediately before launch. This is recorded as a local launch
 diagnostic limitation. Hosted CI remains the v0.8.1 acceptance authority; no
 marker or validator requirement is weakened.
+
+---
+
+# 31. v0.8.2 Governed Runtime State Transition
+
+Date: 2026-07-25
+
+Status: Implemented and locally evidenced; hosted CI pending.
+
+| ID | Status | Rationale |
+| --- | --- | --- |
+| AUDIT-082-001 | Resolved locally | One direct dispatcher owns IDs 1 and 2; capability-specific validation and handlers remain separate from coordination. |
+| AUDIT-082-002 | Resolved locally | The state cell, request, and response use fixed geometry; volatile mutation/readback and rollback are mechanically validated. |
+| AUDIT-082-003 | Resolved locally | Focused ELF reporting records the state symbol size/alignment, direct call edges, comparison retention, and only the governed accessor memory operations. |
+| AUDIT-082-004 | Hosted confirmation pending | Local QEMU captures the complete 23-marker sequence; hosted CI must confirm identical ordering and both validators. |
+| AUDIT-064-002 | Deferred | `validator_coverage.py` remains above the preferred split threshold; decomposition is outside this runtime phase. |
+
+The capability adds no general registry, arbitrary target pointer, dynamic
+memory, userspace ABI, concurrency model, authorization boundary, persistent
+state, compatibility claim, or production claim.

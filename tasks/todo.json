@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO CPU Extended-State Initialization v0.8.1",
+  "task_title": "KOZO Governed Runtime State Transition Capability v0.8.2",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -13,15 +13,17 @@
     "v0.7.45 runtime progression entry and runtime initialization evidence are accepted by hosted CI",
     "v0.7.5 controlled runtime loop evidence is accepted by hosted CI run 30057826315",
     "v0.8.0 first governed runtime capability evidence is accepted by hosted CI",
+    "v0.8.1 CPU extended-state initialization evidence is accepted by hosted CI with 55 checks and 0 failures",
     "The reconciled runtime progression graph is acyclic and permits first capability evidence only after controlled loop evidence",
     "Odin, pinned Rust, Python, jq, and repository verification tooling are installed"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
-    "Stack, memory, progression-entry, runtime-initialization, controlled-loop, and first-capability evidence remain proven",
+    "Stack, memory, progression-entry, runtime-initialization, controlled-loop, first-capability, and CPU-state evidence remain proven",
     "KOZO_FIRST_CAPABILITY_OK requires a validated request, exact dispatch, validated response, and KOZO_RUNTIME_RETURN_OK still requires exact status zero",
     "CPU extended-state initialization executes in assembly after memory evidence and before the first Odin call",
-    "This phase changes only boot-CPU x87/SSE initialization, bounded SIMD evidence, validators, task state, and documentation; public ABI, syscalls, linker layout, first capability behavior, and terminal halt authority remain unchanged"
+    "Capability ID 1 remains read-only and owns the single generic dispatch marker",
+    "This phase adds only capability ID 2, one fixed boot-owned READY/0 to ACTIVE/1 state transition, focused evidence, validators, task state, and documentation; public ABI, syscalls, linker layout, stage order, first capability behavior, and terminal halt authority remain unchanged"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -2568,6 +2570,80 @@
         "verification.tests_run[123]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 78,
+      "title": "Implement the governed runtime state transition capability",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "kernel/arch/x86_64/boot.asm",
+        "kernel/runtime_capability.odin",
+        "kernel/runtime_progression.odin",
+        "contracts/runtime_evidence_taxonomy.v0.json",
+        "contracts/runtime_state_transition_capability.v0.json",
+        "schemas/runtime_state_transition_capability.schema.json",
+        "schemas/latest_verify.schema.json",
+        "schemas/agent_context.schema.json",
+        "harness/runtime_state_transition_capability.py",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/schema.py",
+        "harness/validators_impl/runtime_evidence_taxonomy.py",
+        "harness/validators_impl/qemu_smoke_evidence.py",
+        "harness/validators_impl/runtime_progression_evidence.py",
+        "harness/validators_impl/first_governed_runtime_capability_evidence.py",
+        "harness/validators_impl/runtime_state_transition_capability.py",
+        "harness/validators_impl/runtime_state_transition_capability_evidence.py",
+        "harness/validators_impl/validator_coverage.py",
+        "scripts/kernel_elf_report.py",
+        "scripts/qemu_smoke.sh",
+        "tests/test_runtime_evidence_taxonomy.py",
+        "tests/test_qemu_smoke_evidence.py",
+        "tests/test_runtime_progression_evidence.py",
+        "tests/test_first_governed_runtime_capability_evidence.py",
+        "tests/test_runtime_state_transition_capability.py",
+        "tests/test_runtime_state_transition_capability_evidence.py",
+        "docs/ARCHITECTURE.md",
+        "docs/BOOT.md",
+        "docs/CONTRACTS.md",
+        "docs/INVARIANTS.md",
+        "docs/RUNTIME_CAPABILITIES.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/REQUIRED_CHECKS.md",
+        "docs/VALIDATION.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/CODEBASE_AUDIT.md",
+        "docs/SECURITY_MODEL.md",
+        "docs/CODING_STYLE.md",
+        "docs/generated/governance_index.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.summary.txt"
+      ],
+      "verification_refs": [
+        "verification.tests_run[131]",
+        "verification.tests_run[132]",
+        "verification.tests_run[133]",
+        "verification.tests_run[134]",
+        "verification.tests_run[135]",
+        "verification.tests_run[136]",
+        "verification.tests_run[137]",
+        "verification.tests_run[138]",
+        "verification.tests_run[139]",
+        "verification.tests_run[140]",
+        "verification.tests_run[141]",
+        "verification.tests_run[142]",
+        "verification.tests_run[143]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -3290,6 +3366,71 @@
         "tool": "local QEMU launch-boundary inspection",
         "command": "pgrep exact-name checks; lsof QEMU/ISO/log checks; verify.sh and qemu_smoke.sh source inspection; ISO size and SHA-256 inspection",
         "status": "passed_no_stale_process_or_open_handle; fixed_artifact_paths_and_exists_only_iso_check_recorded_as_local_limitation"
+      },
+      {
+        "tool": "Odin",
+        "command": "odin check kernel",
+        "status": "passed"
+      },
+      {
+        "tool": "Python unittest",
+        "command": "python3 -m unittest tests/test_runtime_state_transition_capability.py",
+        "status": "passed_18_tests"
+      },
+      {
+        "tool": "Python unittest",
+        "command": "python3 -m unittest tests/test_runtime_state_transition_capability_evidence.py",
+        "status": "passed_26_tests"
+      },
+      {
+        "tool": "Python unittest",
+        "command": "python3 -m unittest tests/test_qemu_smoke_evidence.py",
+        "status": "passed_54_tests"
+      },
+      {
+        "tool": "Python unittest",
+        "command": "python3 -m unittest tests/test_runtime_evidence_taxonomy.py tests/test_first_governed_runtime_capability_evidence.py tests/test_runtime_progression_evidence.py",
+        "status": "passed_57_tests"
+      },
+      {
+        "tool": "Python unittest",
+        "command": "python3 -m unittest tests/test_validator_coverage.py",
+        "status": "passed_20_tests"
+      },
+      {
+        "tool": "boot image and QEMU smoke",
+        "command": "scripts/build_boot_image.sh without configured Limine recorded missing_iso_generation_tooling; configured scripts/qemu_smoke.sh produced a bootable ISO and passing 23-marker evidence",
+        "status": "passed_after_governed_tool_configuration"
+      },
+      {
+        "tool": "ELF and direct validators",
+        "command": "python3 scripts/kernel_elf_report.py; nm; objdump; direct runtime_state_transition_capability_evidence and qemu_smoke_evidence validation",
+        "status": "passed"
+      },
+      {
+        "tool": "Python focused unittest",
+        "command": "python3 -m unittest with the 11 required v0.8.2 contract, evidence, regression, halt, taxonomy, QEMU, and coverage modules",
+        "status": "passed_234_tests"
+      },
+      {
+        "tool": "Python unittest discovery",
+        "command": "python3 -m unittest discover -s tests",
+        "status": "passed_764_tests"
+      },
+      {
+        "tool": "Odin, Rust, policy, and TOML validation",
+        "command": "odin check kernel; cargo check; cargo deny check; cargo audit; cargo nextest run; taplo fmt --check .; taplo check",
+        "status": "odin_and_cargo_check_passed; audit_passed; deny_existing_missing_license_failure; nextest_no_tests; taplo_macos_system_configuration_panic"
+      },
+      {
+        "tool": "full verification with governed local ISO and QEMU tooling",
+        "command": "scripts/verify.sh with configured Limine v12.3.3, xorriso, and KOZO_QEMU_BIN after governance index regeneration",
+        "status": "passed_57_checks_0_failures_qemu_outcome_pass_23_markers"
+      },
+      {
+        "tool": "final JSON, generated governance, and diff validation",
+        "command": "python3 -m json.tool and jq for 9 final JSON files; direct governance_index_report validation; git diff --check",
+        "status": "passed"
       }
     ],
     "logs": [

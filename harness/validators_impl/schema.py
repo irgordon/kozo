@@ -30,6 +30,7 @@ _SCHEMA_PATHS = {
     "controlled_runtime_loop_contract": _SCHEMA_DIR / "controlled_runtime_loop_contract.schema.json",
     "first_governed_runtime_capability": _SCHEMA_DIR / "first_governed_runtime_capability.schema.json",
     "cpu_extended_state_initialization_contract": _SCHEMA_DIR / "cpu_extended_state_initialization_contract.schema.json",
+    "runtime_state_transition_capability": _SCHEMA_DIR / "runtime_state_transition_capability.schema.json",
 }
 
 

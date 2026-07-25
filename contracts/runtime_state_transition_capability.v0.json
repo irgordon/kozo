@@ -1,0 +1,215 @@
+{
+  "version": 0,
+  "architecture": "x86_64",
+  "capability": {
+    "canonical_name": "RUNTIME_STATE_TRANSITION",
+    "canonical_identifier": "SECOND_GOVERNED_RUNTIME_CAPABILITY",
+    "numeric_identifier": 2,
+    "stage_id": 6,
+    "status": "implemented_pending_ci",
+    "source_file": "kernel/runtime_capability.odin",
+    "entry_symbol": "execute_second_governed_capability",
+    "dispatcher_symbol": "dispatch_runtime_capability",
+    "handler_symbol": "transition_runtime_state"
+  },
+  "state": {
+    "symbol": "runtime_state_transition_cell",
+    "size_bytes": 16,
+    "alignment_bytes": 8,
+    "ownership": "boot-owned same-address-space kernel runtime",
+    "lifetime": "current boot only",
+    "fields": [
+      {"name": "state", "offset_bytes": 0, "width_bytes": 4},
+      {"name": "reserved", "offset_bytes": 4, "width_bytes": 4},
+      {"name": "generation", "offset_bytes": 8, "width_bytes": 8}
+    ],
+    "initial_values": {
+      "state": 1,
+      "reserved": 0,
+      "generation": 0
+    },
+    "terminal_values": {
+      "state": 2,
+      "reserved": 0,
+      "generation": 1
+    },
+    "volatile_access_required": true,
+    "concurrency_safe": false,
+    "persistent": false
+  },
+  "request": {
+    "version": 1,
+    "size_bytes": 32,
+    "alignment_bytes": 8,
+    "supported_flags": 0,
+    "aliasing_policy": "request_response_ranges_must_not_overlap",
+    "fields": [
+      {"name": "version", "offset_bytes": 0, "width_bytes": 4},
+      {"name": "capability_id", "offset_bytes": 4, "width_bytes": 4},
+      {"name": "expected_state", "offset_bytes": 8, "width_bytes": 4},
+      {"name": "requested_state", "offset_bytes": 12, "width_bytes": 4},
+      {"name": "expected_generation", "offset_bytes": 16, "width_bytes": 8},
+      {"name": "flags", "offset_bytes": 24, "width_bytes": 4},
+      {"name": "reserved", "offset_bytes": 28, "width_bytes": 4}
+    ],
+    "required_values": {
+      "capability_id": 2,
+      "expected_state": 1,
+      "requested_state": 2,
+      "expected_generation": 0,
+      "flags": 0,
+      "reserved": 0
+    },
+    "required_zero_fields": [
+      "expected_generation",
+      "flags",
+      "reserved"
+    ]
+  },
+  "response": {
+    "version": 1,
+    "size_bytes": 48,
+    "alignment_bytes": 8,
+    "fields": [
+      {"name": "version", "offset_bytes": 0, "width_bytes": 4},
+      {"name": "capability_id", "offset_bytes": 4, "width_bytes": 4},
+      {"name": "status", "offset_bytes": 8, "width_bytes": 4},
+      {"name": "previous_state", "offset_bytes": 12, "width_bytes": 4},
+      {"name": "current_state", "offset_bytes": 16, "width_bytes": 4},
+      {"name": "reserved_0", "offset_bytes": 20, "width_bytes": 4},
+      {"name": "previous_generation", "offset_bytes": 24, "width_bytes": 8},
+      {"name": "current_generation", "offset_bytes": 32, "width_bytes": 8},
+      {"name": "reserved_1", "offset_bytes": 40, "width_bytes": 8}
+    ],
+    "expected_values": {
+      "capability_id": 2,
+      "status": 0,
+      "previous_state": 1,
+      "current_state": 2,
+      "reserved_0": 0,
+      "previous_generation": 0,
+      "current_generation": 1,
+      "reserved_1": 0
+    },
+    "required_zero_fields": [
+      "status",
+      "reserved_0",
+      "previous_generation",
+      "reserved_1"
+    ]
+  },
+  "transition": {
+    "allowed_from_state": 1,
+    "allowed_to_state": 2,
+    "required_initial_generation": 0,
+    "required_terminal_generation": 1,
+    "generation_increment": 1,
+    "generation_overflow_forbidden": true,
+    "readback_required": true,
+    "rollback_on_readback_failure": true,
+    "arbitrary_target_forbidden": true
+  },
+  "statuses": {
+    "success": 0,
+    "invalid_request_pointer": 9,
+    "invalid_response_pointer": 10,
+    "unsupported_request_version": 11,
+    "unsupported_capability": 12,
+    "unsupported_flags": 13,
+    "invalid_reserved_field": 14,
+    "response_validation_failure": 15,
+    "capability_execution_failure": 16,
+    "stale_generation": 17,
+    "invalid_transition": 18,
+    "readback_failure": 19
+  },
+  "markers": {
+    "required_after": "KOZO_FIRST_CAPABILITY_OK",
+    "required_before": "KOZO_RUNTIME_RETURN_OK",
+    "emission_owner": "executed Odin code through fixed assembly bridges",
+    "ordered_sequence": [
+      "KOZO_RUNTIME_STATE_UPDATE_ENTER",
+      "KOZO_RUNTIME_STATE_UPDATE_OK",
+      "KOZO_SECOND_CAPABILITY_OK"
+    ],
+    "generic_dispatch_marker_repeated": false
+  },
+  "execution_order": [
+    "initialize boot-owned state to READY generation 0",
+    "read back initialized state before runtime initialization success",
+    "complete first governed capability",
+    "construct fixed state-transition request",
+    "validate request and response boundary",
+    "dispatch exact runtime state transition capability",
+    "validate current state and expected generation",
+    "emit runtime state update entry",
+    "write ACTIVE and generation 1 through volatile stores",
+    "read back state and generation through volatile loads",
+    "restore previous state and generation on readback failure",
+    "populate deterministic response",
+    "validate populated response",
+    "emit runtime state update success",
+    "validate complete capability result",
+    "emit second capability success",
+    "return exact success status"
+  ],
+  "failure_behavior": {
+    "success_markers_forbidden_on_failure": true,
+    "unknown_capability_rejected": true,
+    "readback_failure_restores_previous_state": true,
+    "runtime_return_requires_success": true,
+    "halt_contract": "contracts/runtime_halt_contract.v0.json"
+  },
+  "required_evidence": [
+    "runtime state transition capability contract validation",
+    "fixed state request and response source layout",
+    "explicit volatile state initialization and readback",
+    "linked state, dispatcher, handler, coordinator, and marker bridge symbols",
+    "runtime progression call to execute_second_governed_capability",
+    "ordered QEMU evidence through KOZO_SECOND_CAPABILITY_OK",
+    "KOZO_RUNTIME_RETURN_OK after exact second capability success status",
+    "runtime halt contract remains valid"
+  ],
+  "claim_boundary": {
+    "proves": [
+      "one kernel-constructed versioned state transition request is validated and dispatched",
+      "one boot-owned state cell transitions from READY generation 0 to ACTIVE generation 1",
+      "the state and generation mutation is read back through volatile accesses",
+      "one fixed deterministic response is populated and validated",
+      "the first capability, governed runtime return, and halt paths remain connected"
+    ],
+    "does_not_prove": [
+      "arbitrary kernel memory writes",
+      "concurrent or atomic state transitions",
+      "userspace capability access",
+      "authentication or authorization",
+      "privilege separation",
+      "persistent state",
+      "production readiness"
+    ]
+  },
+  "non_goals": [
+    "arbitrary kernel memory writes",
+    "general state-machine framework",
+    "dynamic capability registration",
+    "concurrent execution",
+    "atomic multi-thread semantics",
+    "userspace execution",
+    "public userspace ABI",
+    "authentication",
+    "authorization",
+    "privilege separation",
+    "hardware syscall entry",
+    "scheduler behavior",
+    "interrupt handling",
+    "allocator behavior",
+    "general memory management",
+    "persistent state",
+    "process model behavior",
+    "VFS behavior",
+    "file descriptor behavior",
+    "Linux compatibility",
+    "POSIX compatibility",
+    "production readiness"
+  ]
+}

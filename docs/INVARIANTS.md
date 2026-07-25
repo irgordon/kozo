@@ -532,3 +532,9 @@ for the allowed generated instruction class has succeeded. Control-register
 updates preserve unrelated bits, hardware success markers follow readback or
 behavioral validation, and any prerequisite failure converges on a governed
 non-fallthrough terminal path.
+
+Internal runtime capability mutation must remain contract-bounded. Capability
+selection is direct, request and response geometry is validated before use,
+state mutation is limited to the named boot-owned object, evidence follows
+volatile readback and response validation, and failure cannot emit success or
+bypass the terminal halt path.

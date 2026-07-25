@@ -1,0 +1,333 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KOZO runtime state transition capability",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "capability",
+    "state",
+    "request",
+    "response",
+    "transition",
+    "statuses",
+    "markers",
+    "execution_order",
+    "failure_behavior",
+    "required_evidence",
+    "claim_boundary",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {"const": 0},
+    "architecture": {"const": "x86_64"},
+    "capability": {"$ref": "#/$defs/capability"},
+    "state": {"$ref": "#/$defs/state"},
+    "request": {"$ref": "#/$defs/request"},
+    "response": {"$ref": "#/$defs/response"},
+    "transition": {"$ref": "#/$defs/transition"},
+    "statuses": {"$ref": "#/$defs/statuses"},
+    "markers": {"$ref": "#/$defs/markers"},
+    "execution_order": {"$ref": "#/$defs/nonEmptyStrings"},
+    "failure_behavior": {"$ref": "#/$defs/failureBehavior"},
+    "required_evidence": {"$ref": "#/$defs/nonEmptyStrings"},
+    "claim_boundary": {"$ref": "#/$defs/claimBoundary"},
+    "non_goals": {"$ref": "#/$defs/nonEmptyStrings"}
+  },
+  "$defs": {
+    "nonEmptyString": {"type": "string", "pattern": ".*\\S.*"},
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/nonEmptyString"}
+    },
+    "layoutField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "offset_bytes", "width_bytes"],
+      "properties": {
+        "name": {"$ref": "#/$defs/nonEmptyString"},
+        "offset_bytes": {"type": "integer", "minimum": 0},
+        "width_bytes": {"type": "integer", "minimum": 1}
+      }
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_name",
+        "canonical_identifier",
+        "numeric_identifier",
+        "stage_id",
+        "status",
+        "source_file",
+        "entry_symbol",
+        "dispatcher_symbol",
+        "handler_symbol"
+      ],
+      "properties": {
+        "canonical_name": {"const": "RUNTIME_STATE_TRANSITION"},
+        "canonical_identifier": {"const": "SECOND_GOVERNED_RUNTIME_CAPABILITY"},
+        "numeric_identifier": {"const": 2},
+        "stage_id": {"const": 6},
+        "status": {"const": "implemented_pending_ci"},
+        "source_file": {"const": "kernel/runtime_capability.odin"},
+        "entry_symbol": {"const": "execute_second_governed_capability"},
+        "dispatcher_symbol": {"const": "dispatch_runtime_capability"},
+        "handler_symbol": {"const": "transition_runtime_state"}
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "symbol",
+        "size_bytes",
+        "alignment_bytes",
+        "ownership",
+        "lifetime",
+        "fields",
+        "initial_values",
+        "terminal_values",
+        "volatile_access_required",
+        "concurrency_safe",
+        "persistent"
+      ],
+      "properties": {
+        "symbol": {"const": "runtime_state_transition_cell"},
+        "size_bytes": {"const": 16},
+        "alignment_bytes": {"const": 8},
+        "ownership": {"$ref": "#/$defs/nonEmptyString"},
+        "lifetime": {"$ref": "#/$defs/nonEmptyString"},
+        "fields": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {"$ref": "#/$defs/layoutField"}
+        },
+        "initial_values": {"$ref": "#/$defs/stateValues"},
+        "terminal_values": {"$ref": "#/$defs/stateValues"},
+        "volatile_access_required": {"const": true},
+        "concurrency_safe": {"const": false},
+        "persistent": {"const": false}
+      }
+    },
+    "stateValues": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "reserved", "generation"],
+      "properties": {
+        "state": {"type": "integer"},
+        "reserved": {"const": 0},
+        "generation": {"type": "integer"}
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "size_bytes",
+        "alignment_bytes",
+        "supported_flags",
+        "aliasing_policy",
+        "fields",
+        "required_values",
+        "required_zero_fields"
+      ],
+      "properties": {
+        "version": {"const": 1},
+        "size_bytes": {"const": 32},
+        "alignment_bytes": {"const": 8},
+        "supported_flags": {"const": 0},
+        "aliasing_policy": {"const": "request_response_ranges_must_not_overlap"},
+        "fields": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "items": {"$ref": "#/$defs/layoutField"}
+        },
+        "required_values": {"$ref": "#/$defs/requestValues"},
+        "required_zero_fields": {"$ref": "#/$defs/nonEmptyStrings"}
+      }
+    },
+    "requestValues": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capability_id",
+        "expected_state",
+        "requested_state",
+        "expected_generation",
+        "flags",
+        "reserved"
+      ],
+      "properties": {
+        "capability_id": {"const": 2},
+        "expected_state": {"const": 1},
+        "requested_state": {"const": 2},
+        "expected_generation": {"const": 0},
+        "flags": {"const": 0},
+        "reserved": {"const": 0}
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "size_bytes",
+        "alignment_bytes",
+        "fields",
+        "expected_values",
+        "required_zero_fields"
+      ],
+      "properties": {
+        "version": {"const": 1},
+        "size_bytes": {"const": 48},
+        "alignment_bytes": {"const": 8},
+        "fields": {
+          "type": "array",
+          "minItems": 9,
+          "maxItems": 9,
+          "items": {"$ref": "#/$defs/layoutField"}
+        },
+        "expected_values": {"$ref": "#/$defs/responseValues"},
+        "required_zero_fields": {"$ref": "#/$defs/nonEmptyStrings"}
+      }
+    },
+    "responseValues": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capability_id",
+        "status",
+        "previous_state",
+        "current_state",
+        "reserved_0",
+        "previous_generation",
+        "current_generation",
+        "reserved_1"
+      ],
+      "properties": {
+        "capability_id": {"const": 2},
+        "status": {"const": 0},
+        "previous_state": {"const": 1},
+        "current_state": {"const": 2},
+        "reserved_0": {"const": 0},
+        "previous_generation": {"const": 0},
+        "current_generation": {"const": 1},
+        "reserved_1": {"const": 0}
+      }
+    },
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowed_from_state",
+        "allowed_to_state",
+        "required_initial_generation",
+        "required_terminal_generation",
+        "generation_increment",
+        "generation_overflow_forbidden",
+        "readback_required",
+        "rollback_on_readback_failure",
+        "arbitrary_target_forbidden"
+      ],
+      "properties": {
+        "allowed_from_state": {"const": 1},
+        "allowed_to_state": {"const": 2},
+        "required_initial_generation": {"const": 0},
+        "required_terminal_generation": {"const": 1},
+        "generation_increment": {"const": 1},
+        "generation_overflow_forbidden": {"const": true},
+        "readback_required": {"const": true},
+        "rollback_on_readback_failure": {"const": true},
+        "arbitrary_target_forbidden": {"const": true}
+      }
+    },
+    "statuses": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "success",
+        "invalid_request_pointer",
+        "invalid_response_pointer",
+        "unsupported_request_version",
+        "unsupported_capability",
+        "unsupported_flags",
+        "invalid_reserved_field",
+        "response_validation_failure",
+        "capability_execution_failure",
+        "stale_generation",
+        "invalid_transition",
+        "readback_failure"
+      ],
+      "properties": {
+        "success": {"const": 0},
+        "invalid_request_pointer": {"const": 9},
+        "invalid_response_pointer": {"const": 10},
+        "unsupported_request_version": {"const": 11},
+        "unsupported_capability": {"const": 12},
+        "unsupported_flags": {"const": 13},
+        "invalid_reserved_field": {"const": 14},
+        "response_validation_failure": {"const": 15},
+        "capability_execution_failure": {"const": 16},
+        "stale_generation": {"const": 17},
+        "invalid_transition": {"const": 18},
+        "readback_failure": {"const": 19}
+      }
+    },
+    "markers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_after",
+        "required_before",
+        "emission_owner",
+        "ordered_sequence",
+        "generic_dispatch_marker_repeated"
+      ],
+      "properties": {
+        "required_after": {"const": "KOZO_FIRST_CAPABILITY_OK"},
+        "required_before": {"const": "KOZO_RUNTIME_RETURN_OK"},
+        "emission_owner": {"$ref": "#/$defs/nonEmptyString"},
+        "ordered_sequence": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {"$ref": "#/$defs/nonEmptyString"}
+        },
+        "generic_dispatch_marker_repeated": {"const": false}
+      }
+    },
+    "failureBehavior": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "success_markers_forbidden_on_failure",
+        "unknown_capability_rejected",
+        "readback_failure_restores_previous_state",
+        "runtime_return_requires_success",
+        "halt_contract"
+      ],
+      "properties": {
+        "success_markers_forbidden_on_failure": {"const": true},
+        "unknown_capability_rejected": {"const": true},
+        "readback_failure_restores_previous_state": {"const": true},
+        "runtime_return_requires_success": {"const": true},
+        "halt_contract": {"const": "contracts/runtime_halt_contract.v0.json"}
+      }
+    },
+    "claimBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proves", "does_not_prove"],
+      "properties": {
+        "proves": {"$ref": "#/$defs/nonEmptyStrings"},
+        "does_not_prove": {"$ref": "#/$defs/nonEmptyStrings"}
+      }
+    }
+  }
+}

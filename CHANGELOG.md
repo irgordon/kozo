@@ -1,8 +1,20 @@
 # Changelog
 
-## v0.8.1 - 2026-07-25
+## v0.8.2 - 2026-07-25
 
 **Status:** Implemented and locally evidenced; hosted CI acceptance pending.
+
+* Added capability ID 2 for one bounded runtime-state transition.
+* Added fixed 32-byte request, 48-byte response, and 16-byte boot-owned state structures.
+* Validated expected state, requested state, generation, flags, reserved fields, pointer geometry, and non-overlap before mutation.
+* Transitioned the boot-owned state from `READY/0` to `ACTIVE/1` and validated the mutation through volatile readback.
+* Restored the prior state and generation on readback failure and excluded success markers from failure paths.
+* Preserved capability ID 1, CPU-state initialization, the controlled loop, governed return, and terminal halt behavior.
+* Added no arbitrary-write, concurrency, userspace, authorization, compatibility, or production-readiness claim.
+
+## v0.8.1 - 2026-07-25
+
+**Status:** Accepted by hosted CI with 55 checks and 0 failures.
 
 * Detected the required FPU, FXSR, SSE, and SSE2 capabilities before Odin entry.
 * Configured and read back the governed CR0 and CR4 extended-state controls while preserving unrelated bits.

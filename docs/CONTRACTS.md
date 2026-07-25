@@ -79,6 +79,7 @@ Current contract paths include:
 | Runtime progression stages contract | `contracts/runtime_progression_stages.v0.json` | Canonical future runtime progression stage model |
 | Controlled runtime loop contract | `contracts/controlled_runtime_loop_contract.v0.json` | Bounded Odin loop state, marker, status, evidence, transition, and halt-continuation boundary |
 | First governed runtime capability | `contracts/first_governed_runtime_capability.v0.json` | Versioned internal runtime status request, fixed response, dispatch, marker, claim, and halt-continuation boundary |
+| Runtime state transition capability | `contracts/runtime_state_transition_capability.v0.json` | Capability ID 2, fixed request/response and state geometry, READY/0 to ACTIVE/1 transition, volatile readback, rollback, marker, claim, and halt boundary |
 | Stack initialization evidence contract | `contracts/stack_initialization_evidence_contract.v0.json` | Controlled stack proof boundary and marker evidence |
 | Memory initialization evidence contract | `contracts/memory_initialization_evidence_contract.v0.json` | Future memory proof boundary and marker reservation |
 
@@ -284,3 +285,19 @@ The contract does not authorize AVX/XSAVE, XCR0 changes, per-task state
 ownership, context switching, exception recovery, userspace, compatibility, or
 production claims. Generated ELF and QEMU reports are evidence, not contract
 authority.
+
+---
+
+# 23. Runtime State Transition Capability
+
+`contracts/runtime_state_transition_capability.v0.json` owns capability ID 2
+and its one bounded boot-owned state mutation. It defines the versioned
+32-byte request, versioned 48-byte response, 16-byte state cell, exact
+READY/0-to-ACTIVE/1 transition, status values, volatile readback, rollback,
+marker ownership, and terminal halt convergence.
+
+The contract does not create a general capability registry, arbitrary memory
+write, userspace ABI, authentication or authorization boundary, concurrent or
+atomic state machine, persistent state, compatibility claim, or production
+claim. `docs/RUNTIME_CAPABILITIES.md` describes the capability surface without
+overriding contract authority.

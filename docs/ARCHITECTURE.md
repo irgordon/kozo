@@ -193,3 +193,13 @@ readback → x87/MXCSR initialization → bounded SSE2 survival probe → Odin e
 This establishes the boot CPU state required by the allowed early Odin
 instruction class. It does not establish AVX/XSAVE, per-task state ownership,
 context switching, exception recovery, or complete CPU initialization.
+
+v0.8.2 extends the accepted internal Odin path as controlled runtime loop →
+runtime status query → bounded runtime state transition → governed return →
+terminal halt. One direct dispatcher routes capability ID 1 to the unchanged
+status query and capability ID 2 to one boot-owned READY/0-to-ACTIVE/1 state
+transition. The second capability validates fixed request/response geometry,
+performs volatile mutation and readback, and validates its response before
+success. It does not create dynamic registration, arbitrary memory mutation,
+userspace access, concurrency, authorization, privilege separation, or a
+general state-machine subsystem.

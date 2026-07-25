@@ -54,6 +54,21 @@ CPU_EXTENDED_STATE_SYMBOLS = (
     "simd_probe_result",
     "simd_probe_result_end",
 )
+RUNTIME_STATE_TRANSITION_SYMBOLS = (
+    "runtime_state_transition_cell",
+    "initialize_runtime_state_transition_cell",
+    "execute_second_governed_capability",
+    "dispatch_runtime_capability",
+    "dispatch_runtime_state_transition",
+    "transition_runtime_state",
+    "runtime_state_cell_store",
+    "runtime_state_cell_state",
+    "runtime_state_cell_reserved",
+    "runtime_state_cell_generation",
+    "runtime_serial_write_state_update_enter_marker",
+    "runtime_serial_write_state_update_ok_marker",
+    "runtime_serial_write_second_capability_marker",
+)
 AVX_MNEMONIC_PREFIXES = (
     "vadd",
     "vsub",
@@ -171,6 +186,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
             *CONTROLLED_RUNTIME_LOOP_SYMBOLS,
             *FIRST_CAPABILITY_SYMBOLS,
             *CPU_EXTENDED_STATE_SYMBOLS,
+            *RUNTIME_STATE_TRANSITION_SYMBOLS,
         ),
     )
     symbol_address = symbols.get("_start")
@@ -199,6 +215,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "controlled_runtime_loop": controlled_runtime_loop_record(kernel_elf, symbols),
         "first_governed_runtime_capability": first_capability_record(kernel_elf, symbols),
         "cpu_extended_state_initialization": cpu_extended_state_record(kernel_elf, symbols),
+        "runtime_state_transition_capability": runtime_state_transition_record(kernel_elf, symbols),
         "program_header_count": header.program_header_count,
         "section_count": header.section_header_count,
         "load_segments": [segment_record(segment) for segment in load_segments],
@@ -298,6 +315,29 @@ def symbol_addresses(kernel_elf: Path, symbol_names: tuple[str, ...]) -> dict[st
     if result.returncode != 0:
         return {}
     return parse_symbol_addresses(result.stdout, set(symbol_names))
+
+
+def symbol_sizes(kernel_elf: Path, symbol_names: tuple[str, ...]) -> dict[str, int]:
+    try:
+        result = subprocess.run(["nm", "-S", str(kernel_elf)], check=False, capture_output=True, text=True)
+    except OSError:
+        return {}
+    if result.returncode != 0:
+        return {}
+    return parse_symbol_sizes(result.stdout, set(symbol_names))
+
+
+def parse_symbol_sizes(nm_output: str, symbol_names: set[str]) -> dict[str, int]:
+    sizes: dict[str, int] = {}
+    for line in nm_output.splitlines():
+        parts = line.split()
+        if len(parts) < 4 or parts[-1] not in symbol_names:
+            continue
+        try:
+            sizes[parts[-1]] = int(parts[1], 16)
+        except ValueError:
+            continue
+    return sizes
 
 
 def parse_symbol_addresses(nm_output: str, symbol_names: set[str]) -> dict[str, int]:
@@ -407,6 +447,68 @@ def cpu_extended_state_record(
         "avx_prohibited_instruction_present": bool(prohibited),
         "prohibited_instructions": prohibited,
     }
+
+
+def runtime_state_transition_record(
+    kernel_elf: Path,
+    symbols: dict[str, int],
+) -> dict[str, object]:
+    instruction_sets = {
+        symbol: parse_disassembly_instructions(disassemble_symbol(kernel_elf, symbol))
+        for symbol in RUNTIME_STATE_TRANSITION_SYMBOLS
+        if symbol in symbols
+    }
+    progression = parse_disassembly_instructions(
+        disassemble_symbol(kernel_elf, "runtime_progression_entry")
+    )
+    dispatcher = instruction_sets.get("dispatch_runtime_capability", [])
+    handler = instruction_sets.get("transition_runtime_state", [])
+    accessors = _state_accessor_instructions(instruction_sets)
+    sizes = symbol_sizes(kernel_elf, ("runtime_state_transition_cell",))
+    return {
+        "symbols": symbol_record(symbols, RUNTIME_STATE_TRANSITION_SYMBOLS),
+        "progression_call_present": _calls_address(
+            progression,
+            symbols.get("execute_second_governed_capability"),
+        ),
+        "dispatcher_route_present": _calls_address(
+            dispatcher,
+            symbols.get("dispatch_runtime_state_transition"),
+        ),
+        "handler_comparison_count": _mnemonic_count(handler, "cmp"),
+        "volatile_memory_access_count": _memory_move_count(accessors),
+        "state_cell_address": _hex(symbols["runtime_state_transition_cell"])
+        if "runtime_state_transition_cell" in symbols
+        else "",
+        "state_cell_size_bytes": sizes.get("runtime_state_transition_cell", -1),
+        "state_cell_required_size_bytes": 16,
+        "state_cell_required_alignment_bytes": 8,
+        "state_cell_aligned": (
+            "runtime_state_transition_cell" in symbols
+            and symbols["runtime_state_transition_cell"] % 8 == 0
+        ),
+    }
+
+
+def _state_accessor_instructions(instruction_sets):
+    names = (
+        "runtime_state_cell_store",
+        "runtime_state_cell_state",
+        "runtime_state_cell_reserved",
+        "runtime_state_cell_generation",
+    )
+    return [
+        instruction
+        for name in names
+        for instruction in instruction_sets.get(name, [])
+    ]
+
+
+def _memory_move_count(instructions) -> int:
+    return sum(
+        mnemonic.startswith("mov") and ("(" in operands or "[" in operands)
+        for _, mnemonic, operands in instructions
+    )
 
 
 def _cpu_instruction_sets(all_instructions, symbol_addresses) -> dict[str, list[tuple[int, str, str]]]:
@@ -696,6 +798,8 @@ def malformed_report(kernel_elf: Path, linker_script: Path, issue: str) -> dict[
         "runtime_progression_symbols": runtime_progression_symbol_record({}),
         "controlled_runtime_loop": controlled_runtime_loop_record(kernel_elf, {}),
         "first_governed_runtime_capability": first_capability_record(kernel_elf, {}),
+        "cpu_extended_state_initialization": cpu_extended_state_record(kernel_elf, {}),
+        "runtime_state_transition_capability": runtime_state_transition_record(kernel_elf, {}),
         "program_header_count": 0,
         "section_count": 0,
         "load_segments": [],

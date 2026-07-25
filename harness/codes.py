@@ -55,6 +55,8 @@ FIRST_GOVERNED_RUNTIME_CAPABILITY_INVALID = "FIRST_GOVERNED_RUNTIME_CAPABILITY_I
 FIRST_GOVERNED_RUNTIME_CAPABILITY_EVIDENCE_INVALID = "FIRST_GOVERNED_RUNTIME_CAPABILITY_EVIDENCE_INVALID"
 CPU_EXTENDED_STATE_INITIALIZATION_CONTRACT_INVALID = "CPU_EXTENDED_STATE_INITIALIZATION_CONTRACT_INVALID"
 CPU_EXTENDED_STATE_INITIALIZATION_EVIDENCE_INVALID = "CPU_EXTENDED_STATE_INITIALIZATION_EVIDENCE_INVALID"
+RUNTIME_STATE_TRANSITION_CAPABILITY_INVALID = "RUNTIME_STATE_TRANSITION_CAPABILITY_INVALID"
+RUNTIME_STATE_TRANSITION_CAPABILITY_EVIDENCE_INVALID = "RUNTIME_STATE_TRANSITION_CAPABILITY_EVIDENCE_INVALID"
 BOOT_BLOCKER_REPORT_INVALID = "BOOT_BLOCKER_REPORT_INVALID"
 BOOT_PROTOCOL_DECISION_INVALID = "BOOT_PROTOCOL_DECISION_INVALID"
 BOOT_IMAGE_SKELETON_INVALID = "BOOT_IMAGE_SKELETON_INVALID"
@@ -123,6 +125,8 @@ CODES = MappingProxyType(
         FIRST_GOVERNED_RUNTIME_CAPABILITY_EVIDENCE_INVALID: "First governed runtime capability evidence is missing, malformed, or inconsistent with source, ELF, QEMU, stage, or halt state",
         CPU_EXTENDED_STATE_INITIALIZATION_CONTRACT_INVALID: "CPU extended-state initialization contract is missing, malformed, or inconsistent with pre-Odin x87 and SSE policy",
         CPU_EXTENDED_STATE_INITIALIZATION_EVIDENCE_INVALID: "CPU extended-state initialization evidence is missing, malformed, or inconsistent with source, ELF, runtime markers, or AVX prohibition",
+        RUNTIME_STATE_TRANSITION_CAPABILITY_INVALID: "Runtime state transition capability contract is missing, malformed, or inconsistent with its bounded READY/0 to ACTIVE/1 boundary",
+        RUNTIME_STATE_TRANSITION_CAPABILITY_EVIDENCE_INVALID: "Runtime state transition capability evidence is missing, malformed, or inconsistent with source, ELF, QEMU, first-capability, or halt state",
         BOOT_BLOCKER_REPORT_INVALID: "Boot blocker report is missing, malformed, or inconsistent with boot baseline policy",
         BOOT_PROTOCOL_DECISION_INVALID: "Boot protocol decision is missing, incomplete, or inconsistent with boot blocker policy",
         BOOT_IMAGE_SKELETON_INVALID: "Boot image skeleton is missing, incomplete, or inconsistent with boot blocker state",

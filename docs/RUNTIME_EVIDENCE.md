@@ -72,6 +72,16 @@ v0.7.5 implements a three-iteration controlled loop inside the already-proven Od
 
 v0.8.0 adds one internal `RUNTIME_STATUS_QUERY`. Odin validates a versioned fixed request, clears a non-overlapping fixed response, emits dispatch evidence, selects one exact capability ID, validates accepted loop state, populates and validates only the accepted stage 0 through 5 baseline, emits handler and capability success evidence, and returns exact status zero to the existing assembly return-to-halt path. Local contract, source, and ELF evidence establish implementation readiness only; hosted CI must capture the three capability markers before `FIRST_GOVERNED_RUNTIME_CAPABILITY` becomes proven.
 
+v0.8.1 is accepted by hosted CI. Required CPUID feature checks, CR0/CR4
+readback, x87/MXCSR initialization, and the bounded SSE2 survival probe occur
+before the first Odin entry while AVX/XSAVE remains outside the governed path.
+
+v0.8.2 adds capability ID 2, `RUNTIME_STATE_TRANSITION`. Local QEMU evidence
+shows the unchanged first capability followed by a kernel-constructed fixed
+request, exact READY/0-to-ACTIVE/1 volatile mutation and readback, validated
+fixed response, second-capability success, governed return, and terminal halt.
+Hosted CI remains the phase acceptance authority.
+
 The first hosted v0.8.0 attempt reached `KOZO_RUNTIME_LOOP_EXIT_OK` and
 triple-faulted on a generated `xorps` instruction before
 `KOZO_CAPABILITY_DISPATCH_ENTER`. Aggregate response initialization was the
@@ -97,7 +107,17 @@ The v0.4.8 QEMU smoke metadata records Limine entry-point evidence, expected ent
 
 The latest inspected v0.4.8 CI artifact captured `KOZO_EARLY_0_ENTRY`, so kernel entry handoff is proven for that artifact. It did not capture `KOZO_EARLY_2_SERIAL_INIT_OK`, so serial initialization remains unproven until that marker appears in captured QEMU serial output.
 
-The expected v0.8.0 QEMU serial sequence is `KOZO_EARLY_0_ENTRY`, `KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`, `KOZO_BOOT_SMOKE_OK`, `KOZO_STACK_INIT_OK`, `KOZO_MEMORY_INIT_OK`, `KOZO_RUNTIME_PROGRESS_ENTRY`, `KOZO_RUNTIME_INIT_OK`, `KOZO_RUNTIME_LOOP_ENTER`, `KOZO_RUNTIME_LOOP_ITER_1`, `KOZO_RUNTIME_LOOP_ITER_2`, `KOZO_RUNTIME_LOOP_ITER_3`, `KOZO_RUNTIME_LOOP_EXIT_OK`, `KOZO_CAPABILITY_DISPATCH_ENTER`, `KOZO_RUNTIME_STATUS_QUERY_OK`, `KOZO_FIRST_CAPABILITY_OK`, and `KOZO_RUNTIME_RETURN_OK`.
+The current expected QEMU serial sequence is `KOZO_EARLY_0_ENTRY`,
+`KOZO_EARLY_1_SERIAL_INIT_START`, `KOZO_EARLY_2_SERIAL_INIT_OK`,
+`KOZO_BOOT_SMOKE_OK`, `KOZO_STACK_INIT_OK`, `KOZO_MEMORY_INIT_OK`,
+`KOZO_CPU_EXT_STATE_INIT_START`, `KOZO_CPU_EXT_STATE_INIT_OK`,
+`KOZO_SIMD_PROBE_OK`, `KOZO_RUNTIME_PROGRESS_ENTRY`, `KOZO_RUNTIME_INIT_OK`,
+`KOZO_RUNTIME_LOOP_ENTER`, `KOZO_RUNTIME_LOOP_ITER_1`,
+`KOZO_RUNTIME_LOOP_ITER_2`, `KOZO_RUNTIME_LOOP_ITER_3`,
+`KOZO_RUNTIME_LOOP_EXIT_OK`, `KOZO_CAPABILITY_DISPATCH_ENTER`,
+`KOZO_RUNTIME_STATUS_QUERY_OK`, `KOZO_FIRST_CAPABILITY_OK`,
+`KOZO_RUNTIME_STATE_UPDATE_ENTER`, `KOZO_RUNTIME_STATE_UPDATE_OK`,
+`KOZO_SECOND_CAPABILITY_OK`, and `KOZO_RUNTIME_RETURN_OK`.
 
 In v0.7.1 and v0.7.3, `KOZO_MEMORY_INIT_OK` was reserved planning vocabulary and was not runtime evidence. v0.7.4 replaces that planning state: runtime assembly now emits the marker only after completing the contract-defined initialization and probe, and the governed QEMU pass sequence includes it as the final expected marker.
 
@@ -355,6 +375,26 @@ first_governed_runtime_capability_evidence
 
 The contract owns request/response geometry, numeric identity, status values, stage-mask meaning, marker ownership, claim limits, and halt continuation. The evidence validator correlates source ordering, response defense, ELF symbols and call edge, stage state, and QEMU metadata/logs. This evidence does not prove userspace capability access, privilege separation, a hardware syscall entry, scheduler or process behavior, allocation, compatibility, or production readiness.
 
+The governed runtime state transition contract is:
+
+```text
+contracts/runtime_state_transition_capability.v0.json
+```
+
+Its contract and evidence validators are:
+
+```text
+runtime_state_transition_capability
+runtime_state_transition_capability_evidence
+```
+
+The contract owns capability ID 2, fixed request/response and state geometry,
+the sole READY/0-to-ACTIVE/1 transition, status values, volatile readback,
+rollback, marker ownership, and halt convergence. The evidence validator
+correlates source order, overflow-safe pointer geometry, direct dispatch, ELF
+symbols and calls, volatile state operations, QEMU metadata/logs, the
+unchanged first capability, governed return, and terminal halt.
+
 The selected boot protocol is documented in:
 
 ```text
@@ -525,6 +565,9 @@ This evidence proves:
   continuation
 * local v0.8.1 evidence shows required boot-CPU feature detection, CR0/CR4
   readback, x87/MXCSR initialization, and one bounded SSE2 probe before Odin
+* local v0.8.2 evidence shows one fixed capability ID 2 request transitions
+  one boot-owned state cell from READY/0 to ACTIVE/1, validates volatile
+  readback and a fixed response, then preserves governed return and halt
 
 ---
 
@@ -563,5 +606,26 @@ KOZO_RUNTIME_PROGRESS_ENTRY
 ```
 
 `cpu_extended_state_initialization_evidence` correlates the contract, source,
-ELF report, QEMU metadata, and serial log. Local evidence is passing; hosted CI
-acceptance remains pending. The generated report does not replace the contract.
+ELF report, QEMU metadata, and serial log. Hosted CI acceptance is recorded for
+v0.8.1. The generated report does not replace the contract.
+
+---
+
+# 16. Runtime State Transition Evidence
+
+The v0.8.2 state-transition suffix is:
+
+```text
+KOZO_FIRST_CAPABILITY_OK
+KOZO_RUNTIME_STATE_UPDATE_ENTER
+KOZO_RUNTIME_STATE_UPDATE_OK
+KOZO_SECOND_CAPABILITY_OK
+KOZO_RUNTIME_RETURN_OK
+```
+
+Local evidence proves one bounded kernel-constructed request validated expected
+state and generation, changed one boot-owned cell to ACTIVE/1, read it back
+through volatile accesses, validated the fixed response, and preserved return
+and halt. It does not prove arbitrary mutable kernel services, concurrency,
+atomicity, userspace access, authorization, persistence, process isolation, or
+production readiness.
