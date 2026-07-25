@@ -285,6 +285,12 @@ For v0.7.5 and later, confirm the controlled runtime loop contract and evidence 
 
 For v0.8.0 and later, confirm the first capability contract and evidence validators pass, request and response validation remain explicit, the ELF report records dispatcher/handler/bridge symbols and the progression call edge, hosted QEMU evidence contains all three capability markers before runtime return, and failure paths cannot emit success markers. Do not promote the capability from local source or ELF evidence alone.
 
+For v0.8.1 and later, confirm the CPU extended-state contract and evidence
+validators pass, the ELF report records CPU-state symbols and required
+instructions, no governed AVX/YMM/ZMM/`xsetbv` use exists, hosted QEMU contains
+the three CPU-state markers before runtime progression, the full capability
+suffix remains present, and the terminal halt contract still passes.
+
 ---
 
 # 14. Release Decision

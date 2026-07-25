@@ -252,9 +252,7 @@ def move_halt_before_marker(source: str) -> str:
 
 
 def insert_instruction_after_halt_loop(source: str) -> str:
-    boundary = "    jmp .halt\n\nruntime_serial_write_init_marker:"
-    replacement = "    jmp .halt\n    nop\n\nruntime_serial_write_init_marker:"
-    return source.replace(boundary, replacement)
+    return source.replace("    jmp .halt\n", "    jmp .halt\n    nop\n", 1)
 
 
 if __name__ == "__main__":

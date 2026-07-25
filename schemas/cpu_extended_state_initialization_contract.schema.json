@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KOZO CPU extended-state initialization contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "execution_point",
+    "required_cpu_features",
+    "cr0_policy",
+    "cr4_policy",
+    "x87_initialization",
+    "sse_initialization",
+    "simd_probe",
+    "success_markers",
+    "failure_statuses",
+    "runtime_continuation",
+    "avx_prohibition",
+    "claim_boundary",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {"const": 0},
+    "architecture": {"const": "x86_64"},
+    "execution_point": {"$ref": "#/$defs/executionPoint"},
+    "required_cpu_features": {"$ref": "#/$defs/cpuFeatures"},
+    "cr0_policy": {"$ref": "#/$defs/controlPolicy"},
+    "cr4_policy": {"$ref": "#/$defs/controlPolicy"},
+    "x87_initialization": {"$ref": "#/$defs/x87Initialization"},
+    "sse_initialization": {"$ref": "#/$defs/sseInitialization"},
+    "simd_probe": {"$ref": "#/$defs/simdProbe"},
+    "success_markers": {"$ref": "#/$defs/nonEmptyStrings"},
+    "failure_statuses": {"$ref": "#/$defs/statuses"},
+    "runtime_continuation": {"$ref": "#/$defs/runtimeContinuation"},
+    "avx_prohibition": {"$ref": "#/$defs/avxProhibition"},
+    "claim_boundary": {"$ref": "#/$defs/claimBoundary"},
+    "non_goals": {"$ref": "#/$defs/nonEmptyStrings"}
+  },
+  "$defs": {
+    "nonEmptyString": {"type": "string", "pattern": ".*\\S.*"},
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/nonEmptyString"}
+    },
+    "namedBit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "bit"],
+      "properties": {
+        "name": {"$ref": "#/$defs/nonEmptyString"},
+        "bit": {"type": "integer"}
+      }
+    },
+    "executionPoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_file", "entry_symbol", "required_after_marker", "required_before_symbol"],
+      "properties": {
+        "source_file": {"const": "kernel/arch/x86_64/boot.asm"},
+        "entry_symbol": {"const": "_start"},
+        "required_after_marker": {"const": "KOZO_MEMORY_INIT_OK"},
+        "required_before_symbol": {"const": "runtime_progression_entry"}
+      }
+    },
+    "cpuFeatures": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maximum_basic_leaf_query", "required_leaf", "leaf_1_register", "required_bits", "required_mask"],
+      "properties": {
+        "maximum_basic_leaf_query": {"const": 0},
+        "required_leaf": {"const": 1},
+        "leaf_1_register": {"const": "edx"},
+        "required_bits": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {"$ref": "#/$defs/namedBit"}
+        },
+        "required_mask": {"const": "0x07000001"}
+      }
+    },
+    "controlPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read_modify_write", "readback_required", "required_set_bits", "required_clear_bits"],
+      "properties": {
+        "read_modify_write": {"const": true},
+        "readback_required": {"const": true},
+        "required_set_bits": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/namedBit"}
+        },
+        "required_clear_bits": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/namedBit"}
+        }
+      }
+    },
+    "x87Initialization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "observation_operation", "observation_symbol", "expected_control_word"],
+      "properties": {
+        "operation": {"const": "fninit"},
+        "observation_operation": {"const": "fnstcw"},
+        "observation_symbol": {"const": "observed_x87_control_word"},
+        "expected_control_word": {"const": "0x037f"}
+      }
+    },
+    "sseInitialization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["load_operation", "observation_operation", "observation_symbol", "expected_mxcsr"],
+      "properties": {
+        "load_operation": {"const": "ldmxcsr"},
+        "observation_operation": {"const": "stmxcsr"},
+        "observation_symbol": {"const": "observed_mxcsr"},
+        "expected_mxcsr": {"const": "0x00001f80"}
+      }
+    },
+    "simdProbe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entry_symbol",
+        "operation",
+        "width_bytes",
+        "buffer_symbol",
+        "buffer_end_symbol",
+        "buffer_size_bytes",
+        "buffer_alignment_bytes",
+        "input_low",
+        "input_high",
+        "mask_low",
+        "mask_high",
+        "expected_low",
+        "expected_high",
+        "scalar_result_validation",
+        "output_restored_to_zero",
+        "xmm_register_cleared"
+      ],
+      "properties": {
+        "entry_symbol": {"const": "run_simd_survival_probe"},
+        "operation": {"const": "pxor"},
+        "width_bytes": {"const": 16},
+        "buffer_symbol": {"const": "simd_probe_result"},
+        "buffer_end_symbol": {"const": "simd_probe_result_end"},
+        "buffer_size_bytes": {"const": 16},
+        "buffer_alignment_bytes": {"const": 16},
+        "input_low": {"$ref": "#/$defs/nonEmptyString"},
+        "input_high": {"$ref": "#/$defs/nonEmptyString"},
+        "mask_low": {"$ref": "#/$defs/nonEmptyString"},
+        "mask_high": {"$ref": "#/$defs/nonEmptyString"},
+        "expected_low": {"$ref": "#/$defs/nonEmptyString"},
+        "expected_high": {"$ref": "#/$defs/nonEmptyString"},
+        "scalar_result_validation": {"const": true},
+        "output_restored_to_zero": {"const": true},
+        "xmm_register_cleared": {"const": true}
+      }
+    },
+    "statuses": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "success",
+        "cpuid_unavailable",
+        "required_feature_missing",
+        "control_configuration_failed",
+        "x87_initialization_failed",
+        "sse_initialization_failed",
+        "simd_probe_failed"
+      ],
+      "properties": {
+        "success": {"const": 0},
+        "cpuid_unavailable": {"const": 1},
+        "required_feature_missing": {"const": 2},
+        "control_configuration_failed": {"const": 3},
+        "x87_initialization_failed": {"const": 4},
+        "sse_initialization_failed": {"const": 5},
+        "simd_probe_failed": {"const": 6}
+      }
+    },
+    "runtimeContinuation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "initialization_symbol",
+        "runtime_entry_symbol",
+        "runtime_entry_requires_simd_marker",
+        "failure_terminal_behavior",
+        "halt_label"
+      ],
+      "properties": {
+        "initialization_symbol": {"const": "initialize_cpu_extended_state"},
+        "runtime_entry_symbol": {"const": "runtime_progression_entry"},
+        "runtime_entry_requires_simd_marker": {"const": true},
+        "failure_terminal_behavior": {"const": "cli_hlt_loop"},
+        "halt_label": {"const": ".halt"}
+      }
+    },
+    "avxProhibition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cr4_osxsave_required_value",
+        "xsetbv_allowed",
+        "xgetbv_required",
+        "forbidden_register_classes",
+        "forbidden_encoding_classes",
+        "forbidden_instruction_families"
+      ],
+      "properties": {
+        "cr4_osxsave_required_value": {"const": 0},
+        "xsetbv_allowed": {"const": false},
+        "xgetbv_required": {"const": false},
+        "forbidden_register_classes": {"$ref": "#/$defs/nonEmptyStrings"},
+        "forbidden_encoding_classes": {"$ref": "#/$defs/nonEmptyStrings"},
+        "forbidden_instruction_families": {"$ref": "#/$defs/nonEmptyStrings"}
+      }
+    },
+    "claimBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proves", "does_not_prove"],
+      "properties": {
+        "proves": {"$ref": "#/$defs/nonEmptyStrings"},
+        "does_not_prove": {"$ref": "#/$defs/nonEmptyStrings"}
+      }
+    }
+  }
+}

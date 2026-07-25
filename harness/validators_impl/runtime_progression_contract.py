@@ -18,6 +18,8 @@ _EXPECTED_TERMINAL_BEHAVIOR = "halt_loop"
 _REQUIRED_PREREQUISITES = (
     "stack initialization evidence",
     "memory initialization evidence",
+    "CPU extended-state initialization evidence",
+    "SIMD survival evidence",
     "progression path evidence",
 )
 _REQUIRED_TRANSITION_REQUIREMENTS = (
@@ -37,6 +39,7 @@ _REQUIRED_EVIDENCE_REQUIREMENTS = (
     "runtime progression stages contract",
     "stack initialization evidence contract",
     "memory initialization evidence contract",
+    "CPU extended-state initialization contract",
     "focused validator coverage",
     "QEMU evidence for progression entry",
     "release evidence update",

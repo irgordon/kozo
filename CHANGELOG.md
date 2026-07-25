@@ -1,8 +1,21 @@
 # Changelog
 
+## v0.8.1 - 2026-07-25
+
+**Status:** Implemented and locally evidenced; hosted CI acceptance pending.
+
+* Detected the required FPU, FXSR, SSE, and SSE2 capabilities before Odin entry.
+* Configured and read back the governed CR0 and CR4 extended-state controls while preserving unrelated bits.
+* Initialized x87 state and MXCSR and validated their expected control values.
+* Executed and validated one bounded SSE2 survival probe, then cleared its output and register state.
+* Kept `CR4.OSXSAVE` clear and added source and ELF validation that rejects AVX, YMM, ZMM, and `xsetbv` use in the governed pre-Odin path.
+* Required CPU-state and SIMD evidence before `KOZO_RUNTIME_PROGRESS_ENTRY`.
+* Preserved the controlled runtime loop, first capability, exact return path, and terminal halt loop.
+* Added no scheduler, userspace, exception recovery, extended-state context switching, compatibility, or production-readiness claim.
+
 ## v0.8.0 - 2026-07-23
 
-**Status:** Corrected locally; hosted CI acceptance pending.
+**Status:** Accepted by hosted CI.
 
 * Implemented the versioned internal `RUNTIME_STATUS_QUERY` request and fixed-size response in Odin.
 * Added explicit request, response, dispatch, handler, stage-mask, ELF-symbol, marker-order, and halt-continuation validation.
@@ -12,8 +25,8 @@
 * Replaced aggregate response initialization with explicit scalar stores, retained strict request/response validation, and hardened overlap checks against end-address overflow.
 * Added configurable QEMU discovery through `KOZO_QEMU_BIN`, `PATH`, and a platform package-manager prefix while preserving the governed missing-tool blocker.
 * Added `MEMORY_INITIALIZATION_EVIDENCE_INVALID` to every `latest_verify` verification-code enum and regression coverage for aggregate report serialization.
-* Local QEMU evidence now captures the complete ordered capability suffix and reports `outcome: pass`; hosted CI must still confirm the correction.
-* Recorded hosted CI acceptance of the v0.7.5 controlled runtime loop and marked the first governed capability implemented pending hosted CI evidence.
+* Hosted CI accepted the corrected complete ordered capability suffix and passing capability evidence.
+* Recorded hosted CI acceptance of the v0.7.5 controlled runtime loop and later accepted the corrected first governed capability through hosted CI.
 * Preserved the controlled return and assembly halt path.
 * Added no userspace, scheduler, allocator, interrupt, ABI, syscall, compatibility, isolation, or production-readiness claim.
 

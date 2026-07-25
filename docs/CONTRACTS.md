@@ -270,3 +270,17 @@ The contract does not authorize a scheduler, interrupts, allocation, userspace, 
 `contracts/first_governed_runtime_capability.v0.json` owns the `CONTROLLED_RUNTIME_LOOP` to `FIRST_GOVERNED_RUNTIME_CAPABILITY` proof boundary. It defines capability ID 1 (`RUNTIME_STATUS_QUERY`), request version 1 with a 16-byte/4-byte-aligned layout, response version 1 with a 64-byte/8-byte-aligned layout, exact status values, validation requirements, marker ownership, and terminal continuation.
 
 The response reports the last accepted baseline, stage 5 with mask `0x3f`, plus the governed 4096-byte memory-region size and executed loop values 3, 3, and 6. It does not report the capability stage as already proven. The contract creates no public ABI, userspace access, privilege separation, hardware syscall entry, scheduler, process, allocation, compatibility, or production claim.
+
+---
+
+# 22. CPU Extended-State Initialization Contract Role
+
+`contracts/cpu_extended_state_initialization_contract.v0.json` owns the
+boot-CPU x87/SSE prerequisite immediately before Odin entry. It defines the
+required CPUID bits, CR0/CR4 policy, x87 control word, MXCSR value, bounded SIMD
+probe, marker order, failure statuses, halt continuation, and AVX prohibition.
+
+The contract does not authorize AVX/XSAVE, XCR0 changes, per-task state
+ownership, context switching, exception recovery, userspace, compatibility, or
+production claims. Generated ELF and QEMU reports are evidence, not contract
+authority.

@@ -186,3 +186,10 @@ Generated reports and diagrams explain but do not govern.
 The v0.7.5 controlled runtime loop is a bounded internal Odin operation inside the existing boot-owned address space. It uses static volatile state, fixed no-input marker bridges, exact internal statuses, and the existing assembly return-to-halt continuation. It is not a scheduler, event loop, userspace execution path, allocator, interrupt path, or production runtime.
 
 The v0.8.0 first governed capability extends that same internal path as `runtime_progression_entry` → `controlled_runtime_loop` → `execute_first_governed_capability` → `dispatch_runtime_capability` → `query_runtime_status` → validated response → governed return. It accepts one fixed versioned request, dispatches one numeric identifier, reports only the accepted stage 0 through 5 baseline, and returns an exact status. It is a same-address-space kernel boundary, not a userspace, privilege, authentication, isolation, or hardware syscall boundary.
+
+Before that Odin path, v0.8.1 extends the assembly bootstrap sequence as
+memory evidence → CPUID feature validation → CR0/CR4 read-modify-write and
+readback → x87/MXCSR initialization → bounded SSE2 survival probe → Odin entry.
+This establishes the boot CPU state required by the allowed early Odin
+instruction class. It does not establish AVX/XSAVE, per-task state ownership,
+context switching, exception recovery, or complete CPU initialization.

@@ -338,7 +338,7 @@ FIRST_GOVERNED_RUNTIME_CAPABILITY
 USERSPACE_PLANNING
 ```
 
-This stage model is not runtime evidence. It is the sole authority for stage order and allowed transitions, requires each mandatory prerequisite to be an earlier proven stage before promotion, and assigns one proof-boundary owner to every transition. The current status is boot, stack, memory, progression-entry, runtime-initialization, and controlled-loop evidence proven; the first capability is implemented pending hosted CI, and userspace planning remains planned.
+This stage model is not runtime evidence. It is the sole authority for stage order and allowed transitions, requires each mandatory prerequisite to be an earlier proven stage before promotion, and assigns one proof-boundary owner to every transition. The current status is boot, stack, memory, progression-entry, runtime-initialization, controlled-loop, and first-capability evidence proven; userspace planning remains planned.
 
 The first governed runtime capability contract is:
 
@@ -520,6 +520,11 @@ This evidence proves:
 * current serial heartbeat marker strings are present in binary evidence
 * the generated runtime smoke artifact is available for release review
 * the source-level post-smoke path is governed by a runtime halt contract
+* hosted QEMU evidence has proven the bounded assembly-to-Odin progression,
+  controlled loop, first runtime status capability, exact return, and halt
+  continuation
+* local v0.8.1 evidence shows required boot-CPU feature detection, CR0/CR4
+  readback, x87/MXCSR initialization, and one bounded SSE2 probe before Odin
 
 ---
 
@@ -527,7 +532,6 @@ This evidence proves:
 
 This evidence does not prove:
 
-* QEMU boot
 * hardware syscall or interrupt transition
 * privilege transition
 * Rust userspace execution in a kernel-managed process
@@ -535,18 +539,29 @@ This evidence does not prove:
 * memory isolation
 * hardware halt instruction semantics
 * interrupt handling
-* Odin runtime execution
-* stack setup
-* memory initialization
 * syscall dispatch during boot
+* AVX/XSAVE support
+* per-task extended-state ownership or context switching
+* floating-point exception recovery
+* complete CPU initialization
 * production readiness
 
 Those surfaces require later phase work.
 
 ---
 
-# 15. Known Limitations
+# 15. CPU Extended-State Evidence
 
-The current runtime smoke path is not a boot smoke test.
+The v0.8.1 markers are owned by the assembly boot path:
 
-It is a deterministic runtime-adjacent evidence step until the repository has enough boot packaging to run a bounded emulator smoke path honestly.
+```text
+KOZO_MEMORY_INIT_OK
+KOZO_CPU_EXT_STATE_INIT_START
+KOZO_CPU_EXT_STATE_INIT_OK
+KOZO_SIMD_PROBE_OK
+KOZO_RUNTIME_PROGRESS_ENTRY
+```
+
+`cpu_extended_state_initialization_evidence` correlates the contract, source,
+ELF report, QEMU metadata, and serial log. Local evidence is passing; hosted CI
+acceptance remains pending. The generated report does not replace the contract.

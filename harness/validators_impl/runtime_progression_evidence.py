@@ -107,6 +107,15 @@ def _assembly_boundary_issue(context: RuntimeProgressionContext) -> RuntimeProgr
     boundary = context.contract.return_boundary
     expected = (
         "WRITE_COM1_MARKER memory_init_marker, memory_init_marker_end",
+        "WRITE_COM1_MARKER cpu_ext_state_init_start_marker, cpu_ext_state_init_start_marker_end",
+        "call initialize_cpu_extended_state",
+        "test eax, eax",
+        "jnz .halt",
+        "WRITE_COM1_MARKER cpu_ext_state_init_ok_marker, cpu_ext_state_init_ok_marker_end",
+        "call run_simd_survival_probe",
+        "test eax, eax",
+        "jnz .halt",
+        "WRITE_COM1_MARKER simd_probe_ok_marker, simd_probe_ok_marker_end",
         "test rsp, 0x0f",
         "jnz .halt",
         f"lea rdi, [rel {context.contract.bootstrap_context.symbol}]",

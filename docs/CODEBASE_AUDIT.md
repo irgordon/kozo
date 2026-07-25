@@ -976,7 +976,7 @@ This loop is not a scheduler or general runtime loop. It adds no interrupts, con
 
 Date: 2026-07-23
 
-Status: Implemented locally; hosted CI evidence pending.
+Status: Accepted by hosted CI.
 
 ## 29.1 Scope
 
@@ -1004,6 +1004,44 @@ response initialization before request/response validation and before
 
 | ID | Status | Rationale |
 | --- | --- | --- |
-| AUDIT-080-003 | Resolved locally; hosted confirmation pending | The capability response now uses explicit scalar initialization, the linked capability path no longer contains the faulting pre-dispatch SIMD initialization, and local QEMU captures the complete capability suffix. |
+| AUDIT-080-003 | Resolved | The capability response uses explicit scalar initialization, and hosted CI captures the complete capability suffix. v0.8.1 replaces the local workaround as architectural policy by initializing and validating x87/SSE state before Odin. |
 | AUDIT-080-004 | Resolved | `latest_verify` verification-code enums now include `MEMORY_INITIALIZATION_EVIDENCE_INVALID`, with an aggregation regression test that preserves the failure in the report. |
 | AUDIT-080-005 | Resolved | QEMU discovery supports an executable `KOZO_QEMU_BIN` override, `PATH`, and a Homebrew package prefix without requiring a developer-specific absolute path. |
+
+---
+
+# 30. v0.8.1 CPU Extended-State Initialization
+
+Date: 2026-07-25
+
+Status: Implemented and locally evidenced; hosted CI pending.
+
+## 30.1 Finding Status
+
+| ID | Status | Rationale |
+| --- | --- | --- |
+| AUDIT-081-001 | Resolved locally | The previous implicit SIMD-generation risk is addressed by a pre-Odin CPUID/control-state/x87/MXCSR gate and bounded SSE2 survival probe rather than source-by-source scalar workarounds. |
+| AUDIT-081-002 | Resolved locally | CPU feature detection, control configuration, readback, x87 setup, SSE setup, and probe execution are separated into focused assembly helpers; `_start` remains coordination-level code. |
+| AUDIT-081-003 | Hosted confirmation pending | Local ELF inspection finds no governed AVX/YMM/ZMM/`xsetbv` use and local QEMU captures the complete 20-marker sequence. |
+| AUDIT-064-002 | Deferred | `validator_coverage.py` remains above the preferred split threshold; decomposition is outside this runtime phase. |
+| AUDIT-073-001 | Deferred | The existing Rust package license metadata warning remains release-hardening work. |
+
+## 30.2 Boundaries
+
+The change initializes only the boot CPU x87/SSE execution environment. It
+does not add AVX/XSAVE, per-task state, context switching, exception recovery,
+interrupts, userspace, isolation, compatibility, or production behavior.
+
+## 30.3 Local Launch Observation
+
+Several local QEMU attempts produced zero-byte serial logs and no Limine output;
+explicit retries with the same ISO later produced the complete marker sequence.
+Exact-name process and open-file checks found no stale QEMU/Limine process or
+ISO handle after the passing run. The script truncates prior logs, launches one
+synchronous child, records exit status and stderr, terminates and reaps the
+child after timeout, and verification invokes QEMU smoke once sequentially.
+
+The script currently uses fixed artifact paths and checks ISO existence but not
+nonzero size immediately before launch. This is recorded as a local launch
+diagnostic limitation. Hosted CI remains the v0.8.1 acceptance authority; no
+marker or validator requirement is weakened.

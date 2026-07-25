@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO First Governed Runtime Capability v0.8.0",
+  "task_title": "KOZO CPU Extended-State Initialization v0.8.1",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -12,14 +12,16 @@
     "v0.7.4 memory initialization evidence is accepted by the CI validator gate; manual artifact inspection was not completed",
     "v0.7.45 runtime progression entry and runtime initialization evidence are accepted by hosted CI",
     "v0.7.5 controlled runtime loop evidence is accepted by hosted CI run 30057826315",
+    "v0.8.0 first governed runtime capability evidence is accepted by hosted CI",
     "The reconciled runtime progression graph is acyclic and permits first capability evidence only after controlled loop evidence",
     "Odin, pinned Rust, Python, jq, and repository verification tooling are installed"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
-    "Stack, memory, progression-entry, runtime-initialization, and controlled-loop evidence remain proven while first capability evidence requires new CI evidence",
+    "Stack, memory, progression-entry, runtime-initialization, controlled-loop, and first-capability evidence remain proven",
     "KOZO_FIRST_CAPABILITY_OK requires a validated request, exact dispatch, validated response, and KOZO_RUNTIME_RETURN_OK still requires exact status zero",
-    "This phase changes only the bounded internal runtime capability, fixed marker bridges, evidence validation, progression status, and documentation; public ABI, syscalls, linker layout, and terminal halt authority remain unchanged"
+    "CPU extended-state initialization executes in assembly after memory evidence and before the first Odin call",
+    "This phase changes only boot-CPU x87/SSE initialization, bounded SIMD evidence, validators, task state, and documentation; public ABI, syscalls, linker layout, first capability behavior, and terminal halt authority remain unchanged"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -2515,6 +2517,57 @@
         "verification.tests_run[115]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 77,
+      "title": "Initialize and validate boot CPU x87 and SSE state",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "kernel/arch/x86_64/boot.asm",
+        "contracts/cpu_extended_state_initialization_contract.v0.json",
+        "contracts/runtime_evidence_taxonomy.v0.json",
+        "contracts/runtime_progression_contract.v0.json",
+        "contracts/runtime_progression_entry_contract.v0.json",
+        "schemas/cpu_extended_state_initialization_contract.schema.json",
+        "schemas/latest_verify.schema.json",
+        "schemas/agent_context.schema.json",
+        "harness/cpu_extended_state_initialization_contract.py",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/cpu_extended_state_initialization_contract.py",
+        "harness/validators_impl/cpu_extended_state_initialization_evidence.py",
+        "harness/validators_impl/qemu_smoke_evidence.py",
+        "harness/validators_impl/runtime_progression_evidence.py",
+        "harness/validators_impl/validator_coverage.py",
+        "scripts/kernel_elf_report.py",
+        "scripts/qemu_smoke.sh",
+        "tests/test_cpu_extended_state_initialization_contract.py",
+        "tests/test_cpu_extended_state_initialization_evidence.py",
+        "tests/test_qemu_smoke_evidence.py",
+        "docs/CPU_EXTENDED_STATE.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "docs/generated/governance_index.md",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.summary.txt"
+      ],
+      "verification_refs": [
+        "verification.tests_run[116]",
+        "verification.tests_run[117]",
+        "verification.tests_run[118]",
+        "verification.tests_run[119]",
+        "verification.tests_run[120]",
+        "verification.tests_run[121]",
+        "verification.tests_run[122]",
+        "verification.tests_run[123]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -2578,7 +2631,8 @@
     "v0.7.45 implements a fixed internal assembly-to-Odin boundary, validated bootstrap context, bounded static-state probe, Odin-dependent initialization marker, exact return status, and terminal halt continuation without expanding the public ABI or runtime claims.",
     "v0.7.5 implements a bounded three-iteration Odin loop with volatile boot-owned state, ordered iteration evidence, linked backward-edge proof, exact return status, and the unchanged terminal halt continuation without adding scheduler, userspace, compatibility, or production claims.",
     "v0.8.0 implements one versioned internal runtime status request with explicit field validation, one direct dispatcher, one deterministic response handler, response validation, governed capability evidence, and the unchanged return-to-halt path without adding userspace, isolation, scheduler, allocator, interrupt, ABI, syscall, compatibility, or production claims.",
-    "The v0.8.0 corrective continuation replaces faulting aggregate response initialization with scalar stores, preserves strict pointer validation, hardens overlap arithmetic, restores local QEMU evidence through KOZO_RUNTIME_RETURN_OK, and leaves hosted acceptance pending."
+    "The v0.8.0 corrective continuation replaces faulting aggregate response initialization with scalar stores, preserves strict pointer validation, hardens overlap arithmetic, and is accepted by hosted CI.",
+    "v0.8.1 detects required FPU/FXSR/SSE/SSE2 support, configures and validates CR0/CR4, initializes x87/MXCSR, validates a bounded SSE2 probe, prohibits AVX, and preserves the accepted capability and halt path."
   ],
   "verification": {
     "tests_run": [
@@ -3161,6 +3215,81 @@
         "tool": "verification harness with local ISO and QEMU tooling",
         "command": "scripts/verify.sh with pinned Limine v12.3.3, xorriso, and KOZO_QEMU_BIN",
         "status": "passed_53_checks_0_failures_qemu_outcome_pass"
+      },
+      {
+        "tool": "CPU extended-state contract tests",
+        "command": "python3 -m unittest tests/test_cpu_extended_state_initialization_contract.py",
+        "status": "passed_14_tests"
+      },
+      {
+        "tool": "CPU extended-state evidence tests",
+        "command": "python3 -m unittest tests/test_cpu_extended_state_initialization_evidence.py",
+        "status": "passed_17_tests"
+      },
+      {
+        "tool": "runtime taxonomy tests",
+        "command": "python3 -m unittest tests/test_runtime_evidence_taxonomy.py",
+        "status": "passed_12_tests"
+      },
+      {
+        "tool": "QEMU evidence tests",
+        "command": "python3 -m unittest tests/test_qemu_smoke_evidence.py",
+        "status": "passed_51_tests"
+      },
+      {
+        "tool": "validator coverage tests",
+        "command": "python3 -m unittest tests/test_validator_coverage.py",
+        "status": "passed_20_tests"
+      },
+      {
+        "tool": "local boot image",
+        "command": "scripts/build_boot_image.sh with pinned Limine v12.3.3 and xorriso",
+        "status": "passed_iso_packaged"
+      },
+      {
+        "tool": "local QEMU evidence",
+        "command": "KOZO_QEMU_BIN=<configured-qemu> scripts/qemu_smoke.sh with pinned Limine v12.3.3 and xorriso",
+        "status": "passed_20_ordered_markers_outcome_pass"
+      },
+      {
+        "tool": "CPU state ELF inspection",
+        "command": "nm -n and objdump -d artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf",
+        "status": "passed_required_symbols_and_instructions_no_prohibited_avx_matches"
+      },
+      {
+        "tool": "Python unit discovery",
+        "command": "python3 -m unittest discover -s tests",
+        "status": "passed_715_tests"
+      },
+      {
+        "tool": "Odin and Rust checks",
+        "command": "odin check kernel; cargo check --manifest-path userspace/core_service/Cargo.toml",
+        "status": "passed_with_existing_generated_binding_style_warnings"
+      },
+      {
+        "tool": "Rust policy tools",
+        "command": "cargo deny check; cargo audit; cargo nextest run --manifest-path userspace/core_service/Cargo.toml",
+        "status": "audit_passed; deny_existing_missing_license_failure; nextest_no_tests"
+      },
+      {
+        "tool": "TOML tooling",
+        "command": "taplo fmt --check .; taplo check",
+        "status": "tooling_limitation_macos_system_configuration_panic"
+      },
+      {
+        "tool": "JSON, shell, search, and consistency validation",
+        "command": "python3 -m json.tool and jq for modified JSON; bash -n scripts/qemu_smoke.sh; rga and rg marker searches; git diff --check",
+        "status": "passed"
+      },
+      {
+        "tool": "verification harness with local ISO and QEMU tooling",
+        "command": "scripts/verify.sh with configured Limine v12.3.3, xorriso, and KOZO_QEMU_BIN",
+        "status": "passed_55_checks_0_failures_qemu_outcome_pass"
+      },
+      {
+        "tool": "local QEMU launch-boundary inspection",
+        "command": "pgrep exact-name checks; lsof QEMU/ISO/log checks; verify.sh and qemu_smoke.sh source inspection; ISO size and SHA-256 inspection",
+        "status": "passed_no_stale_process_or_open_handle; fixed_artifact_paths_and_exists_only_iso_check_recorded_as_local_limitation"
       }
     ],
     "logs": [
@@ -3393,7 +3522,7 @@
     "v0.7.4 implements only the governed static-region memory evidence path, adds structural and captured-evidence validation, preserves the halt loop, and does not add paging, allocation, Odin runtime execution, userspace, compatibility, or production-readiness claims.",
     "v0.7.45 adds a governed internal assembly-to-Odin progression boundary, bounded Odin state evidence, exact return handling, linked-symbol reporting, and progression evidence validation while preserving terminal halt authority and all subsystem, compatibility, and production non-goals.",
     "v0.7.5 adds a contract-backed three-iteration Odin loop with volatile state mutation, ordered marker bridges, deterministic status handling, ELF backward-edge reporting, the unchanged exact return-to-halt boundary, and hosted CI acceptance.",
-    "v0.8.0 adds one explicit internal runtime status request, fixed response, direct dispatcher, bounded handler, source and ELF evidence validation, fixed capability markers, and the unchanged exact return-to-halt boundary while leaving hosted capability evidence pending.",
-    "The first hosted v0.8.0 attempt faulted on unsupported generated SIMD before dispatch; scalar response initialization now passes the complete local QEMU marker sequence while hosted correction evidence remains pending."
+    "v0.8.0 adds one explicit internal runtime status request, fixed response, direct dispatcher, bounded handler, source and ELF evidence validation, fixed capability markers, and the unchanged exact return-to-halt boundary, accepted by hosted CI.",
+    "The first hosted v0.8.0 attempt exposed an implicit CPU-state dependency; v0.8.1 establishes a contract-backed pre-Odin x87/SSE state gate and bounded SIMD evidence while preserving the accepted runtime suffix."
   ]
 }

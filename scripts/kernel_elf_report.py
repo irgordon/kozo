@@ -41,6 +41,37 @@ FIRST_CAPABILITY_SYMBOLS = (
     "runtime_serial_write_status_query_marker",
     "runtime_serial_write_first_capability_marker",
 )
+CPU_EXTENDED_STATE_SYMBOLS = (
+    "initialize_cpu_extended_state",
+    "required_cpu_features_available",
+    "configure_extended_state_controls",
+    "verify_extended_state_controls",
+    "initialize_x87_state",
+    "initialize_sse_state",
+    "run_simd_survival_probe",
+    "observed_x87_control_word",
+    "observed_mxcsr",
+    "simd_probe_result",
+    "simd_probe_result_end",
+)
+AVX_MNEMONIC_PREFIXES = (
+    "vadd",
+    "vsub",
+    "vmul",
+    "vdiv",
+    "vmov",
+    "vxor",
+    "vpxor",
+    "vand",
+    "vor",
+    "vblend",
+    "vbroadcast",
+    "vextract",
+    "vinsert",
+    "vperm",
+    "vshuf",
+    "vzero",
+)
 BRANCH_MNEMONIC = re.compile(r"^j[a-z]+$")
 INSTRUCTION_LINE = re.compile(
     r"^\s*([0-9a-fA-F]+):\s+(?:(?:[0-9a-fA-F]{2})\s+)+([a-zA-Z][a-zA-Z0-9.]*)\s*(.*)$"
@@ -139,6 +170,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
             *RUNTIME_PROGRESSION_SYMBOLS,
             *CONTROLLED_RUNTIME_LOOP_SYMBOLS,
             *FIRST_CAPABILITY_SYMBOLS,
+            *CPU_EXTENDED_STATE_SYMBOLS,
         ),
     )
     symbol_address = symbols.get("_start")
@@ -166,6 +198,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "runtime_progression_symbols": runtime_progression_symbol_record(symbols),
         "controlled_runtime_loop": controlled_runtime_loop_record(kernel_elf, symbols),
         "first_governed_runtime_capability": first_capability_record(kernel_elf, symbols),
+        "cpu_extended_state_initialization": cpu_extended_state_record(kernel_elf, symbols),
         "program_header_count": header.program_header_count,
         "section_count": header.section_header_count,
         "load_segments": [segment_record(segment) for segment in load_segments],
@@ -339,6 +372,141 @@ def first_capability_record(
         "symbols": symbol_record(symbols, FIRST_CAPABILITY_SYMBOLS),
         "progression_call_present": _calls_address(instructions, entry_address),
     }
+
+
+def cpu_extended_state_record(
+    kernel_elf: Path,
+    symbols: dict[str, int],
+) -> dict[str, object]:
+    all_instructions = parse_disassembly_instructions(run_text_command(["objdump", "-d", str(kernel_elf)]))
+    instruction_sets = _cpu_instruction_sets(all_instructions, symbols)
+    prohibited = prohibited_extended_state_instructions(all_instructions)
+    return {
+        "symbols": symbol_record(symbols, CPU_EXTENDED_STATE_SYMBOLS),
+        "probe_buffer": _cpu_probe_buffer_record(symbols),
+        "pre_odin_call_order_valid": _pre_odin_call_order_valid(instruction_sets["_start"], symbols),
+        "initialization_call_chain_valid": _initialization_call_chain_valid(
+            instruction_sets["initialize_cpu_extended_state"],
+            symbols,
+        ),
+        "cpuid_present": _mnemonic_present(instruction_sets["required_cpu_features_available"], "cpuid"),
+        "cr0_access_count": _register_access_count(instruction_sets, "cr0"),
+        "cr4_access_count": _register_access_count(instruction_sets, "cr4"),
+        "fninit_present": _mnemonic_present(instruction_sets["initialize_x87_state"], "fninit"),
+        "fnstcw_present": _mnemonic_present(instruction_sets["initialize_x87_state"], "fnstcw"),
+        "ldmxcsr_present": _mnemonic_present(instruction_sets["initialize_sse_state"], "ldmxcsr"),
+        "stmxcsr_present": _mnemonic_present(instruction_sets["initialize_sse_state"], "stmxcsr"),
+        "simd_probe_instruction_present": _mnemonic_present(
+            instruction_sets["run_simd_survival_probe"],
+            "pxor",
+        ),
+        "simd_probe_comparison_count": _mnemonic_count(
+            instruction_sets["run_simd_survival_probe"],
+            "cmp",
+        ),
+        "avx_prohibited_instruction_present": bool(prohibited),
+        "prohibited_instructions": prohibited,
+    }
+
+
+def _cpu_instruction_sets(all_instructions, symbol_addresses) -> dict[str, list[tuple[int, str, str]]]:
+    symbol_names = ("_start", *CPU_EXTENDED_STATE_SYMBOLS[:7])
+    return {
+        symbol: _instructions_for_symbol(all_instructions, symbol, symbol_addresses)
+        for symbol in symbol_names
+        if symbol in symbol_addresses
+    }
+
+
+def _instructions_for_symbol(all_instructions, symbol: str, symbol_addresses):
+    start = symbol_addresses[symbol]
+    later = [address for address in symbol_addresses.values() if address > start]
+    end = min(later) if later else None
+    return [
+        instruction
+        for instruction in all_instructions
+        if instruction[0] >= start and (end is None or instruction[0] < end)
+    ]
+
+
+def _cpu_probe_buffer_record(symbols: dict[str, int]) -> dict[str, object]:
+    start = symbols.get("simd_probe_result")
+    end = symbols.get("simd_probe_result_end")
+    size = end - start if start is not None and end is not None else -1
+    return {
+        "start_address": _hex(start) if start is not None else "",
+        "end_address": _hex(end) if end is not None else "",
+        "size_bytes": size,
+        "required_alignment_bytes": 16,
+        "start_aligned": start is not None and start % 16 == 0,
+    }
+
+
+def _pre_odin_call_order_valid(instructions, symbols: dict[str, int]) -> bool:
+    targets = (
+        symbols.get("initialize_cpu_extended_state"),
+        symbols.get("run_simd_survival_probe"),
+        symbols.get("runtime_progression_entry"),
+    )
+    return _ordered_call_targets_present(instructions, targets)
+
+
+def _initialization_call_chain_valid(instructions, symbols: dict[str, int]) -> bool:
+    targets = tuple(symbols.get(name) for name in CPU_EXTENDED_STATE_SYMBOLS[1:6])
+    return _ordered_call_targets_present(instructions, targets)
+
+
+def _ordered_call_targets_present(instructions, targets: tuple[int | None, ...]) -> bool:
+    if any(target is None for target in targets):
+        return False
+    calls = [
+        instruction_target(operands)
+        for _, mnemonic, operands in instructions
+        if mnemonic.startswith("call")
+    ]
+    position = -1
+    for target in targets:
+        try:
+            position = calls.index(target, position + 1)
+        except ValueError:
+            return False
+    return True
+
+
+def _register_access_count(instruction_sets, register: str) -> int:
+    return sum(
+        register in operands.lower()
+        for instructions in instruction_sets.values()
+        for _, mnemonic, operands in instructions
+        if mnemonic.startswith("mov")
+    )
+
+
+def _mnemonic_present(instructions, mnemonic: str) -> bool:
+    return _mnemonic_count(instructions, mnemonic) > 0
+
+
+def _mnemonic_count(instructions, mnemonic: str) -> int:
+    return sum(candidate.startswith(mnemonic) for _, candidate, _ in instructions)
+
+
+def prohibited_extended_state_instructions(
+    instructions: list[tuple[int, str, str]],
+) -> list[dict[str, str]]:
+    return [
+        {"address": _hex(address), "mnemonic": mnemonic, "operands": operands.strip()}
+        for address, mnemonic, operands in instructions
+        if _is_prohibited_extended_state_instruction(mnemonic, operands)
+    ]
+
+
+def _is_prohibited_extended_state_instruction(mnemonic: str, operands: str) -> bool:
+    lowered_operands = operands.lower()
+    if mnemonic == "xsetbv":
+        return True
+    if re.search(r"\b(?:ymm|zmm)[0-9]+\b", lowered_operands):
+        return True
+    return mnemonic.startswith(AVX_MNEMONIC_PREFIXES)
 
 
 def _calls_address(

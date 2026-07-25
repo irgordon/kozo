@@ -218,3 +218,16 @@ Validators must not depend on network access, hidden environment state, random o
 `INVARIANTS.md` owns validation invariants.
 
 `GOVERNANCE.md` owns conflict resolution.
+
+---
+
+# 16. CPU Extended-State Validation
+
+`cpu_extended_state_initialization_contract` validates the authoritative
+feature, control-register, x87, MXCSR, SIMD, marker, failure, and non-goal
+policy. `cpu_extended_state_initialization_evidence` then validates source
+ordering, ELF symbols and instructions, bounded probe geometry, AVX
+prohibition, QEMU marker evidence, and halt convergence.
+
+Source strings or generated reports alone cannot promote the runtime claim.
+Hosted QEMU and verification evidence are required for phase acceptance.

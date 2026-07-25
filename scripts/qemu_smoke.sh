@@ -20,6 +20,9 @@ EARLY_MARKERS=(
   "KOZO_BOOT_SMOKE_OK"
   "KOZO_STACK_INIT_OK"
   "KOZO_MEMORY_INIT_OK"
+  "KOZO_CPU_EXT_STATE_INIT_START"
+  "KOZO_CPU_EXT_STATE_INIT_OK"
+  "KOZO_SIMD_PROBE_OK"
   "KOZO_RUNTIME_PROGRESS_ENTRY"
   "KOZO_RUNTIME_INIT_OK"
   "KOZO_RUNTIME_LOOP_ENTER"
@@ -274,22 +277,28 @@ elif markers[3] in observed and markers[4] not in observed:
 elif markers[4] in observed and markers[5] not in observed:
     print("memory_marker_not_emitted")
 elif markers[5] in observed and markers[6] not in observed:
-    print("runtime_progression_entry_not_reached")
+    print("cpu_extended_state_initialization_not_completed")
 elif markers[6] in observed and markers[7] not in observed:
-    print("runtime_initialization_not_proven")
+    print("cpu_extended_state_initialization_not_completed")
 elif markers[7] in observed and markers[8] not in observed:
+    print("simd_survival_probe_not_completed")
+elif markers[8] in observed and markers[9] not in observed:
+    print("runtime_progression_entry_not_reached")
+elif markers[9] in observed and markers[10] not in observed:
+    print("runtime_initialization_not_proven")
+elif markers[10] in observed and markers[11] not in observed:
     print("runtime_loop_entry_not_reached")
-elif markers[8] in observed and markers[11] not in observed:
+elif markers[11] in observed and markers[14] not in observed:
     print("runtime_loop_iteration_incomplete")
-elif markers[11] in observed and markers[12] not in observed:
-    print("runtime_loop_exit_not_reached")
-elif markers[12] in observed and markers[13] not in observed:
-    print("capability_dispatch_not_reached")
-elif markers[13] in observed and markers[14] not in observed:
-    print("runtime_status_query_not_completed")
 elif markers[14] in observed and markers[15] not in observed:
-    print("first_governed_capability_not_proven")
+    print("runtime_loop_exit_not_reached")
 elif markers[15] in observed and markers[16] not in observed:
+    print("capability_dispatch_not_reached")
+elif markers[16] in observed and markers[17] not in observed:
+    print("runtime_status_query_not_completed")
+elif markers[17] in observed and markers[18] not in observed:
+    print("first_governed_capability_not_proven")
+elif markers[18] in observed and markers[19] not in observed:
     print("runtime_return_not_reached")
 elif observed and observed[0] != markers[0]:
     print("qemu_timeout")

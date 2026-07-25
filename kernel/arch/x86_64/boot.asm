@@ -6,6 +6,17 @@ global _start
 global boot_memory_region
 global boot_memory_region_end
 global runtime_bootstrap_context
+global initialize_cpu_extended_state
+global required_cpu_features_available
+global configure_extended_state_controls
+global verify_extended_state_controls
+global initialize_x87_state
+global initialize_sse_state
+global run_simd_survival_probe
+global observed_x87_control_word
+global observed_mxcsr
+global simd_probe_result
+global simd_probe_result_end
 global runtime_serial_write_init_marker
 global runtime_serial_write_loop_enter_marker
 global runtime_serial_write_loop_iter_1_marker
@@ -27,6 +38,17 @@ global runtime_serial_write_first_capability_marker
 %define FIFO_ENABLE_CLEAR 0xc7
 %define MODEM_READY 0x03
 %define TRANSMIT_READY 0x20
+%define CPU_REQUIRED_FEATURE_MASK 0x07000001
+%define CR0_REQUIRED_SET_MASK 0x22
+%define CR0_REQUIRED_CLEAR_MASK 0x0c
+%define CR4_REQUIRED_SET_MASK 0x600
+%define CR4_OSXSAVE_MASK 0x40000
+%define CPU_EXT_STATE_CPUID_UNAVAILABLE 1
+%define CPU_EXT_STATE_REQUIRED_FEATURE_MISSING 2
+%define CPU_EXT_STATE_CONTROL_CONFIGURATION_FAILED 3
+%define CPU_EXT_STATE_X87_INITIALIZATION_FAILED 4
+%define CPU_EXT_STATE_SSE_INITIALIZATION_FAILED 5
+%define CPU_EXT_STATE_SIMD_PROBE_FAILED 6
 
 %macro INIT_COM1 0
     mov dx, COM1_INTERRUPT_ENABLE
@@ -78,6 +100,17 @@ boot_memory_region:
     resb 4096
 boot_memory_region_end:
 
+alignb 16
+observed_x87_control_word:
+    resw 1
+alignb 4
+observed_mxcsr:
+    resd 1
+alignb 16
+simd_probe_result:
+    resb 16
+simd_probe_result_end:
+
 section .note.GNU-stack
 section .rodata
 
@@ -104,6 +137,18 @@ stack_init_marker_end:
 memory_init_marker:
     db "KOZO_MEMORY_INIT_OK", 13, 10
 memory_init_marker_end:
+
+cpu_ext_state_init_start_marker:
+    db "KOZO_CPU_EXT_STATE_INIT_START", 13, 10
+cpu_ext_state_init_start_marker_end:
+
+cpu_ext_state_init_ok_marker:
+    db "KOZO_CPU_EXT_STATE_INIT_OK", 13, 10
+cpu_ext_state_init_ok_marker_end:
+
+simd_probe_ok_marker:
+    db "KOZO_SIMD_PROBE_OK", 13, 10
+simd_probe_ok_marker_end:
 
 runtime_progress_entry_marker:
     db "KOZO_RUNTIME_PROGRESS_ENTRY", 13, 10
@@ -148,6 +193,20 @@ first_capability_marker_end:
 runtime_return_marker:
     db "KOZO_RUNTIME_RETURN_OK", 13, 10
 runtime_return_marker_end:
+
+align 16
+default_mxcsr:
+    dd 0x00001f80
+
+align 16
+simd_probe_input:
+    dq 0x0011223344556677
+    dq 0x8899aabbccddeeff
+
+align 16
+simd_probe_mask:
+    dq 0xffff0000ffff0000
+    dq 0x0f0f0f0f0f0f0f0f
 
 section .data
 align 8
@@ -195,6 +254,15 @@ _start:
     cmp qword [rel boot_memory_region], 0
     jne .halt
     WRITE_COM1_MARKER memory_init_marker, memory_init_marker_end
+    WRITE_COM1_MARKER cpu_ext_state_init_start_marker, cpu_ext_state_init_start_marker_end
+    call initialize_cpu_extended_state
+    test eax, eax
+    jnz .halt
+    WRITE_COM1_MARKER cpu_ext_state_init_ok_marker, cpu_ext_state_init_ok_marker_end
+    call run_simd_survival_probe
+    test eax, eax
+    jnz .halt
+    WRITE_COM1_MARKER simd_probe_ok_marker, simd_probe_ok_marker_end
     test rsp, 0x0f
     jnz .halt
     lea rdi, [rel runtime_bootstrap_context]
@@ -208,6 +276,133 @@ _start:
 .halt:
     hlt
     jmp .halt
+
+; Input: none. Output: eax is an exact CPU_EXT_STATE status.
+; Preserves rbx; clobbers other caller-saved registers and CPU control state.
+initialize_cpu_extended_state:
+    push rbx
+    call required_cpu_features_available
+    test eax, eax
+    jnz .done
+    call configure_extended_state_controls
+    call verify_extended_state_controls
+    test eax, eax
+    jnz .done
+    call initialize_x87_state
+    test eax, eax
+    jnz .done
+    call initialize_sse_state
+.done:
+    pop rbx
+    ret
+
+; Input: none. Output: eax is success or a CPUID capability status.
+; Clobbers rax-rdx; rbx is preserved by the caller.
+required_cpu_features_available:
+    xor eax, eax
+    cpuid
+    cmp eax, 1
+    jb .cpuid_unavailable
+    mov eax, 1
+    cpuid
+    and edx, CPU_REQUIRED_FEATURE_MASK
+    cmp edx, CPU_REQUIRED_FEATURE_MASK
+    jne .required_feature_missing
+    xor eax, eax
+    ret
+.cpuid_unavailable:
+    mov eax, CPU_EXT_STATE_CPUID_UNAVAILABLE
+    ret
+.required_feature_missing:
+    mov eax, CPU_EXT_STATE_REQUIRED_FEATURE_MISSING
+    ret
+
+; Input: none. Output: eax is success.
+; Preserves unrelated CR0/CR4 policy and clobbers rax.
+configure_extended_state_controls:
+    mov rax, cr0
+    or rax, CR0_REQUIRED_SET_MASK
+    and rax, ~CR0_REQUIRED_CLEAR_MASK
+    mov cr0, rax
+    mov rax, cr4
+    or rax, CR4_REQUIRED_SET_MASK
+    and rax, ~CR4_OSXSAVE_MASK
+    mov cr4, rax
+    xor eax, eax
+    ret
+
+; Input: configured CR0/CR4. Output: eax is success or configuration failure.
+; Clobbers rax and rdx.
+verify_extended_state_controls:
+    mov rax, cr0
+    mov rdx, rax
+    and rax, CR0_REQUIRED_SET_MASK
+    cmp rax, CR0_REQUIRED_SET_MASK
+    jne .control_failure
+    test rdx, CR0_REQUIRED_CLEAR_MASK
+    jnz .control_failure
+    mov rax, cr4
+    mov rdx, rax
+    and rax, CR4_REQUIRED_SET_MASK
+    cmp rax, CR4_REQUIRED_SET_MASK
+    jne .control_failure
+    test rdx, CR4_OSXSAVE_MASK
+    jnz .control_failure
+    xor eax, eax
+    ret
+.control_failure:
+    mov eax, CPU_EXT_STATE_CONTROL_CONFIGURATION_FAILED
+    ret
+
+; Input: configured x87 control state. Output: eax is success or x87 failure.
+; Touches only the bounded x87 observation word.
+initialize_x87_state:
+    fninit
+    fnstcw [rel observed_x87_control_word]
+    cmp word [rel observed_x87_control_word], 0x037f
+    jne .x87_failure
+    xor eax, eax
+    ret
+.x87_failure:
+    mov eax, CPU_EXT_STATE_X87_INITIALIZATION_FAILED
+    ret
+
+; Input: configured SSE control state. Output: eax is success or SSE failure.
+; Touches only the bounded MXCSR observation word.
+initialize_sse_state:
+    ldmxcsr [rel default_mxcsr]
+    stmxcsr [rel observed_mxcsr]
+    cmp dword [rel observed_mxcsr], 0x00001f80
+    jne .sse_failure
+    xor eax, eax
+    ret
+.sse_failure:
+    mov eax, CPU_EXT_STATE_SSE_INITIALIZATION_FAILED
+    ret
+
+; Input: initialized SSE2 state. Output: eax is success or probe failure.
+; Touches 16 bounded bytes and xmm0, both cleared before return.
+run_simd_survival_probe:
+    movdqa xmm0, [rel simd_probe_input]
+    pxor xmm0, [rel simd_probe_mask]
+    movdqa [rel simd_probe_result], xmm0
+    mov rax, 0xffee2233bbaa6677
+    cmp qword [rel simd_probe_result], rax
+    jne .probe_failure
+    mov rax, 0x8796a5b4c3d2e1f0
+    cmp qword [rel simd_probe_result + 8], rax
+    jne .probe_failure
+    mov qword [rel simd_probe_result], 0
+    mov qword [rel simd_probe_result + 8], 0
+    pxor xmm0, xmm0
+    xor eax, eax
+    ret
+.probe_failure:
+    mov qword [rel simd_probe_result], 0
+    mov qword [rel simd_probe_result + 8], 0
+    pxor xmm0, xmm0
+    mov eax, CPU_EXT_STATE_SIMD_PROBE_FAILED
+    ret
 
 runtime_serial_write_init_marker:
     WRITE_COM1_MARKER runtime_init_marker, runtime_init_marker_end

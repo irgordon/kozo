@@ -90,11 +90,16 @@
     "stack initialization evidence",
     "stack initialization evidence contract",
     "memory initialization evidence",
-    "memory initialization evidence contract"
+    "memory initialization evidence contract",
+    "CPU extended-state initialization evidence",
+    "SIMD survival evidence",
+    "CPU extended-state initialization contract"
   ],
   "required_evidence": [
     "runtime progression entry contract",
     "QEMU evidence for KOZO_RUNTIME_PROGRESS_ENTRY",
+    "QEMU evidence for KOZO_CPU_EXT_STATE_INIT_OK",
+    "QEMU evidence for KOZO_SIMD_PROBE_OK",
     "QEMU evidence for KOZO_RUNTIME_INIT_OK",
     "QEMU evidence for KOZO_RUNTIME_RETURN_OK",
     "runtime progression ELF symbols",
@@ -103,6 +108,7 @@
   "transition_requirements": [
     "runtime_halt_contract remains authoritative after bounded runtime progression",
     "runtime_progression_contract defines halt-preservation requirements",
+    "CPU extended-state initialization and SIMD survival evidence must precede Odin entry",
     "KOZO_RUNTIME_INIT_OK must originate from executed Odin code",
     "first governed runtime capability execution must follow controlled runtime loop completion",
     "KOZO_RUNTIME_RETURN_OK requires the exact success status",
@@ -119,6 +125,7 @@
     "runtime_progression_contract owns halt-preservation governance",
     "runtime_progression_stages contract owns canonical stage order and allowed transitions",
     "runtime_progression_entry_contract owns the MEMORY_INITIALIZATION_EVIDENCE to RUNTIME_PROGRESSION_ENTRY proof boundary",
+    "cpu_extended_state_initialization_contract owns the pre-Odin x87 and SSE prerequisite proof boundary",
     "runtime_progression_entry_contract owns the RUNTIME_PROGRESSION_ENTRY to RUNTIME_INITIALIZATION_EVIDENCE proof boundary"
   ],
   "non_goals": [

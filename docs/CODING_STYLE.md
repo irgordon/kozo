@@ -868,3 +868,9 @@ Keep validators contract-driven.
 Keep generated files non-authoritative.
 
 Use comments only when structure cannot carry the reason.
+
+Architecture initialization paths must read top-down. Each helper owns one
+hardware responsibility, control-register changes preserve unrelated bits, and
+hardware success markers follow readback or behavioral validation. Tests should
+cover consequential architectural failures instead of mirroring every
+instruction.

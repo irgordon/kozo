@@ -24,9 +24,13 @@ _REQUIRED_PREREQUISITES = (
     "stack initialization evidence",
     "memory initialization evidence",
     "memory initialization evidence contract",
+    "CPU extended-state initialization evidence",
+    "SIMD survival evidence",
+    "CPU extended-state initialization contract",
 )
 _REQUIRED_TRANSITIONS = (
     "runtime_halt_contract remains authoritative after bounded runtime progression",
+    "CPU extended-state initialization and SIMD survival evidence must precede Odin entry",
     "KOZO_RUNTIME_INIT_OK must originate from executed Odin code",
     "KOZO_RUNTIME_RETURN_OK requires the exact success status",
     "CI QEMU evidence is required before progression stages are proven",

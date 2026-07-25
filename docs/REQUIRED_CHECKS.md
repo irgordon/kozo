@@ -177,3 +177,10 @@ Do not treat generated reports as source truth.
 Do not downgrade required checks without a governance update.
 
 For v0.8.0, full CI must run `first_governed_runtime_capability` and `first_governed_runtime_capability_evidence`. Passing capability evidence requires the full taxonomy marker sequence, matching metadata/logs, linked dispatcher/handler/bridge symbols, a recorded progression call edge, and the unchanged runtime halt contract. The check proves only one internal same-address-space status query.
+
+For v0.8.1, full CI must also run
+`cpu_extended_state_initialization_contract` and
+`cpu_extended_state_initialization_evidence`. Passing evidence requires CPUID
+feature checks, preserved and read-back CR0/CR4 policy, x87/MXCSR validation,
+the bounded SIMD probe, no prohibited AVX state or instructions, complete
+metadata/log agreement, the unchanged runtime suffix, and the halt contract.

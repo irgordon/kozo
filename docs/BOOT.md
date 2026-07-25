@@ -64,7 +64,7 @@ v0.7.45 adds a bounded progression path after memory evidence. Assembly verifies
 
 v0.7.5 extends that bounded Odin path with `controlled_runtime_loop`. After `KOZO_RUNTIME_INIT_OK`, Odin initializes static volatile loop state, executes exactly three iterations, accumulates `1 + 2 + 3`, validates the terminal count, accumulator, status, and reserved field, and causes fixed assembly bridges to emit `KOZO_RUNTIME_LOOP_ENTER`, three ordered iteration markers, and `KOZO_RUNTIME_LOOP_EXIT_OK`. Hosted CI run `30057826315` captured that ordered sequence and passed `controlled_runtime_loop_evidence`.
 
-v0.8.0 executes one versioned internal `RUNTIME_STATUS_QUERY` after controlled-loop success. Odin validates a fixed 16-byte request and non-overlapping 64-byte response, clears the response, dispatches capability ID 1, reports only the accepted stage 0 through 5 baseline, validates every response field, and emits three fixed capability markers before exact status zero permits `KOZO_RUNTIME_RETURN_OK`. This remains same-address-space kernel execution and is implemented pending hosted CI marker evidence.
+v0.8.0 executes one versioned internal `RUNTIME_STATUS_QUERY` after controlled-loop success. Odin validates a fixed 16-byte request and non-overlapping 64-byte response, clears the response, dispatches capability ID 1, reports only the accepted stage 0 through 5 baseline, validates every response field, and emits three fixed capability markers before exact status zero permits `KOZO_RUNTIME_RETURN_OK`. This remains same-address-space kernel execution and is accepted by hosted CI marker and validator evidence.
 
 No active QEMU serial smoke blocker.
 
@@ -214,7 +214,7 @@ The previous `missing_bootable_iso_packaging` blocker was refined to `missing_li
 
 The previous `missing_limine_iso_tooling` blocker is refined by `docs/BOOT_TOOLING.md`.
 
-The QEMU serial smoke, stack evidence, controlled-memory evidence, bounded progression entry, minimal Odin initialization, and controlled runtime loop paths are proven. v0.8.0 adds the first governed internal capability locally; hosted capability marker evidence is required before promotion.
+The QEMU serial smoke, stack evidence, controlled-memory evidence, bounded progression entry, minimal Odin initialization, controlled runtime loop, and first governed internal capability paths are proven. v0.8.1 adds locally evidenced CPU extended-state initialization before Odin; hosted marker and validator evidence is required before promotion.
 
 The existing QEMU smoke command writes blocked or passing metadata to `artifacts/runtime/qemu_smoke.metadata.json` and serial output to `artifacts/runtime/qemu_smoke.log`.
 
@@ -299,3 +299,24 @@ The kernel ELF loadability validator is:
 ```text
 kernel_loadability
 ```
+
+## CPU Extended-State Gate
+
+After `KOZO_MEMORY_INIT_OK` and before the first Odin call, assembly validates
+CPUID leaf 1 FPU/FXSR/SSE/SSE2 support, configures and reads back the required
+CR0/CR4 bits, initializes x87 and MXCSR, and validates one bounded SSE2 result.
+The resulting markers are:
+
+```text
+KOZO_CPU_EXT_STATE_INIT_START
+KOZO_CPU_EXT_STATE_INIT_OK
+KOZO_SIMD_PROBE_OK
+```
+
+Only the successful path continues to `KOZO_RUNTIME_PROGRESS_ENTRY`. Every
+failure converges on the existing `cli`/`hlt` loop without CPU, SIMD, or
+runtime-success markers. `docs/CPU_EXTENDED_STATE.md` owns the detailed
+descriptive boundary; the contract under `contracts/` is authoritative.
+
+This gate does not enable AVX/XSAVE, context switching, exception recovery,
+userspace, or production behavior.

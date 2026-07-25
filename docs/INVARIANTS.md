@@ -526,3 +526,9 @@ Syscall behavior stays classed, contracted, and validated.
 Validators stay covered by behavioral negative tests.
 
 Compatibility claims stay scoped and evidence-backed.
+
+Boot code must not enter Odin until every governed architecture prerequisite
+for the allowed generated instruction class has succeeded. Control-register
+updates preserve unrelated bits, hardware success markers follow readback or
+behavioral validation, and any prerequisite failure converges on a governed
+non-fallthrough terminal path.

@@ -369,22 +369,28 @@ def _expected_blocker_from_logs(metadata: dict[str, object]) -> str | None:
     if _EARLY_MARKERS[4] in observed and _EARLY_MARKERS[5] not in observed:
         return "memory_marker_not_emitted"
     if _EARLY_MARKERS[5] in observed and _EARLY_MARKERS[6] not in observed:
-        return "runtime_progression_entry_not_reached"
+        return "cpu_extended_state_initialization_not_completed"
     if _EARLY_MARKERS[6] in observed and _EARLY_MARKERS[7] not in observed:
-        return "runtime_initialization_not_proven"
+        return "cpu_extended_state_initialization_not_completed"
     if _EARLY_MARKERS[7] in observed and _EARLY_MARKERS[8] not in observed:
+        return "simd_survival_probe_not_completed"
+    if _EARLY_MARKERS[8] in observed and _EARLY_MARKERS[9] not in observed:
+        return "runtime_progression_entry_not_reached"
+    if _EARLY_MARKERS[9] in observed and _EARLY_MARKERS[10] not in observed:
+        return "runtime_initialization_not_proven"
+    if _EARLY_MARKERS[10] in observed and _EARLY_MARKERS[11] not in observed:
         return "runtime_loop_entry_not_reached"
-    if _EARLY_MARKERS[8] in observed and _EARLY_MARKERS[11] not in observed:
+    if _EARLY_MARKERS[11] in observed and _EARLY_MARKERS[14] not in observed:
         return "runtime_loop_iteration_incomplete"
-    if _EARLY_MARKERS[11] in observed and _EARLY_MARKERS[12] not in observed:
-        return "runtime_loop_exit_not_reached"
-    if _EARLY_MARKERS[12] in observed and _EARLY_MARKERS[13] not in observed:
-        return "capability_dispatch_not_reached"
-    if _EARLY_MARKERS[13] in observed and _EARLY_MARKERS[14] not in observed:
-        return "runtime_status_query_not_completed"
     if _EARLY_MARKERS[14] in observed and _EARLY_MARKERS[15] not in observed:
-        return "first_governed_capability_not_proven"
+        return "runtime_loop_exit_not_reached"
     if _EARLY_MARKERS[15] in observed and _EARLY_MARKERS[16] not in observed:
+        return "capability_dispatch_not_reached"
+    if _EARLY_MARKERS[16] in observed and _EARLY_MARKERS[17] not in observed:
+        return "runtime_status_query_not_completed"
+    if _EARLY_MARKERS[17] in observed and _EARLY_MARKERS[18] not in observed:
+        return "first_governed_capability_not_proven"
+    if _EARLY_MARKERS[18] in observed and _EARLY_MARKERS[19] not in observed:
         return "runtime_return_not_reached"
     if observed and observed[0] != _EARLY_MARKERS[0]:
         return "qemu_timeout"

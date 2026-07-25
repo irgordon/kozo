@@ -53,6 +53,8 @@ CONTROLLED_RUNTIME_LOOP_CONTRACT_INVALID = "CONTROLLED_RUNTIME_LOOP_CONTRACT_INV
 CONTROLLED_RUNTIME_LOOP_EVIDENCE_INVALID = "CONTROLLED_RUNTIME_LOOP_EVIDENCE_INVALID"
 FIRST_GOVERNED_RUNTIME_CAPABILITY_INVALID = "FIRST_GOVERNED_RUNTIME_CAPABILITY_INVALID"
 FIRST_GOVERNED_RUNTIME_CAPABILITY_EVIDENCE_INVALID = "FIRST_GOVERNED_RUNTIME_CAPABILITY_EVIDENCE_INVALID"
+CPU_EXTENDED_STATE_INITIALIZATION_CONTRACT_INVALID = "CPU_EXTENDED_STATE_INITIALIZATION_CONTRACT_INVALID"
+CPU_EXTENDED_STATE_INITIALIZATION_EVIDENCE_INVALID = "CPU_EXTENDED_STATE_INITIALIZATION_EVIDENCE_INVALID"
 BOOT_BLOCKER_REPORT_INVALID = "BOOT_BLOCKER_REPORT_INVALID"
 BOOT_PROTOCOL_DECISION_INVALID = "BOOT_PROTOCOL_DECISION_INVALID"
 BOOT_IMAGE_SKELETON_INVALID = "BOOT_IMAGE_SKELETON_INVALID"
@@ -119,6 +121,8 @@ CODES = MappingProxyType(
         CONTROLLED_RUNTIME_LOOP_EVIDENCE_INVALID: "Controlled runtime loop evidence is missing, malformed, or inconsistent with source, ELF, QEMU, stage, or halt state",
         FIRST_GOVERNED_RUNTIME_CAPABILITY_INVALID: "First governed runtime capability contract is missing, malformed, or inconsistent with its bounded internal request and response boundary",
         FIRST_GOVERNED_RUNTIME_CAPABILITY_EVIDENCE_INVALID: "First governed runtime capability evidence is missing, malformed, or inconsistent with source, ELF, QEMU, stage, or halt state",
+        CPU_EXTENDED_STATE_INITIALIZATION_CONTRACT_INVALID: "CPU extended-state initialization contract is missing, malformed, or inconsistent with pre-Odin x87 and SSE policy",
+        CPU_EXTENDED_STATE_INITIALIZATION_EVIDENCE_INVALID: "CPU extended-state initialization evidence is missing, malformed, or inconsistent with source, ELF, runtime markers, or AVX prohibition",
         BOOT_BLOCKER_REPORT_INVALID: "Boot blocker report is missing, malformed, or inconsistent with boot baseline policy",
         BOOT_PROTOCOL_DECISION_INVALID: "Boot protocol decision is missing, incomplete, or inconsistent with boot blocker policy",
         BOOT_IMAGE_SKELETON_INVALID: "Boot image skeleton is missing, incomplete, or inconsistent with boot blocker state",

@@ -93,8 +93,9 @@ Detailed evidence rules are owned by `docs/RELEASE_EVIDENCE.md`.
 
 The current local generated evidence proves:
 
-* `scripts/verify.sh` passes locally with 53 checks and 0 failures.
-* Unit discovery passes locally with 682 tests after the v0.8.0 capability correction coverage expansion.
+* `scripts/verify.sh` passes locally with 55 checks and 0 failures.
+* Unit discovery passes locally with 715 tests.
+* v0.8.0 is accepted by hosted CI with the complete capability marker suffix and passing capability evidence.
 * The kernel ELF uses higher-half PT_LOAD virtual addresses.
 * Local kernel ELF loadability reports no lower-half PHDR blocker.
 * The repository source defines the ordered evidence path through `KOZO_RUNTIME_PROGRESS_ENTRY`, Odin-dependent `KOZO_RUNTIME_INIT_OK`, and `KOZO_RUNTIME_RETURN_OK` after the existing boot, stack, and memory markers.
@@ -113,25 +114,23 @@ The current local generated evidence proves:
 * v0.7.4 memory evidence is accepted by the CI validator gate; manual artifact inspection was not completed.
 * v0.7.45 is accepted by hosted CI run `29459278491`; `RUNTIME_PROGRESSION_ENTRY` and `RUNTIME_INITIALIZATION_EVIDENCE` are proven.
 * Hosted CI run `30057826315` accepted v0.7.5 with verification at 51 checks and 0 failures, passing `controlled_runtime_loop_evidence`, and the complete ordered controlled-loop marker sequence. Lint run `30057826311` also passed.
-* The first hosted v0.8.0 attempt reached `KOZO_RUNTIME_LOOP_EXIT_OK` and then faulted on an unsupported generated `xorps` instruction before capability dispatch.
-* The corrective v0.8.0 implementation uses scalar response initialization and locally captures the complete sequence through `KOZO_RUNTIME_RETURN_OK` with QEMU `outcome: pass`.
-* `CONTROLLED_RUNTIME_LOOP` is proven, `FIRST_GOVERNED_RUNTIME_CAPABILITY` is implemented and locally evidenced pending hosted CI confirmation, and `USERSPACE_PLANNING` remains planned.
+* `CONTROLLED_RUNTIME_LOOP` and `FIRST_GOVERNED_RUNTIME_CAPABILITY` are proven; `USERSPACE_PLANNING` remains planned.
+* v0.8.1 locally detects FPU, FXSR, SSE, and SSE2, configures and verifies CR0/CR4 state, initializes x87 and MXCSR, validates a bounded SSE2 probe, and preserves the accepted runtime capability and halt suffix.
+* Local QEMU evidence contains `KOZO_CPU_EXT_STATE_INIT_START`, `KOZO_CPU_EXT_STATE_INIT_OK`, and `KOZO_SIMD_PROBE_OK` between memory evidence and runtime progression.
 
 ## Current Active Blocker
 
-The first hosted v0.8.0 attempt recorded `capability_dispatch_not_reached`.
-The exact local correction now passes QEMU; hosted confirmation of the
-corrective commit remains the active v0.8.0 acceptance gate.
+No active local runtime blocker is recorded for v0.8.1. Hosted CI marker,
+validator, and binary-policy confirmation remains the acceptance gate.
 
 Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr`, `kernel_entry_not_reached`, `serial_not_initialized`, and `marker_not_emitted` are retained only as resolved historical evidence states unless a future CI artifact reintroduces one.
 
 ## Next Runtime Phase
 
-The current runtime phase remains `v0.8.0 First Governed Runtime Capability`.
-Do not start v0.8.1 until hosted CI captures
-`KOZO_CAPABILITY_DISPATCH_ENTER`, `KOZO_RUNTIME_STATUS_QUERY_OK`,
-`KOZO_FIRST_CAPABILITY_OK`, and `KOZO_RUNTIME_RETURN_OK` after
-`KOZO_RUNTIME_LOOP_EXIT_OK`, with verification aggregation completing.
+The current runtime phase is `v0.8.1 CPU Extended-State Initialization`.
+After hosted acceptance, the next implementation phase should add a second
+bounded runtime capability that performs governed state mutation and readback
+through the existing dispatcher. It must not be a planning-only milestone.
 
 ---
 
@@ -187,6 +186,7 @@ Do not start v0.8.1 until hosted CI captures
 | `v0.7.45` | Runtime Progression Entry and Minimal Runtime Initialization | Add a bounded internal assembly-to-Odin call after memory evidence and return to the authoritative halt path. | Calling-convention contract, fixed bootstrap context, bounded Odin state probe, fixed serial bridge, progression evidence validator, ordered CI markers. | CI captures `KOZO_RUNTIME_PROGRESS_ENTRY`, Odin-dependent `KOZO_RUNTIME_INIT_OK`, and `KOZO_RUNTIME_RETURN_OK`; exact status zero returns to the terminal halt path without allocator, scheduler, userspace, interrupt, compatibility, or production claims. |
 | `v0.7.5` | Controlled Runtime Loop | Add a contract-backed, bounded three-iteration Odin loop between runtime initialization and the exact return-to-halt continuation. | Controlled loop contract/schema/validators, static volatile state, fixed loop markers, ELF backward-edge evidence, QEMU classification, docs and tests. | Hosted CI captures loop entry, iterations 1-3, loop exit, and runtime return in order; validators pass; the halt loop remains authoritative; no scheduler, userspace, allocator, interrupt, compatibility, or production claim is added. |
 | `v0.8.0` | First Governed Runtime Capability | Execute one versioned internal runtime status query after the accepted controlled loop. | Fixed request/response types, explicit dispatcher and handler, contract/schema/validators, fixed capability markers, ELF evidence, docs, and tests. | Hosted CI captures capability dispatch, status-query success, first-capability success, and runtime return in order; capability validators pass; the halt loop remains authoritative; no userspace, isolation, scheduler, allocator, interrupt, compatibility, or production claim is added. |
+| `v0.8.1` | CPU Extended-State Initialization | Establish and validate the boot CPU x87/SSE execution state before Odin entry. | CPUID feature checks, CR0/CR4 read-modify-write and readback, x87/MXCSR initialization, bounded SIMD probe, contract/schema/validators, ELF and QEMU evidence. | Hosted CI captures the three CPU-state markers before runtime progression; CPU-state, progression, controlled-loop, capability, halt, and schema validators pass; AVX/XSAVE remains prohibited and no broader runtime claim is added. |
 | `v1.0.0-rc.1` | Release candidate hardening | Freeze release scope and release gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | Release evidence bundle, completed release checklist, current generated reports, changelog/release notes dry run, all required CI checks green. | Release candidate can be reviewed without adding new scope. |
 | `v1.0.0` | Scoped production release | Release only the proven, scoped KOZO surface. | Final release evidence bundle, final changelog and release notes, passing required gates, explicit non-goals. | v1.0.0 claims only evidence-backed behavior and preserves all compatibility non-goals. |
 
