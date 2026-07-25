@@ -30,6 +30,9 @@
     "KOZO_CAPABILITY_DISPATCH_ENTER",
     "KOZO_RUNTIME_STATUS_QUERY_OK",
     "KOZO_FIRST_CAPABILITY_OK",
+    "KOZO_RUNTIME_STATE_UPDATE_ENTER",
+    "KOZO_RUNTIME_STATE_UPDATE_OK",
+    "KOZO_SECOND_CAPABILITY_OK",
     "KOZO_RUNTIME_RETURN_OK"
   ],
   "observed_markers": [
@@ -52,6 +55,9 @@
     "KOZO_CAPABILITY_DISPATCH_ENTER",
     "KOZO_RUNTIME_STATUS_QUERY_OK",
     "KOZO_FIRST_CAPABILITY_OK",
+    "KOZO_RUNTIME_STATE_UPDATE_ENTER",
+    "KOZO_RUNTIME_STATE_UPDATE_OK",
+    "KOZO_SECOND_CAPABILITY_OK",
     "KOZO_RUNTIME_RETURN_OK"
   ],
   "earliest_observed_marker": "KOZO_EARLY_0_ENTRY",
@@ -63,7 +69,7 @@
   "qemu_exit_code": 124,
   "timed_out": true,
   "timeout_seconds": 20,
-  "serial_log_bytes": 1733,
+  "serial_log_bytes": 1823,
   "stderr_log_bytes": 80,
   "validator": "qemu_smoke_evidence",
   "proves": [
@@ -78,6 +84,12 @@
     "dynamic initialization",
     "general stack readiness",
     "general memory management",
+    "arbitrary kernel memory writes",
+    "concurrent execution",
+    "persistent state",
+    "authentication",
+    "authorization",
+    "privilege separation",
     "syscall dispatch",
     "Linux compatibility",
     "POSIX compatibility",

@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260725T204247Z",
+  "run_id": "verify-20260725T212943Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 55,
+    "total_checks": 57,
     "failed_check_count": 0
   },
   "checks": [
@@ -70,7 +70,7 @@
       "subsystem": "odin",
       "status": "pass",
       "code": "OK",
-      "detail": "No Odin kernel changes require validation in this bootstrap loop"
+      "detail": "Odin changes are backed by declared odin check evidence"
     },
     {
       "name": "abi",
@@ -311,6 +311,20 @@
       "detail": "CPU extended-state initialization is aligned across source, ELF, and runtime evidence"
     },
     {
+      "name": "runtime_state_transition_capability",
+      "subsystem": "runtime_state_transition_capability",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Runtime state transition contract governs one bounded READY/0 to ACTIVE/1 capability"
+    },
+    {
+      "name": "runtime_state_transition_capability_evidence",
+      "subsystem": "runtime_state_transition_capability_evidence",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Runtime state transition evidence aligns bounded volatile mutation, response proof, markers, ELF, first capability, and halt"
+    },
+    {
       "name": "boot_blocker_report",
       "subsystem": "boot_blocker_report",
       "status": "pass",
@@ -409,11 +423,54 @@
   ],
   "failed_checks": [],
   "changed_files": [
-    "artifacts/runtime/boot_blocker_report.json",
+    "CHANGELOG.md",
     "artifacts/runtime/kernel_elf_report.json",
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt",
-    "docs/generated/governance_index.md"
+    "contracts/runtime_evidence_taxonomy.v0.json",
+    "contracts/runtime_state_transition_capability.v0.json",
+    "docs/ARCHITECTURE.md",
+    "docs/BOOT.md",
+    "docs/CODEBASE_AUDIT.md",
+    "docs/CODING_STYLE.md",
+    "docs/CONTRACTS.md",
+    "docs/INVARIANTS.md",
+    "docs/PHASEMAP.md",
+    "docs/RELEASE_CHECKLIST.md",
+    "docs/RELEASE_EVIDENCE.md",
+    "docs/REQUIRED_CHECKS.md",
+    "docs/ROADMAP.md",
+    "docs/RUNTIME_CAPABILITIES.md",
+    "docs/RUNTIME_EVIDENCE.md",
+    "docs/SECURITY_MODEL.md",
+    "docs/VALIDATION.md",
+    "docs/generated/governance_index.md",
+    "harness/codes.py",
+    "harness/registry.py",
+    "harness/runtime_state_transition_capability.py",
+    "harness/validators.py",
+    "harness/validators_impl/first_governed_runtime_capability_evidence.py",
+    "harness/validators_impl/qemu_smoke_evidence.py",
+    "harness/validators_impl/runtime_evidence_taxonomy.py",
+    "harness/validators_impl/runtime_progression_evidence.py",
+    "harness/validators_impl/runtime_state_transition_capability.py",
+    "harness/validators_impl/runtime_state_transition_capability_evidence.py",
+    "harness/validators_impl/schema.py",
+    "harness/validators_impl/validator_coverage.py",
+    "kernel/arch/x86_64/boot.asm",
+    "kernel/runtime_capability.odin",
+    "kernel/runtime_progression.odin",
+    "schemas/agent_context.schema.json",
+    "schemas/latest_verify.schema.json",
+    "schemas/runtime_state_transition_capability.schema.json",
+    "scripts/kernel_elf_report.py",
+    "scripts/qemu_smoke.sh",
+    "tasks/todo.json",
+    "tests/test_first_governed_runtime_capability_evidence.py",
+    "tests/test_qemu_smoke_evidence.py",
+    "tests/test_runtime_evidence_taxonomy.py",
+    "tests/test_runtime_state_transition_capability.py",
+    "tests/test_runtime_state_transition_capability_evidence.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -430,5 +487,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-07-25T20:42:47Z"
+  "generated_at": "2026-07-25T21:29:43Z"
 }

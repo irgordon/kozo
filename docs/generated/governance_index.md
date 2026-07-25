@@ -12,7 +12,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.8.1`
+* Version: `v0.8.2`
 * Date: `2026-07-25`
 * Status: Implemented and locally evidenced; hosted CI acceptance pending.
 
@@ -20,10 +20,10 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 55
+* Total checks: 57
 * Failed checks: 0
-* Run ID: `verify-20260725T204247Z`
-* Generated at: `2026-07-25T20:42:47Z`
+* Run ID: `verify-20260725T212943Z`
+* Generated at: `2026-07-25T21:29:43Z`
 
 ## Registered validators
 
@@ -72,18 +72,20 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 41 | `first_governed_runtime_capability_evidence` |
 | 42 | `cpu_extended_state_initialization_contract` |
 | 43 | `cpu_extended_state_initialization_evidence` |
-| 44 | `boot_blocker_report` |
-| 45 | `boot_protocol_decision` |
-| 46 | `boot_image_skeleton` |
-| 47 | `boot_image_packaging` |
-| 48 | `boot_tooling` |
-| 49 | `kernel_loadability` |
-| 50 | `host_dependency_portability` |
-| 51 | `qemu_smoke_evidence` |
-| 52 | `return_path_proof` |
-| 53 | `execution_proof` |
-| 54 | `validator_coverage` |
-| 55 | `evidence` |
+| 44 | `runtime_state_transition_capability` |
+| 45 | `runtime_state_transition_capability_evidence` |
+| 46 | `boot_blocker_report` |
+| 47 | `boot_protocol_decision` |
+| 48 | `boot_image_skeleton` |
+| 49 | `boot_image_packaging` |
+| 50 | `boot_tooling` |
+| 51 | `kernel_loadability` |
+| 52 | `host_dependency_portability` |
+| 53 | `qemu_smoke_evidence` |
+| 54 | `return_path_proof` |
+| 55 | `execution_proof` |
+| 56 | `validator_coverage` |
+| 57 | `evidence` |
 
 ## Active contracts
 
@@ -99,6 +101,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | `contracts/runtime_progression_contract.v0.json` | `0` | runtime progression contract.v0 |
 | `contracts/runtime_progression_entry_contract.v0.json` | `0` | runtime progression entry contract.v0 |
 | `contracts/runtime_progression_stages.v0.json` | `0` | runtime progression stages.v0 |
+| `contracts/runtime_state_transition_capability.v0.json` | `0` | runtime state transition capability.v0 |
 | `contracts/stack_initialization_evidence_contract.v0.json` | `0` | stack initialization evidence contract.v0 |
 | `contracts/syscall_boundary_contract.v0.json` | `0` | syscall boundary contract |
 | `contracts/syscall_catalog.v0.json` | `0` | syscall catalog |
@@ -122,6 +125,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | `schemas/runtime_progression_contract.schema.json` | KOZO runtime progression contract |
 | `schemas/runtime_progression_entry_contract.schema.json` | KOZO runtime progression entry contract |
 | `schemas/runtime_progression_stages.schema.json` | KOZO runtime progression stages contract |
+| `schemas/runtime_state_transition_capability.schema.json` | KOZO runtime state transition capability |
 | `schemas/stack_initialization_evidence_contract.schema.json` | KOZO stack initialization evidence contract |
 | `schemas/syscall_boundary_contract.schema.json` | syscall_boundary_contract.schema.json |
 | `schemas/syscall_catalog.schema.json` | syscall_catalog.schema.json |
@@ -141,7 +145,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 55
+* Check count: 57
 * Failure count: 0
 
 ## Non-goals

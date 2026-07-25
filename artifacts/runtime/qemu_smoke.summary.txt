@@ -26,6 +26,9 @@ Observed Markers
   - KOZO_CAPABILITY_DISPATCH_ENTER
   - KOZO_RUNTIME_STATUS_QUERY_OK
   - KOZO_FIRST_CAPABILITY_OK
+  - KOZO_RUNTIME_STATE_UPDATE_ENTER
+  - KOZO_RUNTIME_STATE_UPDATE_OK
+  - KOZO_SECOND_CAPABILITY_OK
   - KOZO_RUNTIME_RETURN_OK
 
 Expected Marker
@@ -37,7 +40,7 @@ Validator: qemu_smoke_evidence
 Metadata
 QEMU exit code: 124
 Timed out: True
-Serial log bytes: 1733
+Serial log bytes: 1823
 Stderr log bytes: 80
 
 Evidence References
@@ -47,13 +50,10 @@ artifacts/runtime/qemu_smoke.metadata.json
 artifacts/runtime/boot_blocker_report.json
 
 Last 50 serial lines
-edid: Success.
-vbe: EDID detected screen resolution of 1280x800
-vbe: Found matching mode 0x17a, attempting to set...
 vbe: Framebuffer address: 0xfd000000
 edid: Success.
 limine: Loading executable `boot():/boot/kozo/kozo-kernel.elf`...
-limine: Physical base:   0xff36000
+limine: Physical base:   0xff34000
 limine: Virtual base:    0xffffffff80200000
 limine: Slide:           0x0
 limine: ELF entry point: 0xffffffff80200000
@@ -96,7 +96,10 @@ KOZO_RUNTIME_LOOP_EXIT_OK
 KOZO_CAPABILITY_DISPATCH_ENTER
 KOZO_RUNTIME_STATUS_QUERY_OK
 KOZO_FIRST_CAPABILITY_OK
+KOZO_RUNTIME_STATE_UPDATE_ENTER
+KOZO_RUNTIME_STATE_UPDATE_OK
+KOZO_SECOND_CAPABILITY_OK
 KOZO_RUNTIME_RETURN_OK
 
 Last 50 stderr lines
-qemu-system-x86_64: terminating on signal 15 from pid 63749 (<unknown process>)
+qemu-system-x86_64: terminating on signal 15 from pid 73207 (<unknown process>)
