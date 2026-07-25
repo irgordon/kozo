@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260724T032230Z",
+  "run_id": "verify-20260725T204247Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 53,
+    "total_checks": 55,
     "failed_check_count": 0
   },
   "checks": [
@@ -70,7 +70,7 @@
       "subsystem": "odin",
       "status": "pass",
       "code": "OK",
-      "detail": "Odin changes are backed by declared odin check evidence"
+      "detail": "No Odin kernel changes require validation in this bootstrap loop"
     },
     {
       "name": "abi",
@@ -297,6 +297,20 @@
       "detail": "First governed runtime capability aligns request validation, dispatch, response proof, markers, ELF symbols, stages, and halt"
     },
     {
+      "name": "cpu_extended_state_initialization_contract",
+      "subsystem": "cpu_extended_state_initialization_contract",
+      "status": "pass",
+      "code": "OK",
+      "detail": "CPU extended-state contract governs pre-Odin x87 and SSE initialization"
+    },
+    {
+      "name": "cpu_extended_state_initialization_evidence",
+      "subsystem": "cpu_extended_state_initialization_evidence",
+      "status": "pass",
+      "code": "OK",
+      "detail": "CPU extended-state initialization is aligned across source, ELF, and runtime evidence"
+    },
+    {
       "name": "boot_blocker_report",
       "subsystem": "boot_blocker_report",
       "status": "pass",
@@ -395,28 +409,11 @@
   ],
   "failed_checks": [],
   "changed_files": [
-    "CHANGELOG.md",
     "artifacts/runtime/boot_blocker_report.json",
     "artifacts/runtime/kernel_elf_report.json",
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt",
-    "docs/BOOT_TOOLING.md",
-    "docs/CODEBASE_AUDIT.md",
-    "docs/PHASEMAP.md",
-    "docs/ROADMAP.md",
-    "docs/RUNTIME_EVIDENCE.md",
-    "docs/generated/governance_index.md",
-    "harness/validators_impl/first_governed_runtime_capability_evidence.py",
-    "harness/validators_impl/host_dependency_portability.py",
-    "harness/validators_impl/validator_coverage.py",
-    "kernel/runtime_capability.odin",
-    "schemas/latest_verify.schema.json",
-    "scripts/build_boot_image.sh",
-    "scripts/qemu_smoke.sh",
-    "tasks/todo.json",
-    "tests/test_first_governed_runtime_capability_evidence.py",
-    "tests/test_host_dependency_portability.py",
-    "tests/test_schema.py"
+    "docs/generated/governance_index.md"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -433,5 +430,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-07-24T03:22:30Z"
+  "generated_at": "2026-07-25T20:42:47Z"
 }

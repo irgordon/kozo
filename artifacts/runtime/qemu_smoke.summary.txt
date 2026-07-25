@@ -13,6 +13,9 @@ Observed Markers
   - KOZO_BOOT_SMOKE_OK
   - KOZO_STACK_INIT_OK
   - KOZO_MEMORY_INIT_OK
+  - KOZO_CPU_EXT_STATE_INIT_START
+  - KOZO_CPU_EXT_STATE_INIT_OK
+  - KOZO_SIMD_PROBE_OK
   - KOZO_RUNTIME_PROGRESS_ENTRY
   - KOZO_RUNTIME_INIT_OK
   - KOZO_RUNTIME_LOOP_ENTER
@@ -34,7 +37,7 @@ Validator: qemu_smoke_evidence
 Metadata
 QEMU exit code: 124
 Timed out: True
-Serial log bytes: 1654
+Serial log bytes: 1733
 Stderr log bytes: 80
 
 Evidence References
@@ -44,16 +47,13 @@ artifacts/runtime/qemu_smoke.metadata.json
 artifacts/runtime/boot_blocker_report.json
 
 Last 50 serial lines
-vbe: Graphics vendor: SeaBIOS Developers
-vbe: Product name: SeaBIOS VBE Adapter
-vbe: Product revision: Rev. 1
 edid: Success.
 vbe: EDID detected screen resolution of 1280x800
 vbe: Found matching mode 0x17a, attempting to set...
 vbe: Framebuffer address: 0xfd000000
 edid: Success.
 limine: Loading executable `boot():/boot/kozo/kozo-kernel.elf`...
-limine: Physical base:   0xff37000
+limine: Physical base:   0xff36000
 limine: Virtual base:    0xffffffff80200000
 limine: Slide:           0x0
 limine: ELF entry point: 0xffffffff80200000
@@ -83,6 +83,9 @@ KOZO_EARLY_2_SERIAL_INIT_OK
 KOZO_BOOT_SMOKE_OK
 KOZO_STACK_INIT_OK
 KOZO_MEMORY_INIT_OK
+KOZO_CPU_EXT_STATE_INIT_START
+KOZO_CPU_EXT_STATE_INIT_OK
+KOZO_SIMD_PROBE_OK
 KOZO_RUNTIME_PROGRESS_ENTRY
 KOZO_RUNTIME_INIT_OK
 KOZO_RUNTIME_LOOP_ENTER
@@ -96,4 +99,4 @@ KOZO_FIRST_CAPABILITY_OK
 KOZO_RUNTIME_RETURN_OK
 
 Last 50 stderr lines
-qemu-system-x86_64: terminating on signal 15 from pid 22033 (<unknown process>)
+qemu-system-x86_64: terminating on signal 15 from pid 63749 (<unknown process>)

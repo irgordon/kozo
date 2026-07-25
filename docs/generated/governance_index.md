@@ -12,18 +12,18 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.8.0`
-* Date: `2026-07-23`
-* Status: Corrected locally; hosted CI acceptance pending.
+* Version: `v0.8.1`
+* Date: `2026-07-25`
+* Status: Implemented and locally evidenced; hosted CI acceptance pending.
 
 ## Verification status
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 53
+* Total checks: 55
 * Failed checks: 0
-* Run ID: `verify-20260724T032202Z`
-* Generated at: `2026-07-24T03:22:02Z`
+* Run ID: `verify-20260725T204247Z`
+* Generated at: `2026-07-25T20:42:47Z`
 
 ## Registered validators
 
@@ -70,24 +70,27 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 39 | `controlled_runtime_loop_evidence` |
 | 40 | `first_governed_runtime_capability` |
 | 41 | `first_governed_runtime_capability_evidence` |
-| 42 | `boot_blocker_report` |
-| 43 | `boot_protocol_decision` |
-| 44 | `boot_image_skeleton` |
-| 45 | `boot_image_packaging` |
-| 46 | `boot_tooling` |
-| 47 | `kernel_loadability` |
-| 48 | `host_dependency_portability` |
-| 49 | `qemu_smoke_evidence` |
-| 50 | `return_path_proof` |
-| 51 | `execution_proof` |
-| 52 | `validator_coverage` |
-| 53 | `evidence` |
+| 42 | `cpu_extended_state_initialization_contract` |
+| 43 | `cpu_extended_state_initialization_evidence` |
+| 44 | `boot_blocker_report` |
+| 45 | `boot_protocol_decision` |
+| 46 | `boot_image_skeleton` |
+| 47 | `boot_image_packaging` |
+| 48 | `boot_tooling` |
+| 49 | `kernel_loadability` |
+| 50 | `host_dependency_portability` |
+| 51 | `qemu_smoke_evidence` |
+| 52 | `return_path_proof` |
+| 53 | `execution_proof` |
+| 54 | `validator_coverage` |
+| 55 | `evidence` |
 
 ## Active contracts
 
 | Path | Version | Role |
 | --- | --- | --- |
 | `contracts/controlled_runtime_loop_contract.v0.json` | `0` | controlled runtime loop contract.v0 |
+| `contracts/cpu_extended_state_initialization_contract.v0.json` | `0` | cpu extended state initialization contract.v0 |
 | `contracts/first_governed_runtime_capability.v0.json` | `0` | first governed runtime capability.v0 |
 | `contracts/kozo_abi_manifest.json` | `0` | ABI manifest |
 | `contracts/memory_initialization_evidence_contract.v0.json` | `0` | memory initialization evidence contract.v0 |
@@ -108,6 +111,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | --- | --- |
 | `schemas/agent_context.schema.json` | agent_context.schema.json |
 | `schemas/controlled_runtime_loop_contract.schema.json` | KOZO controlled runtime loop contract |
+| `schemas/cpu_extended_state_initialization_contract.schema.json` | KOZO CPU extended-state initialization contract |
 | `schemas/first_governed_runtime_capability.schema.json` | KOZO first governed runtime capability |
 | `schemas/kozo_abi_manifest.schema.json` | kozo_abi_manifest.schema.json |
 | `schemas/latest_verify.schema.json` | latest_verify.schema.json |
@@ -137,7 +141,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 53
+* Check count: 55
 * Failure count: 0
 
 ## Non-goals
