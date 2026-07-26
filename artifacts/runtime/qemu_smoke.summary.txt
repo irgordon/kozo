@@ -21,6 +21,11 @@ Observed Markers
   - KOZO_USER_MAPPING_PERMISSIONS_OK
   - KOZO_USER_MAPPING_ACTIVATE_OK
   - KOZO_USER_MAPPING_SURVIVAL_OK
+  - KOZO_PRIVILEGE_TRANSITION_INIT_START
+  - KOZO_PRIVILEGE_TABLES_OK
+  - KOZO_RING3_ENTER
+  - KOZO_RING3_PROBE_OK
+  - KOZO_RING0_RETURN_OK
   - KOZO_RUNTIME_PROGRESS_ENTRY
   - KOZO_RUNTIME_INIT_OK
   - KOZO_RUNTIME_LOOP_ENTER
@@ -45,8 +50,8 @@ Validator: qemu_smoke_evidence
 Metadata
 QEMU exit code: 124
 Timed out: True
-Serial log bytes: 1978
-Stderr log bytes: 80
+Serial log bytes: 2103
+Stderr log bytes: 79
 
 Evidence References
 artifacts/runtime/qemu_smoke.log
@@ -55,11 +60,6 @@ artifacts/runtime/qemu_smoke.metadata.json
 artifacts/runtime/boot_blocker_report.json
 
 Last 50 serial lines
-limine: Slide:           0x0
-limine: ELF entry point: 0xffffffff80200000
-limine: Base revision:   0
-limine: Requests count:  1
-limine: Top of HHDM:     0x10000000000
 vbe: Initialising...
 vbe: Version: 3.0
 vbe: OEM: SeaBIOS VBE(C) 2011
@@ -91,6 +91,11 @@ KOZO_USER_MAPPING_TABLES_OK
 KOZO_USER_MAPPING_PERMISSIONS_OK
 KOZO_USER_MAPPING_ACTIVATE_OK
 KOZO_USER_MAPPING_SURVIVAL_OK
+KOZO_PRIVILEGE_TRANSITION_INIT_START
+KOZO_PRIVILEGE_TABLES_OK
+KOZO_RING3_ENTER
+KOZO_RING3_PROBE_OK
+KOZO_RING0_RETURN_OK
 KOZO_RUNTIME_PROGRESS_ENTRY
 KOZO_RUNTIME_INIT_OK
 KOZO_RUNTIME_LOOP_ENTER
@@ -107,4 +112,4 @@ KOZO_SECOND_CAPABILITY_OK
 KOZO_RUNTIME_RETURN_OK
 
 Last 50 stderr lines
-qemu-system-x86_64: terminating on signal 15 from pid 95498 (<unknown process>)
+qemu-system-x86_64: terminating on signal 15 from pid 7603 (<unknown process>)

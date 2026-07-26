@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260726T173803Z",
+  "run_id": "verify-20260726T194338Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 59,
+    "total_checks": 61,
     "failed_check_count": 0
   },
   "checks": [
@@ -325,6 +325,20 @@
       "detail": "Fixed user mappings align across contract, source, ELF, and QEMU evidence"
     },
     {
+      "name": "bounded_privilege_transition_probe_contract",
+      "subsystem": "bounded_privilege_transition_probe_contract",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Bounded privilege-transition contract governs one fixed CPL3 excursion"
+    },
+    {
+      "name": "bounded_privilege_transition_probe_evidence",
+      "subsystem": "bounded_privilege_transition_probe_evidence",
+      "status": "pass",
+      "code": "OK",
+      "detail": "One fixed CPL3 excursion and TSS-backed Ring0 return align across source, ELF, and QEMU evidence"
+    },
+    {
       "name": "runtime_state_transition_capability",
       "subsystem": "runtime_state_transition_capability",
       "status": "pass",
@@ -441,7 +455,7 @@
     "artifacts/runtime/kernel_elf_report.json",
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt",
-    "contracts/fixed_user_mapping_foundation.v0.json",
+    "contracts/bounded_privilege_transition_probe_contract.v0.json",
     "contracts/runtime_evidence_taxonomy.v0.json",
     "docs/ARCHITECTURE.md",
     "docs/BOOT.md",
@@ -451,6 +465,7 @@
     "docs/INVARIANTS.md",
     "docs/PAGING.md",
     "docs/PHASEMAP.md",
+    "docs/PRIVILEGE_TRANSITION.md",
     "docs/RELEASE_CHECKLIST.md",
     "docs/RELEASE_EVIDENCE.md",
     "docs/REQUIRED_CHECKS.md",
@@ -460,11 +475,12 @@
     "docs/SECURITY_MODEL.md",
     "docs/VALIDATION.md",
     "docs/generated/governance_index.md",
+    "harness/bounded_privilege_transition_probe_contract.py",
     "harness/codes.py",
-    "harness/fixed_user_mapping_foundation.py",
     "harness/registry.py",
     "harness/validators.py",
-    "harness/validators_impl/fixed_user_mapping_foundation.py",
+    "harness/validators_impl/bounded_privilege_transition_probe_contract.py",
+    "harness/validators_impl/bounded_privilege_transition_probe_evidence.py",
     "harness/validators_impl/fixed_user_mapping_foundation_evidence.py",
     "harness/validators_impl/qemu_smoke_evidence.py",
     "harness/validators_impl/runtime_evidence_taxonomy.py",
@@ -472,18 +488,21 @@
     "harness/validators_impl/validator_coverage.py",
     "kernel/arch/x86_64/boot.asm",
     "kernel/arch/x86_64/paging.asm",
+    "kernel/arch/x86_64/privilege_transition.asm",
+    "kernel/arch/x86_64/runtime_layout.inc",
     "linker/kernel.ld",
-    "schemas/agent_context.schema.json",
-    "schemas/fixed_user_mapping_foundation.schema.json",
+    "schemas/bounded_privilege_transition_probe_contract.schema.json",
     "schemas/latest_verify.schema.json",
     "scripts/build_boot_image.sh",
     "scripts/kernel_elf_report.py",
     "scripts/qemu_smoke.sh",
     "tasks/todo.json",
-    "tests/test_fixed_user_mapping_foundation.py",
+    "tests/test_bounded_privilege_transition_probe_contract.py",
+    "tests/test_bounded_privilege_transition_probe_evidence.py",
     "tests/test_fixed_user_mapping_foundation_evidence.py",
     "tests/test_qemu_smoke_evidence.py",
-    "tests/test_runtime_evidence_taxonomy.py"
+    "tests/test_runtime_evidence_taxonomy.py",
+    "tests/test_schema.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -500,5 +519,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-07-26T17:38:03Z"
+  "generated_at": "2026-07-26T19:43:38Z"
 }

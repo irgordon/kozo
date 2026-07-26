@@ -12,18 +12,18 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v0.8.2`
-* Date: `2026-07-25`
-* Status: Implemented and locally evidenced; hosted CI acceptance pending.
+* Version: `v0.8.4`
+* Date: `2026-07-26`
+* Status: Implemented and locally evidenced; hosted CI pending.
 
 ## Verification status
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 59
+* Total checks: 61
 * Failed checks: 0
-* Run ID: `verify-20260726T150446Z`
-* Generated at: `2026-07-26T15:04:46Z`
+* Run ID: `verify-20260726T194338Z`
+* Generated at: `2026-07-26T19:43:38Z`
 
 ## Registered validators
 
@@ -74,25 +74,28 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 43 | `cpu_extended_state_initialization_evidence` |
 | 44 | `fixed_user_mapping_foundation` |
 | 45 | `fixed_user_mapping_foundation_evidence` |
-| 46 | `runtime_state_transition_capability` |
-| 47 | `runtime_state_transition_capability_evidence` |
-| 48 | `boot_blocker_report` |
-| 49 | `boot_protocol_decision` |
-| 50 | `boot_image_skeleton` |
-| 51 | `boot_image_packaging` |
-| 52 | `boot_tooling` |
-| 53 | `kernel_loadability` |
-| 54 | `host_dependency_portability` |
-| 55 | `qemu_smoke_evidence` |
-| 56 | `return_path_proof` |
-| 57 | `execution_proof` |
-| 58 | `validator_coverage` |
-| 59 | `evidence` |
+| 46 | `bounded_privilege_transition_probe_contract` |
+| 47 | `bounded_privilege_transition_probe_evidence` |
+| 48 | `runtime_state_transition_capability` |
+| 49 | `runtime_state_transition_capability_evidence` |
+| 50 | `boot_blocker_report` |
+| 51 | `boot_protocol_decision` |
+| 52 | `boot_image_skeleton` |
+| 53 | `boot_image_packaging` |
+| 54 | `boot_tooling` |
+| 55 | `kernel_loadability` |
+| 56 | `host_dependency_portability` |
+| 57 | `qemu_smoke_evidence` |
+| 58 | `return_path_proof` |
+| 59 | `execution_proof` |
+| 60 | `validator_coverage` |
+| 61 | `evidence` |
 
 ## Active contracts
 
 | Path | Version | Role |
 | --- | --- | --- |
+| `contracts/bounded_privilege_transition_probe_contract.v0.json` | `0` | bounded privilege transition probe contract.v0 |
 | `contracts/controlled_runtime_loop_contract.v0.json` | `0` | controlled runtime loop contract.v0 |
 | `contracts/cpu_extended_state_initialization_contract.v0.json` | `0` | cpu extended state initialization contract.v0 |
 | `contracts/first_governed_runtime_capability.v0.json` | `0` | first governed runtime capability.v0 |
@@ -116,6 +119,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | Path | Title |
 | --- | --- |
 | `schemas/agent_context.schema.json` | agent_context.schema.json |
+| `schemas/bounded_privilege_transition_probe_contract.schema.json` | KOZO bounded privilege-transition probe contract |
 | `schemas/controlled_runtime_loop_contract.schema.json` | KOZO controlled runtime loop contract |
 | `schemas/cpu_extended_state_initialization_contract.schema.json` | KOZO CPU extended-state initialization contract |
 | `schemas/first_governed_runtime_capability.schema.json` | KOZO first governed runtime capability |
@@ -149,7 +153,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 59
+* Check count: 61
 * Failure count: 0
 
 ## Non-goals
