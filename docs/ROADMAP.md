@@ -113,7 +113,7 @@ The latest local generated evidence may still report missing local Limine/xorris
 
 KOZO still does not prove:
 
-* hosted QEMU proof of the v0.8.2 state-transition marker sequence and evidence checks
+* hosted QEMU proof of the v0.8.3 fixed user-mapping marker sequence and evidence checks
 * complete Odin runtime readiness or dynamic initialization
 * general stack readiness beyond the controlled boot stack proof
 * general memory management beyond the governed static region
@@ -137,10 +137,11 @@ KOZO still does not prove:
 
 # 9. Current Active Blocker
 
-No local v0.8.2 runtime blocker is active. Hosted CI confirmation of the
-state-transition markers, both capability validators, focused ELF evidence,
-preserved first capability, governed return, and halt remains required before
-phase acceptance.
+No local v0.8.3 runtime blocker is active. Hosted CI confirmation of the fixed
+mapping markers, both paging validators, effective permission policy, focused
+ELF evidence, preserved capabilities, governed return, and halt remains
+required before phase acceptance. Local verification passes 59 checks with 0
+failures.
 
 ---
 
@@ -156,10 +157,11 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 6. Treat v0.7.4 memory evidence as accepted by the CI validator gate, while preserving the manual-artifact-inspection limitation.
 7. Preserve the accepted v0.7.45 progression/runtime-initialization evidence and the hosted-CI-proven v0.7.5 controlled loop.
 8. Keep the terminal halt path authoritative after the bounded Odin call.
-9. Keep physical memory discovery, paging, virtual memory management, allocators, heaps, dynamic Odin initialization, and userspace outside the current proof.
+9. Keep physical memory discovery, general virtual memory management, allocators, heaps, dynamic Odin initialization, and userspace outside the current proof.
 10. Preserve the hosted-accepted v0.8.1 CPU-state boundary before all Odin capability work.
-11. Accept v0.8.2 only after hosted CI confirms the complete state-transition suffix, both validators, and the unchanged return-to-halt path.
-12. Keep arbitrary writes, concurrency, userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
+11. Accept v0.8.3 only after hosted CI confirms the complete fixed-mapping boundary, both validators, effective U/S and W^X, and the unchanged runtime suffix.
+12. After acceptance, implement one bounded privilege-transition probe without broad userspace, process, syscall, or isolation claims.
+13. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
 
 ---
 
@@ -241,6 +243,8 @@ Deferred until separately scoped runtime or cleanup phases:
 | `v0.8.0` | First Governed Runtime Capability | Validate and dispatch one internal versioned runtime status request, validate a deterministic response, and preserve governed return-to-halt behavior. | Userspace access, privilege separation, hardware syscall entry, scheduler/process/VFS/fd behavior, allocation, compatibility claims, production-readiness claims. |
 | `v0.8.1` | CPU Extended-State Initialization | Detect and configure the boot CPU x87/SSE state, validate x87/MXCSR control state, and prove one bounded SIMD result before Odin. | AVX/XSAVE/XCR0, per-task extended-state ownership, context switching, exception recovery, complete CPU initialization, compatibility, production readiness. |
 | `v0.8.2` | Governed Runtime State Transition Capability | Validate and dispatch one fixed internal READY/0-to-ACTIVE/1 state mutation, read it back through volatile accesses, validate its response, and preserve return-to-halt. | Arbitrary memory writes, general state machines, dynamic capability registration, concurrency, userspace access, authorization, persistence, compatibility, production readiness. |
+| `v0.8.3` | Fixed User-Mapping Foundation | Own one fixed four-level hierarchy with supervisor-only kernel leaves and three W^X user pages, then verify CR3 activation and survival. | Ring 3, process isolation, general VM, dynamic mappings, allocators, page-fault recovery, compatibility, production readiness. |
+| `v0.8.4` | Bounded Privilege-Transition Probe | Execute one fixed Ring 0 to Ring 3 probe and one governed return using the accepted fixed mappings. | General userspace, process model, scheduler, general syscall ABI, isolation, compatibility, production readiness. |
 | `v1.0.0-rc.1` | Release candidate hardening | Freeze scope, freeze gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | New feature scope after RC. |
 | `v1.0.0` | Scoped release | Release only evidence-backed behavior with explicit non-goals. | Any unimplemented compatibility or runtime subsystem claim. |
 

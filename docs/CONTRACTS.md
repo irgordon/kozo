@@ -80,6 +80,7 @@ Current contract paths include:
 | Controlled runtime loop contract | `contracts/controlled_runtime_loop_contract.v0.json` | Bounded Odin loop state, marker, status, evidence, transition, and halt-continuation boundary |
 | First governed runtime capability | `contracts/first_governed_runtime_capability.v0.json` | Versioned internal runtime status request, fixed response, dispatch, marker, claim, and halt-continuation boundary |
 | Runtime state transition capability | `contracts/runtime_state_transition_capability.v0.json` | Capability ID 2, fixed request/response and state geometry, READY/0 to ACTIVE/1 transition, volatile readback, rollback, marker, claim, and halt boundary |
+| Fixed user-mapping foundation | `contracts/fixed_user_mapping_foundation.v0.json` | Fixed four-level page-table geometry, kernel/user permission split, U/S propagation, W^X, CR3 activation, software walk, survival evidence, and non-goals |
 | Stack initialization evidence contract | `contracts/stack_initialization_evidence_contract.v0.json` | Controlled stack proof boundary and marker evidence |
 | Memory initialization evidence contract | `contracts/memory_initialization_evidence_contract.v0.json` | Future memory proof boundary and marker reservation |
 

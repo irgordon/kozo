@@ -66,6 +66,13 @@ v0.7.5 extends that bounded Odin path with `controlled_runtime_loop`. After `KOZ
 
 v0.8.0 executes one versioned internal `RUNTIME_STATUS_QUERY` after controlled-loop success. Odin validates a fixed 16-byte request and non-overlapping 64-byte response, clears the response, dispatches capability ID 1, reports only the accepted stage 0 through 5 baseline, validates every response field, and emits three fixed capability markers before exact status zero permits `KOZO_RUNTIME_RETURN_OK`. This remains same-address-space kernel execution and is accepted by hosted CI marker and validator evidence.
 
+v0.8.3 constructs and validates a fixed KOZO-owned four-level page-table
+hierarchy after SIMD evidence and before Odin entry. It preserves the loaded
+kernel as supervisor-only, adds fixed user RX code and user RW-NX data/stack
+mappings, verifies effective permissions through a software walk, activates
+and reads back CR3, proves bounded kernel survival, and then continues through
+the unchanged runtime and halt path. It does not enter Ring 3.
+
 No active QEMU serial smoke blocker.
 
 Local generated blocker: `missing_iso_generation_tooling` when Limine and xorriso tooling are unavailable outside CI.

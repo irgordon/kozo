@@ -23,6 +23,11 @@ EARLY_MARKERS=(
   "KOZO_CPU_EXT_STATE_INIT_START"
   "KOZO_CPU_EXT_STATE_INIT_OK"
   "KOZO_SIMD_PROBE_OK"
+  "KOZO_USER_MAPPING_INIT_START"
+  "KOZO_USER_MAPPING_TABLES_OK"
+  "KOZO_USER_MAPPING_PERMISSIONS_OK"
+  "KOZO_USER_MAPPING_ACTIVATE_OK"
+  "KOZO_USER_MAPPING_SURVIVAL_OK"
   "KOZO_RUNTIME_PROGRESS_ENTRY"
   "KOZO_RUNTIME_INIT_OK"
   "KOZO_RUNTIME_LOOP_ENTER"
@@ -286,28 +291,38 @@ elif markers[6] in observed and markers[7] not in observed:
 elif markers[7] in observed and markers[8] not in observed:
     print("simd_survival_probe_not_completed")
 elif markers[8] in observed and markers[9] not in observed:
-    print("runtime_progression_entry_not_reached")
+    print("user_mapping_initialization_not_reached")
 elif markers[9] in observed and markers[10] not in observed:
-    print("runtime_initialization_not_proven")
+    print("user_mapping_tables_not_validated")
 elif markers[10] in observed and markers[11] not in observed:
-    print("runtime_loop_entry_not_reached")
-elif markers[11] in observed and markers[14] not in observed:
-    print("runtime_loop_iteration_incomplete")
+    print("user_mapping_permissions_not_validated")
+elif markers[11] in observed and markers[12] not in observed:
+    print("user_mapping_activation_not_completed")
+elif markers[12] in observed and markers[13] not in observed:
+    print("user_mapping_survival_not_proven")
+elif markers[13] in observed and markers[14] not in observed:
+    print("runtime_progression_entry_not_reached")
 elif markers[14] in observed and markers[15] not in observed:
-    print("runtime_loop_exit_not_reached")
+    print("runtime_initialization_not_proven")
 elif markers[15] in observed and markers[16] not in observed:
-    print("capability_dispatch_not_reached")
-elif markers[16] in observed and markers[17] not in observed:
-    print("runtime_status_query_not_completed")
-elif markers[17] in observed and markers[18] not in observed:
-    print("first_governed_capability_not_proven")
-elif markers[18] in observed and markers[19] not in observed:
-    print("runtime_state_update_not_reached")
+    print("runtime_loop_entry_not_reached")
+elif markers[16] in observed and markers[19] not in observed:
+    print("runtime_loop_iteration_incomplete")
 elif markers[19] in observed and markers[20] not in observed:
-    print("runtime_state_update_not_completed")
+    print("runtime_loop_exit_not_reached")
 elif markers[20] in observed and markers[21] not in observed:
-    print("second_governed_capability_not_proven")
+    print("capability_dispatch_not_reached")
 elif markers[21] in observed and markers[22] not in observed:
+    print("runtime_status_query_not_completed")
+elif markers[22] in observed and markers[23] not in observed:
+    print("first_governed_capability_not_proven")
+elif markers[23] in observed and markers[24] not in observed:
+    print("runtime_state_update_not_reached")
+elif markers[24] in observed and markers[25] not in observed:
+    print("runtime_state_update_not_completed")
+elif markers[25] in observed and markers[26] not in observed:
+    print("second_governed_capability_not_proven")
+elif markers[26] in observed and markers[27] not in observed:
     print("runtime_return_not_reached")
 elif observed and observed[0] != markers[0]:
     print("qemu_timeout")
@@ -432,6 +447,10 @@ metadata = {
         "authentication",
         "authorization",
         "privilege separation",
+        "Ring 3 execution",
+        "general virtual memory management",
+        "dynamic mapping",
+        "page-fault recovery",
         "syscall dispatch",
         "Linux compatibility",
         "POSIX compatibility",

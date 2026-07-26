@@ -298,6 +298,14 @@ ordered update-entry, update-success, second-capability, return, and halt
 evidence. Reject any release evidence that implies arbitrary memory writes,
 concurrency, userspace access, authorization, persistence, or isolation.
 
+For v0.8.3 and later, confirm both fixed user-mapping validators pass; ELF
+evidence records seven aligned table pages and three aligned backing pages;
+effective U/S propagates across PML4E/PDPTE/PDE/PTE; kernel leaves remain
+supervisor-only; code is RX and data/stack are RW-NX; CR3 readback matches;
+QEMU captures all five mapping markers before runtime entry; and the existing
+capability, return, and halt evidence remains present. Do not infer Ring 3 or
+isolation from Ring 0 survival probes.
+
 ---
 
 # 14. Release Decision

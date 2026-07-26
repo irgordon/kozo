@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KOZO fixed user-mapping foundation contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "source_files",
+    "paging",
+    "page_tables",
+    "kernel_regions",
+    "user_regions",
+    "permission_policy",
+    "activation",
+    "software_walk",
+    "survival_probe",
+    "success_markers",
+    "failure_statuses",
+    "claim_boundary",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {"const": 0},
+    "architecture": {"const": "x86_64"},
+    "source_files": {"$ref": "#/$defs/sourceFiles"},
+    "paging": {"$ref": "#/$defs/paging"},
+    "page_tables": {"$ref": "#/$defs/pageTables"},
+    "kernel_regions": {
+      "type": "array",
+      "minItems": 5,
+      "items": {"$ref": "#/$defs/kernelRegion"}
+    },
+    "user_regions": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {"$ref": "#/$defs/userRegion"}
+    },
+    "permission_policy": {"type": "object"},
+    "activation": {"type": "object"},
+    "software_walk": {"type": "object"},
+    "survival_probe": {"type": "object"},
+    "success_markers": {"$ref": "#/$defs/nonEmptyStrings"},
+    "failure_statuses": {"type": "object"},
+    "claim_boundary": {"type": "object"},
+    "non_goals": {"$ref": "#/$defs/nonEmptyStrings"}
+  },
+  "$defs": {
+    "nonEmptyString": {"type": "string", "pattern": ".*\\S.*"},
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/nonEmptyString"}
+    },
+    "sourceFiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["boot", "paging", "linker"],
+      "properties": {
+        "boot": {"const": "kernel/arch/x86_64/boot.asm"},
+        "paging": {"const": "kernel/arch/x86_64/paging.asm"},
+        "linker": {"const": "linker/kernel.ld"}
+      }
+    },
+    "paging": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "page_size_bytes",
+        "la57_required",
+        "nx_required",
+        "efer_nxe_required",
+        "physical_address_source",
+        "uniform_kernel_load_offset_required"
+      ],
+      "properties": {
+        "mode": {"const": "four_level"},
+        "page_size_bytes": {"const": 4096},
+        "la57_required": {"const": false},
+        "nx_required": {"const": true},
+        "efer_nxe_required": {"const": true},
+        "physical_address_source": {"const": "limine_executable_address_response"},
+        "uniform_kernel_load_offset_required": {"const": true}
+      }
+    },
+    "pageTables": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root_symbol",
+        "storage_start_symbol",
+        "storage_end_symbol",
+        "page_count",
+        "size_bytes",
+        "alignment_bytes",
+        "zero_fill_required",
+        "pages"
+      ],
+      "properties": {
+        "root_symbol": {"const": "governed_pml4"},
+        "storage_start_symbol": {"const": "governed_page_tables_start"},
+        "storage_end_symbol": {"const": "governed_page_tables_end"},
+        "page_count": {"const": 7},
+        "size_bytes": {"const": 28672},
+        "alignment_bytes": {"const": 4096},
+        "zero_fill_required": {"const": true},
+        "pages": {"$ref": "#/$defs/nonEmptyStrings"}
+      }
+    },
+    "kernelRegion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "start_symbol",
+        "end_symbol",
+        "user",
+        "writable",
+        "executable"
+      ],
+      "properties": {
+        "name": {"$ref": "#/$defs/nonEmptyString"},
+        "start_symbol": {"$ref": "#/$defs/nonEmptyString"},
+        "end_symbol": {"$ref": "#/$defs/nonEmptyString"},
+        "user": {"const": false},
+        "writable": {"type": "boolean"},
+        "executable": {"type": "boolean"}
+      }
+    },
+    "userRegion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "virtual_start",
+        "virtual_end",
+        "backing_start_symbol",
+        "backing_end_symbol",
+        "size_bytes",
+        "alignment_bytes",
+        "user",
+        "writable",
+        "executable"
+      ],
+      "properties": {
+        "name": {"$ref": "#/$defs/nonEmptyString"},
+        "virtual_start": {"$ref": "#/$defs/nonEmptyString"},
+        "virtual_end": {"$ref": "#/$defs/nonEmptyString"},
+        "backing_start_symbol": {"$ref": "#/$defs/nonEmptyString"},
+        "backing_end_symbol": {"$ref": "#/$defs/nonEmptyString"},
+        "size_bytes": {"const": 4096},
+        "alignment_bytes": {"const": 4096},
+        "user": {"const": true},
+        "writable": {"type": "boolean"},
+        "executable": {"type": "boolean"}
+      }
+    }
+  }
+}

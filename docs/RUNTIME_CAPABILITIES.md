@@ -113,3 +113,12 @@ framework, dynamic capability registration, concurrent or atomic execution,
 persistent state, userspace access, authentication, authorization, privilege
 separation, process isolation, hardware syscall entry, compatibility, or
 production readiness.
+
+# 8. Paging Prerequisite
+
+v0.8.3 establishes the fixed user-mapping foundation before Odin runtime
+progression. It does not add a new capability ID and does not change either
+capability request, response, state, or dispatch behavior. Both capabilities
+execute only after table policy, CR3 readback, and mapping survival succeed.
+The mappings are future privilege-probe prerequisites, not proof of Ring 3 or
+general userspace.

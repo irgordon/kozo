@@ -85,6 +85,12 @@ Bad code makes the reader reconstruct behavior from scattered helpers, implicit 
 
 # 5. File Organization
 
+Paging coordinators must read top-down: validate prerequisites, clear tables,
+construct mappings, validate policy, activate CR3, validate readback, then run
+survival probes. Raw entry masks, shifts, indices, and physical-address
+conversion belong in focused low-level helpers. Marker emission and runtime
+progression decisions must not be mixed into page-walk primitives.
+
 Write files from high level to low level.
 
 Place the main entry point first.

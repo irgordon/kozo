@@ -1,0 +1,217 @@
+{
+  "version": 0,
+  "architecture": "x86_64",
+  "source_files": {
+    "boot": "kernel/arch/x86_64/boot.asm",
+    "paging": "kernel/arch/x86_64/paging.asm",
+    "linker": "linker/kernel.ld"
+  },
+  "paging": {
+    "mode": "four_level",
+    "page_size_bytes": 4096,
+    "la57_required": false,
+    "nx_required": true,
+    "efer_nxe_required": true,
+    "physical_address_source": "limine_executable_address_response",
+    "uniform_kernel_load_offset_required": true
+  },
+  "page_tables": {
+    "root_symbol": "governed_pml4",
+    "storage_start_symbol": "governed_page_tables_start",
+    "storage_end_symbol": "governed_page_tables_end",
+    "page_count": 7,
+    "size_bytes": 28672,
+    "alignment_bytes": 4096,
+    "zero_fill_required": true,
+    "pages": [
+      "governed_pml4",
+      "governed_kernel_pdpt",
+      "governed_kernel_pd",
+      "governed_kernel_pt",
+      "governed_user_pdpt",
+      "governed_user_pd",
+      "governed_user_pt"
+    ]
+  },
+  "kernel_regions": [
+    {
+      "name": "kernel_text",
+      "start_symbol": "__kernel_text_start",
+      "end_symbol": "__kernel_text_end",
+      "user": false,
+      "writable": false,
+      "executable": true
+    },
+    {
+      "name": "kernel_rodata",
+      "start_symbol": "__kernel_rodata_start",
+      "end_symbol": "__kernel_rodata_end",
+      "user": false,
+      "writable": false,
+      "executable": false
+    },
+    {
+      "name": "kernel_data",
+      "start_symbol": "__kernel_data_start",
+      "end_symbol": "__kernel_data_end",
+      "user": false,
+      "writable": true,
+      "executable": false
+    },
+    {
+      "name": "kernel_bss",
+      "start_symbol": "__kernel_bss_start",
+      "end_symbol": "__kernel_bss_end",
+      "user": false,
+      "writable": true,
+      "executable": false
+    },
+    {
+      "name": "page_table_storage",
+      "start_symbol": "governed_page_tables_start",
+      "end_symbol": "governed_page_tables_end",
+      "user": false,
+      "writable": true,
+      "executable": false
+    }
+  ],
+  "user_regions": [
+    {
+      "name": "user_probe_code",
+      "virtual_start": "0x0000400000000000",
+      "virtual_end": "0x0000400000001000",
+      "backing_start_symbol": "user_probe_code_start",
+      "backing_end_symbol": "user_probe_code_end",
+      "size_bytes": 4096,
+      "alignment_bytes": 4096,
+      "user": true,
+      "writable": false,
+      "executable": true
+    },
+    {
+      "name": "user_probe_data",
+      "virtual_start": "0x0000400000001000",
+      "virtual_end": "0x0000400000002000",
+      "backing_start_symbol": "user_probe_data_start",
+      "backing_end_symbol": "user_probe_data_end",
+      "size_bytes": 4096,
+      "alignment_bytes": 4096,
+      "user": true,
+      "writable": true,
+      "executable": false
+    },
+    {
+      "name": "user_probe_stack",
+      "virtual_start": "0x0000400000002000",
+      "virtual_end": "0x0000400000003000",
+      "backing_start_symbol": "user_probe_stack",
+      "backing_end_symbol": "user_probe_stack_top",
+      "size_bytes": 4096,
+      "alignment_bytes": 4096,
+      "user": true,
+      "writable": true,
+      "executable": false
+    }
+  ],
+  "permission_policy": {
+    "user_levels": [
+      "PML4E",
+      "PDPTE",
+      "PDE",
+      "PTE"
+    ],
+    "dedicated_user_subtree_required": true,
+    "kernel_supervisor_only": true,
+    "write_xor_execute_required": true,
+    "page_tables_supervisor_only": true,
+    "effective_permissions_combine_all_levels": true
+  },
+  "activation": {
+    "construction_precedes_policy_validation": true,
+    "policy_validation_precedes_cr3_load": true,
+    "root_physical_symbol": "governed_page_table_root_physical",
+    "observed_cr3_symbol": "observed_governed_cr3",
+    "cr3_address_mask": "0x000ffffffffff000",
+    "readback_required": true,
+    "exact_root_match_required": true,
+    "mov_cr3_is_serializing": true
+  },
+  "software_walk": {
+    "symbol": "walk_page_mapping",
+    "reported_fields": [
+      "present",
+      "user_accessible",
+      "writable",
+      "executable",
+      "physical_page",
+      "page_size"
+    ],
+    "large_pages_forbidden": true,
+    "fixed_table_storage_only": true
+  },
+  "survival_probe": {
+    "symbol": "run_fixed_user_mapping_survival_probe",
+    "kernel_static_value_checked": true,
+    "kernel_stack_checked": true,
+    "serial_continuation_checked": true,
+    "user_data_write_read_restore": true,
+    "user_stack_write_read_restore": true,
+    "post_activation_walk_required": true,
+    "ring3_execution_forbidden": true
+  },
+  "success_markers": [
+    "KOZO_USER_MAPPING_INIT_START",
+    "KOZO_USER_MAPPING_TABLES_OK",
+    "KOZO_USER_MAPPING_PERMISSIONS_OK",
+    "KOZO_USER_MAPPING_ACTIVATE_OK",
+    "KOZO_USER_MAPPING_SURVIVAL_OK"
+  ],
+  "failure_statuses": {
+    "success": 0,
+    "paging_mode_unsupported": 1,
+    "nx_unavailable": 2,
+    "physical_backing_invalid": 3,
+    "table_geometry_invalid": 4,
+    "overlap": 5,
+    "permission_invalid": 6,
+    "cr3_activation_failed": 7,
+    "survival_failed": 8
+  },
+  "claim_boundary": {
+    "proves": [
+      "KOZO activated one fixed four-level page-table hierarchy",
+      "three dedicated user-accessible pages have governed effective permissions",
+      "required kernel mappings remain supervisor-only",
+      "CR3 readback matched the governed root",
+      "kernel execution survived bounded fixed-mapping probes"
+    ],
+    "does_not_prove": [
+      "Ring 3 execution",
+      "general userspace execution",
+      "process isolation",
+      "general virtual memory management",
+      "page-fault recovery",
+      "production readiness"
+    ]
+  },
+  "non_goals": [
+    "Ring 3 execution",
+    "GDT user descriptors",
+    "TSS",
+    "IDT",
+    "syscall MSRs",
+    "general userspace execution",
+    "process creation",
+    "process isolation",
+    "general virtual memory manager",
+    "dynamic mapping",
+    "unmapping",
+    "frame allocator",
+    "physical memory manager",
+    "page-fault recovery",
+    "scheduler behavior",
+    "Linux compatibility",
+    "POSIX compatibility",
+    "production readiness"
+  ]
+}

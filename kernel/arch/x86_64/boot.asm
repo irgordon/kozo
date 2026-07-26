@@ -2,6 +2,10 @@ bits 64
 
 extern kernel_entry
 extern runtime_progression_entry
+extern initialize_fixed_user_mapping_tables
+extern validate_fixed_user_mapping_policy
+extern activate_fixed_user_mapping_root
+extern run_fixed_user_mapping_survival_probe
 global _start
 global boot_memory_region
 global boot_memory_region_end
@@ -153,6 +157,26 @@ simd_probe_ok_marker:
     db "KOZO_SIMD_PROBE_OK", 13, 10
 simd_probe_ok_marker_end:
 
+user_mapping_init_start_marker:
+    db "KOZO_USER_MAPPING_INIT_START", 13, 10
+user_mapping_init_start_marker_end:
+
+user_mapping_tables_ok_marker:
+    db "KOZO_USER_MAPPING_TABLES_OK", 13, 10
+user_mapping_tables_ok_marker_end:
+
+user_mapping_permissions_ok_marker:
+    db "KOZO_USER_MAPPING_PERMISSIONS_OK", 13, 10
+user_mapping_permissions_ok_marker_end:
+
+user_mapping_activate_ok_marker:
+    db "KOZO_USER_MAPPING_ACTIVATE_OK", 13, 10
+user_mapping_activate_ok_marker_end:
+
+user_mapping_survival_ok_marker:
+    db "KOZO_USER_MAPPING_SURVIVAL_OK", 13, 10
+user_mapping_survival_ok_marker_end:
+
 runtime_progress_entry_marker:
     db "KOZO_RUNTIME_PROGRESS_ENTRY", 13, 10
 runtime_progress_entry_marker_end:
@@ -278,6 +302,23 @@ _start:
     test eax, eax
     jnz .halt
     WRITE_COM1_MARKER simd_probe_ok_marker, simd_probe_ok_marker_end
+    WRITE_COM1_MARKER user_mapping_init_start_marker, user_mapping_init_start_marker_end
+    call initialize_fixed_user_mapping_tables
+    test eax, eax
+    jnz .halt
+    WRITE_COM1_MARKER user_mapping_tables_ok_marker, user_mapping_tables_ok_marker_end
+    call validate_fixed_user_mapping_policy
+    test eax, eax
+    jnz .halt
+    WRITE_COM1_MARKER user_mapping_permissions_ok_marker, user_mapping_permissions_ok_marker_end
+    call activate_fixed_user_mapping_root
+    test eax, eax
+    jnz .halt
+    WRITE_COM1_MARKER user_mapping_activate_ok_marker, user_mapping_activate_ok_marker_end
+    call run_fixed_user_mapping_survival_probe
+    test eax, eax
+    jnz .halt
+    WRITE_COM1_MARKER user_mapping_survival_ok_marker, user_mapping_survival_ok_marker_end
     test rsp, 0x0f
     jnz .halt
     lea rdi, [rel runtime_bootstrap_context]

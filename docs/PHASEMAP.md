@@ -102,7 +102,7 @@ The current local generated evidence proves:
 * QEMU smoke metadata from that run reports `outcome: pass` and `blocker_category: none`.
 * QEMU serial smoke evidence is proven for the narrow smoke path.
 * The post-smoke path in `kernel/arch/x86_64/boot.asm` is governed by `contracts/runtime_halt_contract.v0.json`.
-* After `KOZO_MEMORY_INIT_OK`, the assembly path enters a deterministic terminal `cli`/`hlt` loop with structural fallthrough forbidden.
+* After `KOZO_MEMORY_INIT_OK`, the assembly path initializes CPU state, validates the fixed user mappings, enters the bounded Odin runtime path, and returns to a deterministic terminal `cli`/`hlt` loop with structural fallthrough forbidden.
 * `contracts/runtime_progression_contract.v0.json` governs future halt-to-runtime transition prerequisites and forbids deleting, replacing, bypassing, or jumping around the halt loop without separate progression evidence.
 * `contracts/runtime_progression_entry_contract.v0.json` governs the implemented internal assembly-to-Odin boundary, fixed bootstrap context, bounded state probe, exact return status, and terminal continuation.
 * `contracts/runtime_evidence_taxonomy.v0.json` governs QEMU serial smoke marker order, smoke outcomes, blocker categories, pass condition, blocked condition, and taxonomy non-goals.
@@ -115,20 +115,23 @@ The current local generated evidence proves:
 * Hosted CI run `30057826315` accepted v0.7.5 with verification at 51 checks and 0 failures, passing `controlled_runtime_loop_evidence`, and the complete ordered controlled-loop marker sequence. Lint run `30057826311` also passed.
 * `CONTROLLED_RUNTIME_LOOP` and `FIRST_GOVERNED_RUNTIME_CAPABILITY` are proven; `USERSPACE_PLANNING` remains planned.
 * v0.8.1 is accepted by hosted CI with FPU, FXSR, SSE, and SSE2 detection, CR0/CR4 readback, x87/MXCSR initialization, bounded SSE2 evidence, and the preserved runtime suffix.
-* v0.8.2 locally validates capability ID 2, one boot-owned READY/0-to-ACTIVE/1 volatile state transition, fixed response validation, governed return, and the terminal halt continuation.
+* v0.8.2 is accepted by hosted CI with capability ID 2, one boot-owned READY/0-to-ACTIVE/1 volatile state transition, fixed response validation, governed return, and the terminal halt continuation.
+* v0.8.3 locally validates one KOZO-owned four-level page-table hierarchy, supervisor-only kernel leaves, fixed user RX/RW-NX pages, effective U/S propagation, W^X, exact CR3 readback, bounded survival, and the unchanged 28-marker runtime path.
+* The v0.8.3 local verification harness passes 59 checks with 0 failures; hosted acceptance remains pending.
 
 ## Current Active Blocker
 
-No active local runtime blocker is recorded for v0.8.2. Hosted CI marker,
-validator, and focused ELF confirmation remains the phase acceptance gate.
+No active local runtime blocker is recorded for v0.8.3. Hosted CI marker,
+validator, paging-policy, and focused ELF confirmation remains the phase
+acceptance gate.
 
 Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr`, `kernel_entry_not_reached`, `serial_not_initialized`, and `marker_not_emitted` are retained only as resolved historical evidence states unless a future CI artifact reintroduces one.
 
 ## Next Runtime Phase
 
-The current runtime phase is `v0.8.2 Governed Runtime State Transition
-Capability`. The next implementation milestone must be chosen from hosted
-evidence after this phase is accepted; userspace planning remains unproven.
+The current runtime phase is `v0.8.3 Fixed User-Mapping Foundation`. After
+hosted acceptance, the next implementation milestone is `v0.8.4 Bounded
+Privilege-Transition Probe`. Ring 3 and general userspace remain unproven.
 
 ---
 
@@ -186,6 +189,7 @@ evidence after this phase is accepted; userspace planning remains unproven.
 | `v0.8.0` | First Governed Runtime Capability | Execute one versioned internal runtime status query after the accepted controlled loop. | Fixed request/response types, explicit dispatcher and handler, contract/schema/validators, fixed capability markers, ELF evidence, docs, and tests. | Hosted CI captures capability dispatch, status-query success, first-capability success, and runtime return in order; capability validators pass; the halt loop remains authoritative; no userspace, isolation, scheduler, allocator, interrupt, compatibility, or production claim is added. |
 | `v0.8.1` | CPU Extended-State Initialization | Establish and validate the boot CPU x87/SSE execution state before Odin entry. | CPUID feature checks, CR0/CR4 read-modify-write and readback, x87/MXCSR initialization, bounded SIMD probe, contract/schema/validators, ELF and QEMU evidence. | Hosted CI captures the three CPU-state markers before runtime progression; CPU-state, progression, controlled-loop, capability, halt, and schema validators pass; AVX/XSAVE remains prohibited and no broader runtime claim is added. |
 | `v0.8.2` | Governed Runtime State Transition Capability | Execute a second fixed internal capability that mutates one boot-owned state cell through the existing direct dispatcher. | Fixed request/response/state geometry, READY/0-to-ACTIVE/1 volatile mutation and readback, rollback, fixed markers, focused ELF and QEMU evidence, contracts, validators, docs, and tests. | Hosted CI captures update entry, update success, second-capability success, governed return, and halt in order; both state-transition validators pass; capability ID 1 is unchanged; no arbitrary write, userspace, concurrency, authorization, compatibility, or production claim is added. |
+| `v0.8.3` | Fixed User-Mapping Foundation | Replace inherited supervisor-only paging with one fixed KOZO-owned hierarchy suitable for a later bounded privilege probe. | Seven fixed table pages; supervisor-only kernel leaves; user RX code and RW-NX data/stack pages; software walk; CR3 readback; survival markers; contracts, validators, ELF/QEMU evidence, docs, and tests. | Hosted CI captures all five mapping markers before runtime entry; mapping contract/evidence validators pass; effective U/S and W^X validate; the capability suffix and halt remain; no Ring 3 or general-VM claim is added. |
 | `v1.0.0-rc.1` | Release candidate hardening | Freeze release scope and release gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | Release evidence bundle, completed release checklist, current generated reports, changelog/release notes dry run, all required CI checks green. | Release candidate can be reviewed without adding new scope. |
 | `v1.0.0` | Scoped production release | Release only the proven, scoped KOZO surface. | Final release evidence bundle, final changelog and release notes, passing required gates, explicit non-goals. | v1.0.0 claims only evidence-backed behavior and preserves all compatibility non-goals. |
 

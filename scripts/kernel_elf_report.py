@@ -69,6 +69,40 @@ RUNTIME_STATE_TRANSITION_SYMBOLS = (
     "runtime_serial_write_state_update_ok_marker",
     "runtime_serial_write_second_capability_marker",
 )
+FIXED_USER_MAPPING_SYMBOLS = (
+    "initialize_fixed_user_mapping_tables",
+    "validate_fixed_user_mapping_policy",
+    "activate_fixed_user_mapping_root",
+    "run_fixed_user_mapping_survival_probe",
+    "walk_page_mapping",
+    "governed_pml4",
+    "governed_kernel_pdpt",
+    "governed_kernel_pd",
+    "governed_kernel_pt",
+    "governed_user_pdpt",
+    "governed_user_pd",
+    "governed_user_pt",
+    "governed_page_tables_start",
+    "governed_page_tables_end",
+    "governed_page_table_root_physical",
+    "observed_governed_cr3",
+    "user_probe_code_start",
+    "user_probe_code_end",
+    "user_probe_data_start",
+    "user_probe_data_end",
+    "user_probe_stack",
+    "user_probe_stack_top",
+)
+FIXED_MAPPING_TRANSITION_MNEMONICS = {
+    "iretq",
+    "syscall",
+    "sysret",
+    "sysretq",
+    "lgdt",
+    "lidt",
+    "ltr",
+    "wrmsr",
+}
 AVX_MNEMONIC_PREFIXES = (
     "vadd",
     "vsub",
@@ -187,6 +221,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
             *FIRST_CAPABILITY_SYMBOLS,
             *CPU_EXTENDED_STATE_SYMBOLS,
             *RUNTIME_STATE_TRANSITION_SYMBOLS,
+            *FIXED_USER_MAPPING_SYMBOLS,
         ),
     )
     symbol_address = symbols.get("_start")
@@ -216,6 +251,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "first_governed_runtime_capability": first_capability_record(kernel_elf, symbols),
         "cpu_extended_state_initialization": cpu_extended_state_record(kernel_elf, symbols),
         "runtime_state_transition_capability": runtime_state_transition_record(kernel_elf, symbols),
+        "fixed_user_mapping_foundation": fixed_user_mapping_record(kernel_elf, symbols),
         "program_header_count": header.program_header_count,
         "section_count": header.section_header_count,
         "load_segments": [segment_record(segment) for segment in load_segments],
@@ -488,6 +524,121 @@ def runtime_state_transition_record(
             and symbols["runtime_state_transition_cell"] % 8 == 0
         ),
     }
+
+
+def fixed_user_mapping_record(
+    kernel_elf: Path,
+    symbols: dict[str, int],
+) -> dict[str, object]:
+    all_instructions = parse_disassembly_instructions(
+        run_text_command(["objdump", "-d", str(kernel_elf)])
+    )
+    paging_instructions = [
+        instruction
+        for symbol in FIXED_USER_MAPPING_SYMBOLS[:5]
+        for instruction in parse_disassembly_instructions(disassemble_symbol(kernel_elf, symbol))
+    ]
+    return {
+        "symbols": symbol_record(symbols, FIXED_USER_MAPPING_SYMBOLS),
+        "page_table_storage": _symbol_range_record(
+            symbols,
+            "governed_page_tables_start",
+            "governed_page_tables_end",
+            7 * 4096,
+            4096,
+        ),
+        "user_regions": {
+            "code": _symbol_range_record(
+                symbols,
+                "user_probe_code_start",
+                "user_probe_code_end",
+                4096,
+                4096,
+            ),
+            "data": _symbol_range_record(
+                symbols,
+                "user_probe_data_start",
+                "user_probe_data_end",
+                4096,
+                4096,
+            ),
+            "stack": _symbol_range_record(
+                symbols,
+                "user_probe_stack",
+                "user_probe_stack_top",
+                4096,
+                4096,
+            ),
+        },
+        "pre_odin_call_order_valid": _fixed_mapping_call_order_valid(kernel_elf, symbols),
+        "cr3_read_present": any("cr3" in operands for _, _, operands in paging_instructions),
+        "cr3_write_present": any(
+            mnemonic.startswith("mov")
+            and operands.replace(" ", "").startswith("%rax,%cr3")
+            for _, mnemonic, operands in paging_instructions
+        ),
+        "software_walk_present": "walk_page_mapping" in symbols,
+        "prohibited_transition_instructions": sorted(
+            {
+                mnemonic
+                for _, mnemonic, _ in all_instructions
+                if mnemonic in FIXED_MAPPING_TRANSITION_MNEMONICS
+            }
+        ),
+    }
+
+
+def _symbol_range_record(
+    symbols: dict[str, int],
+    start_symbol: str,
+    end_symbol: str,
+    required_size: int,
+    required_alignment: int,
+) -> dict[str, object]:
+    start = symbols.get(start_symbol)
+    end = symbols.get(end_symbol)
+    size = end - start if start is not None and end is not None else -1
+    return {
+        "start_symbol": start_symbol,
+        "end_symbol": end_symbol,
+        "start_address": _hex(start) if start is not None else "",
+        "end_address": _hex(end) if end is not None else "",
+        "size_bytes": size,
+        "required_size_bytes": required_size,
+        "required_alignment_bytes": required_alignment,
+        "start_aligned": start is not None and start % required_alignment == 0,
+    }
+
+
+def _fixed_mapping_call_order_valid(
+    kernel_elf: Path,
+    symbols: dict[str, int],
+) -> bool:
+    all_instructions = parse_disassembly_instructions(
+        run_text_command(["objdump", "-d", str(kernel_elf)])
+    )
+    instructions = _instructions_for_symbol(all_instructions, "_start", symbols)
+    targets = [
+        instruction_target(operands)
+        for _, mnemonic, operands in instructions
+        if mnemonic.startswith("call")
+    ]
+    required = (
+        symbols.get("initialize_fixed_user_mapping_tables"),
+        symbols.get("validate_fixed_user_mapping_policy"),
+        symbols.get("activate_fixed_user_mapping_root"),
+        symbols.get("run_fixed_user_mapping_survival_probe"),
+        symbols.get("runtime_progression_entry"),
+    )
+    if any(target is None for target in required):
+        return False
+    position = -1
+    for target in required:
+        try:
+            position = targets.index(target, position + 1)
+        except ValueError:
+            return False
+    return True
 
 
 def _state_accessor_instructions(instruction_sets):
@@ -800,6 +951,7 @@ def malformed_report(kernel_elf: Path, linker_script: Path, issue: str) -> dict[
         "first_governed_runtime_capability": first_capability_record(kernel_elf, {}),
         "cpu_extended_state_initialization": cpu_extended_state_record(kernel_elf, {}),
         "runtime_state_transition_capability": runtime_state_transition_record(kernel_elf, {}),
+        "fixed_user_mapping_foundation": fixed_user_mapping_record(kernel_elf, {}),
         "program_header_count": 0,
         "section_count": 0,
         "load_segments": [],

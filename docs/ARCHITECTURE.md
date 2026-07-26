@@ -70,6 +70,15 @@ The current boot-to-runtime boundary is an internal System V AMD64 C call from `
 
 This boundary proves only a bounded language-level call when passing QEMU evidence captures its markers. It is not a userspace ABI, security boundary, allocator, scheduler, interrupt path, dynamic runtime initialization path, or complete Odin runtime.
 
+Before Odin entry, v0.8.3 replaces the inherited bootloader mapping root with
+one KOZO-owned, fixed four-level hierarchy. A supervisor-only higher-half
+kernel subtree preserves the loaded image and active stack. A separate
+lower-half subtree maps one user RX code page and two user RW-NX pages for data
+and a future stack. Construction, effective-permission walking, CR3 activation
+and readback, and bounded survival remain assembly-owned. `docs/PAGING.md` and
+`contracts/fixed_user_mapping_foundation.v0.json` own the detailed boundary.
+No lower-privilege execution occurs.
+
 Security boundary details are owned by `docs/SECURITY_MODEL.md`.
 
 ---

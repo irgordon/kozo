@@ -88,6 +88,15 @@ Userspace must receive opaque identifiers, handles, or capability-like values.
 
 Pointer forgery must not become an authority path.
 
+## 4.5 Fixed user mappings do not weaken kernel authority
+
+Any fixed user mapping must propagate U/S through every traversed level,
+enforce W^X, and remain disjoint from supervisor kernel leaves and page-table
+storage. Kernel mappings must remain supervisor-only. Activating a governed
+root requires pre-activation policy validation and exact masked CR3 readback.
+User-accessible mappings do not by themselves prove Ring 3 execution,
+isolation, or general userspace.
+
 ---
 
 ## 4.5 Internal capabilities do not imply isolation

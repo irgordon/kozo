@@ -12,6 +12,14 @@ This document defines KOZO's current runtime smoke evidence path.
 
 The current evidence set includes a bounded runtime-adjacent object and symbol smoke check plus CI-proven QEMU serial smoke evidence. The runtime-adjacent check proves that the freestanding x86_64 kernel objects and assembly bridge objects can be built together with the current entry, dispatcher, syscall bridge, and serial marker surfaces present in binary evidence. The QEMU serial smoke check proves only that QEMU launched the KOZO ISO, Limine loaded the KOZO kernel ELF, serial output was captured, and the expected smoke marker sequence was observed.
 
+v0.8.3 adds fixed user-mapping evidence between SIMD survival and Odin entry.
+Local QEMU evidence records table construction, permission validation, CR3
+activation/readback, and bounded survival before the unchanged runtime suffix.
+The contract and ELF report establish fixed geometry; the software walk
+establishes effective U/S and W^X policy; QEMU establishes continued execution.
+This proves no Ring 3 execution, process isolation, general virtual-memory
+manager, page-fault recovery, general userspace, or production readiness.
+
 The v0.3.0 boot baseline attempted to move beyond runtime-adjacent evidence. It is currently blocked by `missing_boot_protocol_and_image_packaging`.
 
 v0.3.1 selected Limine as the planned x86_64 boot protocol, but QEMU smoke is planned and not yet proven.

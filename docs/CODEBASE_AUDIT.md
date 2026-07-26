@@ -1065,3 +1065,25 @@ Status: Implemented and locally evidenced; hosted CI pending.
 The capability adds no general registry, arbitrary target pointer, dynamic
 memory, userspace ABI, concurrency model, authorization boundary, persistent
 state, compatibility claim, or production claim.
+
+---
+
+# 32. v0.8.3 Fixed User-Mapping Foundation
+
+Date: 2026-07-26
+
+Status: Implemented and locally evidenced; hosted CI pending.
+
+| ID | Status | Rationale |
+| --- | --- | --- |
+| AUDIT-083-001 | Resolved locally | KOZO owns seven fixed, aligned, explicitly cleared page-table pages instead of relying on inherited supervisor-only mappings for the future user probe. |
+| AUDIT-083-002 | Resolved locally | A dedicated user subtree propagates U/S at all four levels while kernel leaves and table storage remain supervisor-only. |
+| AUDIT-083-003 | Resolved locally | User code is RX, user data/stack are RW-NX, and the contract, software walker, source validator, and ELF geometry enforce W^X and fixed backing. |
+| AUDIT-083-004 | Resolved locally | CR3 activation follows policy validation, exact masked readback, and bounded post-switch kernel/data/stack survival checks. |
+| AUDIT-083-005 | Hosted confirmation pending | Local QEMU captures the complete 28-marker sequence; hosted CI must confirm identical ordering and both fixed-mapping validators. |
+| AUDIT-064-002 | Deferred | `validator_coverage.py` remains above the preferred split threshold; decomposition is outside this runtime phase. |
+| AUDIT-073-001 | Deferred | The existing Rust package license metadata warning remains release-hardening work. |
+
+The page-table implementation is intentionally fixed and architecture-local.
+It adds no frame allocator, map/unmap API, page-fault recovery, Ring 3
+execution, process isolation, compatibility claim, or production claim.

@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.8.3 - 2026-07-26
+
+* Established KOZO-owned fixed four-level page tables and preserved required kernel mappings as supervisor-only.
+* Added one user read-only executable code page, one user writable non-executable data page, and one user writable non-executable stack page.
+* Propagated U/S through every user translation level, enforced W^X, activated and verified the governed CR3 root, and completed bounded mapping survival checks.
+* Preserved CPU-state initialization, both governed capabilities, runtime return, and the terminal halt path.
+* Added no Ring 3, GDT, TSS, IDT, syscall-MSR, scheduler, process, general-VM, allocator, compatibility, or production-readiness claim.
+
 ## v0.8.2 - 2026-07-25
 
 **Status:** Implemented and locally evidenced; hosted CI acceptance pending.

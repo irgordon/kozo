@@ -64,6 +64,12 @@ Development-time proof validation must not be confused with runtime security enf
 
 The v0.7.45 bootstrap context is an internal same-address-space assembly-to-Odin input. Odin validates its version, size, reserved fields, stack range, and memory range before using it, but this validation does not create a privilege boundary or userspace ABI. The fixed serial bridge accepts no caller-controlled string or length and conveys no authority.
 
+The v0.8.3 fixed user pages are reserved lower-half mappings with effective
+user permissions and W^X policy. All loaded kernel leaves and page-table
+storage remain supervisor-only. No Ring 3 code executes, so these mappings do
+not establish a privilege boundary, process isolation, arbitrary user-pointer
+acceptance, or general userspace. Page faults are not recovered.
+
 ---
 
 # 6. Opaque Handles

@@ -199,3 +199,11 @@ For v0.8.2, full CI must also run
 fixed geometry, exact direct dispatch, volatile READY/0-to-ACTIVE/1 mutation
 and readback, response validation before success, complete metadata/log
 agreement, the unchanged first capability, exact return, and halt convergence.
+
+For v0.8.3, full CI must also run `fixed_user_mapping_foundation` and
+`fixed_user_mapping_foundation_evidence`. Passing evidence requires fixed
+four-level geometry, page-aligned symbols, explicitly cleared tables,
+effective U/S propagation, supervisor-only kernel policy, W^X, NX support,
+pre-activation software walks, exact masked CR3 readback, post-activation
+survival checks, complete QEMU metadata/log agreement, and the unchanged
+runtime return and halt path.

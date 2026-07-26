@@ -87,6 +87,7 @@ build_kernel_objects() {
     -build-mode:obj \
     "-out:$WORK_DIR/kernel.o"
   nasm -f elf64 "$ROOT/kernel/arch/x86_64/boot.asm" -o "$WORK_DIR/boot.o"
+  nasm -f elf64 "$ROOT/kernel/arch/x86_64/paging.asm" -o "$WORK_DIR/paging.o"
   nasm -f elf64 "$ROOT/kernel/arch/x86_64/syscall.asm" -o "$WORK_DIR/syscall.o"
   nasm -f elf64 "$ROOT/kernel/arch/x86_64/memory.asm" -o "$WORK_DIR/memory.o"
 }

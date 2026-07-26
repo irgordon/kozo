@@ -435,3 +435,13 @@ completion, second-capability success, governed return, and the halt contract.
 This proves one bounded boot-owned READY/0-to-ACTIVE/1 mutation only; it does
 not prove arbitrary writes, concurrency, userspace access, authorization,
 persistent state, isolation, compatibility, or production readiness.
+
+For v0.8.3, release review must include
+`contracts/fixed_user_mapping_foundation.v0.json`,
+`fixed_user_mapping_foundation`, `fixed_user_mapping_foundation_evidence`,
+the kernel ELF report, and QEMU metadata/logs. Acceptance requires all five
+mapping markers between SIMD survival and Odin entry, fixed page/table symbol
+geometry, effective U/S and W^X policy, exact CR3 readback, bounded survival,
+the unchanged capability suffix, and terminal halt. This proves no Ring 3,
+process isolation, general virtual memory, dynamic mapping, page-fault
+recovery, compatibility, or production readiness.

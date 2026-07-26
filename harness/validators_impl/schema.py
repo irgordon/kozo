@@ -31,6 +31,7 @@ _SCHEMA_PATHS = {
     "first_governed_runtime_capability": _SCHEMA_DIR / "first_governed_runtime_capability.schema.json",
     "cpu_extended_state_initialization_contract": _SCHEMA_DIR / "cpu_extended_state_initialization_contract.schema.json",
     "runtime_state_transition_capability": _SCHEMA_DIR / "runtime_state_transition_capability.schema.json",
+    "fixed_user_mapping_foundation": _SCHEMA_DIR / "fixed_user_mapping_foundation.schema.json",
 }
 
 

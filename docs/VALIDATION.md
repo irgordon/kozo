@@ -145,6 +145,8 @@ Current runtime evidence and runtime contract validators include:
 * `first_governed_runtime_capability_evidence`
 * `runtime_state_transition_capability`
 * `runtime_state_transition_capability_evidence`
+* `fixed_user_mapping_foundation`
+* `fixed_user_mapping_foundation_evidence`
 
 `runtime_progression_stages` performs graph-level validation. It rejects direct and indirect cycles, duplicate identifiers and names, unknown references, forward prerequisites, proven stages with unproven mandatory prerequisites, backward or skipped transitions, unknown contract or validator authorities, and transitions with missing or multiple owners. The traversal is deterministic and contract order remains authoritative.
 
@@ -165,6 +167,13 @@ direct dispatcher routing, volatile mutation/readback, response validation,
 fixed bridges, focused ELF symbols and call edges, full QEMU marker order, and
 the existing return-to-halt continuation. Hosted QEMU evidence is required for
 phase acceptance.
+
+`fixed_user_mapping_foundation` validates the authoritative fixed paging
+geometry and permission policy. `fixed_user_mapping_foundation_evidence`
+separately validates source ordering, table clearing, upper-level U/S, NX and
+W^X, CR3 readback, fixed software walking, survival probes, ELF symbols and
+geometry, absence of privilege-transition instructions, and full QEMU marker
+agreement.
 
 ---
 
