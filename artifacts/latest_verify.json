@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260725T212943Z",
+  "run_id": "verify-20260726T173803Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 57,
+    "total_checks": 59,
     "failed_check_count": 0
   },
   "checks": [
@@ -311,6 +311,20 @@
       "detail": "CPU extended-state initialization is aligned across source, ELF, and runtime evidence"
     },
     {
+      "name": "fixed_user_mapping_foundation",
+      "subsystem": "fixed_user_mapping_foundation",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Fixed user-mapping contract governs one four-level W^X mapping foundation"
+    },
+    {
+      "name": "fixed_user_mapping_foundation_evidence",
+      "subsystem": "fixed_user_mapping_foundation_evidence",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Fixed user mappings align across contract, source, ELF, and QEMU evidence"
+    },
+    {
       "name": "runtime_state_transition_capability",
       "subsystem": "runtime_state_transition_capability",
       "status": "pass",
@@ -427,14 +441,15 @@
     "artifacts/runtime/kernel_elf_report.json",
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt",
+    "contracts/fixed_user_mapping_foundation.v0.json",
     "contracts/runtime_evidence_taxonomy.v0.json",
-    "contracts/runtime_state_transition_capability.v0.json",
     "docs/ARCHITECTURE.md",
     "docs/BOOT.md",
     "docs/CODEBASE_AUDIT.md",
     "docs/CODING_STYLE.md",
     "docs/CONTRACTS.md",
     "docs/INVARIANTS.md",
+    "docs/PAGING.md",
     "docs/PHASEMAP.md",
     "docs/RELEASE_CHECKLIST.md",
     "docs/RELEASE_EVIDENCE.md",
@@ -446,31 +461,29 @@
     "docs/VALIDATION.md",
     "docs/generated/governance_index.md",
     "harness/codes.py",
+    "harness/fixed_user_mapping_foundation.py",
     "harness/registry.py",
-    "harness/runtime_state_transition_capability.py",
     "harness/validators.py",
-    "harness/validators_impl/first_governed_runtime_capability_evidence.py",
+    "harness/validators_impl/fixed_user_mapping_foundation.py",
+    "harness/validators_impl/fixed_user_mapping_foundation_evidence.py",
     "harness/validators_impl/qemu_smoke_evidence.py",
     "harness/validators_impl/runtime_evidence_taxonomy.py",
-    "harness/validators_impl/runtime_progression_evidence.py",
-    "harness/validators_impl/runtime_state_transition_capability.py",
-    "harness/validators_impl/runtime_state_transition_capability_evidence.py",
     "harness/validators_impl/schema.py",
     "harness/validators_impl/validator_coverage.py",
     "kernel/arch/x86_64/boot.asm",
-    "kernel/runtime_capability.odin",
-    "kernel/runtime_progression.odin",
+    "kernel/arch/x86_64/paging.asm",
+    "linker/kernel.ld",
     "schemas/agent_context.schema.json",
+    "schemas/fixed_user_mapping_foundation.schema.json",
     "schemas/latest_verify.schema.json",
-    "schemas/runtime_state_transition_capability.schema.json",
+    "scripts/build_boot_image.sh",
     "scripts/kernel_elf_report.py",
     "scripts/qemu_smoke.sh",
     "tasks/todo.json",
-    "tests/test_first_governed_runtime_capability_evidence.py",
+    "tests/test_fixed_user_mapping_foundation.py",
+    "tests/test_fixed_user_mapping_foundation_evidence.py",
     "tests/test_qemu_smoke_evidence.py",
-    "tests/test_runtime_evidence_taxonomy.py",
-    "tests/test_runtime_state_transition_capability.py",
-    "tests/test_runtime_state_transition_capability_evidence.py"
+    "tests/test_runtime_evidence_taxonomy.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -487,5 +500,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-07-25T21:29:43Z"
+  "generated_at": "2026-07-26T17:38:03Z"
 }

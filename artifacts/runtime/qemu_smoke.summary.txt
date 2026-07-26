@@ -16,6 +16,11 @@ Observed Markers
   - KOZO_CPU_EXT_STATE_INIT_START
   - KOZO_CPU_EXT_STATE_INIT_OK
   - KOZO_SIMD_PROBE_OK
+  - KOZO_USER_MAPPING_INIT_START
+  - KOZO_USER_MAPPING_TABLES_OK
+  - KOZO_USER_MAPPING_PERMISSIONS_OK
+  - KOZO_USER_MAPPING_ACTIVATE_OK
+  - KOZO_USER_MAPPING_SURVIVAL_OK
   - KOZO_RUNTIME_PROGRESS_ENTRY
   - KOZO_RUNTIME_INIT_OK
   - KOZO_RUNTIME_LOOP_ENTER
@@ -40,7 +45,7 @@ Validator: qemu_smoke_evidence
 Metadata
 QEMU exit code: 124
 Timed out: True
-Serial log bytes: 1823
+Serial log bytes: 1978
 Stderr log bytes: 80
 
 Evidence References
@@ -50,15 +55,10 @@ artifacts/runtime/qemu_smoke.metadata.json
 artifacts/runtime/boot_blocker_report.json
 
 Last 50 serial lines
-vbe: Framebuffer address: 0xfd000000
-edid: Success.
-limine: Loading executable `boot():/boot/kozo/kozo-kernel.elf`...
-limine: Physical base:   0xff34000
-limine: Virtual base:    0xffffffff80200000
 limine: Slide:           0x0
 limine: ELF entry point: 0xffffffff80200000
 limine: Base revision:   0
-limine: Requests count:  0
+limine: Requests count:  1
 limine: Top of HHDM:     0x10000000000
 vbe: Initialising...
 vbe: Version: 3.0
@@ -86,6 +86,11 @@ KOZO_MEMORY_INIT_OK
 KOZO_CPU_EXT_STATE_INIT_START
 KOZO_CPU_EXT_STATE_INIT_OK
 KOZO_SIMD_PROBE_OK
+KOZO_USER_MAPPING_INIT_START
+KOZO_USER_MAPPING_TABLES_OK
+KOZO_USER_MAPPING_PERMISSIONS_OK
+KOZO_USER_MAPPING_ACTIVATE_OK
+KOZO_USER_MAPPING_SURVIVAL_OK
 KOZO_RUNTIME_PROGRESS_ENTRY
 KOZO_RUNTIME_INIT_OK
 KOZO_RUNTIME_LOOP_ENTER
@@ -102,4 +107,4 @@ KOZO_SECOND_CAPABILITY_OK
 KOZO_RUNTIME_RETURN_OK
 
 Last 50 stderr lines
-qemu-system-x86_64: terminating on signal 15 from pid 73207 (<unknown process>)
+qemu-system-x86_64: terminating on signal 15 from pid 95498 (<unknown process>)

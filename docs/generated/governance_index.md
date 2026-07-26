@@ -20,10 +20,10 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Status: `pass`
 * Summary code: `OK`
-* Total checks: 57
+* Total checks: 59
 * Failed checks: 0
-* Run ID: `verify-20260725T212943Z`
-* Generated at: `2026-07-25T21:29:43Z`
+* Run ID: `verify-20260726T150446Z`
+* Generated at: `2026-07-26T15:04:46Z`
 
 ## Registered validators
 
@@ -72,20 +72,22 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | 41 | `first_governed_runtime_capability_evidence` |
 | 42 | `cpu_extended_state_initialization_contract` |
 | 43 | `cpu_extended_state_initialization_evidence` |
-| 44 | `runtime_state_transition_capability` |
-| 45 | `runtime_state_transition_capability_evidence` |
-| 46 | `boot_blocker_report` |
-| 47 | `boot_protocol_decision` |
-| 48 | `boot_image_skeleton` |
-| 49 | `boot_image_packaging` |
-| 50 | `boot_tooling` |
-| 51 | `kernel_loadability` |
-| 52 | `host_dependency_portability` |
-| 53 | `qemu_smoke_evidence` |
-| 54 | `return_path_proof` |
-| 55 | `execution_proof` |
-| 56 | `validator_coverage` |
-| 57 | `evidence` |
+| 44 | `fixed_user_mapping_foundation` |
+| 45 | `fixed_user_mapping_foundation_evidence` |
+| 46 | `runtime_state_transition_capability` |
+| 47 | `runtime_state_transition_capability_evidence` |
+| 48 | `boot_blocker_report` |
+| 49 | `boot_protocol_decision` |
+| 50 | `boot_image_skeleton` |
+| 51 | `boot_image_packaging` |
+| 52 | `boot_tooling` |
+| 53 | `kernel_loadability` |
+| 54 | `host_dependency_portability` |
+| 55 | `qemu_smoke_evidence` |
+| 56 | `return_path_proof` |
+| 57 | `execution_proof` |
+| 58 | `validator_coverage` |
+| 59 | `evidence` |
 
 ## Active contracts
 
@@ -94,6 +96,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | `contracts/controlled_runtime_loop_contract.v0.json` | `0` | controlled runtime loop contract.v0 |
 | `contracts/cpu_extended_state_initialization_contract.v0.json` | `0` | cpu extended state initialization contract.v0 |
 | `contracts/first_governed_runtime_capability.v0.json` | `0` | first governed runtime capability.v0 |
+| `contracts/fixed_user_mapping_foundation.v0.json` | `0` | fixed user mapping foundation.v0 |
 | `contracts/kozo_abi_manifest.json` | `0` | ABI manifest |
 | `contracts/memory_initialization_evidence_contract.v0.json` | `0` | memory initialization evidence contract.v0 |
 | `contracts/runtime_evidence_taxonomy.v0.json` | `0` | runtime evidence taxonomy.v0 |
@@ -116,6 +119,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | `schemas/controlled_runtime_loop_contract.schema.json` | KOZO controlled runtime loop contract |
 | `schemas/cpu_extended_state_initialization_contract.schema.json` | KOZO CPU extended-state initialization contract |
 | `schemas/first_governed_runtime_capability.schema.json` | KOZO first governed runtime capability |
+| `schemas/fixed_user_mapping_foundation.schema.json` | KOZO fixed user-mapping foundation contract |
 | `schemas/kozo_abi_manifest.schema.json` | kozo_abi_manifest.schema.json |
 | `schemas/latest_verify.schema.json` | latest_verify.schema.json |
 | `schemas/memory_initialization_evidence_contract.schema.json` | KOZO memory initialization evidence contract |
@@ -145,7 +149,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Path: `artifacts/latest_verify.json`
 * Status: `pass`
-* Check count: 57
+* Check count: 59
 * Failure count: 0
 
 ## Non-goals
