@@ -24,6 +24,10 @@ Observed Markers
   - KOZO_PRIVILEGE_TRANSITION_INIT_START
   - KOZO_PRIVILEGE_TABLES_OK
   - KOZO_RING3_ENTER
+  - KOZO_USER_REQUEST_COPY_IN_OK
+  - KOZO_USER_REQUEST_SERVICE_OK
+  - KOZO_USER_RESPONSE_COPY_OUT_OK
+  - KOZO_FIXED_USER_REQUEST_OK
   - KOZO_RING3_PROBE_OK
   - KOZO_RING0_RETURN_OK
   - KOZO_RUNTIME_PROGRESS_ENTRY
@@ -50,8 +54,8 @@ Validator: qemu_smoke_evidence
 Metadata
 QEMU exit code: 124
 Timed out: True
-Serial log bytes: 2103
-Stderr log bytes: 79
+Serial log bytes: 2223
+Stderr log bytes: 80
 
 Evidence References
 artifacts/runtime/qemu_smoke.log
@@ -60,10 +64,6 @@ artifacts/runtime/qemu_smoke.metadata.json
 artifacts/runtime/boot_blocker_report.json
 
 Last 50 serial lines
-vbe: Initialising...
-vbe: Version: 3.0
-vbe: OEM: SeaBIOS VBE(C) 2011
-vbe: Graphics vendor: SeaBIOS Developers
 vbe: Product name: SeaBIOS VBE Adapter
 vbe: Product revision: Rev. 1
 edid: Success.
@@ -94,6 +94,10 @@ KOZO_USER_MAPPING_SURVIVAL_OK
 KOZO_PRIVILEGE_TRANSITION_INIT_START
 KOZO_PRIVILEGE_TABLES_OK
 KOZO_RING3_ENTER
+KOZO_USER_REQUEST_COPY_IN_OK
+KOZO_USER_REQUEST_SERVICE_OK
+KOZO_USER_RESPONSE_COPY_OUT_OK
+KOZO_FIXED_USER_REQUEST_OK
 KOZO_RING3_PROBE_OK
 KOZO_RING0_RETURN_OK
 KOZO_RUNTIME_PROGRESS_ENTRY
@@ -112,4 +116,4 @@ KOZO_SECOND_CAPABILITY_OK
 KOZO_RUNTIME_RETURN_OK
 
 Last 50 stderr lines
-qemu-system-x86_64: terminating on signal 15 from pid 7603 (<unknown process>)
+qemu-system-x86_64: terminating on signal 15 from pid 17041 (<unknown process>)

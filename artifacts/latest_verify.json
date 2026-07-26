@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260726T194338Z",
+  "run_id": "verify-20260726T205523Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 61,
+    "total_checks": 63,
     "failed_check_count": 0
   },
   "checks": [
@@ -339,6 +339,20 @@
       "detail": "One fixed CPL3 excursion and TSS-backed Ring0 return align across source, ELF, and QEMU evidence"
     },
     {
+      "name": "fixed_user_request_boundary_contract",
+      "subsystem": "fixed_user_request_boundary_contract",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Fixed user request contract governs one exact Ring3-to-Ring0 transaction"
+    },
+    {
+      "name": "fixed_user_request_boundary_evidence",
+      "subsystem": "fixed_user_request_boundary_evidence",
+      "status": "pass",
+      "code": "OK",
+      "detail": "One exact Ring3 request and Ring0 response transaction aligns across source, ELF, and QEMU evidence"
+    },
+    {
       "name": "runtime_state_transition_capability",
       "subsystem": "runtime_state_transition_capability",
       "status": "pass",
@@ -455,7 +469,7 @@
     "artifacts/runtime/kernel_elf_report.json",
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt",
-    "contracts/bounded_privilege_transition_probe_contract.v0.json",
+    "contracts/fixed_user_request_boundary_contract.v0.json",
     "contracts/runtime_evidence_taxonomy.v0.json",
     "docs/ARCHITECTURE.md",
     "docs/BOOT.md",
@@ -473,15 +487,16 @@
     "docs/RUNTIME_CAPABILITIES.md",
     "docs/RUNTIME_EVIDENCE.md",
     "docs/SECURITY_MODEL.md",
+    "docs/USER_REQUEST_BOUNDARY.md",
     "docs/VALIDATION.md",
     "docs/generated/governance_index.md",
-    "harness/bounded_privilege_transition_probe_contract.py",
     "harness/codes.py",
+    "harness/fixed_user_request_boundary_contract.py",
     "harness/registry.py",
     "harness/validators.py",
-    "harness/validators_impl/bounded_privilege_transition_probe_contract.py",
     "harness/validators_impl/bounded_privilege_transition_probe_evidence.py",
-    "harness/validators_impl/fixed_user_mapping_foundation_evidence.py",
+    "harness/validators_impl/fixed_user_request_boundary_contract.py",
+    "harness/validators_impl/fixed_user_request_boundary_evidence.py",
     "harness/validators_impl/qemu_smoke_evidence.py",
     "harness/validators_impl/runtime_evidence_taxonomy.py",
     "harness/validators_impl/schema.py",
@@ -491,15 +506,14 @@
     "kernel/arch/x86_64/privilege_transition.asm",
     "kernel/arch/x86_64/runtime_layout.inc",
     "linker/kernel.ld",
-    "schemas/bounded_privilege_transition_probe_contract.schema.json",
+    "schemas/agent_context.schema.json",
+    "schemas/fixed_user_request_boundary_contract.schema.json",
     "schemas/latest_verify.schema.json",
-    "scripts/build_boot_image.sh",
     "scripts/kernel_elf_report.py",
     "scripts/qemu_smoke.sh",
     "tasks/todo.json",
-    "tests/test_bounded_privilege_transition_probe_contract.py",
-    "tests/test_bounded_privilege_transition_probe_evidence.py",
-    "tests/test_fixed_user_mapping_foundation_evidence.py",
+    "tests/test_fixed_user_request_boundary_contract.py",
+    "tests/test_fixed_user_request_boundary_evidence.py",
     "tests/test_qemu_smoke_evidence.py",
     "tests/test_runtime_evidence_taxonomy.py",
     "tests/test_schema.py"
@@ -519,5 +533,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-07-26T19:43:38Z"
+  "generated_at": "2026-07-26T20:55:23Z"
 }
