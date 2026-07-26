@@ -82,6 +82,7 @@ Current contract paths include:
 | Runtime state transition capability | `contracts/runtime_state_transition_capability.v0.json` | Capability ID 2, fixed request/response and state geometry, READY/0 to ACTIVE/1 transition, volatile readback, rollback, marker, claim, and halt boundary |
 | Fixed user-mapping foundation | `contracts/fixed_user_mapping_foundation.v0.json` | Fixed four-level page-table geometry, kernel/user permission split, U/S propagation, W^X, CR3 activation, software walk, survival evidence, and non-goals |
 | Bounded privilege-transition probe | `contracts/bounded_privilege_transition_probe_contract.v0.json` | Fixed CPL0-to-CPL3 `iretq`, DPL3 interrupt-gate return, descriptor and stack geometry, saved-frame validation, markers, statuses, and claim boundary |
+| Fixed user request boundary | `contracts/fixed_user_request_boundary_contract.v0.json` | Exact Ring3 request and Ring0 response geometry, fixed copy-in/service/copy-out sequence, post-copy validation and clearing, marker order, failure status, and claim boundary |
 | Stack initialization evidence contract | `contracts/stack_initialization_evidence_contract.v0.json` | Controlled stack proof boundary and marker evidence |
 | Memory initialization evidence contract | `contracts/memory_initialization_evidence_contract.v0.json` | Future memory proof boundary and marker reservation |
 
@@ -319,3 +320,20 @@ public ABI, general IDT or GDT manager, process model, scheduler, arbitrary
 user-code entry, `syscall`/`sysret` path, exception recovery, isolation claim,
 compatibility claim, or production claim. Generated ELF and QEMU reports are
 evidence and do not own this policy.
+
+---
+
+# 25. Fixed User Request Boundary
+
+`contracts/fixed_user_request_boundary_contract.v0.json` owns the exact
+v0.8.5 transaction inside the existing bounded privilege probe. It defines the
+40-byte versioned request, 48-byte response, fixed shared addresses,
+supervisor-only shadow geometry, complete-span validation, deterministic
+service, exact copy sizes, readback, clearing, marker ownership, failure
+statuses, halt convergence, and claim boundary.
+
+The contract accepts no dynamic identifier, pointer, length, target, or
+continuation. It creates no public syscall ABI, general copy framework,
+persistent Ring3 runtime, process or scheduler behavior, isolation,
+compatibility, or production claim. `docs/USER_REQUEST_BOUNDARY.md` is
+descriptive and generated reports remain evidence only.

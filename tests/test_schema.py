@@ -10,6 +10,8 @@ from harness.codes import (
     BOUNDED_PRIVILEGE_TRANSITION_PROBE_CONTRACT_INVALID,
     BOUNDED_PRIVILEGE_TRANSITION_PROBE_EVIDENCE_INVALID,
     CODES,
+    FIXED_USER_REQUEST_BOUNDARY_CONTRACT_INVALID,
+    FIXED_USER_REQUEST_BOUNDARY_EVIDENCE_INVALID,
     MEMORY_INITIALIZATION_EVIDENCE_INVALID,
     OK,
     SCHEMA_INVALID,
@@ -97,6 +99,42 @@ class SchemaValidatorTests(unittest.TestCase):
             [
                 "bounded_privilege_transition_probe_contract",
                 "bounded_privilege_transition_probe_evidence",
+            ],
+        )
+
+    def test_fixed_request_checks_serialize_in_aggregate_report(self):
+        collected = [
+            (
+                "fixed_user_request_boundary_contract",
+                "fixed_user_request_boundary_contract",
+                ValidationResult.fail(
+                    code=FIXED_USER_REQUEST_BOUNDARY_CONTRACT_INVALID,
+                    detail="Fixed request contract failure remains visible",
+                ),
+            ),
+            (
+                "fixed_user_request_boundary_evidence",
+                "fixed_user_request_boundary_evidence",
+                ValidationResult.fail(
+                    code=FIXED_USER_REQUEST_BOUNDARY_EVIDENCE_INVALID,
+                    detail="Fixed request evidence failure remains visible",
+                ),
+            ),
+        ]
+        with patch("harness.aggregator._collect_results", return_value=collected):
+            artifact = run_aggregator(
+                {},
+                changed_files=[],
+                evidence_files=[],
+                run_id="fixed-user-request-schema-regression",
+                generated_at="2026-07-26T00:00:00Z",
+            )
+        validate_named_document("latest_verify", artifact)
+        self.assertEqual(
+            [check["code"] for check in artifact["failed_checks"]],
+            [
+                FIXED_USER_REQUEST_BOUNDARY_CONTRACT_INVALID,
+                FIXED_USER_REQUEST_BOUNDARY_EVIDENCE_INVALID,
             ],
         )
 

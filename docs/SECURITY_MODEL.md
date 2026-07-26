@@ -208,3 +208,22 @@ system, public syscall surface, arbitrary user-code facility, exception
 recovery system, or general interrupt subsystem. The current fixed mappings
 do not establish isolation between processes, and the probe does not return to
 Ring 3.
+
+---
+
+# 17. Fixed User Request Boundary
+
+v0.8.5 permits one fixed Ring3 request and one fixed Ring0 response in the
+existing governed user-data page. Ring0 validates the hardware entry frame,
+the complete fixed spans, exact request fields, and fixed backing before
+copying data into supervisor-only shadows. The service operates only on those
+shadows. The response is copied to the fixed response span, copied back into a
+supervisor-only verification shadow, validated, and all boundary buffers are
+cleared and checked zero before continuation.
+
+This is not a generic copy-in/copy-out facility, public syscall ABI, arbitrary
+pointer interface, persistent user session, process boundary, authentication
+or authorization mechanism, sandbox, or isolation proof. The fixed exception
+sinks remain fail-closed containment for this bounded probe; they do not
+provide exception recovery, complete diagnostics, or safe execution of
+arbitrary hostile user code.

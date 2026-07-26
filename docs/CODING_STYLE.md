@@ -900,3 +900,17 @@ Do not mix phase policy into raw architecture helpers. Use fixed descriptive
 names for selectors, stacks, tokens, vectors, and continuations. Keep one
 obvious success path and route every malformed architecture state to a
 non-returning failure path.
+
+---
+
+# 28. User Request Boundary Code Shape
+
+Fixed boundary coordinators must read top-down: validate the hardware frame,
+validate complete spans, copy into supervisor storage, validate exact request
+fields, execute the fixed service, validate and copy the response, verify the
+readback, clear buffers, and continue through one fixed target.
+
+Keep canonical-address arithmetic, page-walk checks, qword copies, zeroing, and
+zero verification in focused low-level helpers. Service logic must not read
+user memory directly, and raw copy helpers must not emit final phase markers
+or choose runtime policy.

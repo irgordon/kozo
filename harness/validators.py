@@ -51,6 +51,8 @@ from harness.validators_impl.fixed_user_mapping_foundation import FixedUserMappi
 from harness.validators_impl.fixed_user_mapping_foundation_evidence import FixedUserMappingFoundationEvidenceValidator
 from harness.validators_impl.bounded_privilege_transition_probe_contract import BoundedPrivilegeTransitionProbeContractValidator
 from harness.validators_impl.bounded_privilege_transition_probe_evidence import BoundedPrivilegeTransitionProbeEvidenceValidator
+from harness.validators_impl.fixed_user_request_boundary_contract import FixedUserRequestBoundaryContractValidator
+from harness.validators_impl.fixed_user_request_boundary_evidence import FixedUserRequestBoundaryEvidenceValidator
 from harness.validators_impl.runtime_state_transition_capability import RuntimeStateTransitionCapabilityValidator
 from harness.validators_impl.runtime_state_transition_capability_evidence import RuntimeStateTransitionCapabilityEvidenceValidator
 from harness.validators_impl.boot_blocker_report import BootBlockerReportValidator
@@ -114,6 +116,8 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "fixed_user_mapping_foundation_evidence": FixedUserMappingFoundationEvidenceValidator,
     "bounded_privilege_transition_probe_contract": BoundedPrivilegeTransitionProbeContractValidator,
     "bounded_privilege_transition_probe_evidence": BoundedPrivilegeTransitionProbeEvidenceValidator,
+    "fixed_user_request_boundary_contract": FixedUserRequestBoundaryContractValidator,
+    "fixed_user_request_boundary_evidence": FixedUserRequestBoundaryEvidenceValidator,
     "runtime_state_transition_capability": RuntimeStateTransitionCapabilityValidator,
     "runtime_state_transition_capability_evidence": RuntimeStateTransitionCapabilityEvidenceValidator,
     "boot_blocker_report": BootBlockerReportValidator,

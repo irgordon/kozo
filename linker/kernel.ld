@@ -92,6 +92,18 @@ SECTIONS
          "privilege return stack must be exactly one page")
   ASSERT((double_fault_stack_top - double_fault_stack) == 4K,
          "double-fault stack must be exactly one page")
+  ASSERT((fixed_user_request_shadow_end - fixed_user_request_shadow) == 40,
+         "fixed user request shadow must be exactly 40 bytes")
+  ASSERT((fixed_user_response_shadow_end - fixed_user_response_shadow) == 48,
+         "fixed user response shadow must be exactly 48 bytes")
+  ASSERT((fixed_user_response_verify_end - fixed_user_response_verify) == 48,
+         "fixed user response verify buffer must be exactly 48 bytes")
+  ASSERT((fixed_user_request_shadow % 8) == 0,
+         "fixed user request shadow must be 8-byte aligned")
+  ASSERT((fixed_user_response_shadow % 8) == 0,
+         "fixed user response shadow must be 8-byte aligned")
+  ASSERT((fixed_user_response_verify % 8) == 0,
+         "fixed user response verify buffer must be 8-byte aligned")
   ASSERT((__kernel_loaded_image_end - __kernel_image_start) < 2M,
          "fixed kernel mappings must fit one page table")
 }

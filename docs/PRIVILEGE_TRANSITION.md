@@ -76,16 +76,19 @@ user data and stack mappings, the supervisor-only return structures, and the
 sanitized frame.
 
 The CPL3 stub validates the RPL bits read from CS, performs a bounded stack
-push/pop probe, writes and reads the fixed token `0x4b4f5a4f50524956` at the
-governed user-data address, and invokes `int 0x81`. It performs no serial I/O.
+push/pop probe, constructs one exact versioned request containing the existing
+probe token `0x4b4f5a4f50524956`, validates the payload write, and invokes
+`int 0x81`. It performs no serial I/O.
 
 # 6. Return Boundary
 
 The interrupt gate switches to `privilege_return_stack_top` through TSS.RSP0.
 The handler validates the saved CPL3 CS, SS, RIP, RSP, and RFLAGS; validates
-the probe token; clears and reads back the token; emits
-`KOZO_RING3_PROBE_OK` only after those checks; restores the saved kernel RSP;
-and jumps to `privilege_ring0_continuation`.
+the complete request and response transaction defined by
+`contracts/fixed_user_request_boundary_contract.v0.json`; clears and reads
+back all transaction buffers; emits `KOZO_RING3_PROBE_OK` only after those
+checks; restores the saved kernel RSP; and jumps to
+`privilege_ring0_continuation`.
 
 The continuation validates CPL0, the kernel data selector, the exact restored
 stack, the success state, and the cleared token. It returns only exact status
@@ -101,16 +104,21 @@ KOZO_USER_MAPPING_SURVIVAL_OK
 KOZO_PRIVILEGE_TRANSITION_INIT_START
 KOZO_PRIVILEGE_TABLES_OK
 KOZO_RING3_ENTER
+KOZO_USER_REQUEST_COPY_IN_OK
+KOZO_USER_REQUEST_SERVICE_OK
+KOZO_USER_RESPONSE_COPY_OUT_OK
+KOZO_FIXED_USER_REQUEST_OK
 KOZO_RING3_PROBE_OK
 KOZO_RING0_RETURN_OK
 KOZO_RUNTIME_PROGRESS_ENTRY
 ```
 
 `KOZO_RING3_ENTER` records that the fixed frame is validated and the next
-instruction transfers with `iretq`. `KOZO_RING3_PROBE_OK` is emitted by the
-CPL0 handler only after it validates the hardware-saved CPL3 frame and the
-CPL3-written probe state. It is not a Ring 0 substitute for unexecuted Ring 3
-work.
+instruction transfers with `iretq`. The four request markers are emitted by
+the CPL0 handler after exact copy, service, readback, and clear boundaries.
+`KOZO_RING3_PROBE_OK` remains the enclosing proof emitted only after the
+hardware-saved CPL3 frame and CPL3-constructed request are validated. It is not
+a Ring 0 substitute for unexecuted Ring 3 work.
 
 Source, contract, ELF, and QEMU evidence are all required for final
 acceptance. Generated reports remain evidence and are not authority.

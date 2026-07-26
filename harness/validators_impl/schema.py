@@ -33,6 +33,7 @@ _SCHEMA_PATHS = {
     "runtime_state_transition_capability": _SCHEMA_DIR / "runtime_state_transition_capability.schema.json",
     "fixed_user_mapping_foundation": _SCHEMA_DIR / "fixed_user_mapping_foundation.schema.json",
     "bounded_privilege_transition_probe_contract": _SCHEMA_DIR / "bounded_privilege_transition_probe_contract.schema.json",
+    "fixed_user_request_boundary_contract": _SCHEMA_DIR / "fixed_user_request_boundary_contract.schema.json",
 }
 
 

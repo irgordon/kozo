@@ -108,3 +108,16 @@ user-accessible.
 
 This use does not change the fixed page-table hierarchy, introduce dynamic
 mapping, map arbitrary code, or establish per-process address spaces.
+
+# 8. Fixed Request Consumer
+
+v0.8.5 uses two non-overlapping spans in the existing user data page:
+`0x0000400000001000..0x0000400000001028` for the 40-byte request and
+`0x0000400000001080..0x00004000000010b0` for the 48-byte response. Before
+either span is accessed in Ring0, the software walker validates both endpoints
+against the same expected physical backing and exact effective user RW-NX
+policy.
+
+No mapping, permission, CR3, or page-table geometry changes in this phase.
+The fixed page still does not provide process isolation, dynamic mapping,
+page-fault recovery, or safe arbitrary user-pointer access.

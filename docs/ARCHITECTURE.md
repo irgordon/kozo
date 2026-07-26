@@ -230,3 +230,22 @@ does not introduce a process model, general userspace, a public syscall ABI,
 general interrupt handling, return to Ring 3, or isolation. Detailed authority
 lives in `contracts/bounded_privilege_transition_probe_contract.v0.json` and
 `docs/PRIVILEGE_TRANSITION.md`.
+
+---
+
+# 14. Fixed User Request Boundary
+
+v0.8.5 extends the single fixed CPL3 excursion without adding a second
+transition mechanism. The linked Ring3 stub writes one exact 40-byte request
+inside the accepted user RW-NX page and invokes the existing `int 0x81` gate.
+The Ring0 handler validates the hardware frame and both complete fixed spans,
+copies into supervisor-only shadows, executes one deterministic service,
+copies one exact 48-byte response back, validates readback, clears every
+transaction buffer, and resumes only `privilege_ring0_continuation`.
+
+This remains assembly-owned boot-probe behavior. It is not a public syscall
+ABI, arbitrary user-pointer boundary, general copy framework, persistent
+userspace runtime, process model, scheduler, isolation boundary, compatibility
+claim, or production runtime. Authority lives in
+`contracts/fixed_user_request_boundary_contract.v0.json`; detailed geometry and
+evidence are described in `docs/USER_REQUEST_BOUNDARY.md`.

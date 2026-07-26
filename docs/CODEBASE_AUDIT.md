@@ -1103,6 +1103,36 @@ Status: Implemented and locally evidenced; hosted CI pending.
 | AUDIT-084-003 | Resolved locally | The DPL3 `int 0x81` handler validates the hardware-saved CPL3 frame, fixed token, fixed return reason, and TSS.RSP0 stack before restoring one fixed CPL0 continuation. |
 | AUDIT-084-004 | Resolved locally | Consequential architectural faults and every explicit setup/entry/return failure converge on the existing terminal halt without later success markers. |
 | AUDIT-084-005 | Hosted confirmation pending | Local QEMU captures the complete 33-marker sequence; hosted CI must confirm identical ordering and both bounded privilege-transition validators. |
+
+---
+
+# 34. v0.8.5 Fixed User Request Boundary
+
+## 34.1 Baseline
+
+Hosted CI run `30217859139` accepts v0.8.4 with passing CI and lint, zero
+verification failures, QEMU outcome `pass`, blocker `none`, both bounded
+privilege-transition validators, and the complete 33-marker sequence.
+
+## 34.2 Findings
+
+| ID | Status | Finding |
+| --- | --- | --- |
+| AUDIT-085-001 | Resolved locally | The fixed CPL3 probe now constructs one exact 40-byte request instead of sharing only a token cell. |
+| AUDIT-085-002 | Resolved locally | Ring0 validates the hardware frame and complete fixed request/response spans before any shared-page copy. |
+| AUDIT-085-003 | Resolved locally | One deterministic service operates only on supervisor shadows; response copy-out, supervisor-shadow readback, exact validation, clearing, and zero readback precede completion evidence. |
+| AUDIT-085-004 | Resolved locally | Contract, source, ELF, QEMU, aggregation, failure-path, and validator-coverage checks govern the complete fixed boundary. |
+| AUDIT-085-005 | Hosted confirmation pending | Local QEMU captures the complete 37-marker sequence; hosted CI must confirm identical ordering and both fixed user request validators. |
+| AUDIT-085-006 | Deferred | `validator_coverage.py` remains the largest structural debt item and is not split in this runtime phase. |
+| AUDIT-085-007 | Deferred | The existing Rust package-license metadata warning remains release-hardening debt. |
+
+## 34.3 Claim Boundary
+
+This phase proves one exact boot-time request/response transaction through the
+accepted fixed privilege probe. It does not prove arbitrary pointer or length
+handling, a generic copy API, a public syscall ABI, return to Ring3, persistent
+userspace, hostile-code safety, process isolation, compatibility, or production
+readiness.
 | AUDIT-064-002 | Deferred | `validator_coverage.py` remains above the preferred split threshold; decomposition is outside this runtime phase. |
 | AUDIT-073-001 | Deferred | The existing Rust package license metadata warning remains release-hardening work. |
 

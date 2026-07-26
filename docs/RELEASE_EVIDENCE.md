@@ -463,3 +463,22 @@ marker on a known failure path.
 This evidence proves one fixed CPL3 excursion only. It does not prove general
 userspace, process isolation, a public syscall ABI, general interrupt or
 exception handling, compatibility, or production readiness.
+
+---
+
+# 14. v0.8.5 Fixed User Request Boundary Evidence
+
+Release review must include the fixed user request contract and evidence
+validators, kernel ELF report, QEMU metadata and serial log, and the unchanged
+fixed-mapping, privilege, capability, return, and halt evidence.
+
+Acceptance requires one exact 40-byte request and 48-byte response transaction:
+complete-span validation, supervisor-only copy-in, exact field validation, one
+deterministic service, exact copy-out, supervisor-shadow readback, complete
+response validation, buffer clearing with zero readback, and all four boundary
+markers between Ring3 entry and the existing Ring3 probe marker.
+
+This evidence proves only one fixed boot-time request boundary. It does not
+prove a public syscall ABI, arbitrary copy-in/copy-out, persistent userspace,
+process isolation, hostile-code safety, compatibility, or production
+readiness.

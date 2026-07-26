@@ -344,3 +344,24 @@ For v0.8.4 and later, confirm:
 Reject any release claim that treats this fixed boot-time probe as general
 userspace, process isolation, public syscall handling, exception recovery, or
 production readiness.
+
+---
+
+# 16. v0.8.5 Fixed User Request Boundary Gate
+
+For v0.8.5 and later, confirm:
+
+* `fixed_user_request_boundary_contract` and
+  `fixed_user_request_boundary_evidence` pass;
+* ELF evidence records exact request, response, and verification-shadow
+  geometry and the ordered handler call chain;
+* hosted QEMU captures all four fixed-boundary markers between Ring3 entry and
+  the existing Ring3-probe marker;
+* request and response spans remain fixed within the governed user data page;
+* all boundary buffers are cleared and verified zero before continuation;
+* the accepted privilege, capability, runtime-return, and halt evidence remains
+  green.
+
+Reject any release claim that generalizes this transaction into arbitrary
+user pointers, a public syscall ABI, persistent userspace, process isolation,
+hostile-code safety, compatibility, or production readiness.

@@ -665,3 +665,35 @@ CPL3 frame was validated in CPL0. This does not prove arbitrary userspace,
 process isolation, a public syscall ABI, return to Ring 3, general interrupt
 handling, exception recovery, compatibility, or production readiness. Hosted
 CI remains the phase acceptance authority.
+
+---
+
+# 18. Fixed User Request Boundary Evidence
+
+v0.8.5 extends the accepted fixed CPL3 probe with one exact transaction:
+
+```text
+KOZO_RING3_ENTER
+KOZO_USER_REQUEST_COPY_IN_OK
+KOZO_USER_REQUEST_SERVICE_OK
+KOZO_USER_RESPONSE_COPY_OUT_OK
+KOZO_FIXED_USER_REQUEST_OK
+KOZO_RING3_PROBE_OK
+KOZO_RING0_RETURN_OK
+```
+
+The Ring3 stub constructs one fixed 40-byte request in the governed user data
+page. The Ring0 handler validates the hardware frame and the complete request
+and response spans, copies the request into a supervisor-only shadow, validates
+every field, executes one deterministic fixed service, copies an exact 48-byte
+response out, reads it back into a supervisor-only verification shadow, and
+clears all boundary buffers before the fixed continuation.
+
+Local QEMU evidence captures the complete ordered sequence. Final acceptance
+requires hosted CI agreement from `fixed_user_request_boundary_contract`,
+`fixed_user_request_boundary_evidence`, QEMU metadata and serial logs, and the
+preserved privilege, capability, return, and halt validators.
+
+This evidence does not establish a general syscall ABI, arbitrary user
+pointers or lengths, return to Ring3, persistent userspace, hostile-code
+containment, process isolation, compatibility, or production readiness.

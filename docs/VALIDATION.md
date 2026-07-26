@@ -147,6 +147,10 @@ Current runtime evidence and runtime contract validators include:
 * `runtime_state_transition_capability_evidence`
 * `fixed_user_mapping_foundation`
 * `fixed_user_mapping_foundation_evidence`
+* `bounded_privilege_transition_probe_contract`
+* `bounded_privilege_transition_probe_evidence`
+* `fixed_user_request_boundary_contract`
+* `fixed_user_request_boundary_evidence`
 
 `runtime_progression_stages` performs graph-level validation. It rejects direct and indirect cycles, duplicate identifiers and names, unknown references, forward prerequisites, proven stages with unproven mandatory prerequisites, backward or skipped transitions, unknown contract or validator authorities, and transitions with missing or multiple owners. The traversal is deterministic and contract order remains authoritative.
 
@@ -271,3 +275,20 @@ capability suffix, and terminal halt preservation.
 
 Marker strings alone are insufficient. Final acceptance requires hosted QEMU
 evidence that the full ordered sequence executed.
+
+---
+
+# 18. Fixed User Request Boundary Validation
+
+`fixed_user_request_boundary_contract` validates the exact 40-byte request,
+48-byte response, fixed user spans, supervisor shadows, deterministic service,
+copy sequence, clearing, marker order, statuses, and non-goals.
+
+`fixed_user_request_boundary_evidence` separately validates Ring3 request
+construction, frame and complete-span defense, exact copy-in/service/copy-out
+and readback order, buffer zeroing, linked geometry, QEMU agreement, fixed
+continuation, and failure exclusion.
+
+Marker strings alone are insufficient. Final acceptance requires hosted QEMU
+evidence that the complete boundary sequence executed while the accepted
+privilege, capability, runtime-return, and halt validators remained green.

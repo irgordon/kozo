@@ -222,3 +222,19 @@ Full CI must run `bounded_privilege_transition_probe_contract` and
   halt validators;
 * no public syscall, arbitrary target, return-to-user, or general userspace
   path.
+
+# 10. v0.8.5 Fixed User Request Boundary Checks
+
+Full CI must run `fixed_user_request_boundary_contract` and
+`fixed_user_request_boundary_evidence`. Passing evidence requires:
+
+* contract-valid exact request/response geometry, service semantics, copy
+  policy, clearing, marker order, failures, and non-goals;
+* source and ELF evidence for fixed Ring3 request construction, hardware-frame
+  and full-span validation, supervisor shadows, exact copy/service/readback
+  order, zero validation, and fixed continuation;
+* exact QEMU metadata/log agreement for all four boundary markers;
+* preserved fixed mapping, privilege transition, CPU state, progression,
+  capability, runtime return, and halt validators;
+* no arbitrary pointer, arbitrary length, generic copy API, broad syscall
+  dispatch, return-to-user, or persistent-userspace path.

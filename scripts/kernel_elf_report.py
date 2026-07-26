@@ -128,6 +128,33 @@ PRIVILEGE_TRANSITION_SYMBOLS = (
     "observed_task_register",
     "boot_terminal_halt",
 )
+FIXED_USER_REQUEST_SYMBOLS = (
+    "user_privilege_probe_start",
+    "privilege_return_handler",
+    "validate_ring3_return_frame",
+    "validate_fixed_user_buffer_ranges",
+    "copy_fixed_user_request_in",
+    "validate_fixed_user_request",
+    "execute_fixed_user_boundary_service",
+    "validate_fixed_user_response",
+    "copy_fixed_user_response_out",
+    "validate_fixed_user_response_readback",
+    "clear_fixed_user_request_buffers",
+    "fixed_user_buffers_are_zero",
+    "privilege_ring0_continuation",
+    "runtime_serial_write_user_request_copy_in_marker",
+    "runtime_serial_write_user_request_service_marker",
+    "runtime_serial_write_user_response_copy_out_marker",
+    "runtime_serial_write_fixed_user_request_marker",
+    "runtime_serial_write_ring3_probe_marker",
+    "fixed_user_request_shadow",
+    "fixed_user_request_shadow_end",
+    "fixed_user_response_shadow",
+    "fixed_user_response_shadow_end",
+    "fixed_user_response_verify",
+    "fixed_user_response_verify_end",
+    "fixed_user_request_success_state",
+)
 FIXED_MAPPING_TRANSITION_MNEMONICS = {
     "iretq",
     "syscall",
@@ -258,6 +285,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
             *RUNTIME_STATE_TRANSITION_SYMBOLS,
             *FIXED_USER_MAPPING_SYMBOLS,
             *PRIVILEGE_TRANSITION_SYMBOLS,
+            *FIXED_USER_REQUEST_SYMBOLS,
         ),
     )
     symbol_address = symbols.get("_start")
@@ -289,6 +317,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "runtime_state_transition_capability": runtime_state_transition_record(kernel_elf, symbols),
         "fixed_user_mapping_foundation": fixed_user_mapping_record(kernel_elf, symbols),
         "bounded_privilege_transition_probe": bounded_privilege_transition_record(kernel_elf, symbols),
+        "fixed_user_request_boundary": fixed_user_request_boundary_record(kernel_elf, symbols),
         "program_header_count": header.program_header_count,
         "section_count": header.section_header_count,
         "load_segments": [segment_record(segment) for segment in load_segments],
@@ -670,6 +699,93 @@ def bounded_privilege_transition_record(
     }
 
 
+def fixed_user_request_boundary_record(
+    kernel_elf: Path,
+    symbols: dict[str, int],
+) -> dict[str, object]:
+    instruction_sets = {
+        symbol: parse_disassembly_instructions(disassemble_symbol(kernel_elf, symbol))
+        for symbol in FIXED_USER_REQUEST_SYMBOLS[:13]
+        if symbol in symbols
+    }
+    handler = instruction_sets.get("privilege_return_handler", [])
+    ring3_probe = instruction_sets.get("user_privilege_probe_start", [])
+    return {
+        "symbols": symbol_record(symbols, FIXED_USER_REQUEST_SYMBOLS),
+        "request_shadow": _symbol_range_record(
+            symbols,
+            "fixed_user_request_shadow",
+            "fixed_user_request_shadow_end",
+            40,
+            8,
+        ),
+        "response_shadow": _symbol_range_record(
+            symbols,
+            "fixed_user_response_shadow",
+            "fixed_user_response_shadow_end",
+            48,
+            8,
+        ),
+        "response_verify": _symbol_range_record(
+            symbols,
+            "fixed_user_response_verify",
+            "fixed_user_response_verify_end",
+            48,
+            8,
+        ),
+        "ring3_request_store_count": _memory_store_count(ring3_probe),
+        "ring3_return_interrupt_present": _int_vector_present(ring3_probe, 0x81),
+        "handler_call_order_valid": _ordered_call_targets_present(
+            handler,
+            tuple(
+                symbols.get(name)
+                for name in (
+                    "validate_ring3_return_frame",
+                    "validate_fixed_user_buffer_ranges",
+                    "copy_fixed_user_request_in",
+                    "validate_fixed_user_request",
+                    "runtime_serial_write_user_request_copy_in_marker",
+                    "execute_fixed_user_boundary_service",
+                    "validate_fixed_user_response",
+                    "runtime_serial_write_user_request_service_marker",
+                    "copy_fixed_user_response_out",
+                    "validate_fixed_user_response_readback",
+                    "runtime_serial_write_user_response_copy_out_marker",
+                    "clear_fixed_user_request_buffers",
+                    "runtime_serial_write_fixed_user_request_marker",
+                    "runtime_serial_write_ring3_probe_marker",
+                )
+            ),
+        ),
+        "copy_in_memory_move_count": _memory_move_count(
+            instruction_sets.get("copy_fixed_user_request_in", [])
+        ),
+        "copy_out_memory_move_count": _memory_move_count(
+            instruction_sets.get("copy_fixed_user_response_out", [])
+        ),
+        "readback_memory_move_count": _memory_move_count(
+            instruction_sets.get("validate_fixed_user_response_readback", [])
+        ),
+        "clear_memory_move_count": _memory_move_count(
+            instruction_sets.get("clear_fixed_user_request_buffers", [])
+        ),
+        "clear_stosq_count": _rep_stosq_count(
+            instruction_sets.get("clear_fixed_user_request_buffers", [])
+        ),
+        "post_clear_zero_validation_present": _calls_address(
+            instruction_sets.get("clear_fixed_user_request_buffers", []),
+            symbols.get("fixed_user_buffers_are_zero"),
+        ),
+        "fixed_continuation_jump_present": _jumps_address(
+            handler,
+            symbols.get("privilege_ring0_continuation"),
+        ),
+        "prohibited_boundary_instructions": _fixed_user_request_prohibited_instructions(
+            instruction_sets
+        ),
+    }
+
+
 def _symbol_delta(symbols: dict[str, int], start_name: str, end_name: str) -> int:
     start = symbols.get(start_name)
     end = symbols.get(end_name)
@@ -804,6 +920,34 @@ def _memory_move_count(instructions) -> int:
     return sum(
         mnemonic.startswith("mov") and ("(" in operands or "[" in operands)
         for _, mnemonic, operands in instructions
+    )
+
+
+def _memory_store_count(instructions) -> int:
+    return sum(
+        mnemonic.startswith("mov")
+        and "," in operands
+        and ("(" in operands.rsplit(",", 1)[-1] or "[" in operands.rsplit(",", 1)[-1])
+        for _, mnemonic, operands in instructions
+    )
+
+
+def _rep_stosq_count(instructions) -> int:
+    return sum(
+        mnemonic == "rep" and operands.lstrip().startswith("stosq")
+        for _, mnemonic, operands in instructions
+    )
+
+
+def _fixed_user_request_prohibited_instructions(instruction_sets) -> list[str]:
+    prohibited = {"syscall", "sysret", "sysretq", "swapgs", "sti", "wrmsr"}
+    return sorted(
+        {
+            mnemonic
+            for instructions in instruction_sets.values()
+            for _, mnemonic, _ in instructions
+            if mnemonic in prohibited
+        }
     )
 
 
@@ -1098,6 +1242,7 @@ def malformed_report(kernel_elf: Path, linker_script: Path, issue: str) -> dict[
         "runtime_state_transition_capability": runtime_state_transition_record(kernel_elf, {}),
         "fixed_user_mapping_foundation": fixed_user_mapping_record(kernel_elf, {}),
         "bounded_privilege_transition_probe": bounded_privilege_transition_record(kernel_elf, {}),
+        "fixed_user_request_boundary": fixed_user_request_boundary_record(kernel_elf, {}),
         "program_header_count": 0,
         "section_count": 0,
         "load_segments": [],

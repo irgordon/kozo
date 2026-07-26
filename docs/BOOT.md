@@ -370,18 +370,26 @@ KOZO_USER_MAPPING_SURVIVAL_OK
 KOZO_PRIVILEGE_TRANSITION_INIT_START
 KOZO_PRIVILEGE_TABLES_OK
 KOZO_RING3_ENTER
+KOZO_USER_REQUEST_COPY_IN_OK
+KOZO_USER_REQUEST_SERVICE_OK
+KOZO_USER_RESPONSE_COPY_OUT_OK
+KOZO_FIXED_USER_REQUEST_OK
 KOZO_RING3_PROBE_OK
 KOZO_RING0_RETURN_OK
 KOZO_RUNTIME_PROGRESS_ENTRY
 ```
 
-`KOZO_RING3_PROBE_OK` follows validation of the hardware-saved CPL3 frame and
-the CPL3-written token. Any descriptor, stack, frame, token, or continuation
-failure suppresses later success markers and converges on
+The v0.8.5 markers between Ring3 entry and probe completion follow exact
+copy-in, fixed-service, copy-out/readback, and buffer-clear validation.
+`KOZO_RING3_PROBE_OK` still follows validation of the hardware-saved CPL3
+frame and the complete fixed request transaction. Any descriptor, stack,
+frame, request, response, clear, or continuation failure suppresses later
+success markers and converges on
 `boot_terminal_halt`. The final assembly `cli`/`hlt` loop remains the only
 terminal runtime state.
 
-This proves one fixed lower-privilege excursion and fixed return. It does not
-prove general userspace, process isolation, a public syscall ABI, return to
-Ring 3, general interrupt handling, exception recovery, or production
-readiness.
+This proves one fixed lower-privilege excursion, one exact boot-time request
+and response, and a fixed return. It does not prove general userspace, process
+isolation, a public syscall ABI, arbitrary user-pointer handling, general copy
+helpers, return to Ring 3, general interrupt handling, exception recovery, or
+production readiness.

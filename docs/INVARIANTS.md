@@ -563,3 +563,20 @@ or continuation failure must suppress every later success marker and converge
 on the terminal halt path. This invariant does not promote the probe into
 general userspace, a syscall interface, process isolation, or general
 interrupt handling.
+
+---
+
+# 18. Fixed User Request Invariants
+
+The bounded CPL3 probe may construct only the fixed version-1 request at
+`0x0000400000001000`. Ring0 must validate the saved CPL3 frame and each complete
+fixed span before shared-page access, copy exactly 40 request bytes into
+supervisor storage, validate every field, execute only the named deterministic
+service, and copy exactly 48 response bytes to `0x0000400000001080`.
+
+Success requires response readback, every-field validation, clearing of both
+shared spans and all supervisor shadows, zero readback, and the fixed Ring0
+continuation. No failure may emit later success evidence. This invariant does
+not authorize arbitrary pointers, lengths, request identifiers, general copy
+helpers, a public syscall ABI, return to Ring3, persistent userspace, or
+process isolation.

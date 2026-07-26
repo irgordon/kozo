@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.8.5 - 2026-07-26
+
+Status: implemented and validated locally; hosted CI acceptance pending.
+
+* Added one exact 40-byte Ring3 request and 48-byte Ring0 response transaction through the existing fixed `int 0x81` boundary.
+* Added complete-span and hardware-frame validation, supervisor-only copy-in and verification shadows, exact field validation, one deterministic fixed service, exact copy-out, readback validation, and verified buffer clearing.
+* Added governed copy-in, service, copy-out, and boundary-completion markers while preserving the accepted fixed privilege transition, CPU-state gate, both Odin capabilities, runtime return, and terminal halt.
+* Added contract, source, ELF, QEMU, failure-path, aggregation, and validator-coverage checks for the fixed boundary.
+* Added no arbitrary pointer or length handling, general copy API, public syscall ABI, return to Ring3, persistent userspace, process or isolation behavior, compatibility claim, or production-readiness claim.
+
 ## v0.8.4 - 2026-07-26
 
 **Status:** Implemented and locally evidenced; hosted CI pending.

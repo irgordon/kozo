@@ -130,3 +130,15 @@ and before `KOZO_RUNTIME_PROGRESS_ENTRY`. It does not add a capability ID,
 change capability request or response geometry, or expose either internal
 capability to CPL3. Both capabilities still execute in Odin at CPL0 only after
 the fixed CPL3 round trip returns through its governed continuation.
+
+# 10. Fixed User Request Boundary
+
+v0.8.5 adds no runtime capability ID and does not expose capability IDs 1 or 2
+to CPL3. The fixed privilege probe constructs one separate version-1 request,
+and the interrupt handler executes one exact assembly-owned service before the
+existing Odin capability path begins.
+
+The 40-byte request, 48-byte response, fixed user spans, supervisor shadows,
+service result, marker order, and buffer clearing are governed by
+`contracts/fixed_user_request_boundary_contract.v0.json`. They do not define a
+generic dispatcher or public runtime capability ABI.

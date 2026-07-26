@@ -7,6 +7,7 @@ global validate_fixed_user_mapping_policy
 global activate_fixed_user_mapping_root
 global run_fixed_user_mapping_survival_probe
 global walk_page_mapping
+global physical_for_kernel_virtual
 global governed_pml4
 global governed_kernel_pdpt
 global governed_kernel_pd

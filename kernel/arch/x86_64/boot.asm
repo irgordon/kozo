@@ -37,6 +37,10 @@ global runtime_serial_write_state_update_enter_marker
 global runtime_serial_write_state_update_ok_marker
 global runtime_serial_write_second_capability_marker
 global runtime_serial_write_ring3_enter_marker
+global runtime_serial_write_user_request_copy_in_marker
+global runtime_serial_write_user_request_service_marker
+global runtime_serial_write_user_response_copy_out_marker
+global runtime_serial_write_fixed_user_request_marker
 global runtime_serial_write_ring3_probe_marker
 
 %define COM1 0x03f8
@@ -193,6 +197,22 @@ privilege_tables_ok_marker_end:
 ring3_enter_marker:
     db "KOZO_RING3_ENTER", 13, 10
 ring3_enter_marker_end:
+
+user_request_copy_in_marker:
+    db "KOZO_USER_REQUEST_COPY_IN_OK", 13, 10
+user_request_copy_in_marker_end:
+
+user_request_service_marker:
+    db "KOZO_USER_REQUEST_SERVICE_OK", 13, 10
+user_request_service_marker_end:
+
+user_response_copy_out_marker:
+    db "KOZO_USER_RESPONSE_COPY_OUT_OK", 13, 10
+user_response_copy_out_marker_end:
+
+fixed_user_request_marker:
+    db "KOZO_FIXED_USER_REQUEST_OK", 13, 10
+fixed_user_request_marker_end:
 
 ring3_probe_ok_marker:
     db "KOZO_RING3_PROBE_OK", 13, 10
@@ -546,6 +566,22 @@ runtime_serial_write_second_capability_marker:
 
 runtime_serial_write_ring3_enter_marker:
     WRITE_COM1_MARKER ring3_enter_marker, ring3_enter_marker_end
+    ret
+
+runtime_serial_write_user_request_copy_in_marker:
+    WRITE_COM1_MARKER user_request_copy_in_marker, user_request_copy_in_marker_end
+    ret
+
+runtime_serial_write_user_request_service_marker:
+    WRITE_COM1_MARKER user_request_service_marker, user_request_service_marker_end
+    ret
+
+runtime_serial_write_user_response_copy_out_marker:
+    WRITE_COM1_MARKER user_response_copy_out_marker, user_response_copy_out_marker_end
+    ret
+
+runtime_serial_write_fixed_user_request_marker:
+    WRITE_COM1_MARKER fixed_user_request_marker, fixed_user_request_marker_end
     ret
 
 runtime_serial_write_ring3_probe_marker:

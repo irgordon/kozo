@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KOZO fixed user request boundary contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "source_files",
+    "execution_point",
+    "request",
+    "response",
+    "kernel_shadows",
+    "fixed_service",
+    "copy_boundary",
+    "page_permissions",
+    "buffer_clearing",
+    "marker_order",
+    "marker_ownership",
+    "failure_statuses",
+    "halt_behavior",
+    "claim_boundary",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {"const": 0},
+    "architecture": {"const": "x86_64"},
+    "source_files": {"$ref": "#/$defs/sourceFiles"},
+    "execution_point": {"type": "object"},
+    "request": {"$ref": "#/$defs/request"},
+    "response": {"$ref": "#/$defs/response"},
+    "kernel_shadows": {"type": "object"},
+    "fixed_service": {"type": "object"},
+    "copy_boundary": {"type": "object"},
+    "page_permissions": {"type": "object"},
+    "buffer_clearing": {"type": "object"},
+    "marker_order": {"$ref": "#/$defs/nonEmptyStrings"},
+    "marker_ownership": {"type": "object"},
+    "failure_statuses": {"type": "object"},
+    "halt_behavior": {"type": "object"},
+    "claim_boundary": {"type": "object"},
+    "non_goals": {"$ref": "#/$defs/nonEmptyStrings"}
+  },
+  "$defs": {
+    "nonEmptyString": {"type": "string", "pattern": ".*\\S.*"},
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/nonEmptyString"}
+    },
+    "sourceFiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["boot", "privilege_transition", "paging", "layout", "linker"],
+      "properties": {
+        "boot": {"const": "kernel/arch/x86_64/boot.asm"},
+        "privilege_transition": {"const": "kernel/arch/x86_64/privilege_transition.asm"},
+        "paging": {"const": "kernel/arch/x86_64/paging.asm"},
+        "layout": {"const": "kernel/arch/x86_64/runtime_layout.inc"},
+        "linker": {"const": "linker/kernel.ld"}
+      }
+    },
+    "field": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "offset", "size"],
+      "properties": {
+        "name": {"$ref": "#/$defs/nonEmptyString"},
+        "offset": {"type": "integer", "minimum": 0},
+        "size": {"enum": [4, 8]}
+      }
+    },
+    "request": {
+      "type": "object",
+      "required": [
+        "name",
+        "identifier",
+        "version",
+        "virtual_address",
+        "page_offset",
+        "size_bytes",
+        "alignment_bytes",
+        "physical_backing_symbol",
+        "sequence",
+        "payload",
+        "flags",
+        "reserved",
+        "fields"
+      ],
+      "properties": {
+        "name": {"const": "FIXED_USER_BOUNDARY_PROBE"},
+        "identifier": {"const": 1},
+        "version": {"const": 1},
+        "virtual_address": {"const": "0x0000400000001000"},
+        "page_offset": {"const": 0},
+        "size_bytes": {"const": 40},
+        "alignment_bytes": {"const": 8},
+        "physical_backing_symbol": {"const": "user_probe_data_start"},
+        "sequence": {"const": 1},
+        "payload": {"type": "string"},
+        "flags": {"const": 0},
+        "reserved": {"const": 0},
+        "fields": {"type": "array", "minItems": 8, "items": {"$ref": "#/$defs/field"}}
+      }
+    },
+    "response": {
+      "type": "object",
+      "required": [
+        "version",
+        "request_identifier",
+        "success_status",
+        "virtual_address",
+        "page_offset",
+        "size_bytes",
+        "alignment_bytes",
+        "physical_backing_symbol",
+        "observed_user_cpl",
+        "observed_kernel_cpl",
+        "fields"
+      ],
+      "properties": {
+        "version": {"const": 1},
+        "request_identifier": {"const": 1},
+        "success_status": {"const": 0},
+        "virtual_address": {"const": "0x0000400000001080"},
+        "page_offset": {"const": 128},
+        "size_bytes": {"const": 48},
+        "alignment_bytes": {"const": 8},
+        "physical_backing_symbol": {"const": "user_probe_data_start"},
+        "observed_user_cpl": {"const": 3},
+        "observed_kernel_cpl": {"const": 0},
+        "fields": {"type": "array", "minItems": 9, "items": {"$ref": "#/$defs/field"}}
+      }
+    }
+  }
+}
