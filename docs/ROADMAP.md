@@ -103,7 +103,9 @@ The current repository proves:
 * hosted-CI-proven contract-backed three-iteration controlled Odin loop with linked-symbol, backward-edge, terminal-comparison, marker-order, and halt-continuation validation
 * hosted-CI-proven versioned internal runtime status query with fixed request/response geometry, explicit dispatch, response validation, linked-symbol evidence, and governed capability markers
 * hosted-CI-proven boot-CPU x87/SSE initialization with CPUID checks, CR0/CR4 readback, x87/MXCSR validation, and one bounded SSE2 probe before Odin entry
-* locally evidenced capability ID 2 path for one fixed boot-owned READY/0-to-ACTIVE/1 volatile state transition and validated response
+* hosted-CI-proven capability ID 2 path for one fixed boot-owned READY/0-to-ACTIVE/1 volatile state transition and validated response
+* hosted-CI-proven fixed user-mapping foundation with supervisor-only kernel leaves, user RX/RW-NX pages, effective U/S propagation, W^X, exact CR3 readback, and bounded survival
+* locally evidenced fixed CPL0-to-CPL3 `iretq` probe, DPL3 `int 0x81` return through TSS.RSP0, saved-frame/token validation, fixed CPL0 continuation, and unchanged capability/halt suffix
 
 The latest local generated evidence may still report missing local Limine/xorriso tooling, but CI run `27894312430` proves the narrow QEMU serial smoke path.
 
@@ -113,12 +115,12 @@ The latest local generated evidence may still report missing local Limine/xorris
 
 KOZO still does not prove:
 
-* hosted QEMU proof of the v0.8.3 fixed user-mapping marker sequence and evidence checks
+* hosted QEMU proof of the v0.8.4 fixed privilege-transition marker sequence and evidence checks
 * complete Odin runtime readiness or dynamic initialization
 * general stack readiness beyond the controlled boot stack proof
 * general memory management beyond the governed static region
 * runtime progression beyond the bounded call and governed halt continuation
-* userspace planning and execution remain unproven
+* general userspace planning and execution remain unproven beyond the fixed boot-time CPL3 probe
 * AVX, XSAVE, extended-state context switching, and floating-point exception recovery remain unproven
 * syscall dispatch during boot
 * hardware halt instruction semantics
@@ -137,11 +139,11 @@ KOZO still does not prove:
 
 # 9. Current Active Blocker
 
-No local v0.8.3 runtime blocker is active. Hosted CI confirmation of the fixed
-mapping markers, both paging validators, effective permission policy, focused
-ELF evidence, preserved capabilities, governed return, and halt remains
-required before phase acceptance. Local verification passes 59 checks with 0
-failures.
+No local v0.8.4 runtime blocker is active. Hosted CI confirmation of the fixed
+privilege markers, both privilege validators, descriptor and stack geometry,
+saved-frame/token validation, focused ELF evidence, preserved capabilities,
+governed return, and halt remains required before phase acceptance.
+Local verification passes 61 checks with 0 failures and 856 unit tests.
 
 ---
 
@@ -159,9 +161,10 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 8. Keep the terminal halt path authoritative after the bounded Odin call.
 9. Keep physical memory discovery, general virtual memory management, allocators, heaps, dynamic Odin initialization, and userspace outside the current proof.
 10. Preserve the hosted-accepted v0.8.1 CPU-state boundary before all Odin capability work.
-11. Accept v0.8.3 only after hosted CI confirms the complete fixed-mapping boundary, both validators, effective U/S and W^X, and the unchanged runtime suffix.
-12. After acceptance, implement one bounded privilege-transition probe without broad userspace, process, syscall, or isolation claims.
-13. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
+11. Preserve the hosted-accepted v0.8.3 fixed-mapping boundary, both validators, effective U/S and W^X, and the unchanged runtime suffix.
+12. Accept v0.8.4 only after hosted CI confirms the fixed `iretq` entry, CPL3 probe, `int 0x81` return, saved-frame validation, fixed continuation, and unchanged runtime suffix.
+13. Select the next implementation milestone from hosted v0.8.4 evidence; do not promote the fixed probe into general userspace.
+14. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
 
 ---
 

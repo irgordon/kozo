@@ -637,3 +637,31 @@ through volatile accesses, validated the fixed response, and preserved return
 and halt. It does not prove arbitrary mutable kernel services, concurrency,
 atomicity, userspace access, authorization, persistence, process isolation, or
 production readiness.
+
+---
+
+# 17. Bounded Privilege-Transition Evidence
+
+v0.8.4 local QEMU evidence captures:
+
+```text
+KOZO_USER_MAPPING_SURVIVAL_OK
+KOZO_PRIVILEGE_TRANSITION_INIT_START
+KOZO_PRIVILEGE_TABLES_OK
+KOZO_RING3_ENTER
+KOZO_RING3_PROBE_OK
+KOZO_RING0_RETURN_OK
+KOZO_RUNTIME_PROGRESS_ENTRY
+```
+
+The contract validator proves the fixed policy. The evidence validator
+correlates source structure, linked symbols and instruction paths, QEMU
+metadata/log ordering, failure exclusions, the fixed mapping prerequisite,
+continued Odin capabilities, and terminal halt convergence.
+
+The strongest local runtime claim is one fixed CPL3 instruction path with a
+bounded stack/token probe and one fixed interrupt-gate return whose saved
+CPL3 frame was validated in CPL0. This does not prove arbitrary userspace,
+process isolation, a public syscall ABI, return to Ring 3, general interrupt
+handling, exception recovery, compatibility, or production readiness. Hosted
+CI remains the phase acceptance authority.

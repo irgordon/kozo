@@ -269,7 +269,7 @@ def valid_report():
             "cr3_read_present": True,
             "cr3_write_present": True,
             "software_walk_present": True,
-            "prohibited_transition_instructions": [],
+            "paging_module_transition_instructions": [],
         }
     }
 

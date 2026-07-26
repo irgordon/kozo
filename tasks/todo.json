@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO Fixed User-Mapping Foundation v0.8.3",
+  "task_title": "KOZO Bounded Privilege-Transition Probe v0.8.4",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -15,6 +15,7 @@
     "v0.8.0 first governed runtime capability evidence is accepted by hosted CI",
     "v0.8.1 CPU extended-state initialization evidence is accepted by hosted CI with 55 checks and 0 failures",
     "v0.8.2 governed runtime state-transition capability evidence is accepted by hosted CI with 57 checks and 0 failures",
+    "v0.8.3 fixed user-mapping evidence is accepted by hosted CI with 59 checks and 0 failures",
     "The reconciled runtime progression graph is acyclic and permits first capability evidence only after controlled loop evidence",
     "Odin, pinned Rust, Python, jq, and repository verification tooling are installed"
   ],
@@ -24,7 +25,8 @@
     "KOZO_FIRST_CAPABILITY_OK requires a validated request, exact dispatch, validated response, and KOZO_RUNTIME_RETURN_OK still requires exact status zero",
     "CPU extended-state initialization executes in assembly after memory evidence and before the first Odin call",
     "Capability ID 1 remains read-only and owns the single generic dispatch marker",
-    "This phase adds only one fixed KOZO-owned four-level hierarchy, one user RX page, two user RW-NX pages, focused paging evidence, validators, task state, and documentation; public ABI, syscalls, runtime capabilities, stage order, Ring 3 behavior, and terminal halt authority remain unchanged"
+    "The accepted fixed user-mapping foundation provides the only user RX code page and user RW-NX data/stack pages consumed by this phase",
+    "This phase adds one fixed iretq CPL3 probe, one fixed DPL3 int 0x81 return, focused privilege evidence, validators, task state, and documentation; public ABI, syscalls, runtime capabilities, stage order, general userspace, and terminal halt authority remain unchanged"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -2656,6 +2658,70 @@
         "verification.tests_run[143]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 79,
+      "title": "Implement the bounded privilege-transition probe",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "kernel/arch/x86_64/boot.asm",
+        "kernel/arch/x86_64/paging.asm",
+        "kernel/arch/x86_64/privilege_transition.asm",
+        "kernel/arch/x86_64/runtime_layout.inc",
+        "linker/kernel.ld",
+        "contracts/runtime_evidence_taxonomy.v0.json",
+        "contracts/bounded_privilege_transition_probe_contract.v0.json",
+        "schemas/bounded_privilege_transition_probe_contract.schema.json",
+        "schemas/latest_verify.schema.json",
+        "harness/bounded_privilege_transition_probe_contract.py",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/bounded_privilege_transition_probe_contract.py",
+        "harness/validators_impl/bounded_privilege_transition_probe_evidence.py",
+        "harness/validators_impl/fixed_user_mapping_foundation_evidence.py",
+        "harness/validators_impl/qemu_smoke_evidence.py",
+        "harness/validators_impl/runtime_evidence_taxonomy.py",
+        "harness/validators_impl/schema.py",
+        "harness/validators_impl/validator_coverage.py",
+        "scripts/build_boot_image.sh",
+        "scripts/kernel_elf_report.py",
+        "scripts/qemu_smoke.sh",
+        "tests/test_bounded_privilege_transition_probe_contract.py",
+        "tests/test_bounded_privilege_transition_probe_evidence.py",
+        "tests/test_fixed_user_mapping_foundation_evidence.py",
+        "tests/test_qemu_smoke_evidence.py",
+        "tests/test_runtime_evidence_taxonomy.py",
+        "docs/ARCHITECTURE.md",
+        "docs/BOOT.md",
+        "docs/CONTRACTS.md",
+        "docs/INVARIANTS.md",
+        "docs/PAGING.md",
+        "docs/PRIVILEGE_TRANSITION.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/REQUIRED_CHECKS.md",
+        "docs/VALIDATION.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/CODEBASE_AUDIT.md",
+        "docs/SECURITY_MODEL.md",
+        "docs/CODING_STYLE.md",
+        "docs/RUNTIME_CAPABILITIES.md",
+        "docs/generated/governance_index.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.summary.txt"
+      ],
+      "verification_refs": [
+        "verification.tests_run[144]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -3443,6 +3509,11 @@
         "tool": "final JSON, generated governance, and diff validation",
         "command": "python3 -m json.tool and jq for 9 final JSON files; direct governance_index_report validation; git diff --check",
         "status": "passed"
+      },
+      {
+        "tool": "bounded privilege-transition validation",
+        "command": "focused Python tests; full Python discovery; odin check kernel; configured build and QEMU smoke; nm and objdump inspection",
+        "status": "passed_local_61_checks_856_tests_33_markers"
       }
     ],
     "logs": [

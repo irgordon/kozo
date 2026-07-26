@@ -547,3 +547,19 @@ selection is direct, request and response geometry is validated before use,
 state mutation is limited to the named boot-owned object, evidence follows
 volatile readback and response validation, and failure cannot emit success or
 bypass the terminal halt path.
+
+---
+
+# 17. Privilege-Transition Invariants
+
+The bounded privilege probe may enter only the fixed linked CPL3 target with
+fixed selectors, a fixed user stack, sanitized RFLAGS, and validated user
+mapping permissions. The return may arrive only through vector `0x81`, switch
+through the fixed TSS.RSP0 stack, and resume only the fixed CPL0 continuation.
+
+Ring 3 success requires direct privilege evidence from the hardware-saved
+frame plus the fixed stack/token probe. Descriptor, stack, entry, frame, token,
+or continuation failure must suppress every later success marker and converge
+on the terminal halt path. This invariant does not promote the probe into
+general userspace, a syscall interface, process isolation, or general
+interrupt handling.

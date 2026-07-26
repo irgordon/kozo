@@ -327,3 +327,20 @@ The decision record must include:
 * reviewer or maintainer approval
 
 Release decision records may be stored in release notes, issue trackers, or a later governed release record file.
+
+---
+
+# 15. v0.8.4 Privilege-Transition Gate
+
+For v0.8.4 and later, confirm:
+
+* both bounded privilege-transition validators pass;
+* the accepted fixed user-mapping validators remain green;
+* ELF evidence records fixed GDT, TSS, IDT, stack, user-target, return-handler, continuation, `iretq`, and `int 0x81` paths;
+* hosted QEMU captures all five privilege markers between mapping survival and Odin entry;
+* the complete capability suffix and terminal halt remain present;
+* no known failure path emits Ring3-probe, Ring0-return, or runtime-return success.
+
+Reject any release claim that treats this fixed boot-time probe as general
+userspace, process isolation, public syscall handling, exception recovery, or
+production readiness.

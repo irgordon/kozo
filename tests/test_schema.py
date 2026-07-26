@@ -6,7 +6,14 @@ from pathlib import Path
 from unittest.mock import patch
 
 from harness.aggregator import run_aggregator
-from harness.codes import CODES, MEMORY_INITIALIZATION_EVIDENCE_INVALID, OK, SCHEMA_INVALID
+from harness.codes import (
+    BOUNDED_PRIVILEGE_TRANSITION_PROBE_CONTRACT_INVALID,
+    BOUNDED_PRIVILEGE_TRANSITION_PROBE_EVIDENCE_INVALID,
+    CODES,
+    MEMORY_INITIALIZATION_EVIDENCE_INVALID,
+    OK,
+    SCHEMA_INVALID,
+)
 from harness.validator import ValidationResult
 from harness.validators_impl.schema import SchemaValidator, validate_named_document
 
@@ -54,6 +61,44 @@ class SchemaValidatorTests(unittest.TestCase):
         self.assertEqual(artifact["summary_code"], MEMORY_INITIALIZATION_EVIDENCE_INVALID)
         self.assertEqual(artifact["checks"][0]["code"], MEMORY_INITIALIZATION_EVIDENCE_INVALID)
         self.assertEqual(artifact["failed_checks"][0]["code"], MEMORY_INITIALIZATION_EVIDENCE_INVALID)
+
+    def test_privilege_transition_checks_serialize_in_aggregate_report(self):
+        collected = [
+            (
+                "bounded_privilege_transition_probe_contract",
+                "bounded_privilege_transition_probe_contract",
+                ValidationResult.fail(
+                    code=BOUNDED_PRIVILEGE_TRANSITION_PROBE_CONTRACT_INVALID,
+                    detail="Contract failure remains visible",
+                ),
+            ),
+            (
+                "bounded_privilege_transition_probe_evidence",
+                "bounded_privilege_transition_probe_evidence",
+                ValidationResult.fail(
+                    code=BOUNDED_PRIVILEGE_TRANSITION_PROBE_EVIDENCE_INVALID,
+                    detail="Evidence failure remains visible",
+                ),
+            ),
+        ]
+
+        with patch("harness.aggregator._collect_results", return_value=collected):
+            artifact = run_aggregator(
+                {},
+                changed_files=[],
+                evidence_files=[],
+                run_id="privilege-transition-schema-regression",
+                generated_at="2026-07-26T00:00:00Z",
+            )
+
+        validate_named_document("latest_verify", artifact)
+        self.assertEqual(
+            [check["name"] for check in artifact["failed_checks"]],
+            [
+                "bounded_privilege_transition_probe_contract",
+                "bounded_privilege_transition_probe_evidence",
+            ],
+        )
 
 
 def latest_verify_schema_path() -> Path:

@@ -1087,3 +1087,26 @@ Status: Implemented and locally evidenced; hosted CI pending.
 The page-table implementation is intentionally fixed and architecture-local.
 It adds no frame allocator, map/unmap API, page-fault recovery, Ring 3
 execution, process isolation, compatibility claim, or production claim.
+
+---
+
+# 33. v0.8.4 Bounded Privilege-Transition Probe
+
+Date: 2026-07-26
+
+Status: Implemented and locally evidenced; hosted CI pending.
+
+| ID | Status | Rationale |
+| --- | --- | --- |
+| AUDIT-084-001 | Resolved locally | One fixed seven-entry GDT, 104-byte TSS, 4096-byte IDT, dedicated privilege-return stack, and dedicated double-fault stack own the exact transition geometry. |
+| AUDIT-084-002 | Resolved locally | The only CPL3 target is the fixed linked probe; selectors, RFLAGS, user RIP/RSP, mappings, and the `iretq` frame are validated before entry. |
+| AUDIT-084-003 | Resolved locally | The DPL3 `int 0x81` handler validates the hardware-saved CPL3 frame, fixed token, fixed return reason, and TSS.RSP0 stack before restoring one fixed CPL0 continuation. |
+| AUDIT-084-004 | Resolved locally | Consequential architectural faults and every explicit setup/entry/return failure converge on the existing terminal halt without later success markers. |
+| AUDIT-084-005 | Hosted confirmation pending | Local QEMU captures the complete 33-marker sequence; hosted CI must confirm identical ordering and both bounded privilege-transition validators. |
+| AUDIT-064-002 | Deferred | `validator_coverage.py` remains above the preferred split threshold; decomposition is outside this runtime phase. |
+| AUDIT-073-001 | Deferred | The existing Rust package license metadata warning remains release-hardening work. |
+
+The implementation is intentionally fixed and assembly-owned. It adds no
+general GDT/IDT manager, public syscall ABI, process abstraction, scheduler,
+return-to-user path, exception recovery, compatibility claim, or production
+claim.

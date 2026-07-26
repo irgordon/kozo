@@ -1,5 +1,7 @@
 bits 64
 
+%include "kernel/arch/x86_64/runtime_layout.inc"
+
 global initialize_fixed_user_mapping_tables
 global validate_fixed_user_mapping_policy
 global activate_fixed_user_mapping_root
@@ -16,8 +18,6 @@ global governed_page_tables_start
 global governed_page_tables_end
 global governed_page_table_root_physical
 global observed_governed_cr3
-global user_probe_code_start
-global user_probe_code_end
 global user_probe_data_start
 global user_probe_data_end
 global user_probe_stack
@@ -34,8 +34,10 @@ extern __kernel_data_end
 extern __kernel_bss_start
 extern __kernel_bss_end
 extern __kernel_loaded_image_end
+extern user_probe_code_start
+extern user_probe_code_end
 
-%define PAGE_SIZE 4096
+%define PAGE_SIZE KOZO_PAGE_SIZE
 %define PAGE_QWORDS 512
 %define GOVERNED_TABLE_PAGE_COUNT 7
 %define GOVERNED_TABLE_BYTES (GOVERNED_TABLE_PAGE_COUNT * PAGE_SIZE)
@@ -64,10 +66,6 @@ extern __kernel_loaded_image_end
 %define USER_PML4_INDEX 128
 %define USER_PDPT_INDEX 0
 %define USER_PD_INDEX 0
-
-%define USER_PROBE_CODE_VA 0x0000400000000000
-%define USER_PROBE_DATA_VA 0x0000400000001000
-%define USER_PROBE_STACK_VA 0x0000400000002000
 
 %define USER_MAPPING_OK 0
 %define USER_MAPPING_PAGING_MODE_UNSUPPORTED 1
@@ -103,12 +101,6 @@ section .limine_requests_end progbits alloc write align=8
 limine_requests_end_marker:
     dq 0xadc0e0531bb10d03
     dq 0x9572709f31764c62
-
-section .user_probe_code progbits alloc exec nowrite align=4096
-align 4096
-user_probe_code_start:
-    times PAGE_SIZE db 0x90
-user_probe_code_end:
 
 section .user_probe_data nobits alloc noexec write align=4096
 align 4096

@@ -445,3 +445,21 @@ geometry, effective U/S and W^X policy, exact CR3 readback, bounded survival,
 the unchanged capability suffix, and terminal halt. This proves no Ring 3,
 process isolation, general virtual memory, dynamic mapping, page-fault
 recovery, compatibility, or production readiness.
+
+---
+
+# 13. v0.8.4 Privilege-Transition Evidence
+
+Release review must include the bounded privilege-transition contract, both
+privilege validators, the kernel ELF report, QEMU metadata and serial log, and
+the unchanged fixed-mapping, capability, return, and halt evidence.
+
+Acceptance requires the five privilege markers between mapping survival and
+Odin entry, fixed GDT/TSS/IDT and stack geometry, `iretq` entry, fixed
+`int 0x81` return, hardware-saved CPL3 frame validation, fixed-token
+validation and cleanup, one fixed CPL0 continuation, and no later success
+marker on a known failure path.
+
+This evidence proves one fixed CPL3 excursion only. It does not prove general
+userspace, process isolation, a public syscall ABI, general interrupt or
+exception handling, compatibility, or production readiness.

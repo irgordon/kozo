@@ -192,3 +192,19 @@ hardware syscall boundary. The capability can mutate only the named
 boot-owned state cell from READY/0 to ACTIVE/1. It exposes no arbitrary target
 address, dynamic registration, concurrency guarantee, atomic multi-thread
 semantics, or persistent state.
+
+---
+
+# 16. Bounded Privilege-Transition Boundary
+
+v0.8.4 proves one fixed CPL3 excursion and return. Ring 0 selects the target,
+selectors, RFLAGS, user stack, token address, interrupt vector, return stack,
+and CPL0 continuation. The CPL3 stub cannot choose an arbitrary kernel target
+or pointer. The handler accepts only the fixed vector path and validates the
+hardware-saved CPL3 frame and fixed probe state before continuation.
+
+This boundary is not a process, sandbox, authentication or authorization
+system, public syscall surface, arbitrary user-code facility, exception
+recovery system, or general interrupt subsystem. The current fixed mappings
+do not establish isolation between processes, and the probe does not return to
+Ring 3.

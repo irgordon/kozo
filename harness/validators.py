@@ -49,6 +49,8 @@ from harness.validators_impl.cpu_extended_state_initialization_contract import C
 from harness.validators_impl.cpu_extended_state_initialization_evidence import CpuExtendedStateInitializationEvidenceValidator
 from harness.validators_impl.fixed_user_mapping_foundation import FixedUserMappingFoundationValidator
 from harness.validators_impl.fixed_user_mapping_foundation_evidence import FixedUserMappingFoundationEvidenceValidator
+from harness.validators_impl.bounded_privilege_transition_probe_contract import BoundedPrivilegeTransitionProbeContractValidator
+from harness.validators_impl.bounded_privilege_transition_probe_evidence import BoundedPrivilegeTransitionProbeEvidenceValidator
 from harness.validators_impl.runtime_state_transition_capability import RuntimeStateTransitionCapabilityValidator
 from harness.validators_impl.runtime_state_transition_capability_evidence import RuntimeStateTransitionCapabilityEvidenceValidator
 from harness.validators_impl.boot_blocker_report import BootBlockerReportValidator
@@ -110,6 +112,8 @@ _VALIDATOR_CLASSES_BY_NAME: Dict[str, Type[BaseValidator]] = {
     "cpu_extended_state_initialization_evidence": CpuExtendedStateInitializationEvidenceValidator,
     "fixed_user_mapping_foundation": FixedUserMappingFoundationValidator,
     "fixed_user_mapping_foundation_evidence": FixedUserMappingFoundationEvidenceValidator,
+    "bounded_privilege_transition_probe_contract": BoundedPrivilegeTransitionProbeContractValidator,
+    "bounded_privilege_transition_probe_evidence": BoundedPrivilegeTransitionProbeEvidenceValidator,
     "runtime_state_transition_capability": RuntimeStateTransitionCapabilityValidator,
     "runtime_state_transition_capability_evidence": RuntimeStateTransitionCapabilityEvidenceValidator,
     "boot_blocker_report": BootBlockerReportValidator,

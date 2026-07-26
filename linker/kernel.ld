@@ -72,12 +72,26 @@ SECTIONS
 
   ASSERT((user_probe_code_end - user_probe_code_start) == 4K,
          "user probe code backing must be one page")
+  ASSERT(user_privilege_probe_start == user_probe_code_start,
+         "user privilege probe must begin at the user code page")
+  ASSERT(user_privilege_probe_end <= user_probe_code_end,
+         "user privilege probe must remain inside one code page")
   ASSERT((user_probe_data_end - user_probe_data_start) == 4K,
          "user probe data backing must be one page")
   ASSERT((user_probe_stack_top - user_probe_stack) == 4K,
          "user probe stack backing must be one page")
   ASSERT((governed_page_tables_end - governed_page_tables_start) == 28K,
          "governed page-table storage must be seven pages")
+  ASSERT((governed_gdt_end - governed_gdt) == 56,
+         "governed GDT must contain seven descriptor slots")
+  ASSERT((governed_tss_end - governed_tss) == 104,
+         "governed TSS must be exactly 104 bytes")
+  ASSERT((governed_idt_end - governed_idt) == 4K,
+         "governed IDT must be exactly one page")
+  ASSERT((privilege_return_stack_top - privilege_return_stack) == 4K,
+         "privilege return stack must be exactly one page")
+  ASSERT((double_fault_stack_top - double_fault_stack) == 4K,
+         "double-fault stack must be exactly one page")
   ASSERT((__kernel_loaded_image_end - __kernel_image_start) < 2M,
          "fixed kernel mappings must fit one page table")
 }

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KOZO bounded privilege-transition probe contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "source_files",
+    "transition",
+    "selectors",
+    "gdt",
+    "tss",
+    "idt",
+    "stacks",
+    "entry",
+    "probe",
+    "return_boundary",
+    "success_markers",
+    "failure_statuses",
+    "claim_boundary",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {"const": 0},
+    "architecture": {"const": "x86_64"},
+    "source_files": {"$ref": "#/$defs/sourceFiles"},
+    "transition": {"$ref": "#/$defs/transition"},
+    "selectors": {"$ref": "#/$defs/selectors"},
+    "gdt": {"$ref": "#/$defs/table"},
+    "tss": {"type": "object"},
+    "idt": {"$ref": "#/$defs/table"},
+    "stacks": {"type": "object"},
+    "entry": {"type": "object"},
+    "probe": {"type": "object"},
+    "return_boundary": {"type": "object"},
+    "success_markers": {"$ref": "#/$defs/nonEmptyStrings"},
+    "failure_statuses": {"type": "object"},
+    "claim_boundary": {"type": "object"},
+    "non_goals": {"$ref": "#/$defs/nonEmptyStrings"}
+  },
+  "$defs": {
+    "nonEmptyString": {"type": "string", "pattern": ".*\\S.*"},
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/nonEmptyString"}
+    },
+    "sourceFiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["boot", "privilege_transition", "paging", "layout", "linker"],
+      "properties": {
+        "boot": {"const": "kernel/arch/x86_64/boot.asm"},
+        "privilege_transition": {"const": "kernel/arch/x86_64/privilege_transition.asm"},
+        "paging": {"const": "kernel/arch/x86_64/paging.asm"},
+        "layout": {"const": "kernel/arch/x86_64/runtime_layout.inc"},
+        "linker": {"const": "linker/kernel.ld"}
+      }
+    },
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entry_privilege",
+        "target_privilege",
+        "entry_mechanism",
+        "return_mechanism",
+        "returns_to_user",
+        "interrupts_enabled"
+      ],
+      "properties": {
+        "entry_privilege": {"const": 0},
+        "target_privilege": {"const": 3},
+        "entry_mechanism": {"const": "iretq"},
+        "return_mechanism": {"const": "int_0x81_interrupt_gate"},
+        "returns_to_user": {"const": false},
+        "interrupts_enabled": {"const": false}
+      }
+    },
+    "selectors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kernel_code", "kernel_data", "user_data", "user_code", "tss"],
+      "properties": {
+        "kernel_code": {"const": "0x08"},
+        "kernel_data": {"const": "0x10"},
+        "user_data": {"const": "0x1b"},
+        "user_code": {"const": "0x23"},
+        "tss": {"const": "0x28"}
+      }
+    },
+    "table": {
+      "type": "object",
+      "required": ["start_symbol", "end_symbol", "size_bytes", "alignment_bytes"]
+    }
+  }
+}

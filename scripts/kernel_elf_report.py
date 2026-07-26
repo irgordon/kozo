@@ -93,6 +93,41 @@ FIXED_USER_MAPPING_SYMBOLS = (
     "user_probe_stack",
     "user_probe_stack_top",
 )
+PRIVILEGE_TRANSITION_SYMBOLS = (
+    "initialize_privilege_transition",
+    "clear_privilege_transition_storage",
+    "initialize_governed_tss",
+    "initialize_governed_gdt",
+    "populate_tss_descriptor",
+    "load_governed_tss",
+    "initialize_governed_idt",
+    "set_idt_gate",
+    "validate_privilege_transition_tables",
+    "validate_privilege_return_gate",
+    "validate_user_probe_entry",
+    "enter_bounded_ring3_probe",
+    "governed_gdt",
+    "governed_gdt_end",
+    "governed_tss",
+    "governed_tss_end",
+    "governed_idt",
+    "governed_idt_end",
+    "privilege_return_stack",
+    "privilege_return_stack_top",
+    "double_fault_stack",
+    "double_fault_stack_top",
+    "user_privilege_probe_start",
+    "user_privilege_probe_end",
+    "privilege_return_handler",
+    "validate_ring3_return_frame",
+    "privilege_ring0_continuation",
+    "privilege_fault_sink",
+    "privilege_double_fault_sink",
+    "observed_governed_gdtr",
+    "observed_governed_idtr",
+    "observed_task_register",
+    "boot_terminal_halt",
+)
 FIXED_MAPPING_TRANSITION_MNEMONICS = {
     "iretq",
     "syscall",
@@ -222,6 +257,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
             *CPU_EXTENDED_STATE_SYMBOLS,
             *RUNTIME_STATE_TRANSITION_SYMBOLS,
             *FIXED_USER_MAPPING_SYMBOLS,
+            *PRIVILEGE_TRANSITION_SYMBOLS,
         ),
     )
     symbol_address = symbols.get("_start")
@@ -252,6 +288,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "cpu_extended_state_initialization": cpu_extended_state_record(kernel_elf, symbols),
         "runtime_state_transition_capability": runtime_state_transition_record(kernel_elf, symbols),
         "fixed_user_mapping_foundation": fixed_user_mapping_record(kernel_elf, symbols),
+        "bounded_privilege_transition_probe": bounded_privilege_transition_record(kernel_elf, symbols),
         "program_header_count": header.program_header_count,
         "section_count": header.section_header_count,
         "load_segments": [segment_record(segment) for segment in load_segments],
@@ -530,9 +567,6 @@ def fixed_user_mapping_record(
     kernel_elf: Path,
     symbols: dict[str, int],
 ) -> dict[str, object]:
-    all_instructions = parse_disassembly_instructions(
-        run_text_command(["objdump", "-d", str(kernel_elf)])
-    )
     paging_instructions = [
         instruction
         for symbol in FIXED_USER_MAPPING_SYMBOLS[:5]
@@ -578,14 +612,125 @@ def fixed_user_mapping_record(
             for _, mnemonic, operands in paging_instructions
         ),
         "software_walk_present": "walk_page_mapping" in symbols,
-        "prohibited_transition_instructions": sorted(
+        "paging_module_transition_instructions": sorted(
             {
                 mnemonic
-                for _, mnemonic, _ in all_instructions
+                for _, mnemonic, _ in paging_instructions
                 if mnemonic in FIXED_MAPPING_TRANSITION_MNEMONICS
             }
         ),
     }
+
+
+def bounded_privilege_transition_record(
+    kernel_elf: Path,
+    symbols: dict[str, int],
+) -> dict[str, object]:
+    instruction_sets = {
+        symbol: parse_disassembly_instructions(disassemble_symbol(kernel_elf, symbol))
+        for symbol in PRIVILEGE_TRANSITION_SYMBOLS
+        if symbol in symbols
+    }
+    return {
+        "symbols": symbol_record(symbols, PRIVILEGE_TRANSITION_SYMBOLS),
+        "gdt": _symbol_range_record(symbols, "governed_gdt", "governed_gdt_end", 56, 16),
+        "tss": _symbol_range_record(symbols, "governed_tss", "governed_tss_end", 104, 16),
+        "idt": _symbol_range_record(symbols, "governed_idt", "governed_idt_end", 4096, 4096),
+        "return_stack": _symbol_range_record(
+            symbols, "privilege_return_stack", "privilege_return_stack_top", 4096, 4096
+        ),
+        "double_fault_stack": _symbol_range_record(
+            symbols, "double_fault_stack", "double_fault_stack_top", 4096, 4096
+        ),
+        "user_probe": _symbol_range_record(
+            symbols,
+            "user_privilege_probe_start",
+            "user_privilege_probe_end",
+            _symbol_delta(symbols, "user_privilege_probe_start", "user_privilege_probe_end"),
+            1,
+        ),
+        "pre_odin_call_order_valid": _privilege_call_order_valid(kernel_elf, symbols),
+        "lgdt_present": _instruction_present(instruction_sets, "lgdt"),
+        "sgdt_present": _instruction_present(instruction_sets, "sgdt"),
+        "ltr_present": _instruction_present(instruction_sets, "ltr"),
+        "str_present": _instruction_present(instruction_sets, "str"),
+        "lidt_present": _instruction_present(instruction_sets, "lidt"),
+        "sidt_present": _instruction_present(instruction_sets, "sidt"),
+        "iretq_present": _instruction_present(instruction_sets, "iretq"),
+        "int_0x81_present": _int_vector_present(
+            instruction_sets.get("user_privilege_probe_start", []),
+            0x81,
+        ),
+        "handler_continuation_jump_present": _jumps_address(
+            instruction_sets.get("privilege_return_handler", []),
+            symbols.get("privilege_ring0_continuation"),
+        ),
+        "fault_halt_paths_present": _fault_halt_paths_present(instruction_sets, symbols),
+        "prohibited_instructions": _privilege_prohibited_instructions(instruction_sets),
+    }
+
+
+def _symbol_delta(symbols: dict[str, int], start_name: str, end_name: str) -> int:
+    start = symbols.get(start_name)
+    end = symbols.get(end_name)
+    return end - start if start is not None and end is not None else -1
+
+
+def _privilege_call_order_valid(kernel_elf: Path, symbols: dict[str, int]) -> bool:
+    all_instructions = parse_disassembly_instructions(
+        run_text_command(["objdump", "-d", str(kernel_elf)])
+    )
+    instructions = _instructions_for_symbol(all_instructions, "_start", symbols)
+    required = (
+        symbols.get("initialize_privilege_transition"),
+        symbols.get("enter_bounded_ring3_probe"),
+        symbols.get("runtime_progression_entry"),
+    )
+    return _ordered_call_targets_present(instructions, required)
+
+
+def _instruction_present(instruction_sets, mnemonic: str) -> bool:
+    return any(
+        candidate.startswith(mnemonic)
+        for instructions in instruction_sets.values()
+        for _, candidate, _ in instructions
+    )
+
+
+def _int_vector_present(instructions, vector: int) -> bool:
+    return any(
+        mnemonic == "int" and f"0x{vector:x}" in operands.lower()
+        for _, mnemonic, operands in instructions
+    )
+
+
+def _jumps_address(instructions, target_address: int | None) -> bool:
+    if target_address is None:
+        return False
+    return any(
+        mnemonic.startswith("jmp") and instruction_target(operands) == target_address
+        for _, mnemonic, operands in instructions
+    )
+
+
+def _fault_halt_paths_present(instruction_sets, symbols: dict[str, int]) -> bool:
+    target = symbols.get("boot_terminal_halt")
+    return all(
+        _jumps_address(instruction_sets.get(name, []), target)
+        for name in ("privilege_fault_sink", "privilege_double_fault_sink")
+    )
+
+
+def _privilege_prohibited_instructions(instruction_sets) -> list[str]:
+    prohibited = {"syscall", "sysret", "sysretq", "swapgs", "sti", "wrmsr"}
+    return sorted(
+        {
+            mnemonic
+            for instructions in instruction_sets.values()
+            for _, mnemonic, _ in instructions
+            if mnemonic in prohibited
+        }
+    )
 
 
 def _symbol_range_record(
@@ -952,6 +1097,7 @@ def malformed_report(kernel_elf: Path, linker_script: Path, issue: str) -> dict[
         "cpu_extended_state_initialization": cpu_extended_state_record(kernel_elf, {}),
         "runtime_state_transition_capability": runtime_state_transition_record(kernel_elf, {}),
         "fixed_user_mapping_foundation": fixed_user_mapping_record(kernel_elf, {}),
+        "bounded_privilege_transition_probe": bounded_privilege_transition_record(kernel_elf, {}),
         "program_header_count": 0,
         "section_count": 0,
         "load_segments": [],

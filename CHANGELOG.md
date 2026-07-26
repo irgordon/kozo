@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.8.4 - 2026-07-26
+
+**Status:** Implemented and locally evidenced; hosted CI pending.
+
+* Added one fixed `iretq` transition from Ring 0 to a contract-owned Ring 3 probe and one governed `int 0x81` return.
+* Added fixed GDT, TSS, IDT, lower-privilege stack, privilege-return stack, and double-fault stack geometry with structural and ELF validation.
+* Validated CPL 3 through the saved hardware frame, completed one fixed stack/token probe, restored the fixed Ring 0 continuation, and preserved the existing Odin capability suffix.
+* Preserved the CPU-state gate, fixed user mappings, both governed runtime capabilities, exact runtime return, and terminal halt path.
+* Added no general userspace, process, scheduler, public syscall ABI, isolation, exception-recovery, compatibility, or production-readiness claim.
+
 ## v0.8.3 - 2026-07-26
 
 * Established KOZO-owned fixed four-level page tables and preserved required kernel mappings as supervisor-only.

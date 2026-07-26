@@ -212,3 +212,21 @@ performs volatile mutation and readback, and validates its response before
 success. It does not create dynamic registration, arbitrary memory mutation,
 userspace access, concurrency, authorization, privilege separation, or a
 general state-machine subsystem.
+
+---
+
+# 13. Bounded Privilege Transition
+
+v0.8.4 inserts one assembly-owned privilege probe between fixed mapping
+survival and Odin runtime entry. A fixed GDT, TSS, and IDT establish one
+`iretq` path to `user_privilege_probe_start` and one DPL3 `int 0x81` return
+gate. The return gate switches through TSS.RSP0 to a dedicated
+supervisor-only stack, validates the hardware-saved CPL3 frame and probe state,
+and restores one fixed CPL0 continuation.
+
+The path is layered as boot coordination, descriptor/table validation,
+fixed-entry execution, return-frame validation, and terminal convergence. It
+does not introduce a process model, general userspace, a public syscall ABI,
+general interrupt handling, return to Ring 3, or isolation. Detailed authority
+lives in `contracts/bounded_privilege_transition_probe_contract.v0.json` and
+`docs/PRIVILEGE_TRANSITION.md`.

@@ -32,6 +32,7 @@ _SCHEMA_PATHS = {
     "cpu_extended_state_initialization_contract": _SCHEMA_DIR / "cpu_extended_state_initialization_contract.schema.json",
     "runtime_state_transition_capability": _SCHEMA_DIR / "runtime_state_transition_capability.schema.json",
     "fixed_user_mapping_foundation": _SCHEMA_DIR / "fixed_user_mapping_foundation.schema.json",
+    "bounded_privilege_transition_probe_contract": _SCHEMA_DIR / "bounded_privilege_transition_probe_contract.schema.json",
 }
 
 

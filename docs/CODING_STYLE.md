@@ -885,3 +885,18 @@ Runtime capability paths must also read top-down. Keep one direct dispatcher,
 separate boundary validation from state mutation and evidence emission, and
 prefer the smallest consequential malformed-request and failure-path tests
 over exhaustive field permutations.
+
+---
+
+# 27. Privilege-Transition Code Shape
+
+Privilege-transition coordinators must read top-down: validate fixed mappings,
+prepare and validate descriptor state, construct the sanitized frame, enter
+the fixed target, validate the fixed return, and converge on the existing
+continuation. Raw descriptor encoding, IDT gate packing, mapping-bit checks,
+and frame offsets belong in focused low-level helpers.
+
+Do not mix phase policy into raw architecture helpers. Use fixed descriptive
+names for selectors, stacks, tokens, vectors, and continuations. Keep one
+obvious success path and route every malformed architecture state to a
+non-returning failure path.

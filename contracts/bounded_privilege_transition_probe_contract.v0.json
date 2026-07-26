@@ -1,0 +1,191 @@
+{
+  "version": 0,
+  "architecture": "x86_64",
+  "source_files": {
+    "boot": "kernel/arch/x86_64/boot.asm",
+    "privilege_transition": "kernel/arch/x86_64/privilege_transition.asm",
+    "paging": "kernel/arch/x86_64/paging.asm",
+    "layout": "kernel/arch/x86_64/runtime_layout.inc",
+    "linker": "linker/kernel.ld"
+  },
+  "transition": {
+    "entry_privilege": 0,
+    "target_privilege": 3,
+    "entry_mechanism": "iretq",
+    "return_mechanism": "int_0x81_interrupt_gate",
+    "returns_to_user": false,
+    "interrupts_enabled": false
+  },
+  "selectors": {
+    "kernel_code": "0x08",
+    "kernel_data": "0x10",
+    "user_data": "0x1b",
+    "user_code": "0x23",
+    "tss": "0x28"
+  },
+  "gdt": {
+    "start_symbol": "governed_gdt",
+    "end_symbol": "governed_gdt_end",
+    "entry_count": 7,
+    "size_bytes": 56,
+    "alignment_bytes": 16,
+    "required_entries": [
+      "null",
+      "kernel_code",
+      "kernel_data",
+      "user_data",
+      "user_code",
+      "tss_low",
+      "tss_high"
+    ],
+    "gdtr_readback_required": true,
+    "kernel_selectors_reloaded": true
+  },
+  "tss": {
+    "start_symbol": "governed_tss",
+    "end_symbol": "governed_tss_end",
+    "size_bytes": 104,
+    "alignment_bytes": 16,
+    "rsp0_symbol": "privilege_return_stack_top",
+    "ist1_symbol": "double_fault_stack_top",
+    "iopb_offset": 104,
+    "task_register_readback_required": true
+  },
+  "idt": {
+    "start_symbol": "governed_idt",
+    "end_symbol": "governed_idt_end",
+    "entry_count": 256,
+    "size_bytes": 4096,
+    "alignment_bytes": 4096,
+    "return_vector": "0x81",
+    "return_gate_dpl": 3,
+    "return_gate_type": "interrupt_gate_64",
+    "return_handler_symbol": "privilege_return_handler",
+    "fault_vectors": [6, 8, 10, 11, 12, 13, 14],
+    "idtr_readback_required": true
+  },
+  "stacks": {
+    "return": {
+      "start_symbol": "privilege_return_stack",
+      "end_symbol": "privilege_return_stack_top",
+      "size_bytes": 4096,
+      "alignment_bytes": 4096,
+      "user": false,
+      "writable": true,
+      "executable": false
+    },
+    "double_fault": {
+      "start_symbol": "double_fault_stack",
+      "end_symbol": "double_fault_stack_top",
+      "size_bytes": 4096,
+      "alignment_bytes": 4096,
+      "user": false,
+      "writable": true,
+      "executable": false
+    },
+    "user": {
+      "start_symbol": "user_probe_stack",
+      "end_symbol": "user_probe_stack_top",
+      "virtual_start": "0x0000400000002000",
+      "virtual_end": "0x0000400000003000",
+      "initial_rsp": "0x0000400000002ff0",
+      "size_bytes": 4096,
+      "alignment_bytes": 4096,
+      "user": true,
+      "writable": true,
+      "executable": false
+    }
+  },
+  "entry": {
+    "fixed_code_symbol": "user_privilege_probe_start",
+    "fixed_code_end_symbol": "user_privilege_probe_end",
+    "fixed_virtual_rip": "0x0000400000000000",
+    "code_page_start": "0x0000400000000000",
+    "code_page_end": "0x0000400000001000",
+    "code_user": true,
+    "code_writable": false,
+    "code_executable": true,
+    "sanitized_rflags": "0x2",
+    "cpl_check_required": true,
+    "mapping_validation_required": true
+  },
+  "probe": {
+    "data_virtual_address": "0x0000400000001000",
+    "token": "0x4b4f5a4f50524956",
+    "failure_token": "0x4641494c50524956",
+    "stack_sentinel": "0x4b4f5a4f55534552",
+    "width_bits": 64,
+    "stack_probe_required": true,
+    "data_write_read_required": true,
+    "token_clear_readback_required": true,
+    "serial_io_forbidden_in_ring3": true
+  },
+  "return_boundary": {
+    "saved_frame_validation_required": true,
+    "expected_user_cpl": 3,
+    "expected_kernel_cpl": 0,
+    "fixed_continuation_symbol": "privilege_ring0_continuation",
+    "kernel_stack_restore_required": true,
+    "user_return_forbidden": true,
+    "halt_on_fault_required": true
+  },
+  "success_markers": [
+    "KOZO_PRIVILEGE_TRANSITION_INIT_START",
+    "KOZO_PRIVILEGE_TABLES_OK",
+    "KOZO_RING3_ENTER",
+    "KOZO_RING3_PROBE_OK",
+    "KOZO_RING0_RETURN_OK"
+  ],
+  "failure_statuses": {
+    "success": 0,
+    "gdt_invalid": 1,
+    "tss_invalid": 2,
+    "idt_invalid": 3,
+    "user_entry_invalid": 4,
+    "user_stack_invalid": 5,
+    "return_frame_invalid": 6,
+    "user_probe_failed": 7,
+    "ring0_continuation_failed": 8
+  },
+  "claim_boundary": {
+    "proves": [
+      "one fixed iretq transition reached CPL3",
+      "one fixed CPL3 stack and data probe completed",
+      "one DPL3 interrupt gate returned through TSS.RSP0",
+      "the Ring0 handler validated the saved CPL3 frame",
+      "the fixed CPL0 continuation restored the governed kernel stack"
+    ],
+    "does_not_prove": [
+      "general userspace execution",
+      "process isolation",
+      "general syscall handling",
+      "exception recovery",
+      "production readiness"
+    ]
+  },
+  "non_goals": [
+    "general userspace execution",
+    "multiple user programs",
+    "ELF user-program loading",
+    "process creation",
+    "process isolation",
+    "scheduler behavior",
+    "task switching",
+    "return to Ring 3",
+    "syscall instruction support",
+    "sysret",
+    "public syscall ABI",
+    "system-call dispatch",
+    "exception recovery",
+    "page-fault recovery",
+    "dynamic mapping",
+    "general virtual memory management",
+    "general GDT management",
+    "general IDT management",
+    "interrupt subsystem",
+    "external interrupts",
+    "Linux compatibility",
+    "POSIX compatibility",
+    "production readiness"
+  ]
+}

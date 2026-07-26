@@ -96,3 +96,15 @@ It does not prove Ring 3 execution, GDT/TSS/IDT setup, syscall MSRs, general
 userspace, process or address-space isolation, dynamic mapping, unmapping,
 frame allocation, page-fault recovery, scheduler behavior, compatibility, or
 production readiness.
+
+# 7. Bounded Privilege Consumer
+
+v0.8.4 consumes only the three accepted fixed mappings. The user code page
+contains the fixed `user_privilege_probe_start` target, the user data page
+contains the fixed token cell, and the user stack page supplies the fixed CPL3
+RSP. Before `iretq`, Ring 0 repeats effective-permission checks for all three
+pages and confirms the supervisor-only privilege structures are not
+user-accessible.
+
+This use does not change the fixed page-table hierarchy, introduce dynamic
+mapping, map arbitrary code, or establish per-process address spaces.

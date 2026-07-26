@@ -254,3 +254,20 @@ prohibition, QEMU marker evidence, and halt convergence.
 
 Source strings or generated reports alone cannot promote the runtime claim.
 Hosted QEMU and verification evidence are required for phase acceptance.
+
+---
+
+# 17. Bounded Privilege-Transition Validation
+
+`bounded_privilege_transition_probe_contract` validates contract/schema
+geometry, fixed selectors, entry and return mechanisms, marker order, failure
+statuses, claim boundary, and non-goals.
+
+`bounded_privilege_transition_probe_evidence` validates source sequencing,
+fixed mapping prerequisites, descriptor and stack ownership, linked symbols,
+`iretq` and `int 0x81` paths, saved-frame/token checks, fixed continuation,
+fault-to-halt convergence, QEMU metadata/log agreement, the unchanged Odin
+capability suffix, and terminal halt preservation.
+
+Marker strings alone are insufficient. Final acceptance requires hosted QEMU
+evidence that the full ordered sequence executed.

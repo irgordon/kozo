@@ -132,7 +132,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_runtime_progression_entry_not_reached_blocker(self):
         result = self.validate_blocked_fixture(
             "runtime_progression_entry_not_reached",
-            "\n".join(early_markers()[:14]) + "\n",
+            "\n".join(early_markers()[:19]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -140,7 +140,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_runtime_initialization_not_proven_blocker(self):
         result = self.validate_blocked_fixture(
             "runtime_initialization_not_proven",
-            "\n".join(early_markers()[:15]) + "\n",
+            "\n".join(early_markers()[:20]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -148,7 +148,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_runtime_return_not_reached_blocker(self):
         result = self.validate_blocked_fixture(
             "runtime_return_not_reached",
-            "\n".join(early_markers()[:27]) + "\n",
+            "\n".join(early_markers()[:32]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -156,7 +156,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_capability_dispatch_not_reached_blocker(self):
         result = self.validate_blocked_fixture(
             "capability_dispatch_not_reached",
-            "\n".join(early_markers()[:21]) + "\n",
+            "\n".join(early_markers()[:26]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -164,7 +164,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_runtime_status_query_not_completed_blocker(self):
         result = self.validate_blocked_fixture(
             "runtime_status_query_not_completed",
-            "\n".join(early_markers()[:22]) + "\n",
+            "\n".join(early_markers()[:27]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -172,7 +172,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_first_governed_capability_not_proven_blocker(self):
         result = self.validate_blocked_fixture(
             "first_governed_capability_not_proven",
-            "\n".join(early_markers()[:23]) + "\n",
+            "\n".join(early_markers()[:28]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -180,7 +180,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_runtime_state_update_not_reached_blocker(self):
         result = self.validate_blocked_fixture(
             "runtime_state_update_not_reached",
-            "\n".join(early_markers()[:24]) + "\n",
+            "\n".join(early_markers()[:29]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -188,7 +188,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_runtime_state_update_not_completed_blocker(self):
         result = self.validate_blocked_fixture(
             "runtime_state_update_not_completed",
-            "\n".join(early_markers()[:25]) + "\n",
+            "\n".join(early_markers()[:30]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -196,7 +196,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_second_governed_capability_not_proven_blocker(self):
         result = self.validate_blocked_fixture(
             "second_governed_capability_not_proven",
-            "\n".join(early_markers()[:26]) + "\n",
+            "\n".join(early_markers()[:31]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -204,7 +204,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_runtime_loop_entry_not_reached_blocker(self):
         result = self.validate_blocked_fixture(
             "runtime_loop_entry_not_reached",
-            "\n".join(early_markers()[:16]) + "\n",
+            "\n".join(early_markers()[:21]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -212,7 +212,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_runtime_loop_iteration_incomplete_blocker(self):
         result = self.validate_blocked_fixture(
             "runtime_loop_iteration_incomplete",
-            "\n".join(early_markers()[:18]) + "\n",
+            "\n".join(early_markers()[:23]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -220,7 +220,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_runtime_loop_exit_not_reached_blocker(self):
         result = self.validate_blocked_fixture(
             "runtime_loop_exit_not_reached",
-            "\n".join(early_markers()[:20]) + "\n",
+            "\n".join(early_markers()[:25]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -711,8 +711,8 @@ def valid_metadata(outcome: str, *, serial_text: str | None = None, stderr_text:
             "the expected KOZO runtime return marker was observed",
         ],
         "does_not_prove": [
-            "hardware trap execution",
-            "interrupt handling",
+            "general hardware trap handling",
+            "general interrupt handling",
             "complete Odin runtime readiness",
             "dynamic initialization",
             "general stack readiness",

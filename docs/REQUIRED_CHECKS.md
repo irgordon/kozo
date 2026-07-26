@@ -207,3 +207,18 @@ effective U/S propagation, supervisor-only kernel policy, W^X, NX support,
 pre-activation software walks, exact masked CR3 readback, post-activation
 survival checks, complete QEMU metadata/log agreement, and the unchanged
 runtime return and halt path.
+
+# 9. v0.8.4 Privilege-Transition Checks
+
+Full CI must run `bounded_privilege_transition_probe_contract` and
+`bounded_privilege_transition_probe_evidence`. Passing evidence requires:
+
+* contract-valid fixed selectors, descriptor tables, stacks, entry, return,
+  token, statuses, markers, and non-goals;
+* source and ELF evidence for `iretq`, `int 0x81`, TSS.RSP0, saved-frame
+  validation, fixed continuation, and fault-to-halt convergence;
+* exact QEMU metadata/log agreement for all privilege markers;
+* preserved fixed-mapping, CPU-state, progression, capability, return, and
+  halt validators;
+* no public syscall, arbitrary target, return-to-user, or general userspace
+  path.

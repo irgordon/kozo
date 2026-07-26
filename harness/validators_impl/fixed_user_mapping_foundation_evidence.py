@@ -306,8 +306,8 @@ def _elf_issue(context: FixedUserMappingEvidenceContext):
     for field in ("pre_odin_call_order_valid", "cr3_read_present", "cr3_write_present", "software_walk_present"):
         if record.get(field) is not True:
             return _issue("missing_elf_evidence", f"kernel_elf_report.fixed_user_mapping_foundation.{field}", f"Kernel ELF mapping evidence requires {field}")
-    if record.get("prohibited_transition_instructions") != []:
-        return _issue("privilege_transition_present", "kernel_elf_report.fixed_user_mapping_foundation.prohibited_transition_instructions", "Kernel ELF must not contain privilege-transition instructions")
+    if record.get("paging_module_transition_instructions") != []:
+        return _issue("privilege_transition_present", "kernel_elf_report.fixed_user_mapping_foundation.paging_module_transition_instructions", "Fixed paging functions must not contain privilege-transition instructions")
     return None
 
 

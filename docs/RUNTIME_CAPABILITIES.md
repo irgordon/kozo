@@ -122,3 +122,11 @@ capability request, response, state, or dispatch behavior. Both capabilities
 execute only after table policy, CR3 readback, and mapping survival succeed.
 The mappings are future privilege-probe prerequisites, not proof of Ring 3 or
 general userspace.
+
+# 9. Privilege Probe Ordering
+
+v0.8.4 executes the fixed privilege-transition probe after mapping survival
+and before `KOZO_RUNTIME_PROGRESS_ENTRY`. It does not add a capability ID,
+change capability request or response geometry, or expose either internal
+capability to CPL3. Both capabilities still execute in Odin at CPL0 only after
+the fixed CPL3 round trip returns through its governed continuation.

@@ -71,7 +71,15 @@ hierarchy after SIMD evidence and before Odin entry. It preserves the loaded
 kernel as supervisor-only, adds fixed user RX code and user RW-NX data/stack
 mappings, verifies effective permissions through a software walk, activates
 and reads back CR3, proves bounded kernel survival, and then continues through
-the unchanged runtime and halt path. It does not enter Ring 3.
+the unchanged runtime and halt path. Hosted CI accepted this fixed-mapping
+boundary with 59 checks and 0 failures.
+
+v0.8.4 adds one fixed privilege-transition probe after mapping survival and
+before Odin entry. Ring 0 validates fixed descriptor tables, fixed user and
+return stacks, and the fixed `iretq` frame. The linked CPL3 stub validates its
+privilege through CS, performs one bounded stack/token probe, and returns
+through the DPL3 `int 0x81` gate. Ring 0 validates the saved frame and token,
+restores one fixed continuation, and only then proceeds to Odin.
 
 No active QEMU serial smoke blocker.
 
@@ -351,4 +359,29 @@ The transition uses volatile write/readback, restores the prior state and
 generation on readback failure, validates the fixed response before success,
 and preserves the assembly terminal halt path. It is not userspace access,
 general memory management, concurrency, authorization, or production
+readiness.
+
+## Bounded Privilege-Transition Probe
+
+The local ordered transition boundary is:
+
+```text
+KOZO_USER_MAPPING_SURVIVAL_OK
+KOZO_PRIVILEGE_TRANSITION_INIT_START
+KOZO_PRIVILEGE_TABLES_OK
+KOZO_RING3_ENTER
+KOZO_RING3_PROBE_OK
+KOZO_RING0_RETURN_OK
+KOZO_RUNTIME_PROGRESS_ENTRY
+```
+
+`KOZO_RING3_PROBE_OK` follows validation of the hardware-saved CPL3 frame and
+the CPL3-written token. Any descriptor, stack, frame, token, or continuation
+failure suppresses later success markers and converges on
+`boot_terminal_halt`. The final assembly `cli`/`hlt` loop remains the only
+terminal runtime state.
+
+This proves one fixed lower-privilege excursion and fixed return. It does not
+prove general userspace, process isolation, a public syscall ABI, return to
+Ring 3, general interrupt handling, exception recovery, or production
 readiness.
