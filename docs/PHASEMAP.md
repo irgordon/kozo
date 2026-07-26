@@ -120,7 +120,7 @@ The current local generated evidence proves:
 * The accepted v0.8.3 verification harness passes 59 checks with 0 failures.
 * v0.8.4 is accepted by hosted CI run `30217859139` with one fixed CPL0-to-CPL3 `iretq` transition, one fixed CPL3 stack/token probe, one DPL3 `int 0x81` return through TSS.RSP0, saved-frame validation, the fixed CPL0 continuation, and the unchanged Odin capability and halt suffix.
 * v0.8.5 locally validates one exact Ring3 request, complete-span defense, supervisor-only copy-in, one deterministic Ring0 service, exact response copy-out and readback, verified buffer clearing, and the unchanged privilege, capability, return, and halt paths.
-* The v0.8.5 local verification harness passes 63 checks with 0 failures, and full unit discovery passes 913 tests.
+* The v0.8.5 local verification harness passes 63 checks with 0 failures, and full unit discovery passes 914 tests after the GNU/LLVM disassembly-normalization regression.
 
 ## Current Active Blocker
 

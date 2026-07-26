@@ -934,8 +934,19 @@ def _memory_store_count(instructions) -> int:
 
 def _rep_stosq_count(instructions) -> int:
     return sum(
-        mnemonic == "rep" and operands.lstrip().startswith("stosq")
+        mnemonic == "rep" and _is_qword_stos(operands)
         for _, mnemonic, operands in instructions
+    )
+
+
+def _is_qword_stos(operands: str) -> bool:
+    normalized = operands.lstrip()
+    if normalized.startswith("stosq"):
+        return True
+    return (
+        normalized.startswith("stos ")
+        and "%rax" in normalized
+        and "%rdi" in normalized
     )
 
 

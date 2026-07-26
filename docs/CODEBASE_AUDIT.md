@@ -1125,6 +1125,7 @@ privilege-transition validators, and the complete 33-marker sequence.
 | AUDIT-085-005 | Hosted confirmation pending | Local QEMU captures the complete 37-marker sequence; hosted CI must confirm identical ordering and both fixed user request validators. |
 | AUDIT-085-006 | Deferred | `validator_coverage.py` remains the largest structural debt item and is not split in this runtime phase. |
 | AUDIT-085-007 | Deferred | The existing Rust package-license metadata warning remains release-hardening debt. |
+| AUDIT-085-008 | Resolved locally | Hosted run `30221011342` exposed GNU `objdump` rendering qword clears as `rep stos %rax,%es:(%rdi)` while LLVM renders `rep stosq`; the ELF generator now normalizes both exact qword forms without reducing the required clear count. |
 
 ## 34.3 Claim Boundary
 

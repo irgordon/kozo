@@ -11,6 +11,7 @@ from harness.validators_impl import fixed_user_request_boundary_evidence as vali
 from harness.validators_impl.fixed_user_request_boundary_evidence import (
     FixedUserRequestBoundaryEvidenceValidator,
 )
+from scripts import kernel_elf_report
 
 KOZO_NEGATIVE_COVERAGE = {
     "fixed_user_request_boundary_evidence": {
@@ -43,6 +44,15 @@ KOZO_NEGATIVE_COVERAGE = {
 
 
 class FixedUserRequestBoundaryEvidenceTests(unittest.TestCase):
+    def test_elf_report_counts_llvm_and_gnu_qword_clears(self):
+        instructions = [
+            (0x1000, "rep", "stosq %rax, %es:(%rdi)"),
+            (0x1002, "rep", "stos %rax,%es:(%rdi)"),
+            (0x1004, "rep", "stos %eax,%es:(%rdi)"),
+        ]
+
+        self.assertEqual(kernel_elf_report._rep_stosq_count(instructions), 2)
+
     def test_valid_evidence_passes(self):
         result = self.validate_fixture()
         self.assertEqual((result.status, result.code), ("pass", OK))

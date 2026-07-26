@@ -144,7 +144,8 @@ No local v0.8.5 runtime blocker is active. Hosted CI confirmation of the fixed
 copy-in/service/copy-out/completion markers, both fixed-boundary validators,
 focused ELF evidence, preserved privilege and capability evidence, governed
 return, and halt remains required before phase acceptance.
-Local verification passes 63 checks with 0 failures and 913 unit tests.
+Local verification passes 63 checks with 0 failures and 914 unit tests after
+the GNU/LLVM disassembly-normalization regression.
 
 ---
 
