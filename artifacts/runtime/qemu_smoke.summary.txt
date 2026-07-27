@@ -27,6 +27,9 @@ Observed Markers
   - KOZO_USER_REQUEST_COPY_IN_OK
   - KOZO_USER_REQUEST_SERVICE_OK
   - KOZO_USER_RESPONSE_COPY_OUT_OK
+  - KOZO_RING3_RESPONSE_RESUME
+  - KOZO_USER_RESPONSE_CONSUMED_OK
+  - KOZO_FIXED_USER_RESPONSE_OK
   - KOZO_FIXED_USER_REQUEST_OK
   - KOZO_RING3_PROBE_OK
   - KOZO_RING0_RETURN_OK
@@ -54,7 +57,7 @@ Validator: qemu_smoke_evidence
 Metadata
 QEMU exit code: 124
 Timed out: True
-Serial log bytes: 2223
+Serial log bytes: 2312
 Stderr log bytes: 80
 
 Evidence References
@@ -64,9 +67,6 @@ artifacts/runtime/qemu_smoke.metadata.json
 artifacts/runtime/boot_blocker_report.json
 
 Last 50 serial lines
-vbe: Product name: SeaBIOS VBE Adapter
-vbe: Product revision: Rev. 1
-edid: Success.
 vbe: EDID detected screen resolution of 1280x800
 vbe: Found matching mode 0x17a, attempting to set...
 vbe: Mode was already set, perfect!
@@ -97,6 +97,9 @@ KOZO_RING3_ENTER
 KOZO_USER_REQUEST_COPY_IN_OK
 KOZO_USER_REQUEST_SERVICE_OK
 KOZO_USER_RESPONSE_COPY_OUT_OK
+KOZO_RING3_RESPONSE_RESUME
+KOZO_USER_RESPONSE_CONSUMED_OK
+KOZO_FIXED_USER_RESPONSE_OK
 KOZO_FIXED_USER_REQUEST_OK
 KOZO_RING3_PROBE_OK
 KOZO_RING0_RETURN_OK
@@ -116,4 +119,4 @@ KOZO_SECOND_CAPABILITY_OK
 KOZO_RUNTIME_RETURN_OK
 
 Last 50 stderr lines
-qemu-system-x86_64: terminating on signal 15 from pid 19406 (<unknown process>)
+qemu-system-x86_64: terminating on signal 15 from pid 33267 (<unknown process>)

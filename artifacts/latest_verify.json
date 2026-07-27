@@ -1,11 +1,11 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260726T213034Z",
+  "run_id": "verify-20260727T060308Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
   "summary": {
-    "total_checks": 63,
+    "total_checks": 65,
     "failed_check_count": 0
   },
   "checks": [
@@ -353,6 +353,20 @@
       "detail": "One exact Ring3 request and Ring0 response transaction aligns across source, ELF, and QEMU evidence"
     },
     {
+      "name": "bounded_user_response_consumption_contract",
+      "subsystem": "bounded_user_response_consumption_contract",
+      "status": "pass",
+      "code": "OK",
+      "detail": "Bounded user response consumption contract governs one fixed resume and second gate"
+    },
+    {
+      "name": "bounded_user_response_consumption_evidence",
+      "subsystem": "bounded_user_response_consumption_evidence",
+      "status": "pass",
+      "code": "OK",
+      "detail": "One fixed Ring3 response consumer and second int 0x81 transaction align across source, ELF, and QEMU"
+    },
+    {
       "name": "runtime_state_transition_capability",
       "subsystem": "runtime_state_transition_capability",
       "status": "pass",
@@ -464,7 +478,12 @@
     }
   ],
   "failed_checks": [],
-  "changed_files": [],
+  "changed_files": [
+    "artifacts/runtime/kernel_elf_report.json",
+    "artifacts/runtime/qemu_smoke.metadata.json",
+    "artifacts/runtime/qemu_smoke.summary.txt",
+    "docs/generated/governance_index.md"
+  ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
     "artifacts/logs/odin-build.log",
@@ -480,5 +499,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-07-26T21:30:34Z"
+  "generated_at": "2026-07-27T06:03:08Z"
 }
