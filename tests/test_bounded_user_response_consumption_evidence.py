@@ -7,6 +7,7 @@ import unittest
 from pathlib import Path
 
 from harness.codes import BOUNDED_USER_RESPONSE_CONSUMPTION_EVIDENCE_INVALID, OK
+from harness.runtime_evidence_taxonomy import get_smoke_marker_order
 from harness.validators_impl import bounded_user_response_consumption_evidence as validator_module
 from harness.validators_impl.bounded_user_response_consumption_evidence import (
     BoundedUserResponseConsumptionEvidenceValidator,
@@ -266,6 +267,8 @@ class BoundedUserResponseConsumptionEvidenceTests(unittest.TestCase):
     ):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
+            serial_source = root / "serial-source"
+            serial_source.write_text(valid_serial_log())
             fixtures = {
                 "_BOOT_PATH": (validator_module._BOOT_PATH, boot, False),
                 "_PRIVILEGE_PATH": (validator_module._PRIVILEGE_PATH, privilege, False),
@@ -273,7 +276,7 @@ class BoundedUserResponseConsumptionEvidenceTests(unittest.TestCase):
                 "_LINKER_PATH": (validator_module._LINKER_PATH, linker, False),
                 "_ELF_REPORT_PATH": (validator_module._ELF_REPORT_PATH, report, True),
                 "_METADATA_PATH": (validator_module._METADATA_PATH, metadata, True),
-                "_SERIAL_PATH": (validator_module._SERIAL_PATH, serial, False),
+                "_SERIAL_PATH": (serial_source, serial, False),
             }
             originals = {}
             try:
@@ -298,6 +301,10 @@ def replace_in_range(text, start, end, old, new):
     end_index = text.index(end, start_index)
     section = text[start_index:end_index].replace(old, new, 1)
     return text[:start_index] + section + text[end_index:]
+
+
+def valid_serial_log():
+    return "\n".join(get_smoke_marker_order()) + "\n"
 
 
 if __name__ == "__main__":
