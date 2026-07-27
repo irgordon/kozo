@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260727T060308Z",
+  "run_id": "verify-20260727T192839Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -479,10 +479,7 @@
   ],
   "failed_checks": [],
   "changed_files": [
-    "artifacts/runtime/kernel_elf_report.json",
-    "artifacts/runtime/qemu_smoke.metadata.json",
-    "artifacts/runtime/qemu_smoke.summary.txt",
-    "docs/generated/governance_index.md"
+    "tests/test_bounded_user_response_consumption_evidence.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -499,5 +496,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-07-27T06:03:08Z"
+  "generated_at": "2026-07-27T19:28:39Z"
 }
