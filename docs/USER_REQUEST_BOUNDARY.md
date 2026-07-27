@@ -96,3 +96,13 @@ It does not prove a general syscall ABI, arbitrary user-pointer handling,
 general `copy_from_user` or `copy_to_user`, return to Ring3, persistent
 userspace, processes, scheduling, isolation, Linux or POSIX compatibility, or
 production readiness.
+
+# 8. v0.8.6 Response Consumer
+
+The request boundary now preserves its validated response for one fixed Ring 3
+consumer instead of clearing it immediately. Request-side buffers are cleared
+after copy-out validation. Response-side buffers remain governed by
+`contracts/bounded_user_response_consumption_contract.v0.json` until the
+second `int 0x81` handler validates consumption and clears them. The v0.8.5
+request service, response geometry, and deterministic token rule are
+unchanged.

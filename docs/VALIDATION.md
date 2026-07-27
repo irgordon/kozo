@@ -292,3 +292,14 @@ continuation, and failure exclusion.
 Marker strings alone are insufficient. Final acceptance requires hosted QEMU
 evidence that the complete boundary sequence executed while the accepted
 privilege, capability, runtime-return, and halt validators remained green.
+
+# 19. Bounded User Response Consumption Validation
+
+The contract validator owns exact phase values, response and record geometry,
+resume-frame policy, response checks, second-frame checks, record copy and
+validation, clearing, phase reset, markers, statuses, and claim boundaries.
+
+The evidence validator separately checks assembly order, linker assertions,
+ELF symbols and operations, two transition and entry sites, QEMU metadata/log
+agreement, exact marker multiplicity, failure exclusions, and terminal halt
+convergence. Every diagnostic includes `reason` and `contract_field`.

@@ -119,25 +119,25 @@ The current local generated evidence proves:
 * v0.8.3 is accepted by hosted CI with one KOZO-owned four-level page-table hierarchy, supervisor-only kernel leaves, fixed user RX/RW-NX pages, effective U/S propagation, W^X, exact CR3 readback, bounded survival, and the unchanged 28-marker runtime path.
 * The accepted v0.8.3 verification harness passes 59 checks with 0 failures.
 * v0.8.4 is accepted by hosted CI run `30217859139` with one fixed CPL0-to-CPL3 `iretq` transition, one fixed CPL3 stack/token probe, one DPL3 `int 0x81` return through TSS.RSP0, saved-frame validation, the fixed CPL0 continuation, and the unchanged Odin capability and halt suffix.
-* v0.8.5 locally validates one exact Ring3 request, complete-span defense, supervisor-only copy-in, one deterministic Ring0 service, exact response copy-out and readback, verified buffer clearing, and the unchanged privilege, capability, return, and halt paths.
-* The v0.8.5 local verification harness passes 63 checks with 0 failures, and full unit discovery passes 914 tests after the GNU/LLVM disassembly-normalization regression.
+* v0.8.5 is accepted by hosted CI and direct artifact inspection with one exact Ring3 request, complete-span defense, supervisor-only copy-in, deterministic Ring0 service, exact response copy-out/readback, and 63 checks with 0 failures.
+* v0.8.6 locally validates one sanitized response-consumer resume, full CPL3 response validation, one fixed 48-byte record, a second `int 0x81`, Ring0 response revalidation, exact record acceptance, verified clearing, and all 40 runtime markers.
 
 ## Current Active Blocker
 
-No active local runtime blocker is recorded for v0.8.5. Hosted CI marker,
-validator, fixed-boundary, focused ELF, preserved privilege/capability, and
-halt confirmation remains the phase acceptance gate.
+No active local runtime blocker is recorded for v0.8.6. Hosted CI marker,
+validator, response-consumption, focused ELF, preserved privilege/capability,
+and halt confirmation remains the phase acceptance gate.
 
 Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr`, `kernel_entry_not_reached`, `serial_not_initialized`, and `marker_not_emitted` are retained only as resolved historical evidence states unless a future CI artifact reintroduces one.
 
 ## Next Runtime Phase
 
-The current runtime phase is `v0.8.5 Fixed User Request Boundary`. Local
-evidence proves one exact request/response transaction inside the fixed
-boot-time CPL3 probe. General pointers, lengths, copy APIs, public syscall
-behavior, persistent userspace, process isolation, and production readiness
-remain unproven. After hosted acceptance, the next implementation milestone is
-`v0.8.6 Bounded User Response Consumption`.
+The current runtime phase is `v0.8.6 Bounded User Response Consumption`.
+Local evidence proves one exact two-stage transaction and response cleanup.
+General pointers, lengths, copy APIs, public syscall behavior, persistent
+userspace, process isolation, hostile-code safety, and production readiness
+remain unproven. Hosted acceptance is required before the next implementation
+milestone exposes existing deterministic kernel status through this boundary.
 
 ---
 

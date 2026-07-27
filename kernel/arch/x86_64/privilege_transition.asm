@@ -21,13 +21,31 @@ global fixed_user_response_shadow
 global fixed_user_response_shadow_end
 global fixed_user_response_verify
 global fixed_user_response_verify_end
+global fixed_user_consumption_shadow
+global fixed_user_consumption_shadow_end
+global fixed_user_transaction_phase
+global fixed_user_transaction_phase_end
 global fixed_user_request_success_state
 global user_probe_code_start
 global user_probe_code_end
 global user_privilege_probe_start
 global user_privilege_probe_end
+global user_response_consumer_start
+global user_response_consumer_interrupt_return
+global user_response_consumer_end
 global privilege_return_handler
 global privilege_ring0_continuation
+global handle_fixed_user_request
+global handle_fixed_user_response_consumption
+global validate_ring3_request_frame
+global validate_ring3_response_frame
+global prepare_user_response_resume
+global resume_fixed_user_response_consumer
+global validate_user_visible_response
+global fixed_user_response_matches_shadow
+global copy_fixed_user_consumption_record
+global validate_fixed_user_consumption_record
+global clear_fixed_user_response_transaction
 global observed_governed_gdtr
 global observed_governed_idtr
 global observed_task_register
@@ -39,6 +57,9 @@ extern runtime_serial_write_ring3_enter_marker
 extern runtime_serial_write_user_request_copy_in_marker
 extern runtime_serial_write_user_request_service_marker
 extern runtime_serial_write_user_response_copy_out_marker
+extern runtime_serial_write_ring3_response_resume_marker
+extern runtime_serial_write_user_response_consumed_marker
+extern runtime_serial_write_fixed_user_response_marker
 extern runtime_serial_write_fixed_user_request_marker
 extern runtime_serial_write_ring3_probe_marker
 extern boot_terminal_halt
@@ -95,9 +116,18 @@ extern boot_terminal_halt
 %define FIXED_USER_RESPONSE_READBACK_FAILED 15
 %define FIXED_USER_BUFFER_CLEAR_FAILED 16
 %define FIXED_USER_CONTINUATION_INVALID 17
+%define USER_RESPONSE_PHASE_INVALID 18
+%define USER_RESPONSE_RESUME_FRAME_INVALID 19
+%define USER_RESPONSE_SPAN_INVALID 20
+%define USER_RESPONSE_CONTENT_INVALID 21
+%define USER_RESPONSE_RECORD_COPY_FAILED 22
+%define USER_RESPONSE_RECORD_INVALID 23
+%define USER_RESPONSE_CLEAR_FAILED 24
+%define USER_RESPONSE_CONTINUATION_INVALID 25
 
 %define FIXED_USER_REQUEST_QWORDS (FIXED_USER_REQUEST_SIZE / 8)
 %define FIXED_USER_RESPONSE_QWORDS (FIXED_USER_RESPONSE_SIZE / 8)
+%define FIXED_USER_CONSUMPTION_RECORD_QWORDS (FIXED_USER_CONSUMPTION_RECORD_SIZE / 8)
 %define USER_DATA_EFFECTIVE_FLAGS (PTE_PRESENT | PTE_WRITABLE | PTE_USER)
 
 section .user_probe_code progbits alloc exec nowrite align=4096
@@ -142,6 +172,84 @@ user_privilege_probe_failed:
     int KOZO_PRIVILEGE_RETURN_VECTOR
     ud2
 user_privilege_probe_end:
+
+user_response_consumer_start:
+    mov rdi, FIXED_USER_RESPONSE_VA
+    mov ax, cs
+    and eax, 3
+    cmp eax, 3
+    jne .cpl_invalid
+    mov rdx, rsp
+    mov rax, USER_INITIAL_RSP
+    cmp rdx, rax
+    jne .stack_invalid
+    mov rax, USER_STACK_SENTINEL
+    push rax
+    pop rcx
+    cmp rcx, rax
+    jne .stack_invalid
+    cmp rsp, rdx
+    jne .stack_invalid
+
+    mov r8d, 1
+    cmp dword [rdi], FIXED_USER_REQUEST_VERSION
+    jne .write_record
+    mov r8d, 2
+    cmp dword [rdi + 4], FIXED_USER_REQUEST_ID
+    jne .write_record
+    mov r8d, 3
+    cmp dword [rdi + 8], PRIVILEGE_TRANSITION_SUCCESS
+    jne .write_record
+    mov r8d, 4
+    cmp dword [rdi + 12], FIXED_USER_RESPONSE_SIZE
+    jne .write_record
+    mov r8d, 5
+    cmp qword [rdi + 16], FIXED_USER_REQUEST_SEQUENCE
+    jne .write_record
+    mov r8d, 6
+    mov rax, USER_PROBE_TOKEN
+    cmp [rdi + 24], rax
+    jne .write_record
+    mov r8d, 7
+    cmp dword [rdi + 32], 3
+    jne .write_record
+    mov r8d, 8
+    cmp dword [rdi + 36], 0
+    jne .write_record
+    mov r8d, 9
+    mov rax, USER_PROBE_TOKEN
+    mov rcx, FIXED_USER_RESPONSE_MASK
+    xor rax, rcx
+    cmp [rdi + 40], rax
+    jne .write_record
+    xor r8d, r8d
+    jmp .write_record
+
+.cpl_invalid:
+    mov r8d, 10
+    jmp .write_record
+.stack_invalid:
+    mov r8d, 11
+
+.write_record:
+    mov rsi, FIXED_USER_CONSUMPTION_RECORD_VA
+    mov dword [rsi], FIXED_USER_CONSUMPTION_RECORD_VERSION
+    mov dword [rsi + 4], FIXED_USER_CONSUMPTION_RECORD_ID
+    mov dword [rsi + 8], FIXED_USER_CONSUMPTION_RECORD_SIZE
+    mov [rsi + 12], r8d
+    mov rax, [rdi + 16]
+    mov [rsi + 16], rax
+    mov rax, [rdi + 24]
+    mov [rsi + 24], rax
+    mov rax, [rdi + 40]
+    mov [rsi + 32], rax
+    mov qword [rsi + 40], 0
+    push qword USER_RFLAGS
+    popfq
+    int KOZO_PRIVILEGE_RETURN_VECTOR
+user_response_consumer_interrupt_return:
+    ud2
+user_response_consumer_end:
     times KOZO_PAGE_SIZE - ($ - user_probe_code_start) db 0x90
 user_probe_code_end:
 
@@ -198,6 +306,15 @@ alignb 8
 fixed_user_response_verify:
     resb FIXED_USER_RESPONSE_SIZE
 fixed_user_response_verify_end:
+alignb 8
+fixed_user_consumption_shadow:
+    resb FIXED_USER_CONSUMPTION_RECORD_SIZE
+fixed_user_consumption_shadow_end:
+alignb 8
+fixed_user_transaction_phase:
+    resd 1
+    resd 1
+fixed_user_transaction_phase_end:
 alignb 8
 fixed_user_request_success_state:
     resq 1
@@ -592,6 +709,8 @@ enter_bounded_ring3_probe:
     call clear_fixed_user_request_buffers
     test eax, eax
     jnz .done
+    cmp qword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
+    jne .phase_invalid
     call runtime_serial_write_ring3_enter_marker
     mov ax, USER_DATA_SELECTOR
     mov ds, ax
@@ -605,10 +724,12 @@ enter_bounded_ring3_probe:
     push rax
     iretq
     ud2
+.phase_invalid:
+    mov eax, USER_RESPONSE_PHASE_INVALID
 .done:
     ret
 
-; Validates the hardware CPL3 frame on TSS.RSP0 and never returns to Ring 3.
+; Routes the fixed gate by the supervisor-owned transaction phase.
 privilege_return_handler:
     mov ax, KERNEL_DATA_SELECTOR
     mov ss, ax
@@ -617,7 +738,16 @@ privilege_return_handler:
     mov fs, ax
     mov gs, ax
     mov r15, rsp
-    call validate_ring3_return_frame
+    cmp dword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
+    je handle_fixed_user_request
+    cmp dword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_RESPONSE_READY
+    je handle_fixed_user_response_consumption
+    mov eax, USER_RESPONSE_PHASE_INVALID
+    jmp privilege_return_failure
+
+; Completes the accepted request service and resumes one fixed Ring3 consumer.
+handle_fixed_user_request:
+    call validate_ring3_request_frame
     test eax, eax
     jnz privilege_return_failure
     call validate_fixed_user_buffer_ranges
@@ -653,9 +783,39 @@ privilege_return_handler:
     jnz privilege_return_failure
     call runtime_serial_write_user_response_copy_out_marker
 
-    call clear_fixed_user_request_buffers
+    call prepare_user_response_resume
     test eax, eax
     jnz privilege_return_failure
+    call runtime_serial_write_ring3_response_resume_marker
+    jmp resume_fixed_user_response_consumer
+
+; Accepts the fixed response-consumption record and ends user execution.
+handle_fixed_user_response_consumption:
+    call validate_ring3_response_frame
+    test eax, eax
+    jnz privilege_return_failure
+    call validate_fixed_user_buffer_ranges
+    test eax, eax
+    jnz privilege_return_failure
+    call validate_user_visible_response
+    test eax, eax
+    jnz privilege_return_failure
+    call copy_fixed_user_consumption_record
+    test eax, eax
+    jnz privilege_return_failure
+    call validate_fixed_user_consumption_record
+    test eax, eax
+    jnz privilege_return_failure
+    call runtime_serial_write_user_response_consumed_marker
+    call clear_fixed_user_response_transaction
+    test eax, eax
+    jnz privilege_return_failure
+    mov dword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_CONSUMED
+    cmp dword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_CONSUMED
+    jne privilege_response_phase_failure
+    cmp dword [rel fixed_user_transaction_phase + 4], 0
+    jne privilege_response_phase_failure
+    call runtime_serial_write_fixed_user_response_marker
     mov rax, FIXED_USER_REQUEST_SUCCESS_STATE
     mov [rel fixed_user_request_success_state], rax
     call runtime_serial_write_fixed_user_request_marker
@@ -665,8 +825,25 @@ privilege_return_handler:
     mov rsp, [rel saved_kernel_continuation_rsp]
     jmp privilege_ring0_continuation
 
-; Validates CS/SS, user RIP/RSP/RFLAGS, CPL0, and TSS stack ownership.
-validate_ring3_return_frame:
+privilege_response_phase_failure:
+    mov eax, USER_RESPONSE_PHASE_INVALID
+    jmp privilege_return_failure
+
+; Validates the first fixed CPL3 return frame.
+validate_ring3_request_frame:
+    mov rax, USER_PROBE_CODE_VA + (user_privilege_probe_after_interrupt - user_probe_code_start)
+    mov rdx, USER_INITIAL_RSP
+    jmp validate_fixed_ring3_frame
+
+; Validates the second fixed CPL3 return frame.
+validate_ring3_response_frame:
+    mov rax, USER_PROBE_CODE_VA + (user_response_consumer_interrupt_return - user_probe_code_start)
+    mov rdx, USER_INITIAL_RSP
+
+; Input: rax=expected RIP, rdx=expected RSP. Validates the TSS.RSP0 frame.
+validate_fixed_ring3_frame:
+    mov r10, rax
+    mov r11, rdx
     mov ax, cs
     test ax, 3
     jnz .invalid
@@ -689,21 +866,24 @@ validate_ring3_return_frame:
     and eax, 3
     cmp eax, 3
     jne .invalid
-    mov rax, USER_PROBE_CODE_VA + (user_privilege_probe_after_interrupt - user_probe_code_start)
-    cmp [r15], rax
+    cmp [r15], r10
     jne .invalid
-    mov rax, USER_INITIAL_RSP
-    cmp [r15 + 24], rax
+    cmp [r15 + 24], r11
     jne .invalid
     cmp qword [r15 + 16], USER_RFLAGS
     jne .invalid
     xor eax, eax
     ret
 .invalid:
+    cmp dword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_RESPONSE_READY
+    je .response_invalid
     mov eax, PRIVILEGE_RETURN_FRAME_INVALID
     ret
+.response_invalid:
+    mov eax, USER_RESPONSE_RESUME_FRAME_INVALID
+    ret
 
-; Validates the two fixed spans and their shared RW-NX backing page.
+; Validates the three fixed spans and their shared RW-NX backing page.
 validate_fixed_user_buffer_ranges:
     mov rdi, FIXED_USER_REQUEST_VA
     mov rsi, FIXED_USER_REQUEST_SIZE
@@ -715,16 +895,32 @@ validate_fixed_user_buffer_ranges:
     call validate_fixed_user_span
     test eax, eax
     jnz .invalid
+    mov rdi, FIXED_USER_CONSUMPTION_RECORD_VA
+    mov rsi, FIXED_USER_CONSUMPTION_RECORD_SIZE
+    call validate_fixed_user_span
+    test eax, eax
+    jnz .invalid
     mov rax, FIXED_USER_REQUEST_VA
     add rax, FIXED_USER_REQUEST_SIZE
     jc .invalid
     mov rcx, FIXED_USER_RESPONSE_VA
     cmp rax, rcx
     ja .invalid
+    mov rax, FIXED_USER_RESPONSE_VA
+    add rax, FIXED_USER_RESPONSE_SIZE
+    jc .invalid
+    mov rcx, FIXED_USER_CONSUMPTION_RECORD_VA
+    cmp rax, rcx
+    ja .invalid
     xor eax, eax
     ret
 .invalid:
+    cmp dword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_RESPONSE_READY
+    je .response_invalid
     mov eax, FIXED_USER_REQUEST_RANGE_INVALID
+    ret
+.response_invalid:
+    mov eax, USER_RESPONSE_SPAN_INVALID
     ret
 
 ; Validates one complete fixed span, including effective permissions and backing.
@@ -894,10 +1090,9 @@ fixed_user_response_fields_are_valid:
     jne .invalid
     cmp dword [rdi + 12], FIXED_USER_RESPONSE_SIZE
     jne .invalid
-    mov rax, [rel fixed_user_request_shadow + 16]
-    cmp [rdi + 16], rax
+    cmp qword [rdi + 16], FIXED_USER_REQUEST_SEQUENCE
     jne .invalid
-    mov rax, [rel fixed_user_request_shadow + 24]
+    mov rax, USER_PROBE_TOKEN
     cmp [rdi + 24], rax
     jne .invalid
     cmp dword [rdi + 32], 3
@@ -979,7 +1174,198 @@ validate_fixed_user_response_readback:
     mov eax, FIXED_USER_RESPONSE_READBACK_FAILED
     ret
 
-; Clears only the governed shared spans and supervisor shadow buffers.
+; Clears first-stage inputs while retaining the validated response and shadow.
+prepare_user_response_resume:
+    cld
+    xor eax, eax
+    mov rdi, FIXED_USER_REQUEST_VA
+    mov ecx, FIXED_USER_REQUEST_QWORDS
+    rep stosq
+    lea rdi, [rel fixed_user_request_shadow]
+    mov ecx, FIXED_USER_REQUEST_QWORDS
+    rep stosq
+    lea rdi, [rel fixed_user_response_verify]
+    mov ecx, FIXED_USER_RESPONSE_QWORDS
+    rep stosq
+    mov rdi, FIXED_USER_CONSUMPTION_RECORD_VA
+    mov ecx, FIXED_USER_CONSUMPTION_RECORD_QWORDS
+    rep stosq
+    lea rdi, [rel fixed_user_consumption_shadow]
+    mov ecx, FIXED_USER_CONSUMPTION_RECORD_QWORDS
+    rep stosq
+    call first_stage_buffers_are_ready
+    test eax, eax
+    jnz .failed
+    mov dword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_RESPONSE_READY
+    mov dword [rel fixed_user_transaction_phase + 4], 0
+    cmp dword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_RESPONSE_READY
+    jne .failed
+    xor eax, eax
+    ret
+.failed:
+    mov eax, USER_RESPONSE_CLEAR_FAILED
+    ret
+
+first_stage_buffers_are_ready:
+    mov rdi, FIXED_USER_REQUEST_VA
+    mov ecx, FIXED_USER_REQUEST_QWORDS
+    call fixed_qword_span_is_zero
+    test eax, eax
+    jnz .not_ready
+    lea rdi, [rel fixed_user_request_shadow]
+    mov ecx, FIXED_USER_REQUEST_QWORDS
+    call fixed_qword_span_is_zero
+    test eax, eax
+    jnz .not_ready
+    lea rdi, [rel fixed_user_response_verify]
+    mov ecx, FIXED_USER_RESPONSE_QWORDS
+    call fixed_qword_span_is_zero
+    test eax, eax
+    jnz .not_ready
+    mov rdi, FIXED_USER_CONSUMPTION_RECORD_VA
+    mov ecx, FIXED_USER_CONSUMPTION_RECORD_QWORDS
+    call fixed_qword_span_is_zero
+    test eax, eax
+    jnz .not_ready
+    lea rdi, [rel fixed_user_consumption_shadow]
+    mov ecx, FIXED_USER_CONSUMPTION_RECORD_QWORDS
+    call fixed_qword_span_is_zero
+    test eax, eax
+    jnz .not_ready
+    jmp fixed_user_response_matches_shadow
+.not_ready:
+    mov eax, 1
+    ret
+
+fixed_user_response_matches_shadow:
+    mov rsi, FIXED_USER_RESPONSE_VA
+    lea rdi, [rel fixed_user_response_shadow]
+    mov ecx, FIXED_USER_RESPONSE_QWORDS
+.compare:
+    mov rax, [rsi]
+    cmp [rdi], rax
+    jne .failed
+    add rsi, 8
+    add rdi, 8
+    loop .compare
+    mov rdi, FIXED_USER_RESPONSE_VA
+    call fixed_user_response_fields_are_valid
+    ret
+.failed:
+    mov eax, 1
+    ret
+
+; Constructs a fresh fixed frame rather than reusing values saved from Ring3.
+resume_fixed_user_response_consumer:
+    mov ax, USER_DATA_SELECTOR
+    mov ds, ax
+    mov es, ax
+    lea rsp, [rel privilege_return_stack_top]
+    push qword USER_DATA_SELECTOR
+    mov rax, USER_INITIAL_RSP
+    push rax
+    push qword USER_RFLAGS
+    push qword USER_CODE_SELECTOR
+    mov rax, USER_PROBE_CODE_VA + (user_response_consumer_start - user_probe_code_start)
+    push rax
+    iretq
+    ud2
+
+validate_user_visible_response:
+    call validate_fixed_user_response_readback
+    test eax, eax
+    jnz .failed
+    xor eax, eax
+    ret
+.failed:
+    mov eax, USER_RESPONSE_CONTENT_INVALID
+    ret
+
+; Copies exactly six qwords from the fixed record into supervisor storage.
+copy_fixed_user_consumption_record:
+    mov rsi, FIXED_USER_CONSUMPTION_RECORD_VA
+    lea rdi, [rel fixed_user_consumption_shadow]
+    mov rax, [rsi]
+    mov [rdi], rax
+    mov rax, [rsi + 8]
+    mov [rdi + 8], rax
+    mov rax, [rsi + 16]
+    mov [rdi + 16], rax
+    mov rax, [rsi + 24]
+    mov [rdi + 24], rax
+    mov rax, [rsi + 32]
+    mov [rdi + 32], rax
+    mov rax, [rsi + 40]
+    mov [rdi + 40], rax
+    mov ecx, FIXED_USER_CONSUMPTION_RECORD_QWORDS
+.verify:
+    mov rax, [rsi]
+    cmp [rdi], rax
+    jne .failed
+    add rsi, 8
+    add rdi, 8
+    loop .verify
+    xor eax, eax
+    ret
+.failed:
+    mov eax, USER_RESPONSE_RECORD_COPY_FAILED
+    ret
+
+validate_fixed_user_consumption_record:
+    cmp dword [rel fixed_user_consumption_shadow], FIXED_USER_CONSUMPTION_RECORD_VERSION
+    jne .invalid
+    cmp dword [rel fixed_user_consumption_shadow + 4], FIXED_USER_CONSUMPTION_RECORD_ID
+    jne .invalid
+    cmp dword [rel fixed_user_consumption_shadow + 8], FIXED_USER_CONSUMPTION_RECORD_SIZE
+    jne .invalid
+    cmp dword [rel fixed_user_consumption_shadow + 12], 0
+    jne .invalid
+    mov rax, [rel fixed_user_response_shadow + 16]
+    cmp [rel fixed_user_consumption_shadow + 16], rax
+    jne .invalid
+    mov rax, [rel fixed_user_response_shadow + 24]
+    cmp [rel fixed_user_consumption_shadow + 24], rax
+    jne .invalid
+    mov rax, [rel fixed_user_response_shadow + 40]
+    cmp [rel fixed_user_consumption_shadow + 32], rax
+    jne .invalid
+    cmp qword [rel fixed_user_consumption_shadow + 40], 0
+    jne .invalid
+    xor eax, eax
+    ret
+.invalid:
+    mov eax, USER_RESPONSE_RECORD_INVALID
+    ret
+
+; Clears only the remaining response-stage spans and supervisor shadows.
+clear_fixed_user_response_transaction:
+    cld
+    xor eax, eax
+    mov rdi, FIXED_USER_RESPONSE_VA
+    mov ecx, FIXED_USER_RESPONSE_QWORDS
+    rep stosq
+    mov rdi, FIXED_USER_CONSUMPTION_RECORD_VA
+    mov ecx, FIXED_USER_CONSUMPTION_RECORD_QWORDS
+    rep stosq
+    lea rdi, [rel fixed_user_response_shadow]
+    mov ecx, FIXED_USER_RESPONSE_QWORDS
+    rep stosq
+    lea rdi, [rel fixed_user_consumption_shadow]
+    mov ecx, FIXED_USER_CONSUMPTION_RECORD_QWORDS
+    rep stosq
+    lea rdi, [rel fixed_user_response_verify]
+    mov ecx, FIXED_USER_RESPONSE_QWORDS
+    rep stosq
+    call fixed_user_buffers_are_zero
+    test eax, eax
+    jnz .failed
+    xor eax, eax
+    ret
+.failed:
+    mov eax, USER_RESPONSE_CLEAR_FAILED
+    ret
+
+; Clears every governed transaction span before the first Ring3 entry.
 clear_fixed_user_request_buffers:
     cld
     mov rdi, FIXED_USER_REQUEST_VA
@@ -988,6 +1374,9 @@ clear_fixed_user_request_buffers:
     rep stosq
     mov rdi, FIXED_USER_RESPONSE_VA
     mov ecx, FIXED_USER_RESPONSE_QWORDS
+    rep stosq
+    mov rdi, FIXED_USER_CONSUMPTION_RECORD_VA
+    mov ecx, FIXED_USER_CONSUMPTION_RECORD_QWORDS
     rep stosq
     lea rdi, [rel fixed_user_request_shadow]
     mov ecx, FIXED_USER_REQUEST_QWORDS
@@ -998,6 +1387,10 @@ clear_fixed_user_request_buffers:
     lea rdi, [rel fixed_user_response_verify]
     mov ecx, FIXED_USER_RESPONSE_QWORDS
     rep stosq
+    lea rdi, [rel fixed_user_consumption_shadow]
+    mov ecx, FIXED_USER_CONSUMPTION_RECORD_QWORDS
+    rep stosq
+    mov qword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
     mov qword [rel fixed_user_request_success_state], 0
     call fixed_user_buffers_are_zero
     test eax, eax
@@ -1019,6 +1412,11 @@ fixed_user_buffers_are_zero:
     call fixed_qword_span_is_zero
     test eax, eax
     jnz .not_zero
+    mov rdi, FIXED_USER_CONSUMPTION_RECORD_VA
+    mov ecx, FIXED_USER_CONSUMPTION_RECORD_QWORDS
+    call fixed_qword_span_is_zero
+    test eax, eax
+    jnz .not_zero
     lea rdi, [rel fixed_user_request_shadow]
     mov ecx, FIXED_USER_REQUEST_QWORDS
     call fixed_qword_span_is_zero
@@ -1031,6 +1429,11 @@ fixed_user_buffers_are_zero:
     jnz .not_zero
     lea rdi, [rel fixed_user_response_verify]
     mov ecx, FIXED_USER_RESPONSE_QWORDS
+    call fixed_qword_span_is_zero
+    test eax, eax
+    jnz .not_zero
+    lea rdi, [rel fixed_user_consumption_shadow]
+    mov ecx, FIXED_USER_CONSUMPTION_RECORD_QWORDS
     call fixed_qword_span_is_zero
     ret
 .not_zero:
@@ -1071,19 +1474,28 @@ privilege_ring0_continuation:
     mov rax, FIXED_USER_REQUEST_SUCCESS_STATE
     cmp [rel fixed_user_request_success_state], rax
     jne .boundary_failed
+    cmp dword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_CONSUMED
+    jne .boundary_failed
+    cmp dword [rel fixed_user_transaction_phase + 4], 0
+    jne .boundary_failed
     call fixed_user_buffers_are_zero
     test eax, eax
     jnz .boundary_failed
+    mov qword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
+    cmp qword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
+    jne .boundary_failed
     mov qword [rel privilege_probe_state], 0
     mov qword [rel fixed_user_request_success_state], 0
     xor eax, eax
     ret
 .boundary_failed:
+    mov qword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
     mov qword [rel privilege_probe_state], 0
     mov qword [rel fixed_user_request_success_state], 0
     mov eax, FIXED_USER_CONTINUATION_INVALID
     ret
 .failed:
+    mov qword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
     mov qword [rel privilege_probe_state], 0
     mov qword [rel fixed_user_request_success_state], 0
     mov eax, PRIVILEGE_RING0_CONTINUATION_FAILED

@@ -393,3 +393,16 @@ and response, and a fixed return. It does not prove general userspace, process
 isolation, a public syscall ABI, arbitrary user-pointer handling, general copy
 helpers, return to Ring 3, general interrupt handling, exception recovery, or
 production readiness.
+
+# 11. Bounded Response-Consumption Path
+
+v0.8.6 preserves the accepted boot, mapping, CPU-state, and privilege setup.
+After response copy-out, Ring 0 preserves the response, sets
+`RESPONSE_READY`, and performs one sanitized `iretq` to the fixed consumer.
+The consumer validates CPL3, its fixed stack, and every response field before
+writing one fixed record and invoking `int 0x81` again.
+
+Ring 0 validates the second saved frame, revalidates the response, copies and
+validates exactly 48 record bytes, clears every remaining transaction buffer,
+and resumes only the fixed continuation. Failure returns nonzero to `_start`,
+which converges on the existing terminal halt.

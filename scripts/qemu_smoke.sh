@@ -34,6 +34,9 @@ EARLY_MARKERS=(
   "KOZO_USER_REQUEST_COPY_IN_OK"
   "KOZO_USER_REQUEST_SERVICE_OK"
   "KOZO_USER_RESPONSE_COPY_OUT_OK"
+  "KOZO_RING3_RESPONSE_RESUME"
+  "KOZO_USER_RESPONSE_CONSUMED_OK"
+  "KOZO_FIXED_USER_RESPONSE_OK"
   "KOZO_FIXED_USER_REQUEST_OK"
   "KOZO_RING3_PROBE_OK"
   "KOZO_RING0_RETURN_OK"
@@ -322,34 +325,40 @@ elif markers[17] in observed and markers[18] not in observed:
 elif markers[18] in observed and markers[19] not in observed:
     print("fixed_user_response_copy_out_not_completed")
 elif markers[19] in observed and markers[20] not in observed:
-    print("fixed_user_request_boundary_not_completed")
+    print("ring3_response_resume_not_reached")
 elif markers[20] in observed and markers[21] not in observed:
-    print("ring3_probe_not_completed")
+    print("user_response_consumption_not_completed")
 elif markers[21] in observed and markers[22] not in observed:
-    print("ring0_return_not_completed")
+    print("fixed_user_response_boundary_not_completed")
 elif markers[22] in observed and markers[23] not in observed:
-    print("runtime_progression_entry_not_reached")
+    print("fixed_user_request_boundary_not_completed")
 elif markers[23] in observed and markers[24] not in observed:
-    print("runtime_initialization_not_proven")
+    print("ring3_probe_not_completed")
 elif markers[24] in observed and markers[25] not in observed:
+    print("ring0_return_not_completed")
+elif markers[25] in observed and markers[26] not in observed:
+    print("runtime_progression_entry_not_reached")
+elif markers[26] in observed and markers[27] not in observed:
+    print("runtime_initialization_not_proven")
+elif markers[27] in observed and markers[28] not in observed:
     print("runtime_loop_entry_not_reached")
-elif markers[25] in observed and markers[28] not in observed:
+elif markers[28] in observed and markers[31] not in observed:
     print("runtime_loop_iteration_incomplete")
-elif markers[28] in observed and markers[29] not in observed:
-    print("runtime_loop_exit_not_reached")
-elif markers[29] in observed and markers[30] not in observed:
-    print("capability_dispatch_not_reached")
-elif markers[30] in observed and markers[31] not in observed:
-    print("runtime_status_query_not_completed")
 elif markers[31] in observed and markers[32] not in observed:
-    print("first_governed_capability_not_proven")
+    print("runtime_loop_exit_not_reached")
 elif markers[32] in observed and markers[33] not in observed:
-    print("runtime_state_update_not_reached")
+    print("capability_dispatch_not_reached")
 elif markers[33] in observed and markers[34] not in observed:
-    print("runtime_state_update_not_completed")
+    print("runtime_status_query_not_completed")
 elif markers[34] in observed and markers[35] not in observed:
-    print("second_governed_capability_not_proven")
+    print("first_governed_capability_not_proven")
 elif markers[35] in observed and markers[36] not in observed:
+    print("runtime_state_update_not_reached")
+elif markers[36] in observed and markers[37] not in observed:
+    print("runtime_state_update_not_completed")
+elif markers[37] in observed and markers[38] not in observed:
+    print("second_governed_capability_not_proven")
+elif markers[38] in observed and markers[39] not in observed:
     print("runtime_return_not_reached")
 elif observed and observed[0] != markers[0]:
     print("qemu_timeout")

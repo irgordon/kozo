@@ -33,7 +33,9 @@ _ELF_RANGES = {
 _ELF_SYMBOLS = (
     "user_privilege_probe_start",
     "privilege_return_handler",
-    "validate_ring3_return_frame",
+    "handle_fixed_user_request",
+    "handle_fixed_user_response_consumption",
+    "validate_ring3_request_frame",
     "validate_fixed_user_buffer_ranges",
     "copy_fixed_user_request_in",
     "validate_fixed_user_request",
@@ -182,9 +184,9 @@ def _ring3_request_issue(context):
 
 
 def _handler_order_issue(context):
-    handler = _source_range(context.privilege, "privilege_return_handler:", "validate_ring3_return_frame:")
+    handler = _source_range(context.privilege, "handle_fixed_user_request:", "handle_fixed_user_response_consumption:")
     expected = (
-        "call validate_ring3_return_frame",
+        "call validate_ring3_request_frame",
         "call validate_fixed_user_buffer_ranges",
         "call copy_fixed_user_request_in",
         "call validate_fixed_user_request",
@@ -195,10 +197,9 @@ def _handler_order_issue(context):
         "call copy_fixed_user_response_out",
         "call validate_fixed_user_response_readback",
         "call runtime_serial_write_user_response_copy_out_marker",
-        "call clear_fixed_user_request_buffers",
-        "call runtime_serial_write_fixed_user_request_marker",
-        "call runtime_serial_write_ring3_probe_marker",
-        "jmp privilege_ring0_continuation",
+        "call prepare_user_response_resume",
+        "call runtime_serial_write_ring3_response_resume_marker",
+        "jmp resume_fixed_user_response_consumer",
     )
     return _ordered_source_issue(handler, expected, "handler_order_invalid", "copy_boundary")
 
@@ -221,15 +222,15 @@ def _range_issue(context):
     issue = _source_tokens_issue(source, required, "span_validation_invalid", "copy_boundary")
     if issue is not None:
         return issue
-    if source.count("jc .invalid") < 2:
-        return _issue("span_validation_invalid", "copy_boundary", "Both span-end additions must fail on overflow")
+    if source.count("jc .invalid") < 3:
+        return _issue("span_validation_invalid", "copy_boundary", "All span-end additions must fail on overflow")
     return None
 
 
 def _copy_issue(context):
     copy_in = _source_range(context.privilege, "copy_fixed_user_request_in:", "validate_fixed_user_request:")
     copy_out = _source_range(context.privilege, "copy_fixed_user_response_out:", "validate_fixed_user_response_readback:")
-    readback = _source_range(context.privilege, "validate_fixed_user_response_readback:", "clear_fixed_user_request_buffers:")
+    readback = _source_range(context.privilege, "validate_fixed_user_response_readback:", "prepare_user_response_resume:")
     if _fixed_move_count(copy_in, 5) is False:
         return _issue("copy_in_invalid", "copy_boundary.copy_in_size_bytes", "Copy-in must move exactly five fixed qwords")
     if _fixed_move_count(copy_out, 6) is False:

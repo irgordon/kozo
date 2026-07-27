@@ -697,3 +697,24 @@ preserved privilege, capability, return, and halt validators.
 This evidence does not establish a general syscall ABI, arbitrary user
 pointers or lengths, return to Ring3, persistent userspace, hostile-code
 containment, process isolation, compatibility, or production readiness.
+
+# 19. Bounded User Response Consumption Evidence
+
+Local QEMU evidence observes the complete 40-marker sequence. The new boundary
+is:
+
+```text
+KOZO_USER_RESPONSE_COPY_OUT_OK
+KOZO_RING3_RESPONSE_RESUME
+KOZO_USER_RESPONSE_CONSUMED_OK
+KOZO_FIXED_USER_RESPONSE_OK
+KOZO_FIXED_USER_REQUEST_OK
+KOZO_RING3_PROBE_OK
+KOZO_RING0_RETURN_OK
+KOZO_RUNTIME_PROGRESS_ENTRY
+```
+
+Contract, source, linker, ELF, metadata, serial-log, failure-path, aggregation,
+and coverage checks must agree. Hosted acceptance remains pending. This does
+not prove persistent Ring 3 execution, general syscalls, arbitrary messages,
+process isolation, hostile-code safety, or production readiness.

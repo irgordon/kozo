@@ -73,13 +73,17 @@ class FixedUserRequestBoundaryEvidenceTests(unittest.TestCase):
         self.assert_reason(result, "ring3_request_invalid")
 
     def test_fails_when_frame_validation_is_missing(self):
-        mutation = lambda text: text.replace("    call validate_ring3_return_frame\n", "")
+        mutation = lambda text: text.replace("    call validate_ring3_request_frame\n", "")
         result = self.validate_fixture(mutate_privilege=mutation)
         self.assertEqual(result.status, "fail")
         self.assert_reason(result, "handler_order_invalid")
 
     def test_fails_when_overflow_check_is_missing(self):
-        mutation = lambda text: text.replace("    jc .invalid\n", "", 1)
+        mutation = lambda text: text.replace(
+            "    add rax, FIXED_USER_REQUEST_SIZE\n    jc .invalid\n",
+            "    add rax, FIXED_USER_REQUEST_SIZE\n",
+            1,
+        )
         result = self.validate_fixture(mutate_privilege=mutation)
         self.assertEqual(result.status, "fail")
         self.assert_reason(result, "span_validation_invalid")
@@ -118,7 +122,12 @@ class FixedUserRequestBoundaryEvidenceTests(unittest.TestCase):
         self.assert_reason(result, "service_invalid")
 
     def test_fails_when_clear_readback_is_missing(self):
-        mutation = lambda text: text.replace("    call fixed_user_buffers_are_zero\n", "", 1)
+        mutation = lambda text: text.replace(
+            "    mov qword [rel fixed_user_request_success_state], 0\n"
+            "    call fixed_user_buffers_are_zero\n",
+            "    mov qword [rel fixed_user_request_success_state], 0\n",
+            1,
+        )
         result = self.validate_fixture(mutate_privilege=mutation)
         self.assertEqual(result.status, "fail")
         self.assert_reason(result, "buffer_clear_invalid")

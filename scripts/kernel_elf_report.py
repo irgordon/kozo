@@ -119,7 +119,10 @@ PRIVILEGE_TRANSITION_SYMBOLS = (
     "user_privilege_probe_start",
     "user_privilege_probe_end",
     "privilege_return_handler",
-    "validate_ring3_return_frame",
+    "handle_fixed_user_request",
+    "handle_fixed_user_response_consumption",
+    "validate_ring3_request_frame",
+    "validate_ring3_response_frame",
     "privilege_ring0_continuation",
     "privilege_fault_sink",
     "privilege_double_fault_sink",
@@ -131,7 +134,9 @@ PRIVILEGE_TRANSITION_SYMBOLS = (
 FIXED_USER_REQUEST_SYMBOLS = (
     "user_privilege_probe_start",
     "privilege_return_handler",
-    "validate_ring3_return_frame",
+    "handle_fixed_user_request",
+    "handle_fixed_user_response_consumption",
+    "validate_ring3_request_frame",
     "validate_fixed_user_buffer_ranges",
     "copy_fixed_user_request_in",
     "validate_fixed_user_request",
@@ -154,6 +159,30 @@ FIXED_USER_REQUEST_SYMBOLS = (
     "fixed_user_response_verify",
     "fixed_user_response_verify_end",
     "fixed_user_request_success_state",
+)
+BOUNDED_USER_RESPONSE_SYMBOLS = (
+    "user_response_consumer_start",
+    "user_response_consumer_interrupt_return",
+    "user_response_consumer_end",
+    "privilege_return_handler",
+    "handle_fixed_user_request",
+    "handle_fixed_user_response_consumption",
+    "validate_ring3_response_frame",
+    "prepare_user_response_resume",
+    "resume_fixed_user_response_consumer",
+    "validate_user_visible_response",
+    "copy_fixed_user_consumption_record",
+    "validate_fixed_user_consumption_record",
+    "clear_fixed_user_response_transaction",
+    "fixed_user_response_matches_shadow",
+    "fixed_user_transaction_phase",
+    "fixed_user_transaction_phase_end",
+    "fixed_user_consumption_shadow",
+    "fixed_user_consumption_shadow_end",
+    "runtime_serial_write_ring3_response_resume_marker",
+    "runtime_serial_write_user_response_consumed_marker",
+    "runtime_serial_write_fixed_user_response_marker",
+    "privilege_ring0_continuation",
 )
 FIXED_MAPPING_TRANSITION_MNEMONICS = {
     "iretq",
@@ -286,6 +315,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
             *FIXED_USER_MAPPING_SYMBOLS,
             *PRIVILEGE_TRANSITION_SYMBOLS,
             *FIXED_USER_REQUEST_SYMBOLS,
+            *BOUNDED_USER_RESPONSE_SYMBOLS,
         ),
     )
     symbol_address = symbols.get("_start")
@@ -318,6 +348,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "fixed_user_mapping_foundation": fixed_user_mapping_record(kernel_elf, symbols),
         "bounded_privilege_transition_probe": bounded_privilege_transition_record(kernel_elf, symbols),
         "fixed_user_request_boundary": fixed_user_request_boundary_record(kernel_elf, symbols),
+        "bounded_user_response_consumption": bounded_user_response_consumption_record(kernel_elf, symbols),
         "program_header_count": header.program_header_count,
         "section_count": header.section_header_count,
         "load_segments": [segment_record(segment) for segment in load_segments],
@@ -691,7 +722,7 @@ def bounded_privilege_transition_record(
             0x81,
         ),
         "handler_continuation_jump_present": _jumps_address(
-            instruction_sets.get("privilege_return_handler", []),
+            instruction_sets.get("handle_fixed_user_response_consumption", []),
             symbols.get("privilege_ring0_continuation"),
         ),
         "fault_halt_paths_present": _fault_halt_paths_present(instruction_sets, symbols),
@@ -705,10 +736,22 @@ def fixed_user_request_boundary_record(
 ) -> dict[str, object]:
     instruction_sets = {
         symbol: parse_disassembly_instructions(disassemble_symbol(kernel_elf, symbol))
-        for symbol in FIXED_USER_REQUEST_SYMBOLS[:13]
+        for symbol in (
+            "user_privilege_probe_start",
+            "handle_fixed_user_request",
+            "handle_fixed_user_response_consumption",
+            "copy_fixed_user_request_in",
+            "validate_fixed_user_request",
+            "execute_fixed_user_boundary_service",
+            "validate_fixed_user_response",
+            "copy_fixed_user_response_out",
+            "validate_fixed_user_response_readback",
+            "clear_fixed_user_request_buffers",
+        )
         if symbol in symbols
     }
-    handler = instruction_sets.get("privilege_return_handler", [])
+    handler = instruction_sets.get("handle_fixed_user_request", [])
+    response_handler = instruction_sets.get("handle_fixed_user_response_consumption", [])
     ring3_probe = instruction_sets.get("user_privilege_probe_start", [])
     return {
         "symbols": symbol_record(symbols, FIXED_USER_REQUEST_SYMBOLS),
@@ -740,7 +783,7 @@ def fixed_user_request_boundary_record(
             tuple(
                 symbols.get(name)
                 for name in (
-                    "validate_ring3_return_frame",
+                    "validate_ring3_request_frame",
                     "validate_fixed_user_buffer_ranges",
                     "copy_fixed_user_request_in",
                     "validate_fixed_user_request",
@@ -751,9 +794,8 @@ def fixed_user_request_boundary_record(
                     "copy_fixed_user_response_out",
                     "validate_fixed_user_response_readback",
                     "runtime_serial_write_user_response_copy_out_marker",
-                    "clear_fixed_user_request_buffers",
-                    "runtime_serial_write_fixed_user_request_marker",
-                    "runtime_serial_write_ring3_probe_marker",
+                    "prepare_user_response_resume",
+                    "runtime_serial_write_ring3_response_resume_marker",
                 )
             ),
         ),
@@ -777,7 +819,7 @@ def fixed_user_request_boundary_record(
             symbols.get("fixed_user_buffers_are_zero"),
         ),
         "fixed_continuation_jump_present": _jumps_address(
-            handler,
+            response_handler,
             symbols.get("privilege_ring0_continuation"),
         ),
         "prohibited_boundary_instructions": _fixed_user_request_prohibited_instructions(
@@ -786,10 +828,133 @@ def fixed_user_request_boundary_record(
     }
 
 
+def bounded_user_response_consumption_record(
+    kernel_elf: Path,
+    symbols: dict[str, int],
+) -> dict[str, object]:
+    all_instructions = parse_disassembly_instructions(
+        run_text_command(["objdump", "-d", str(kernel_elf)])
+    )
+    instruction_sets = {
+        symbol: _instructions_for_symbol(all_instructions, symbol, symbols)
+        for symbol in BOUNDED_USER_RESPONSE_SYMBOLS
+        if symbol in symbols
+    }
+    consumer = instruction_sets.get("user_response_consumer_start", [])
+    first_handler = instruction_sets.get("handle_fixed_user_request", [])
+    second_handler = instruction_sets.get("handle_fixed_user_response_consumption", [])
+    resume = instruction_sets.get("resume_fixed_user_response_consumer", [])
+    record_copy = instruction_sets.get("copy_fixed_user_consumption_record", [])
+    clearing = instruction_sets.get("clear_fixed_user_response_transaction", [])
+    return {
+        "symbols": symbol_record(symbols, BOUNDED_USER_RESPONSE_SYMBOLS),
+        "transaction_phase": _symbol_range_record(
+            symbols,
+            "fixed_user_transaction_phase",
+            "fixed_user_transaction_phase_end",
+            8,
+            8,
+        ),
+        "consumption_shadow": _symbol_range_record(
+            symbols,
+            "fixed_user_consumption_shadow",
+            "fixed_user_consumption_shadow_end",
+            48,
+            8,
+        ),
+        "consumer_inside_user_page": _symbol_range_contains(
+            symbols,
+            "user_probe_code_start",
+            "user_probe_code_end",
+            "user_response_consumer_start",
+            "user_response_consumer_end",
+        ),
+        "consumer_response_compare_count": _comparison_count(consumer),
+        "consumer_record_store_count": _memory_store_count(consumer),
+        "consumer_second_interrupt_present": _int_vector_present(consumer, 0x81),
+        "resume_iretq_present": _mnemonic_present(resume, "iretq"),
+        "total_iretq_count": _mnemonic_count(all_instructions, "iretq"),
+        "initial_interrupt_present": _int_vector_present(
+            _instructions_for_symbol(all_instructions, "user_privilege_probe_start", symbols),
+            0x81,
+        ),
+        "first_handler_resume_call_order_valid": _ordered_call_targets_present(
+            first_handler,
+            tuple(
+                symbols.get(name)
+                for name in (
+                    "prepare_user_response_resume",
+                    "runtime_serial_write_ring3_response_resume_marker",
+                )
+            ),
+        ),
+        "second_handler_call_order_valid": _ordered_call_targets_present(
+            second_handler,
+            tuple(
+                symbols.get(name)
+                for name in (
+                    "validate_ring3_response_frame",
+                    "validate_user_visible_response",
+                    "copy_fixed_user_consumption_record",
+                    "validate_fixed_user_consumption_record",
+                    "runtime_serial_write_user_response_consumed_marker",
+                    "clear_fixed_user_response_transaction",
+                    "runtime_serial_write_fixed_user_response_marker",
+                    "runtime_serial_write_fixed_user_request_marker",
+                    "runtime_serial_write_ring3_probe_marker",
+                )
+            ),
+        ),
+        "record_copy_memory_move_count": _memory_move_count(record_copy),
+        "response_revalidation_compare_count": _comparison_count(
+            instruction_sets.get("fixed_user_response_matches_shadow", [])
+        ),
+        "response_clear_stosq_count": _rep_stosq_count(clearing),
+        "response_clear_zero_validation_present": _calls_address(
+            clearing,
+            symbols.get("fixed_user_buffers_are_zero"),
+        ),
+        "fixed_continuation_jump_present": _jumps_address(
+            second_handler,
+            symbols.get("privilege_ring0_continuation"),
+        ),
+        "prohibited_instructions": _fixed_user_request_prohibited_instructions(
+            instruction_sets
+        ),
+    }
 def _symbol_delta(symbols: dict[str, int], start_name: str, end_name: str) -> int:
     start = symbols.get(start_name)
     end = symbols.get(end_name)
     return end - start if start is not None and end is not None else -1
+
+
+def _symbol_range_contains(
+    symbols: dict[str, int],
+    outer_start_name: str,
+    outer_end_name: str,
+    inner_start_name: str,
+    inner_end_name: str,
+) -> bool:
+    values = tuple(
+        symbols.get(name)
+        for name in (
+            outer_start_name,
+            outer_end_name,
+            inner_start_name,
+            inner_end_name,
+        )
+    )
+    if any(value is None for value in values):
+        return False
+    outer_start, outer_end, inner_start, inner_end = values
+    return outer_start <= inner_start < inner_end <= outer_end
+
+
+def _comparison_count(instructions) -> int:
+    return sum(
+        mnemonic.startswith("cmp") or mnemonic.startswith("test")
+        for _, mnemonic, _ in instructions
+    )
 
 
 def _privilege_call_order_valid(kernel_elf: Path, symbols: dict[str, int]) -> bool:
@@ -1254,6 +1419,7 @@ def malformed_report(kernel_elf: Path, linker_script: Path, issue: str) -> dict[
         "fixed_user_mapping_foundation": fixed_user_mapping_record(kernel_elf, {}),
         "bounded_privilege_transition_probe": bounded_privilege_transition_record(kernel_elf, {}),
         "fixed_user_request_boundary": fixed_user_request_boundary_record(kernel_elf, {}),
+        "bounded_user_response_consumption": bounded_user_response_consumption_record(kernel_elf, {}),
         "program_header_count": 0,
         "section_count": 0,
         "load_segments": [],

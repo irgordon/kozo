@@ -580,3 +580,16 @@ continuation. No failure may emit later success evidence. This invariant does
 not authorize arbitrary pointers, lengths, request identifiers, general copy
 helpers, a public syscall ABI, return to Ring3, persistent userspace, or
 process isolation.
+
+# 19. Bounded User Response Invariants
+
+The supervisor-owned phase follows exactly
+`REQUEST_PENDING -> RESPONSE_READY -> CONSUMED -> REQUEST_PENDING`.
+The response-consumer RIP and RSP are fixed and its resume RFLAGS are
+sanitized. Ring 3 validates all response fields and writes only the fixed
+48-byte record. The second Ring 0 handler validates the frame, revalidates all
+six response qwords, copies and validates all six record qwords, and clears
+every remaining transaction span before success.
+
+No third Ring 3 entry, arbitrary pointer, variable length, persistent user
+loop, or success marker after a failed boundary is permitted.

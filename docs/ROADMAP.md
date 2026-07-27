@@ -106,7 +106,8 @@ The current repository proves:
 * hosted-CI-proven capability ID 2 path for one fixed boot-owned READY/0-to-ACTIVE/1 volatile state transition and validated response
 * hosted-CI-proven fixed user-mapping foundation with supervisor-only kernel leaves, user RX/RW-NX pages, effective U/S propagation, W^X, exact CR3 readback, and bounded survival
 * hosted-CI-proven fixed CPL0-to-CPL3 `iretq` probe, DPL3 `int 0x81` return through TSS.RSP0, saved-frame/token validation, fixed CPL0 continuation, and unchanged capability/halt suffix
-* locally evidenced exact fixed user request boundary with complete-span validation, supervisor-only shadows, deterministic service, response readback, verified clearing, and unchanged privilege/capability/halt paths
+* hosted-accepted exact fixed user request boundary with complete-span validation, supervisor-only shadows, deterministic service, response readback, verified request-side clearing, and unchanged privilege/capability/halt paths
+* locally evidenced bounded response consumption with one sanitized Ring3 resume, complete response validation, fixed 48-byte record, second gate entry, Ring0 revalidation, verified clearing, and phase reset
 
 The latest local generated evidence may still report missing local Limine/xorriso tooling, but CI run `27894312430` proves the narrow QEMU serial smoke path.
 
@@ -116,7 +117,7 @@ The latest local generated evidence may still report missing local Limine/xorris
 
 KOZO still does not prove:
 
-* hosted QEMU proof of the v0.8.5 fixed request-boundary marker sequence and evidence checks
+* hosted QEMU proof of the v0.8.6 bounded response-consumption sequence and evidence checks
 * complete Odin runtime readiness or dynamic initialization
 * general stack readiness beyond the controlled boot stack proof
 * general memory management beyond the governed static region
@@ -140,12 +141,10 @@ KOZO still does not prove:
 
 # 9. Current Active Blocker
 
-No local v0.8.5 runtime blocker is active. Hosted CI confirmation of the fixed
-copy-in/service/copy-out/completion markers, both fixed-boundary validators,
+No local v0.8.6 runtime blocker is active. Hosted CI confirmation of the
+response-resume, consumption, and fixed-response markers, both new validators,
 focused ELF evidence, preserved privilege and capability evidence, governed
 return, and halt remains required before phase acceptance.
-Local verification passes 63 checks with 0 failures and 914 unit tests after
-the GNU/LLVM disassembly-normalization regression.
 
 ---
 
@@ -165,9 +164,10 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 10. Preserve the hosted-accepted v0.8.1 CPU-state boundary before all Odin capability work.
 11. Preserve the hosted-accepted v0.8.3 fixed-mapping boundary, both validators, effective U/S and W^X, and the unchanged runtime suffix.
 12. Preserve the hosted-accepted v0.8.4 fixed `iretq` entry, CPL3 probe, `int 0x81` return, saved-frame validation, fixed continuation, and unchanged runtime suffix.
-13. Accept v0.8.5 only after hosted CI confirms the exact fixed request transaction, all four boundary markers, validator agreement, and verified buffer clearing.
-14. After acceptance, implement one bounded Ring3 response-consumption continuation without introducing general pointers, copy APIs, or a public syscall ABI.
-15. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
+13. Preserve hosted-accepted v0.8.5 fixed request geometry, service behavior, and evidence.
+14. Accept v0.8.6 only after hosted CI confirms the complete 40-marker transaction, both new validators, exact cleanup, and unchanged runtime suffix.
+15. After acceptance, expose one existing deterministic kernel status service through the fixed boundary without introducing a general syscall ABI.
+16. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
 
 ---
 

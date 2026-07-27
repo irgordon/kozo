@@ -121,3 +121,11 @@ policy.
 No mapping, permission, CR3, or page-table geometry changes in this phase.
 The fixed page still does not provide process isolation, dynamic mapping,
 page-fault recovery, or safe arbitrary user-pointer access.
+
+# 9. Fixed Response-Consumption Spans
+
+v0.8.6 adds no mapping. It uses the accepted user RW-NX data page for the
+existing response and the fixed record at
+`0x0000400000001100..0x0000400000001130`. Both endpoints are revalidated by
+the software walker before Ring 0 access. The record does not overlap the
+request, response, code page, user stack, or supervisor storage.

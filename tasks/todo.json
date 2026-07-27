@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO Fixed User Request Boundary v0.8.5",
+  "task_title": "KOZO Bounded User Response Consumption v0.8.6",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -17,6 +17,7 @@
     "v0.8.2 governed runtime state-transition capability evidence is accepted by hosted CI with 57 checks and 0 failures",
     "v0.8.3 fixed user-mapping evidence is accepted by hosted CI with 59 checks and 0 failures",
     "v0.8.4 bounded privilege-transition evidence is accepted by hosted CI run 30217859139 with QEMU outcome pass and blocker none",
+    "v0.8.5 fixed user-request boundary evidence is accepted by hosted CI and direct artifact inspection with 63 checks and 0 failures",
     "The reconciled runtime progression graph is acyclic and permits first capability evidence only after controlled loop evidence",
     "Odin, pinned Rust, Python, jq, and repository verification tooling are installed"
   ],
@@ -28,7 +29,7 @@
     "Capability ID 1 remains read-only and owns the single generic dispatch marker",
     "The accepted fixed user-mapping foundation provides the only user RX code page and user RW-NX data/stack pages consumed by this phase",
     "The accepted fixed iretq CPL3 probe and DPL3 int 0x81 return remain the only privilege transition and return mechanism",
-    "This phase adds one exact 40-byte Ring3 request and 48-byte Ring0 response transaction with fixed spans, supervisor shadows, deterministic service behavior, verified clearing, focused evidence, validators, task state, and documentation; public ABI, general copy behavior, runtime capability IDs, stage order, persistent userspace, and terminal halt authority remain unchanged"
+    "This phase adds one sanitized return to a fixed Ring3 response consumer, one fixed 48-byte consumption record, a second int 0x81 entry, complete response and record revalidation, verified clearing, focused evidence, validators, task state, and documentation; public ABI, general copy behavior, runtime capability IDs, stage order, persistent userspace, and terminal halt authority remain unchanged"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -2789,6 +2790,54 @@
         "verification.tests_run[145]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 81,
+      "title": "Implement bounded user response consumption",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "kernel/arch/x86_64/boot.asm",
+        "kernel/arch/x86_64/privilege_transition.asm",
+        "kernel/arch/x86_64/runtime_layout.inc",
+        "linker/kernel.ld",
+        "contracts/fixed_user_request_boundary_contract.v0.json",
+        "contracts/runtime_evidence_taxonomy.v0.json",
+        "contracts/bounded_user_response_consumption_contract.v0.json",
+        "schemas/bounded_user_response_consumption_contract.schema.json",
+        "schemas/latest_verify.schema.json",
+        "schemas/agent_context.schema.json",
+        "harness/bounded_user_response_consumption_contract.py",
+        "harness/codes.py",
+        "harness/registry.py",
+        "harness/validators.py",
+        "harness/validators_impl/bounded_user_response_consumption_contract.py",
+        "harness/validators_impl/bounded_user_response_consumption_evidence.py",
+        "harness/validators_impl/fixed_user_request_boundary_contract.py",
+        "harness/validators_impl/fixed_user_request_boundary_evidence.py",
+        "harness/validators_impl/runtime_evidence_taxonomy.py",
+        "harness/validators_impl/schema.py",
+        "harness/validators_impl/validator_coverage.py",
+        "scripts/kernel_elf_report.py",
+        "scripts/qemu_smoke.sh",
+        "tests/test_bounded_user_response_consumption_contract.py",
+        "tests/test_bounded_user_response_consumption_evidence.py",
+        "tests/test_fixed_user_request_boundary_contract.py",
+        "tests/test_fixed_user_request_boundary_evidence.py",
+        "tests/test_runtime_evidence_taxonomy.py",
+        "docs/USER_RESPONSE_CONSUMPTION.md",
+        "docs/generated/governance_index.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.summary.txt"
+      ],
+      "verification_refs": [
+        "verification.tests_run[146]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -3586,6 +3635,11 @@
         "tool": "fixed user request boundary validation",
         "command": "focused Python tests; full Python discovery; odin check kernel; configured build and QEMU smoke; direct fixed-boundary validators; nm and objdump inspection",
         "status": "passed_local_63_checks_914_tests_37_markers"
+      },
+      {
+        "tool": "bounded user response consumption validation",
+        "command": "focused Python tests; full Python discovery; odin check kernel; configured build and QEMU smoke; direct response-consumption validators; nm and objdump inspection",
+        "status": "passed_local_65_checks_963_tests_40_markers"
       }
     ],
     "logs": [

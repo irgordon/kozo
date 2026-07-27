@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KOZO bounded user response consumption contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "source_files",
+    "execution_point",
+    "transaction_phases",
+    "response_consumer",
+    "response",
+    "consumption_record",
+    "kernel_shadow",
+    "ring3_response_checks",
+    "second_frame_validation",
+    "response_revalidation",
+    "record_copy",
+    "clearing",
+    "phase_reset",
+    "marker_order",
+    "marker_ownership",
+    "failure_statuses",
+    "halt_behavior",
+    "claim_boundary",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {"const": 0},
+    "architecture": {"const": "x86_64"},
+    "source_files": {"type": "object"},
+    "execution_point": {"type": "object"},
+    "transaction_phases": {"type": "object"},
+    "response_consumer": {"type": "object"},
+    "response": {"type": "object"},
+    "consumption_record": {"type": "object"},
+    "kernel_shadow": {"type": "object"},
+    "ring3_response_checks": {"$ref": "#/$defs/nonEmptyStrings"},
+    "second_frame_validation": {"type": "object"},
+    "response_revalidation": {"type": "object"},
+    "record_copy": {"type": "object"},
+    "clearing": {"type": "object"},
+    "phase_reset": {"type": "object"},
+    "marker_order": {"$ref": "#/$defs/nonEmptyStrings"},
+    "marker_ownership": {"type": "object"},
+    "failure_statuses": {"type": "object"},
+    "halt_behavior": {"type": "object"},
+    "claim_boundary": {"type": "object"},
+    "non_goals": {"$ref": "#/$defs/nonEmptyStrings"}
+  },
+  "$defs": {
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "pattern": ".+"}
+    }
+  }
+}

@@ -427,6 +427,19 @@ suffix, and the halt contract. This proves no AVX/XSAVE, per-task state
 ownership, context switching, exception recovery, compatibility, or production
 readiness.
 
+# 15. v0.8.6 Bounded User Response Consumption Evidence
+
+Release review must include both v0.8.6 validator results, fixed phase/shadow
+ELF geometry, two `iretq` and two `int 0x81` sites, the complete 40-marker QEMU
+sequence, metadata/log agreement, cleanup evidence, and the unchanged
+capability and halt suffix.
+
+This proves one sanitized Ring 3 response resume, complete CPL3 response
+validation, one fixed record, second-entry validation, Ring 0 response
+revalidation, exact record acceptance, and verified clearing. It does not
+prove persistent userspace, request loops, a general syscall ABI, arbitrary
+pointers, process isolation, hostile-code safety, or production readiness.
+
 For v0.8.2, release review must include
 `contracts/runtime_state_transition_capability.v0.json`, both state-transition
 validators, the kernel ELF report, and QEMU metadata/logs. Acceptance requires

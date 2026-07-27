@@ -141,3 +141,15 @@ It does not prove general userspace execution, arbitrary user code, process or
 address-space isolation, a public syscall ABI, `syscall`/`sysret`, return to
 Ring 3, general interrupt handling, exception recovery, scheduling, user ELF
 loading, Linux or POSIX compatibility, or production readiness.
+
+# 10. Governed Response Resume
+
+v0.8.6 authorizes exactly one additional `iretq` to the fixed response
+consumer and one additional return through the existing DPL3 `int 0x81` gate.
+The frame uses fixed selectors, RIP, RSP, and sanitized RFLAGS. The second
+hardware frame must identify the fixed interrupt-return RIP and expected user
+stack before Ring 0 accepts the response.
+
+The fixed fault sinks remain fail-closed containment for this probe. They do
+not establish exception recovery, diagnostic completeness, or safe execution
+of arbitrary hostile user code.

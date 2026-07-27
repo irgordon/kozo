@@ -914,3 +914,12 @@ Keep canonical-address arithmetic, page-walk checks, qword copies, zeroing, and
 zero verification in focused low-level helpers. Service logic must not read
 user memory directly, and raw copy helpers must not emit final phase markers
 or choose runtime policy.
+
+# Bounded Privilege Transaction Style
+
+Keep fixed privilege transactions top-down: phase dispatch, frame validation,
+response validation, exact copy, cleanup, continuation. Raw frame offsets,
+entry flags, and qword moves belong in focused assembly helpers. Marker
+emission belongs at validated policy boundaries, not generic geometry or copy
+helpers. Fixed-address evidence uses named layout constants instead of repeated
+literals.

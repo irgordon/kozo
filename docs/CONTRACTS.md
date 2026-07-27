@@ -337,3 +337,12 @@ continuation. It creates no public syscall ABI, general copy framework,
 persistent Ring3 runtime, process or scheduler behavior, isolation,
 compatibility, or production claim. `docs/USER_REQUEST_BOUNDARY.md` is
 descriptive and generated reports remain evidence only.
+
+# 26. Bounded User Response Consumption
+
+`contracts/bounded_user_response_consumption_contract.v0.json` is authoritative
+for the v0.8.6 kernel-owned phase values, fixed response-consumer entry and
+stack, response and 48-byte record geometry, second-frame policy, response
+revalidation, exact record copy, cleanup, phase reset, markers, statuses, halt
+convergence, and non-goals. It extends but does not override the accepted fixed
+request contract.

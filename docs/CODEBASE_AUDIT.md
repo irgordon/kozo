@@ -1141,3 +1141,13 @@ The implementation is intentionally fixed and assembly-owned. It adds no
 general GDT/IDT manager, public syscall ABI, process abstraction, scheduler,
 return-to-user path, exception recovery, compatibility claim, or production
 claim.
+
+# 35. v0.8.6 Bounded User Response Consumption
+
+| ID | Status | Finding |
+| --- | --- | --- |
+| AUDIT-086-001 | Resolved locally | The response is consumed by a fixed CPL3 continuation and independently revalidated by the second Ring 0 handler. |
+| AUDIT-086-002 | Resolved locally | Kernel-owned phases prevent the same interrupt gate from ambiguously dispatching request and response stages. |
+| AUDIT-086-003 | Resolved locally | Fixed record geometry, exact copy, zero readback, and reset are covered across source, linker, ELF, QEMU, and negative tests. |
+| AUDIT-086-004 | Deferred by scope | The one-shot fixed path is not a general syscall, message, process, or hostile-code boundary. |
+| AUDIT-086-005 | Hosted confirmation pending | Local QEMU captures all 40 markers; hosted CI must confirm identical ordering and both v0.8.6 validators. |

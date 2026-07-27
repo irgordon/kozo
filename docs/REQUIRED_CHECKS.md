@@ -238,3 +238,11 @@ Full CI must run `fixed_user_request_boundary_contract` and
   capability, runtime return, and halt validators;
 * no arbitrary pointer, arbitrary length, generic copy API, broad syscall
   dispatch, return-to-user, or persistent-userspace path.
+
+# 11. v0.8.6 Bounded User Response Consumption Checks
+
+`bounded_user_response_consumption_contract` and
+`bounded_user_response_consumption_evidence` are required. Full verification
+must also pass the fixed request, privilege transition, user mapping,
+CPU-state, runtime capability, QEMU smoke, schema, and halt checks. Missing,
+duplicated, reordered, or metadata-only response markers are blocking.

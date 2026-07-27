@@ -365,3 +365,20 @@ For v0.8.5 and later, confirm:
 Reject any release claim that generalizes this transaction into arbitrary
 user pointers, a public syscall ABI, persistent userspace, process isolation,
 hostile-code safety, compatibility, or production readiness.
+
+# 17. v0.8.6 Bounded User Response Consumption Gate
+
+Confirm:
+
+* v0.8.5 remains accepted;
+* both response-consumption validators pass;
+* QEMU reports `pass`, blocker `none`, and all 40 markers exactly once;
+* the three new markers occur between response copy-out and fixed-request
+  completion;
+* ELF evidence proves fixed phase/shadow geometry, two entries, response
+  revalidation, exact record copy, clearing, and the fixed continuation;
+* no later success marker exists on a failed response path;
+* existing paging, privilege, CPU-state, capability, return, and halt evidence
+  remains green;
+* no persistent Ring 3 runtime, general syscall ABI, arbitrary pointer,
+  process, compatibility, or production claim was added.

@@ -58,7 +58,7 @@ _NON_GOALS = (
     "user-provided lengths",
     "general copy_from_user",
     "general copy_to_user",
-    "return to Ring 3",
+    "more than one response-consumer return to Ring 3",
     "persistent userspace execution",
     "process model behavior",
     "scheduler behavior",
@@ -134,7 +134,7 @@ def _execution_issue(contract) -> FixedUserRequestContractIssue | None:
         "return_handler_symbol": "privilege_return_handler",
         "fixed_continuation_symbol": "privilege_ring0_continuation",
         "return_vector": "0x81",
-        "returns_to_ring3": False,
+        "returns_to_ring3": True,
     }
     if point != expected:
         return _issue("invalid_execution_point", "execution_point", "Boundary must use the fixed Ring3 stub, int 0x81 handler, and Ring0 continuation")
@@ -275,8 +275,14 @@ def _clearing_issue(contract) -> FixedUserRequestContractIssue | None:
         "kernel_response_shadow_clear_size_bytes": 48,
         "kernel_verify_clear_size_bytes": 48,
     }
-    if clearing.get("before_ring3_entry") is not True or clearing.get("after_copy_out_validation") is not True:
-        return _issue("missing_buffer_clear", "buffer_clearing", "Boundary buffers must be cleared before entry and after validated copy-out")
+    required = (
+        clearing.get("before_ring3_entry") is True
+        and clearing.get("request_clear_after_copy_out_validation") is True
+        and clearing.get("response_clear_after_copy_out_validation") is False
+        and clearing.get("after_response_consumption") is True
+    )
+    if not required:
+        return _issue("missing_buffer_clear", "buffer_clearing", "Request state clears after copy-out while response state remains until bounded consumption")
     if clearing.get("zero_readback_required") is not True:
         return _issue("missing_buffer_clear_readback", "buffer_clearing.zero_readback_required", "Buffer clearing requires zero readback")
     for field, size in expected_sizes.items():

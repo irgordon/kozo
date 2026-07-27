@@ -15,7 +15,7 @@
     "return_handler_symbol": "privilege_return_handler",
     "fixed_continuation_symbol": "privilege_ring0_continuation",
     "return_vector": "0x81",
-    "returns_to_ring3": false
+    "returns_to_ring3": true
   },
   "request": {
     "name": "FIXED_USER_BOUNDARY_PROBE",
@@ -128,7 +128,9 @@
   },
   "buffer_clearing": {
     "before_ring3_entry": true,
-    "after_copy_out_validation": true,
+    "request_clear_after_copy_out_validation": true,
+    "response_clear_after_copy_out_validation": false,
+    "after_response_consumption": true,
     "user_request_clear_size_bytes": 40,
     "user_response_clear_size_bytes": 48,
     "kernel_request_shadow_clear_size_bytes": 40,
@@ -202,7 +204,7 @@
     "general copy_from_user",
     "general copy_to_user",
     "page-fault recovery during copy",
-    "return to Ring 3",
+    "more than one response-consumer return to Ring 3",
     "persistent userspace execution",
     "general userspace runtime",
     "process model behavior",

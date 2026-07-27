@@ -142,3 +142,11 @@ The 40-byte request, 48-byte response, fixed user spans, supervisor shadows,
 service result, marker order, and buffer clearing are governed by
 `contracts/fixed_user_request_boundary_contract.v0.json`. They do not define a
 generic dispatcher or public runtime capability ABI.
+
+# 11. Bounded Response Consumption
+
+v0.8.6 adds no capability ID. The fixed Ring 3 consumer validates the response
+from the v0.8.5 boot-time service and records one fixed result. The second
+`int 0x81` path accepts only that record in the kernel-owned
+`RESPONSE_READY` phase. It does not dispatch either Odin capability and does
+not create a general user-callable capability surface.

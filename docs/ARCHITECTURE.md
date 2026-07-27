@@ -249,3 +249,23 @@ userspace runtime, process model, scheduler, isolation boundary, compatibility
 claim, or production runtime. Authority lives in
 `contracts/fixed_user_request_boundary_contract.v0.json`; detailed geometry and
 evidence are described in `docs/USER_REQUEST_BOUNDARY.md`.
+
+# 15. Bounded User Response Consumption
+
+v0.8.6 extends the fixed transaction without adding a general dispatch path:
+
+```text
+fixed Ring 3 request
+-> fixed Ring 0 service and response copy-out
+-> sanitized iretq to fixed Ring 3 response consumer
+-> complete response validation and fixed 48-byte record
+-> second int 0x81
+-> Ring 0 response revalidation and record acceptance
+-> fixed Ring 0 continuation
+-> Odin runtime
+```
+
+The kernel-owned phase selects exactly two handlers. Consumer RIP, RSP,
+response address, record address, and lengths are fixed. No dynamic message,
+arbitrary pointer, third Ring 3 transition, or persistent userspace runtime is
+introduced.

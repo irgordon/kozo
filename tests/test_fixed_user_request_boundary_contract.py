@@ -65,7 +65,7 @@ class FixedUserRequestBoundaryContractTests(unittest.TestCase):
         self.assert_reason(result, "contract_schema_violation")
 
     def test_fails_when_boundary_returns_to_ring3(self):
-        result = self.validate_fixture(mutate=self.nested("execution_point", "returns_to_ring3", True))
+        result = self.validate_fixture(mutate=self.nested("execution_point", "returns_to_ring3", False))
         self.assertEqual(result.status, "fail")
         self.assert_reason(result, "invalid_execution_point")
 
@@ -138,7 +138,7 @@ class FixedUserRequestBoundaryContractTests(unittest.TestCase):
 
     def test_fails_when_post_copy_clear_is_optional(self):
         result = self.validate_fixture(
-            mutate=self.nested("buffer_clearing", "after_copy_out_validation", False)
+            mutate=self.nested("buffer_clearing", "response_clear_after_copy_out_validation", True)
         )
         self.assertEqual(result.status, "fail")
         self.assert_reason(result, "missing_buffer_clear")

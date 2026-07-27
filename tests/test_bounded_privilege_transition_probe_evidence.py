@@ -78,7 +78,7 @@ class BoundedPrivilegeTransitionProbeEvidenceTests(unittest.TestCase):
         self.assert_reason(result, "ring3_serial_io_present")
 
     def test_fails_when_saved_frame_validation_is_missing(self):
-        mutation = lambda text: text.replace("    call validate_ring3_return_frame\n", "")
+        mutation = lambda text: text.replace("    call validate_ring3_request_frame\n", "")
         result = self.validate_fixture(mutate_privilege=mutation)
         self.assertEqual(result.status, "fail")
         self.assert_reason(result, "return_validation_invalid")

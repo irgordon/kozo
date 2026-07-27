@@ -1,14 +1,25 @@
 # Changelog
 
+## v0.8.6 - 2026-07-26
+
+**Status:** Implemented and validated locally; hosted CI acceptance pending.
+
+* Added one sanitized return to a fixed Ring 3 response consumer and validated every fixed response field in CPL3.
+* Added one fixed 48-byte response-consumption record and invoked the accepted `int 0x81` gate a second time.
+* Validated the second saved CPL3 frame, revalidated the user-visible response in Ring 0, and copied and validated the consumption record.
+* Cleared all response and record buffers, verified zero readback, and reset the kernel-owned transaction phase.
+* Preserved paging, CPU state, privilege controls, both runtime capabilities, governed return, and terminal halt.
+* Added no persistent Ring 3 runtime, general syscall ABI, arbitrary pointers, scheduling, compatibility, or production-readiness claim.
+
 ## v0.8.5 - 2026-07-26
 
-Status: implemented and validated locally; hosted CI acceptance pending.
+**Status:** Accepted by hosted CI and direct artifact inspection with 63 checks and 0 failures.
 
 * Added one exact 40-byte Ring3 request and 48-byte Ring0 response transaction through the existing fixed `int 0x81` boundary.
 * Added complete-span and hardware-frame validation, supervisor-only copy-in and verification shadows, exact field validation, one deterministic fixed service, exact copy-out, readback validation, and verified buffer clearing.
 * Added governed copy-in, service, copy-out, and boundary-completion markers while preserving the accepted fixed privilege transition, CPU-state gate, both Odin capabilities, runtime return, and terminal halt.
 * Added contract, source, ELF, QEMU, failure-path, aggregation, and validator-coverage checks for the fixed boundary.
-* Added no arbitrary pointer or length handling, general copy API, public syscall ABI, return to Ring3, persistent userspace, process or isolation behavior, compatibility claim, or production-readiness claim.
+* Added no arbitrary pointer or length handling, general copy API, public syscall ABI, persistent userspace, process or isolation behavior, compatibility claim, or production-readiness claim.
 
 ## v0.8.4 - 2026-07-26
 

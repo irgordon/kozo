@@ -40,6 +40,9 @@ global runtime_serial_write_ring3_enter_marker
 global runtime_serial_write_user_request_copy_in_marker
 global runtime_serial_write_user_request_service_marker
 global runtime_serial_write_user_response_copy_out_marker
+global runtime_serial_write_ring3_response_resume_marker
+global runtime_serial_write_user_response_consumed_marker
+global runtime_serial_write_fixed_user_response_marker
 global runtime_serial_write_fixed_user_request_marker
 global runtime_serial_write_ring3_probe_marker
 
@@ -209,6 +212,18 @@ user_request_service_marker_end:
 user_response_copy_out_marker:
     db "KOZO_USER_RESPONSE_COPY_OUT_OK", 13, 10
 user_response_copy_out_marker_end:
+
+ring3_response_resume_marker:
+    db "KOZO_RING3_RESPONSE_RESUME", 13, 10
+ring3_response_resume_marker_end:
+
+user_response_consumed_marker:
+    db "KOZO_USER_RESPONSE_CONSUMED_OK", 13, 10
+user_response_consumed_marker_end:
+
+fixed_user_response_marker:
+    db "KOZO_FIXED_USER_RESPONSE_OK", 13, 10
+fixed_user_response_marker_end:
 
 fixed_user_request_marker:
     db "KOZO_FIXED_USER_REQUEST_OK", 13, 10
@@ -578,6 +593,18 @@ runtime_serial_write_user_request_service_marker:
 
 runtime_serial_write_user_response_copy_out_marker:
     WRITE_COM1_MARKER user_response_copy_out_marker, user_response_copy_out_marker_end
+    ret
+
+runtime_serial_write_ring3_response_resume_marker:
+    WRITE_COM1_MARKER ring3_response_resume_marker, ring3_response_resume_marker_end
+    ret
+
+runtime_serial_write_user_response_consumed_marker:
+    WRITE_COM1_MARKER user_response_consumed_marker, user_response_consumed_marker_end
+    ret
+
+runtime_serial_write_fixed_user_response_marker:
+    WRITE_COM1_MARKER fixed_user_response_marker, fixed_user_response_marker_end
     ret
 
 runtime_serial_write_fixed_user_request_marker:

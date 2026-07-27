@@ -227,3 +227,15 @@ or authorization mechanism, sandbox, or isolation proof. The fixed exception
 sinks remain fail-closed containment for this bounded probe; they do not
 provide exception recovery, complete diagnostics, or safe execution of
 arbitrary hostile user code.
+
+# 18. Bounded User Response Consumption
+
+The consumer RIP and RSP are fixed. The response and 48-byte record addresses
+are fixed, and no user pointer or length is accepted. A supervisor-owned phase
+selects the second handler. Ring 0 revalidates the response independently
+before trusting the copied record.
+
+There is no third Ring 3 transition or persistent userspace runtime. The fixed
+fault sinks provide fail-closed containment for this probe only; they do not
+prove exception recovery, diagnostic completeness, memory isolation against
+arbitrary hostile code, or production safety.

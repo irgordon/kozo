@@ -61,6 +61,8 @@ BOUNDED_PRIVILEGE_TRANSITION_PROBE_CONTRACT_INVALID = "BOUNDED_PRIVILEGE_TRANSIT
 BOUNDED_PRIVILEGE_TRANSITION_PROBE_EVIDENCE_INVALID = "BOUNDED_PRIVILEGE_TRANSITION_PROBE_EVIDENCE_INVALID"
 FIXED_USER_REQUEST_BOUNDARY_CONTRACT_INVALID = "FIXED_USER_REQUEST_BOUNDARY_CONTRACT_INVALID"
 FIXED_USER_REQUEST_BOUNDARY_EVIDENCE_INVALID = "FIXED_USER_REQUEST_BOUNDARY_EVIDENCE_INVALID"
+BOUNDED_USER_RESPONSE_CONSUMPTION_CONTRACT_INVALID = "BOUNDED_USER_RESPONSE_CONSUMPTION_CONTRACT_INVALID"
+BOUNDED_USER_RESPONSE_CONSUMPTION_EVIDENCE_INVALID = "BOUNDED_USER_RESPONSE_CONSUMPTION_EVIDENCE_INVALID"
 RUNTIME_STATE_TRANSITION_CAPABILITY_INVALID = "RUNTIME_STATE_TRANSITION_CAPABILITY_INVALID"
 RUNTIME_STATE_TRANSITION_CAPABILITY_EVIDENCE_INVALID = "RUNTIME_STATE_TRANSITION_CAPABILITY_EVIDENCE_INVALID"
 BOOT_BLOCKER_REPORT_INVALID = "BOOT_BLOCKER_REPORT_INVALID"
@@ -137,6 +139,8 @@ CODES = MappingProxyType(
         BOUNDED_PRIVILEGE_TRANSITION_PROBE_EVIDENCE_INVALID: "Bounded privilege-transition evidence is missing, malformed, or inconsistent with source, ELF, QEMU, frame, or halt evidence",
         FIXED_USER_REQUEST_BOUNDARY_CONTRACT_INVALID: "Fixed user request boundary contract is missing, malformed, or inconsistent with the exact one-shot Ring3 transaction",
         FIXED_USER_REQUEST_BOUNDARY_EVIDENCE_INVALID: "Fixed user request boundary evidence is missing, malformed, or inconsistent with source, ELF, QEMU, copy, or halt evidence",
+        BOUNDED_USER_RESPONSE_CONSUMPTION_CONTRACT_INVALID: "Bounded user response consumption contract is missing, malformed, or inconsistent with the fixed two-stage transaction",
+        BOUNDED_USER_RESPONSE_CONSUMPTION_EVIDENCE_INVALID: "Bounded user response consumption evidence is missing, malformed, or inconsistent with source, ELF, QEMU, response, record, or halt evidence",
         RUNTIME_STATE_TRANSITION_CAPABILITY_INVALID: "Runtime state transition capability contract is missing, malformed, or inconsistent with its bounded READY/0 to ACTIVE/1 boundary",
         RUNTIME_STATE_TRANSITION_CAPABILITY_EVIDENCE_INVALID: "Runtime state transition capability evidence is missing, malformed, or inconsistent with source, ELF, QEMU, first-capability, or halt state",
         BOOT_BLOCKER_REPORT_INVALID: "Boot blocker report is missing, malformed, or inconsistent with boot baseline policy",

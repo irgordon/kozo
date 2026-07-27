@@ -1,0 +1,209 @@
+{
+  "version": 0,
+  "architecture": "x86_64",
+  "source_files": {
+    "boot": "kernel/arch/x86_64/boot.asm",
+    "privilege_transition": "kernel/arch/x86_64/privilege_transition.asm",
+    "layout": "kernel/arch/x86_64/runtime_layout.inc",
+    "linker": "linker/kernel.ld"
+  },
+  "execution_point": {
+    "after_marker": "KOZO_USER_RESPONSE_COPY_OUT_OK",
+    "before_marker": "KOZO_FIXED_USER_REQUEST_OK",
+    "return_vector": "0x81",
+    "ring3_resume_count": 1,
+    "second_gate_count": 1,
+    "terminal_continuation": "privilege_ring0_continuation"
+  },
+  "transaction_phases": {
+    "owner": "kernel",
+    "storage_symbol": "fixed_user_transaction_phase",
+    "storage_end_symbol": "fixed_user_transaction_phase_end",
+    "size_bytes": 8,
+    "alignment_bytes": 8,
+    "request_pending": 0,
+    "response_ready": 1,
+    "consumed": 2,
+    "user_accessible": false
+  },
+  "response_consumer": {
+    "start_symbol": "user_response_consumer_start",
+    "interrupt_return_symbol": "user_response_consumer_interrupt_return",
+    "end_symbol": "user_response_consumer_end",
+    "virtual_address_rule": "USER_PROBE_CODE_VA + linked_symbol_offset",
+    "fixed_user_rsp": "0x0000400000002ff0",
+    "user_code_selector": "0x23",
+    "user_data_selector": "0x1b",
+    "sanitized_rflags": "0x2",
+    "resume_instruction": "iretq",
+    "gate_instruction": "int 0x81",
+    "unexpected_return_instruction": "ud2"
+  },
+  "response": {
+    "virtual_address": "0x0000400000001080",
+    "size_bytes": 48,
+    "alignment_bytes": 8,
+    "physical_backing_symbol": "user_probe_data_start",
+    "version": 1,
+    "request_id": 1,
+    "status": 0,
+    "response_size": 48,
+    "sequence": 1,
+    "echoed_payload": "0x4b4f5a4f50524956",
+    "observed_user_cpl": 3,
+    "observed_kernel_cpl": 0,
+    "response_token_operation": "echoed_payload_xor_fixed_mask",
+    "response_token_mask": "0xa5a55a5ac3c33c3c"
+  },
+  "consumption_record": {
+    "virtual_address": "0x0000400000001100",
+    "page_offset": 256,
+    "size_bytes": 48,
+    "alignment_bytes": 8,
+    "physical_backing_symbol": "user_probe_data_start",
+    "version": 1,
+    "record_id": 1,
+    "record_size": 48,
+    "success_validation_status": 0,
+    "fields": [
+      {"name": "version", "offset": 0, "size": 4},
+      {"name": "record_id", "offset": 4, "size": 4},
+      {"name": "record_size", "offset": 8, "size": 4},
+      {"name": "validation_status", "offset": 12, "size": 4},
+      {"name": "sequence", "offset": 16, "size": 8},
+      {"name": "echoed_payload", "offset": 24, "size": 8},
+      {"name": "response_token", "offset": 32, "size": 8},
+      {"name": "reserved", "offset": 40, "size": 8}
+    ]
+  },
+  "kernel_shadow": {
+    "start_symbol": "fixed_user_consumption_shadow",
+    "end_symbol": "fixed_user_consumption_shadow_end",
+    "size_bytes": 48,
+    "alignment_bytes": 8,
+    "user_accessible": false,
+    "writable": true,
+    "executable": false
+  },
+  "ring3_response_checks": [
+    "CPL equals 3",
+    "fixed user RSP matches",
+    "bounded stack sentinel survives",
+    "version matches",
+    "request ID matches",
+    "status matches",
+    "response size matches",
+    "sequence matches",
+    "echoed payload matches",
+    "observed user CPL matches",
+    "observed kernel CPL matches",
+    "response token matches"
+  ],
+  "second_frame_validation": {
+    "saved_rip_fixed": true,
+    "saved_rsp_fixed": true,
+    "saved_selectors_fixed": true,
+    "saved_rflags_sanitized": true,
+    "current_cpl_zero": true,
+    "tss_rsp0_stack_required": true
+  },
+  "response_revalidation": {
+    "complete_span_required": true,
+    "mapping_policy_required": true,
+    "physical_backing_required": true,
+    "all_six_qwords_match_shadow": true,
+    "semantic_field_validation_required": true
+  },
+  "record_copy": {
+    "source_fixed": true,
+    "destination_fixed": true,
+    "user_supplied_pointer": false,
+    "user_supplied_length": false,
+    "copy_size_bytes": 48,
+    "complete_copy_before_validation": true
+  },
+  "clearing": {
+    "user_response_bytes": 48,
+    "user_record_bytes": 48,
+    "kernel_response_shadow_bytes": 48,
+    "kernel_consumption_shadow_bytes": 48,
+    "kernel_verify_bytes": 48,
+    "zero_readback_required": true
+  },
+  "phase_reset": {
+    "required_before_odin": true,
+    "reset_value": 0,
+    "readback_required": true
+  },
+  "marker_order": [
+    "KOZO_USER_RESPONSE_COPY_OUT_OK",
+    "KOZO_RING3_RESPONSE_RESUME",
+    "KOZO_USER_RESPONSE_CONSUMED_OK",
+    "KOZO_FIXED_USER_RESPONSE_OK",
+    "KOZO_FIXED_USER_REQUEST_OK",
+    "KOZO_RING3_PROBE_OK",
+    "KOZO_RING0_RETURN_OK",
+    "KOZO_RUNTIME_PROGRESS_ENTRY"
+  ],
+  "marker_ownership": {
+    "KOZO_RING3_RESPONSE_RESUME": "Ring0 after preserving and revalidating the fixed response and constructing a sanitized resume boundary",
+    "KOZO_USER_RESPONSE_CONSUMED_OK": "Ring0 after validating the second CPL3 frame, response, and fixed consumption record",
+    "KOZO_FIXED_USER_RESPONSE_OK": "Ring0 after clearing every response-stage buffer and validating the CONSUMED phase"
+  },
+  "failure_statuses": {
+    "success": 0,
+    "phase_invalid": 18,
+    "resume_frame_invalid": 19,
+    "span_invalid": 20,
+    "content_invalid": 21,
+    "record_copy_failed": 22,
+    "record_invalid": 23,
+    "clear_failed": 24,
+    "continuation_invalid": 25
+  },
+  "halt_behavior": {
+    "failure_target": "boot_terminal_halt",
+    "later_success_markers_forbidden_after_failure": true,
+    "terminal_halt_remains_authoritative": true
+  },
+  "claim_boundary": {
+    "proves": [
+      "Ring0 resumed one fixed Ring3 response consumer",
+      "Ring3 validated every fixed response field",
+      "Ring3 wrote one fixed response-consumption record",
+      "Ring3 invoked the existing int 0x81 gate a second time",
+      "Ring0 validated the second CPL3 frame and response",
+      "Ring0 copied and validated exactly 48 consumption bytes",
+      "Ring0 cleared response-stage buffers and reset the phase"
+    ],
+    "does_not_prove": [
+      "persistent Ring3 execution",
+      "general syscall ABI",
+      "safe execution of arbitrary hostile user code",
+      "process isolation",
+      "production readiness"
+    ]
+  },
+  "non_goals": [
+    "persistent Ring3 execution",
+    "user event loop",
+    "multiple request transactions",
+    "general syscall ABI",
+    "syscall instruction support",
+    "sysret",
+    "arbitrary request identifiers",
+    "arbitrary response types",
+    "user-provided pointers",
+    "user-provided lengths",
+    "variable-sized records",
+    "general copy_from_user",
+    "general copy_to_user",
+    "page-fault recovery",
+    "process model behavior",
+    "scheduler behavior",
+    "dynamic virtual memory",
+    "Linux compatibility",
+    "POSIX compatibility",
+    "production readiness"
+  ]
+}

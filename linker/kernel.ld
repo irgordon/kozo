@@ -98,12 +98,24 @@ SECTIONS
          "fixed user response shadow must be exactly 48 bytes")
   ASSERT((fixed_user_response_verify_end - fixed_user_response_verify) == 48,
          "fixed user response verify buffer must be exactly 48 bytes")
+  ASSERT((fixed_user_consumption_shadow_end - fixed_user_consumption_shadow) == 48,
+         "fixed user consumption shadow must be exactly 48 bytes")
+  ASSERT((fixed_user_transaction_phase_end - fixed_user_transaction_phase) == 8,
+         "fixed user transaction phase must be exactly 8 bytes")
   ASSERT((fixed_user_request_shadow % 8) == 0,
          "fixed user request shadow must be 8-byte aligned")
   ASSERT((fixed_user_response_shadow % 8) == 0,
          "fixed user response shadow must be 8-byte aligned")
   ASSERT((fixed_user_response_verify % 8) == 0,
          "fixed user response verify buffer must be 8-byte aligned")
+  ASSERT((fixed_user_consumption_shadow % 8) == 0,
+         "fixed user consumption shadow must be 8-byte aligned")
+  ASSERT((fixed_user_transaction_phase % 8) == 0,
+         "fixed user transaction phase must be 8-byte aligned")
+  ASSERT(user_response_consumer_start >= user_probe_code_start,
+         "user response consumer must start inside the user code page")
+  ASSERT(user_response_consumer_end <= user_probe_code_end,
+         "user response consumer must remain inside the user code page")
   ASSERT((__kernel_loaded_image_end - __kernel_image_start) < 2M,
          "fixed kernel mappings must fit one page table")
 }
