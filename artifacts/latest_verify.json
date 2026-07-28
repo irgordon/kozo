@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260728T024746Z",
+  "run_id": "verify-20260728T120627Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -494,22 +494,14 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
-    "artifacts/runtime/kernel_elf_report.json",
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt",
+    "deny.toml",
     "docs/CODEBASE_AUDIT.md",
-    "docs/RUNTIME_EVIDENCE.md",
-    "docs/USER_RUNTIME_STATUS_SERVICE.md",
-    "docs/VALIDATION.md",
+    "docs/RELEASE_CHECKLIST.md",
     "docs/generated/governance_index.md",
-    "harness/validators_impl/fixed_user_runtime_status_service_evidence.py",
-    "harness/validators_impl/validator_coverage.py",
-    "scripts/kernel_elf_report.py",
     "tasks/todo.json",
-    "tests/fixtures/elf/gnu_ring3_response_consumer.txt",
-    "tests/fixtures/elf/llvm_ring3_response_consumer.txt",
-    "tests/test_fixed_user_runtime_status_service_evidence.py",
-    "tests/test_kernel_elf_report.py"
+    "userspace/core_service/Cargo.toml"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -526,5 +518,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-07-28T02:47:46Z"
+  "generated_at": "2026-07-28T12:06:27Z"
 }
