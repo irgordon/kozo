@@ -1,33 +1,72 @@
 <p align="center">
-  <a href="https://kozo.page"><img src="kozo-logo.svg" width="240" alt="KOZO: Made Simple, Designed Secure."></a>
+  <a href="https://kozo.page"><img src="kozo-logo.svg" width="240" alt="KOZO"></a>
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Built_with-Odin-3882D2?style=for-the-badge&logo=odin&logoColor=white" />
-  <img src="https://img.shields.io/badge/Built_with-Rust-B7410E?style=for-the-badge&logo=rust&logoColor=white" />
-  <img src="https://img.shields.io/badge/Platform-KOZO_Native-000000?style=for-the-badge&logo=linux&logoColor=white" />
-  <img src="https://img.shields.io/badge/License-FOSS-000000?style=for-the-badge&logo=opensourceinitiative&logoColor=white" />
-  <img src="https://img.shields.io/badge/Architectures-x86__64%20%7C%20ARM64-000000?style=for-the-badge" />
-</p>
+# KOZO
 
----
+KOZO is a small operating-system kernel built to make low-level behavior easy
+to inspect and verify. It is for people who want to learn how a kernel starts,
+crosses CPU privilege levels, handles one fixed request, and proves each step
+without hiding the details behind a large system.
 
-**KOZO** is a new kind of operating system—purpose‑built for people who want their computers to feel fast, private, and trustworthy. By pairing the precision of Odin with the safety of Rust, it creates an environment that’s secure from the moment you turn it on, without slowing you down or locking you into a walled garden.
+Low-level software can fail before normal debugging tools exist. KOZO addresses
+that problem by keeping each runtime feature bounded, recording progress over
+the serial port, and checking source, kernel-binary, and QEMU evidence against
+machine-readable rules.
 
-Instead of patching over decades of legacy design, KOZO starts fresh. Its microkernel foundation is clean, modern, and engineered for today’s hardware and expectations, giving you a system that feels lighter, safer, and more dependable from the inside out.
+## What Works Today
 
----
+KOZO currently boots on the governed x86-64 QEMU path, prepares a controlled
+stack and memory region, initializes required CPU math state, activates
+KOZO-owned page tables, enters one fixed user-mode probe, completes one fixed
+runtime-status request, executes two internal kernel operations, and stops in
+a deterministic halt loop.
 
-Current Status: “KOZO executes a function-call trap path: Rust extern call → asm bridge → Odin dispatcher. This is not a hardware `syscall`/interrupt path and does not perform a privilege transition.”
-The current tree exercises the assembly bridge boundary in source and verification, while the kernel bootstrap self-check remains a direct internal dispatcher call.
+The accepted run contains 41 ordered progress markers and passes 67 verification
+checks. These are narrow proof claims. KOZO does not yet provide general
+userspace, processes, a scheduler, a filesystem, Linux or POSIX compatibility,
+or production readiness.
 
-### Verification Artifacts
+## Start Here
 
-Artifacts in `/artifacts` are:
-- Reproducible outputs of `scripts/verify.sh`
-- NOT authoritative unless `verify.sh` passes on the current tree
+1. Read [Why KOZO](docs/wiki/WHY_KOZO.md).
+2. Follow [Getting Started](docs/wiki/GETTING_STARTED.md).
+3. Use the [User Guide](docs/wiki/USER_GUIDE.md) to understand the result.
+4. Open the [wiki index](docs/wiki/README.md) for maintainer and engineering
+   paths.
 
-Current Status:
-- Harness: Active
-- Kernel Build: PASS
-- Syscall Path: ASM BRIDGE
+From a configured development environment:
+
+```bash
+scripts/build_boot_image.sh
+scripts/qemu_smoke.sh
+python3 -m unittest discover -s tests
+scripts/verify.sh
+```
+
+A successful QEMU run ends with `KOZO_RUNTIME_RETURN_OK`. Full verification
+writes `artifacts/latest_verify.json` and reports `VERIFY: PASS`.
+
+## Documentation
+
+- [User and maintainer wiki](docs/wiki/README.md)
+- [Detailed architecture](docs/ARCHITECTURE.md)
+- [Runtime evidence](docs/RUNTIME_EVIDENCE.md)
+- [Security boundaries](docs/SECURITY_MODEL.md)
+- [Release checklist](docs/RELEASE_CHECKLIST.md)
+- [Documentation audit](docs/DOCUMENTATION_AUDIT.md)
+
+User and maintainer guidance starts in `docs/wiki`. Detailed engineering,
+contract, security, validation, and historical records remain under `docs`.
+
+## Maintaining KOZO
+
+Read the [Maintainer Guide](docs/wiki/MAINTAINER_GUIDE.md) before changing a
+contract, validator, runtime marker, or generated report. Generated files are
+review surfaces, not sources of truth, and must be refreshed through their
+governed generators.
+
+## License
+
+KOZO is available under the MIT or Apache-2.0 license. See [LICENSE](LICENSE),
+[LICENSE-MIT](LICENSE-MIT), and [LICENSE-APACHE](LICENSE-APACHE).

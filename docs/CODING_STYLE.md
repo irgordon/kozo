@@ -485,6 +485,18 @@ Prefer names, types, and structure.
 
 A comment should explain why something exists, not what the code already says.
 
+Keep short comments for hardware ordering, ABI and register rules, security
+boundaries, fail-closed behavior, compiler or assembler limitations,
+GNU/LLVM output differences, and generated-file ownership.
+
+Remove comments that narrate assignments, repeat function names, preserve old
+debugging history, explain simple loops, or duplicate engineering documents.
+Delete commented-out code. Version control already preserves it.
+
+Public boundary entry points may keep a short contract comment. Private helpers
+should rely on clear names unless a parsing or hardware rule is not visible
+from the code.
+
 Good:
 
 ```python

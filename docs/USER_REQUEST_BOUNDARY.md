@@ -1,7 +1,7 @@
 # Fixed User Request Boundary
 
 Version: 0
-Status: Implemented and locally evidenced; hosted CI pending
+Status: Accepted by hosted CI with 63 checks and 0 failures
 
 # 1. Authority
 

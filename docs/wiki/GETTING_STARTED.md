@@ -1,0 +1,125 @@
+# Getting Started
+
+This guide builds KOZO, runs it in QEMU, and checks the result.
+
+## Requirements
+
+The governed x86-64 path requires:
+
+- Python 3;
+- Odin;
+- Rust and Cargo from `rust-toolchain.toml`;
+- NASM and LLVM `lld`;
+- Limine 12.3.3 and its BIOS/UEFI image files;
+- xorriso;
+- `qemu-system-x86_64`;
+- `jq`;
+- GNU or LLVM `nm` and `objdump`;
+- `aarch64-elf-readelf` for portable ELF metadata inspection on macOS.
+
+Check the main tools:
+
+```bash
+python3 --version
+odin version
+cargo --version
+nasm -v
+lld --version
+xorriso -version
+qemu-system-x86_64 --version
+jq --version
+```
+
+See [Boot Tooling](../BOOT_TOOLING.md) for the pinned Limine source and
+checksum. If a tool is outside `PATH`, set the supported `LIMINE_DIR`, `LIMINE`,
+`XORRISO`, or `KOZO_QEMU_BIN` environment variable before running the scripts.
+
+## Open the Repository
+
+```bash
+git clone https://github.com/irgordon/kozo.git
+cd kozo
+git status --short --branch
+```
+
+If you already have the repository, enter its root directory and confirm that
+`git status` names the expected branch.
+
+## Build the Boot Image
+
+```bash
+scripts/build_boot_image.sh
+```
+
+Success creates:
+
+```text
+artifacts/runtime/boot_image/kozo.iso
+artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf
+artifacts/runtime/kernel_elf_report.json
+```
+
+If required ISO tools are missing, the script fails closed or records the exact
+local tooling failure. Do not edit generated package metadata to bypass it.
+
+## Run KOZO in QEMU
+
+```bash
+scripts/qemu_smoke.sh
+```
+
+The QEMU command resolves its binary in this order: `KOZO_QEMU_BIN`, `PATH`,
+then the Homebrew package prefix when available. A successful run writes serial
+evidence under `artifacts/runtime/`.
+
+Inspect the result:
+
+```bash
+jq '{outcome, blocker_category, expected_marker, observed_markers}' artifacts/runtime/qemu_smoke.metadata.json
+```
+
+Expected values are `outcome: "pass"`, no blocker, and an ordered marker list
+ending in `KOZO_RUNTIME_RETURN_OK`.
+
+## Run Tests
+
+```bash
+python3 -m unittest discover -s tests
+cargo check --manifest-path userspace/core_service/Cargo.toml
+odin check kernel
+```
+
+## Run Full Verification
+
+```bash
+scripts/verify.sh
+python3 -m json.tool artifacts/latest_verify.json
+jq '{status, summary}' artifacts/latest_verify.json
+git diff --check
+```
+
+Success prints `VERIFY: PASS`. The v0.8.9 acceptance gate expects 67 checks,
+no failures, QEMU outcome `pass`, and 41 ordered runtime markers.
+
+## Inspect the Kernel Binary
+
+Use the AArch64-prefixed tool only for ELF metadata:
+
+```bash
+aarch64-elf-readelf -h -l -S -s artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf
+```
+
+Use the host `nm` and `objdump` for x86-64 symbols and instructions:
+
+```bash
+nm -n artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf
+objdump -d artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf
+```
+
+Do not use AArch64-prefixed assemblers, linkers, `nm`, or `objdump` for the
+x86-64 kernel.
+
+## Common First-Run Problems
+
+See [Troubleshooting](TROUBLESHOOTING.md) for missing QEMU, empty serial output,
+Limine failures, stale generated reports, Taplo failures, and marker diagnosis.

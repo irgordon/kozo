@@ -79,7 +79,18 @@ This document does not require user-facing language in every file. Developer, op
 
 Each document must be written for a clear audience.
 
-KOZO documentation uses these audience categories:
+KOZO has three primary reading paths:
+
+| Audience | First question | Main entry |
+| --- | --- | --- |
+| User | Why should I care, and how do I use it? | `docs/wiki/README.md` |
+| Maintainer | How do I change and verify it safely? | `docs/wiki/MAINTAINER_GUIDE.md` |
+| Engineer | How does the system work in exact detail? | `docs/wiki/ENGINEERING_OVERVIEW.md` |
+
+The user is the first audience. Introductory text must explain the problem,
+value, current behavior, and limits before implementation detail.
+
+Supporting documentation may use these narrower audience categories:
 
 | Audience | Needs |
 | --- | --- |
@@ -94,6 +105,11 @@ A document should not switch audiences without warning.
 Beginner-facing documentation should not require architecture knowledge before explaining the product.
 
 Maintainer-facing documentation may be more technical, but it must still be clear.
+
+User and maintainer guidance starts in `docs/wiki`. Detailed architecture,
+contracts, security, validation, release evidence, and historical records
+remain in `docs`. Wiki pages summarize purpose and link to those authorities;
+they do not copy whole engineering documents.
 
 ---
 
@@ -329,6 +345,11 @@ Instructions should include:
 * failure meaning
 * next step
 
+Every command presented as current executable guidance must be run during the
+phase that adds or changes it. Record failures, retries, environment variables,
+and fallbacks honestly. Placeholder commands may explain a shape, but they must
+not be presented as tested copy-and-run guidance.
+
 Poor:
 
 ```text
@@ -494,6 +515,10 @@ Examples:
 * validation -> `docs/VALIDATION.md`
 
 A lower-authority document must not redefine a higher-authority rule.
+
+User pages should use the plain-language translation from
+`docs/wiki/TERMS.md` first. Add the engineering term in parentheses when it
+helps the reader find the owning document.
 
 ---
 
@@ -682,3 +707,36 @@ Do not overclaim.
 Do not make generated reports authoritative.
 
 The reader should spend effort understanding KOZO, not decoding the language used to describe it.
+
+---
+
+# 23. Historical Documents
+
+Historical decisions, phase records, and audit findings must remain available
+when they explain why the repository changed.
+
+Mark a historical document or section clearly. Preserve the original decision,
+count, or failure when it belongs to a named phase or CI run, then link to the
+current user or engineering document.
+
+Do not rewrite historical evidence as though it describes the current tree.
+Do not delete useful history merely because the active implementation changed.
+
+---
+
+# 24. Source Comments
+
+Code should explain what it does through clear names, small functions,
+top-down flow, and simple control structures.
+
+Keep a comment only when it explains a reason the code cannot show clearly,
+such as hardware ordering, calling conventions, register ownership, security
+boundaries, fail-closed behavior, compiler or assembler limitations,
+GNU/LLVM output differences, or generated-file ownership.
+
+Remove comments that repeat the next line, preserve stale history, narrate
+simple loops, duplicate detailed documentation, or keep commented-out code.
+Private helpers should not receive template docstrings when their names and
+types already explain their role.
+
+Detailed design belongs in engineering documentation.

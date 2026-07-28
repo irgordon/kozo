@@ -1,9 +1,8 @@
 # Fixed User Runtime Status Service
 
-Status: v0.8.7 implemented with local verification and 41-marker QEMU
-evidence. The first hosted run completed the runtime sequence but exposed a
-GNU/LLVM ELF-report parsing difference; hosted correction acceptance is
-pending.
+Status: v0.8.7 accepted by hosted CI with 67 checks, 0 failures, and all 41
+runtime markers. The earlier GNU/LLVM ELF-report parsing difference is
+resolved.
 
 ## 1. Scope
 

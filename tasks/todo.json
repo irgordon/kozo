@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO v0.8.8 Core Service MIT License Metadata",
+  "task_title": "KOZO v0.8.9 Documentation and Adoption Readiness",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -20,7 +20,8 @@
     "v0.8.5 fixed user-request boundary evidence is accepted by hosted CI and direct artifact inspection with 63 checks and 0 failures",
     "v0.8.7 runtime-ordered user status service and its portable Ring3 comparison correction are accepted by hosted CI with 67 checks and 0 failures",
     "The reconciled runtime progression graph is acyclic and permits first capability evidence only after controlled loop evidence",
-    "Odin, pinned Rust, Python, jq, and repository verification tooling are installed"
+    "Odin, pinned Rust, Python, jq, and repository verification tooling are installed",
+    "v0.8.8 core service MIT license metadata is accepted by hosted CI run 30357658912 with 67 checks, 0 failures, QEMU pass, blocker none, and all 41 runtime markers"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
@@ -33,7 +34,8 @@
     "v0.8.6 bounded response consumption is accepted by hosted CI with 65 checks and 0 failures",
     "This phase moves the accepted fixed transaction after the controlled Odin loop, exposes one shared deterministic status snapshot through fixed request ID 2, preserves internal capability ID 1 geometry and behavior, and adds no general dispatcher, public ABI, arbitrary pointer, persistent userspace, compatibility, or production claim",
     "Hosted CI run 30321090604 proved QEMU outcome pass, blocker none, and the exact 41-marker runtime sequence, but verification reported 67 checks with one fixed_user_runtime_status_service_evidence failure because GNU objdump labeled the Ring3 response-consumer start address with an alias and the report parser found zero comparisons",
-    "The core_service package selects the MIT option provided by the repository license set; LICENSE-MIT is the authoritative MIT text"
+    "The core_service package selects the MIT option provided by the repository license set; LICENSE-MIT is the authoritative MIT text",
+    "v0.8.9 changes documentation and source comments only; user and maintainer guidance begins in docs/wiki while detailed technical authority remains in contracts, source, and docs"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -2926,6 +2928,44 @@
         "verification.tests_run[149]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 85,
+      "title": "Add documentation and adoption readiness",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "README.md",
+        "docs/wiki/README.md",
+        "docs/wiki/WHY_KOZO.md",
+        "docs/wiki/GETTING_STARTED.md",
+        "docs/wiki/USER_GUIDE.md",
+        "docs/wiki/MAINTAINER_GUIDE.md",
+        "docs/wiki/TROUBLESHOOTING.md",
+        "docs/wiki/TERMS.md",
+        "docs/wiki/ENGINEERING_OVERVIEW.md",
+        "docs/DOCUMENTATION_AUDIT.md",
+        "docs/DOCUMENTATION_STANDARD.md",
+        "docs/CODING_STYLE.md",
+        "docs/BOOT.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/CODEBASE_AUDIT.md",
+        "kernel/runtime_capability.odin",
+        "kernel/runtime_progression.odin",
+        "kernel/arch/x86_64/privilege_transition.asm",
+        "scripts/kernel_elf_report.py",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "docs/generated/governance_index.md",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[150]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -2993,7 +3033,8 @@
     "v0.8.1 detects required FPU/FXSR/SSE/SSE2 support, configures and validates CR0/CR4, initializes x87/MXCSR, validates a bounded SSE2 probe, prohibits AVX, and preserves the accepted capability and halt path.",
     "v0.8.7 runs the accepted fixed Ring3 transaction after the controlled Odin loop, uses one validated 64-byte snapshot for the fixed 88-byte user response and unchanged internal capability ID 1 response, validates every response field in both privilege levels, clears all boundary state, and preserves capability ID 2, runtime return, and terminal halt.",
     "Portable Ring3 ELF evidence uses authoritative start/end symbol addresses over full disassembly, normalizes equivalent GNU and LLVM comparison syntax, still requires all 14 response-field offsets, and proves comparisons precede success-record stores, the second int 0x81, and the fail-closed ud2 guard without changing runtime behavior.",
-    "v0.8.8 records the exact MIT SPDX value in the core_service manifest, removes the missing-license cargo-deny failure without an exception, preserves package identity and runtime behavior, and refreshes governed proof."
+    "v0.8.8 records the exact MIT SPDX value in the core_service manifest, removes the missing-license cargo-deny failure without an exception, preserves package identity and runtime behavior, and refreshes governed proof.",
+    "v0.8.9 provides a user-first wiki, tested getting-started and troubleshooting paths, maintainer and engineering navigation, plain-language terminology, documentation and source-comment audits, corrected current claims, and unchanged runtime evidence."
   ],
   "verification": {
     "tests_run": [
@@ -3746,6 +3787,11 @@
         "tool": "core service MIT license metadata validation",
         "command": "cargo metadata; cargo package --list; cargo check; cargo deny check licenses; cargo deny check; cargo audit; cargo nextest run; cargo test fallback; taplo checks; Python discovery; governed verification",
         "status": "metadata_mit_license_file_null; package_list_inspected_allow_dirty; cargo_check_deny_audit_passed; nextest_no_tests; cargo_test_passed; taplo_macos_system_configuration_panic; python_1032_passed; verification_67_checks_0_failures_qemu_pass_41_markers"
+      },
+      {
+        "tool": "documentation and adoption readiness validation",
+        "command": "documentation inventory and local-link scan; every docs/wiki command; source-comment and TODO scans; odin check kernel; cargo check; Python discovery; governed build, QEMU, and full verification; JSON and diff checks",
+        "status": "passed_1032_tests_67_checks_0_failures_qemu_pass_41_markers_62_links; taplo_macos_system_configuration_panic"
       }
     ],
     "logs": [

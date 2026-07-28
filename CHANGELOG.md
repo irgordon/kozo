@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.8.9 - 2026-07-28
+
+**Status:** Implemented and validated locally; hosted CI acceptance pending.
+
+* Added a user and maintainer wiki under `docs/wiki`.
+* Rewrote the project entry path around purpose, use, expected results, and current limits.
+* Separated user, maintainer, and engineering documentation and added a plain-language terminology guide.
+* Audited current, historical, duplicated, stale, and missing documentation.
+* Validated documented commands and local links.
+* Removed unnecessary comments and templated docstrings; no vague TODOs or commented-out code were present.
+* Preserved short comments for hardware, ABI, security, fail-closed, compiler, and toolchain rules.
+* Changed no runtime, ABI, request, marker, capability, mapping, or halt behavior.
+* Did not claim complete release-candidate readiness.
+
 ## v0.8.8 - 2026-07-28
 
 **Status:** Implemented and validated locally; hosted CI acceptance pending.

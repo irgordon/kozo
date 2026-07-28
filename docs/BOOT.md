@@ -10,9 +10,13 @@ Scope: Current bootability status and boot baseline requirements
 
 This document records the current KOZO boot baseline.
 
-The v0.3.0 bootable runtime baseline attempted to determine whether the current kernel output can honestly be booted under QEMU.
+The v0.3.0 bootable runtime baseline attempted to determine whether the kernel
+could honestly boot under QEMU. That historical attempt was blocked. The
+current governed QEMU path passes through all 41 ordered runtime markers and
+ends at `KOZO_RUNTIME_RETURN_OK`.
 
-The result is blocked.
+For the current user-facing path, see `docs/wiki/USER_GUIDE.md`. The phase
+timeline below is retained as engineering history.
 
 v0.3.1 selected Limine as the initial x86_64 boot protocol.
 

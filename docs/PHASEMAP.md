@@ -93,7 +93,8 @@ Detailed evidence rules are owned by `docs/RELEASE_EVIDENCE.md`.
 
 The current local generated evidence proves:
 
-* The last accepted v0.8.1 baseline passes with 55 checks and 0 failures.
+* The accepted v0.8.8 baseline passes 67 checks with 0 failures, QEMU outcome
+  pass, blocker none, and all 41 ordered runtime markers.
 * v0.8.0 is accepted by hosted CI with the complete capability marker suffix and passing capability evidence.
 * The kernel ELF uses higher-half PT_LOAD virtual addresses.
 * Local kernel ELF loadability reports no lower-half PHDR blocker.
@@ -121,24 +122,29 @@ The current local generated evidence proves:
 * v0.8.4 is accepted by hosted CI run `30217859139` with one fixed CPL0-to-CPL3 `iretq` transition, one fixed CPL3 stack/token probe, one DPL3 `int 0x81` return through TSS.RSP0, saved-frame validation, the fixed CPL0 continuation, and the unchanged Odin capability and halt suffix.
 * v0.8.5 is accepted by hosted CI and direct artifact inspection with one exact Ring3 request, complete-span defense, supervisor-only copy-in, deterministic Ring0 service, exact response copy-out/readback, and 63 checks with 0 failures.
 * v0.8.6 is accepted by hosted CI with one sanitized response-consumer resume, full CPL3 response validation, one fixed 48-byte record, a second `int 0x81`, Ring0 response revalidation, exact record acceptance, verified clearing, and all 40 runtime markers.
-* v0.8.7 locally validates post-loop collection of one shared runtime-status snapshot, one fixed 88-byte Ring3 response, complete Ring3/Ring0 field validation, unchanged internal capability ID 1 semantics, and all 41 runtime markers.
+* v0.8.7 is accepted by hosted CI with post-loop collection of one shared
+  runtime-status snapshot, one fixed 88-byte Ring3 response, complete
+  Ring3/Ring0 field validation, unchanged internal capability ID 1 semantics,
+  and all 41 runtime markers.
+* v0.8.8 is accepted with exact MIT package metadata, passing cargo-deny
+  license and full policy checks, inspected package contents, and unchanged
+  runtime evidence.
 
 ## Current Active Blocker
 
-No active local runtime blocker is recorded for v0.8.7. Hosted CI marker,
-shared-snapshot, fixed-status-service, focused ELF, preserved
-privilege/capability, and halt confirmation remains the phase acceptance gate.
+No active runtime blocker is recorded for the accepted v0.8.8 baseline.
+v0.8.9 changes documentation and comments only; hosted CI remains its final
+acceptance gate.
 
 Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr`, `kernel_entry_not_reached`, `serial_not_initialized`, and `marker_not_emitted` are retained only as resolved historical evidence states unless a future CI artifact reintroduces one.
 
-## Next Runtime Phase
+## Next Phase
 
-The current runtime phase is `v0.8.7 Runtime-Ordered User Status Service`.
-Local evidence proves one fixed post-loop status transaction from the same
-snapshot used by internal capability ID 1. General dispatch, pointers,
-lengths, public syscall behavior, persistent userspace, process isolation,
-hostile-code safety, and production readiness remain unproven. Hosted
-acceptance is required before another fixed service or release-hardening work.
+The current phase is `v0.8.9 Documentation and Adoption Readiness`. It adds a
+user-first entry path, maintainer workflow, engineering navigation,
+plain-language terminology, and a documentation/comment audit without changing
+runtime behavior. After hosted acceptance, the next phase is
+`v1.0.0-rc.1 Release-Candidate Hardening`.
 
 ---
 
@@ -201,6 +207,8 @@ acceptance is required before another fixed service or release-hardening work.
 | `v0.8.5` | Fixed User Request Boundary | Execute one exact request/response transaction through the accepted fixed CPL3 probe and interrupt return. | Fixed 40-byte request and 48-byte response spans, supervisor shadows, exact copy/service/readback/clear logic, contracts, validators, ELF/QEMU evidence, docs, and tests. | Hosted CI captures all four boundary markers between Ring3 entry and Ring3 probe success; request/response and privilege validators pass; no generic copy, public syscall, persistent userspace, process, isolation, compatibility, or production claim is added. |
 | `v0.8.6` | Bounded User Response Consumption | Return one validated fixed response to the fixed CPL3 continuation for bounded consumption before final Ring0 convergence. | Runtime implementation, exact continuation and response-consumption evidence, contract updates, validators, ELF/QEMU evidence, docs, and tests. | Hosted CI proves one fixed Ring3 response-consumption step and preserved Ring0 return/halt without generalizing the request boundary. |
 | `v0.8.7` | Runtime-Ordered User Status Service | Invoke the accepted fixed user transaction after the controlled loop and expose the existing deterministic status source through one fixed response. | Shared 64-byte snapshot, fixed request ID 2, fixed 88-byte response, complete Ring3/Ring0 validation, contracts, validators, ELF/QEMU evidence, docs, and tests. | Hosted CI captures all 41 markers in order; both status-service validators pass; internal capability ID 1 remains unchanged; no general dispatcher, public ABI, persistent userspace, compatibility, or production claim is added. |
+| `v0.8.8` | Core Service MIT License Metadata | Record the repository's MIT license choice in the Rust package and remove the cargo-deny metadata blocker. | Exact Cargo SPDX metadata, minimal cargo-deny policy, package-content inspection, release records, and refreshed proof. | Cargo reports MIT, cargo-deny passes without exceptions, package identity and contents remain stable, and runtime verification is unchanged. |
+| `v0.8.9` | Documentation and Adoption Readiness | Give users, maintainers, and engineers a clear entry path and remove stale or redundant explanatory text. | User/maintainer wiki, rewritten README, documentation audit, terminology guide, tested commands and links, comment audit, and refreshed proof. | Readers can move from purpose to operation to maintenance to engineering detail; commands and links validate; runtime evidence remains unchanged. |
 | `v1.0.0-rc.1` | Release candidate hardening | Freeze release scope and release gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | Release evidence bundle, completed release checklist, current generated reports, changelog/release notes dry run, all required CI checks green. | Release candidate can be reviewed without adding new scope. |
 | `v1.0.0` | Scoped production release | Release only the proven, scoped KOZO surface. | Final release evidence bundle, final changelog and release notes, passing required gates, explicit non-goals. | v1.0.0 claims only evidence-backed behavior and preserves all compatibility non-goals. |
 

@@ -1176,8 +1176,25 @@ compatibility claim, or production claim.
 | AUDIT-088-001 | Resolved locally | `userspace/core_service/Cargo.toml` now declares the exact SPDX value `MIT`; Cargo metadata reports `MIT` and no package-specific license file. |
 | AUDIT-073-001 | Resolved locally | The package selects the MIT option provided by the repository license set, and the minimal root cargo-deny policy allows that exact SPDX value without a crate exception or policy weakening. Both the license-only and full checks pass. |
 | AUDIT-088-002 | Resolved locally | Package-list inspection contains only Cargo metadata, the lockfile, manifest, and source; no target output, runtime evidence, local configuration, credential, log, or editor-state file is packaged. |
-| AUDIT-088-003 | Hosted confirmation pending | Local verification preserves the existing runtime evidence; hosted CI must confirm the unchanged verification and QEMU gates. |
+| AUDIT-088-003 | Resolved | Hosted CI run `30357658912` confirmed 67 checks with 0 failures, QEMU outcome pass, blocker none, all 41 markers, and generated artifact validation for the accepted v0.8.8 tree. |
 
 The root `LICENSE-MIT` file remains the authoritative MIT text. This metadata
 correction changes no runtime, kernel, ABI, syscall, Ring 3, capability,
 mapping, or halt behavior and does not establish complete v1.0.0 readiness.
+
+# 38. v0.8.9 Documentation and Adoption Readiness
+
+Status: Implemented and validated locally; hosted CI acceptance pending.
+
+| ID | Status | Finding |
+| --- | --- | --- |
+| AUDIT-089-001 | Resolved locally | The stale root README is replaced by a user-first project summary and a guided `docs/wiki` entry path. |
+| AUDIT-089-002 | Resolved locally | User, maintainer, and engineering audiences now have separate entry points with plain-language term translation and links to authoritative details. |
+| AUDIT-089-003 | Resolved locally | Current-facing boot, fixed-request, status-service, phase-map, roadmap, and historical ADR wording no longer presents accepted or superseded states as current blockers. |
+| AUDIT-089-004 | Resolved locally | The source-comment audit removed templated and self-evident comments while retaining hardware, ABI, security, fail-closed, GNU/LLVM, and generated-file rules. |
+| AUDIT-089-005 | Deferred | Historical boot and audit timelines remain long because they preserve evidence and decision history. The wiki is the short current path. |
+
+`docs/DOCUMENTATION_AUDIT.md` owns the v0.8.9 inventory, duplicate/stale
+findings, command and link review, term decisions, and comment-audit record.
+This phase changes no runtime, ABI, request, marker, capability, mapping, or
+halt behavior.

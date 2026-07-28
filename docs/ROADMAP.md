@@ -108,7 +108,11 @@ The current repository proves:
 * hosted-CI-proven fixed CPL0-to-CPL3 `iretq` probe, DPL3 `int 0x81` return through TSS.RSP0, saved-frame/token validation, fixed CPL0 continuation, and unchanged capability/halt suffix
 * hosted-accepted exact fixed user request boundary with complete-span validation, supervisor-only shadows, deterministic service, response readback, verified request-side clearing, and unchanged privilege/capability/halt paths
 * hosted-CI-accepted bounded response consumption with one sanitized Ring3 resume, complete response validation, fixed 48-byte record, second gate entry, Ring0 revalidation, verified clearing, and phase reset
-* locally evidenced runtime-ordered user status service with one shared post-loop snapshot, fixed 88-byte response, complete Ring3/Ring0 validation, and unchanged internal capability ID 1 behavior
+* hosted-CI-accepted runtime-ordered user status service with one shared
+  post-loop snapshot, fixed 88-byte response, complete Ring3/Ring0 validation,
+  and unchanged internal capability ID 1 behavior
+* accepted MIT metadata and cargo-deny policy for `core_service` with unchanged
+  runtime evidence
 
 The latest local generated evidence may still report missing local Limine/xorriso tooling, but CI run `27894312430` proves the narrow QEMU serial smoke path.
 
@@ -118,7 +122,7 @@ The latest local generated evidence may still report missing local Limine/xorris
 
 KOZO still does not prove:
 
-* hosted QEMU proof of the v0.8.7 runtime-ordered status-service sequence and evidence checks
+* hosted acceptance of the v0.8.9 documentation and comment-only evidence
 * complete Odin runtime readiness or dynamic initialization
 * general stack readiness beyond the controlled boot stack proof
 * general memory management beyond the governed static region
@@ -142,10 +146,10 @@ KOZO still does not prove:
 
 # 9. Current Active Blocker
 
-No local v0.8.7 runtime blocker is active. Hosted CI confirmation of the
-post-loop service markers, both new validators, shared-snapshot ELF evidence,
-preserved privilege and capability evidence, governed return, and halt remains
-required before phase acceptance.
+No active runtime blocker is recorded for the accepted v0.8.8 baseline.
+v0.8.9 remains locally complete until hosted CI confirms that the
+documentation and comment-only patch preserves all verification and QEMU
+evidence.
 
 ---
 
@@ -256,6 +260,8 @@ Deferred until separately scoped runtime or cleanup phases:
 | `v0.8.5` | Fixed User Request Boundary | Execute one exact Ring3 request and Ring0 response transaction through the accepted fixed interrupt boundary. | Arbitrary pointers or lengths, generic copy API, public syscall ABI, persistent userspace, process isolation, compatibility, production readiness. |
 | `v0.8.6` | Bounded User Response Consumption | Return one validated fixed response to a fixed Ring3 continuation for bounded consumption before final Ring0 convergence. | General request dispatch, repeated sessions, arbitrary user buffers, process model, isolation, compatibility, production readiness. |
 | `v0.8.7` | Runtime-Ordered User Status Service | Collect one post-loop snapshot and expose it through the existing fixed transaction while preserving internal capability ID 1. | General dispatch, variable fields or messages, public syscall ABI, persistent userspace, process model, compatibility, production readiness. |
+| `v0.8.8` | Core Service MIT License Metadata | Add exact MIT package metadata, pass cargo-deny, and inspect package contents without changing runtime behavior. | Publication, packaging frameworks, dependency changes, runtime changes, complete release readiness. |
+| `v0.8.9` | Documentation and Adoption Readiness | Add a user-first wiki, maintainer path, engineering overview, terminology guide, documentation audit, and focused comment cleanup. | Runtime features, documentation frameworks, publication, compatibility, complete release readiness. |
 | `v1.0.0-rc.1` | Release candidate hardening | Freeze scope, freeze gates, produce evidence bundle, confirm branch protection, and dry-run release notes. | New feature scope after RC. |
 | `v1.0.0` | Scoped release | Release only evidence-backed behavior with explicit non-goals. | Any unimplemented compatibility or runtime subsystem claim. |
 

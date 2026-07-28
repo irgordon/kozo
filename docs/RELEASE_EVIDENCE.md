@@ -414,6 +414,21 @@ P2 issues block release candidate promotion unless explicitly waived through gov
 
 P3 issues may be deferred when they do not weaken release claims or evidence.
 
+# 13. Documentation Adoption Evidence
+
+For v0.8.9 and later, release review includes:
+
+* the user and maintainer entry path under `docs/wiki`;
+* `docs/DOCUMENTATION_AUDIT.md`;
+* successful local-link validation;
+* the exact command-validation record;
+* source-comment audit results;
+* full verification and QEMU evidence showing no runtime drift.
+
+Documentation is descriptive unless a higher-authority document says
+otherwise. The wiki explains current behavior but does not replace contracts,
+source code, security policy, validation policy, or generated proof.
+
 For v0.7.5, release review must include `contracts/controlled_runtime_loop_contract.v0.json`, `controlled_runtime_loop_contract`, `controlled_runtime_loop_evidence`, the kernel ELF report, and QEMU metadata/logs. Local contract, source, and ELF checks establish only implementation readiness. The stage is proven only after hosted CI captures the ordered loop entry, three iteration, exit, and return markers and all validators pass.
 
 For v0.8.0, release review must include `contracts/first_governed_runtime_capability.v0.json`, `first_governed_runtime_capability`, `first_governed_runtime_capability_evidence`, the kernel ELF report, and QEMU metadata/logs. Local evidence proves the fixed internal request/response and dispatch path exists; promotion requires hosted evidence for dispatch, handler success, capability success, and governed return. This proves no userspace access, privilege separation, hardware syscall entry, scheduler/process behavior, compatibility, or production readiness.
@@ -427,7 +442,7 @@ suffix, and the halt contract. This proves no AVX/XSAVE, per-task state
 ownership, context switching, exception recovery, compatibility, or production
 readiness.
 
-# 15. v0.8.6 Bounded User Response Consumption Evidence
+# 14. v0.8.6 Bounded User Response Consumption Evidence
 
 Release review must include both v0.8.6 validator results, fixed phase/shadow
 ELF geometry, two `iretq` and two `int 0x81` sites, the complete 40-marker QEMU
@@ -461,7 +476,7 @@ recovery, compatibility, or production readiness.
 
 ---
 
-# 13. v0.8.4 Privilege-Transition Evidence
+# 15. v0.8.4 Privilege-Transition Evidence
 
 Release review must include the bounded privilege-transition contract, both
 privilege validators, the kernel ELF report, QEMU metadata and serial log, and
@@ -479,7 +494,7 @@ exception handling, compatibility, or production readiness.
 
 ---
 
-# 14. v0.8.5 Fixed User Request Boundary Evidence
+# 16. v0.8.5 Fixed User Request Boundary Evidence
 
 Release review must include the fixed user request contract and evidence
 validators, kernel ELF report, QEMU metadata and serial log, and the unchanged
@@ -498,7 +513,7 @@ readiness.
 
 ---
 
-# 15. v0.8.7 Runtime Status Service Evidence
+# 17. v0.8.7 Runtime Status Service Evidence
 
 Release review must include the runtime-status service contract and evidence
 validators, shared-snapshot ELF record, QEMU metadata and serial log, and the

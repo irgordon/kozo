@@ -424,3 +424,23 @@ The root `LICENSE-MIT` file is the authoritative MIT license text. Confirm:
 
 This gate removes one package-metadata blocker. It does not publish the
 package or establish complete v1.0.0 release readiness.
+
+# 20. v0.8.9 Documentation and Adoption Gate
+
+Confirm:
+
+* the root README explains purpose, current behavior, quick start, expected
+  result, limits, and documentation paths before implementation detail;
+* `docs/wiki` contains the required user, maintainer, troubleshooting,
+  terminology, and engineering pages;
+* `docs/DOCUMENTATION_AUDIT.md` records document and source-comment review;
+* current-facing version, check, marker, and hosted-acceptance claims match the
+  accepted baseline;
+* local Markdown links resolve;
+* every executable wiki command was run and failures were recorded honestly;
+* redundant comments were removed without deleting hardware, ABI, security,
+  fail-closed, compiler, or toolchain constraints;
+* full verification and QEMU preserve all 67 checks and 41 markers.
+
+This gate improves understanding and adoption readiness. It does not add a
+runtime feature or complete release-candidate hardening.

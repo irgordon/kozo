@@ -1,5 +1,13 @@
 # ADR-0016: Kernel Entry and Syscall Bridge
 
+Status: Historical
+
+This decision records the original function-call bridge boundary. The current
+runtime also contains a separately governed fixed Ring 3 transaction. See
+`docs/PRIVILEGE_TRANSITION.md`, `docs/USER_REQUEST_BOUNDARY.md`, and
+`docs/USER_RUNTIME_STATUS_SERVICE.md` for current behavior. The original
+decision remains below as historical context.
+
 ## Status
 
 Accepted
