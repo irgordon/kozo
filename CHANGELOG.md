@@ -11,6 +11,7 @@
 * Validated every response field in Ring 3 and Ring 0, validated the fixed XOR digest, and cleared all transaction and snapshot storage.
 * Preserved the accepted request, copy, privilege, response-consumption, internal capability, runtime return, and terminal halt paths.
 * Added no general dispatcher, public syscall ABI, arbitrary pointer, persistent userspace, compatibility, or production-readiness claim.
+* Fixed portable Ring 3 comparison evidence across GNU and LLVM `objdump` output. The required comparison count and ordering checks remain unchanged.
 
 ## v0.8.6 - 2026-07-26
 

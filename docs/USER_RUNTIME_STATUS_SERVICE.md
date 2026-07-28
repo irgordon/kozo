@@ -1,7 +1,9 @@
 # Fixed User Runtime Status Service
 
-Status: v0.8.7 implemented with 1,015 local tests, 67 verification checks,
-QEMU outcome `pass`, blocker `none`, and 41 markers; hosted CI pending.
+Status: v0.8.7 implemented with local verification and 41-marker QEMU
+evidence. The first hosted run completed the runtime sequence but exposed a
+GNU/LLVM ELF-report parsing difference; hosted correction acceptance is
+pending.
 
 ## 1. Scope
 
@@ -198,3 +200,23 @@ status source as internal capability ID 1. It does not prove a general
 dispatcher, public syscall ABI, arbitrary status query, variable-sized
 message, persistent Ring 3 execution, process model, scheduler, isolation,
 Linux or POSIX compatibility, or production readiness.
+
+## 13. CI Correction
+
+Hosted QEMU completed the full status transaction, but the GNU ELF report did
+not recognize the Ring 3 comparison instructions. GNU associated the consumer
+start address with the adjacent `user_privilege_probe_end` alias, so
+symbol-specific disassembly returned an empty body even though full
+disassembly contained all required instructions.
+
+The report now bounds the consumer by the authoritative start and end symbol
+addresses. It normalizes known equivalent `cmp`, `cmpl`, and `cmpq` spellings,
+checks all 14 contract response offsets, requires the existing comparison
+threshold, and proves record-store, `int 0x81`, and `ud2` order.
+
+This correction changes only how equivalent GNU and LLVM instruction text is
+read. It does not change runtime code, marker order, response geometry, or
+validator policy.
+
+Future ELF evidence must not depend on one `objdump` spelling. Normalize known
+equivalent forms first, then apply the same governed evidence checks.

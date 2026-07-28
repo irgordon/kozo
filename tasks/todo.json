@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO Runtime-Ordered User Status Service v0.8.7",
+  "task_title": "KOZO v0.8.7 Portable Ring3 Evidence Correction",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -30,7 +30,8 @@
     "The accepted fixed user-mapping foundation provides the only user RX code page and user RW-NX data/stack pages consumed by this phase",
     "The accepted fixed iretq CPL3 probe and DPL3 int 0x81 return remain the only privilege transition and return mechanism",
     "v0.8.6 bounded response consumption is accepted by hosted CI with 65 checks and 0 failures",
-    "This phase moves the accepted fixed transaction after the controlled Odin loop, exposes one shared deterministic status snapshot through fixed request ID 2, preserves internal capability ID 1 geometry and behavior, and adds no general dispatcher, public ABI, arbitrary pointer, persistent userspace, compatibility, or production claim"
+    "This phase moves the accepted fixed transaction after the controlled Odin loop, exposes one shared deterministic status snapshot through fixed request ID 2, preserves internal capability ID 1 geometry and behavior, and adds no general dispatcher, public ABI, arbitrary pointer, persistent userspace, compatibility, or production claim",
+    "Hosted CI run 30321090604 proved QEMU outcome pass, blocker none, and the exact 41-marker runtime sequence, but verification reported 67 checks with one fixed_user_runtime_status_service_evidence failure because GNU objdump labeled the Ring3 response-consumer start address with an alias and the report parser found zero comparisons"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -2874,6 +2875,34 @@
         "verification.tests_run[147]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 83,
+      "title": "Normalize portable Ring3 comparison evidence",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "scripts/kernel_elf_report.py",
+        "harness/validators_impl/fixed_user_runtime_status_service_evidence.py",
+        "harness/validators_impl/validator_coverage.py",
+        "tests/test_kernel_elf_report.py",
+        "tests/test_fixed_user_runtime_status_service_evidence.py",
+        "tests/fixtures/elf/llvm_ring3_response_consumer.txt",
+        "tests/fixtures/elf/gnu_ring3_response_consumer.txt",
+        "docs/USER_RUNTIME_STATUS_SERVICE.md",
+        "docs/RUNTIME_EVIDENCE.md",
+        "docs/VALIDATION.md",
+        "docs/CODEBASE_AUDIT.md",
+        "docs/generated/governance_index.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/kernel_elf_report.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[148]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -2939,7 +2968,8 @@
     "v0.8.0 implements one versioned internal runtime status request with explicit field validation, one direct dispatcher, one deterministic response handler, response validation, governed capability evidence, and the unchanged return-to-halt path without adding userspace, isolation, scheduler, allocator, interrupt, ABI, syscall, compatibility, or production claims.",
     "The v0.8.0 corrective continuation replaces faulting aggregate response initialization with scalar stores, preserves strict pointer validation, hardens overlap arithmetic, and is accepted by hosted CI.",
     "v0.8.1 detects required FPU/FXSR/SSE/SSE2 support, configures and validates CR0/CR4, initializes x87/MXCSR, validates a bounded SSE2 probe, prohibits AVX, and preserves the accepted capability and halt path.",
-    "v0.8.7 runs the accepted fixed Ring3 transaction after the controlled Odin loop, uses one validated 64-byte snapshot for the fixed 88-byte user response and unchanged internal capability ID 1 response, validates every response field in both privilege levels, clears all boundary state, and preserves capability ID 2, runtime return, and terminal halt."
+    "v0.8.7 runs the accepted fixed Ring3 transaction after the controlled Odin loop, uses one validated 64-byte snapshot for the fixed 88-byte user response and unchanged internal capability ID 1 response, validates every response field in both privilege levels, clears all boundary state, and preserves capability ID 2, runtime return, and terminal halt.",
+    "Portable Ring3 ELF evidence uses authoritative start/end symbol addresses over full disassembly, normalizes equivalent GNU and LLVM comparison syntax, still requires all 14 response-field offsets, and proves comparisons precede success-record stores, the second int 0x81, and the fail-closed ud2 guard without changing runtime behavior."
   ],
   "verification": {
     "tests_run": [
@@ -3682,6 +3712,11 @@
         "tool": "runtime-ordered user status validation",
         "command": "required focused Python tests; full Python discovery; odin check kernel; configured build and QEMU smoke; nm and objdump inspection",
         "status": "passed_local_67_checks_0_failures_41_markers_1015_tests"
+      },
+      {
+        "tool": "portable Ring3 comparison evidence correction",
+        "command": "GNU and LLVM fixture tests; real hosted ELF report under GNU objdump 2.46.1; local ELF report under LLVM 17; aarch64-elf-readelf metadata; objconv disassembly; focused and full Python tests; configured build and QEMU smoke",
+        "status": "passed_focused_197_full_1032_qemu_41_markers_verification_67_checks_0_failures"
       }
     ],
     "logs": [
@@ -3699,7 +3734,8 @@
       "The verify artifact is only authoritative when the current tree reproduces it via scripts/verify.sh",
       "runtime evidence taxonomy is authoritative for marker and blocker vocabulary; generated smoke metadata remains evidence and does not define taxonomy authority.",
       "Runtime progression stages are authoritative stage governance; the graph remains acyclic and monotonic, and the halt loop remains authoritative after the bounded progression call.",
-      "Hosted CI run 29459278491 captured the complete ordered runtime marker sequence and passed runtime_progression_evidence."
+      "Hosted CI run 29459278491 captured the complete ordered runtime marker sequence and passed runtime_progression_evidence.",
+      "Ring3 response-consumer ELF evidence must be bounded by authoritative start and end symbol addresses so GNU and LLVM label aliases cannot change the governed comparison result."
     ],
     "expected_behavior": [
       "verify.sh succeeds on a clean tree and prints the generated artifact JSON before VERIFY: PASS",
@@ -3838,7 +3874,8 @@
       "v0.7.0 implements controlled boot stack evidence by setting rsp to boot_stack_top, probing stack use, emitting KOZO_STACK_INIT_OK, extending the governed marker sequence, and preserving no memory/runtime/userspace/compatibility/production claims.",
       "v0.7.2 orders BOOT_SMOKE, STACK_INITIALIZATION_EVIDENCE, MEMORY_INITIALIZATION_EVIDENCE, and RUNTIME_PROGRESSION_ENTRY monotonically, leaves stack proven and later stages planned, and validates graph and authority integrity.",
       "v0.7.4 implements the contract-owned 4096-byte static memory region, explicit zero fill, bounded sentinel write/read/compare/restore probe, KOZO_MEMORY_INIT_OK marker, and unchanged terminal halt loop.",
-      "v0.7.45 is accepted by hosted CI marker and validator evidence for the bounded assembly-to-Odin call, fixed bootstrap context validation, volatile static-state probe, exact return status, and preserved terminal halt."
+      "v0.7.45 is accepted by hosted CI marker and validator evidence for the bounded assembly-to-Odin call, fixed bootstrap context validation, volatile static-state probe, exact return status, and preserved terminal halt.",
+      "The portable Ring3 evidence correction resolves GNU/LLVM function-label differences by extracting the consumer from its ELF address range and preserves the full comparison, response-offset, success-store, int 0x81, and ud2 ordering requirements."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -3916,6 +3953,7 @@
     "v0.7.5 adds a contract-backed three-iteration Odin loop with volatile state mutation, ordered marker bridges, deterministic status handling, ELF backward-edge reporting, the unchanged exact return-to-halt boundary, and hosted CI acceptance.",
     "v0.8.0 adds one explicit internal runtime status request, fixed response, direct dispatcher, bounded handler, source and ELF evidence validation, fixed capability markers, and the unchanged exact return-to-halt boundary, accepted by hosted CI.",
     "The first hosted v0.8.0 attempt exposed an implicit CPU-state dependency; v0.8.1 establishes a contract-backed pre-Odin x87/SSE state gate and bounded SIMD evidence while preserving the accepted runtime suffix.",
-    "v0.8.7 moves the one-shot fixed user transaction after the controlled loop, shares one kernel-owned status snapshot with internal capability ID 1, validates the 88-byte response in Ring3 and Ring0, clears every snapshot and transaction buffer, and preserves the existing capability and halt boundaries."
+    "v0.8.7 moves the one-shot fixed user transaction after the controlled loop, shares one kernel-owned status snapshot with internal capability ID 1, validates the 88-byte response in Ring3 and Ring0, clears every snapshot and transaction buffer, and preserves the existing capability and halt boundaries.",
+    "Corrected the CI-only Ring3 ELF evidence failure by parsing GNU and LLVM full disassembly within authoritative consumer symbol bounds, while retaining all field-coverage and success-path ordering checks and leaving the accepted runtime marker sequence unchanged."
   ]
 }

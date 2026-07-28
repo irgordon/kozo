@@ -316,3 +316,11 @@ complete assembly formatting and validation, linked snapshot/shadow geometry,
 Ring 3 comparisons, Ring 0 revalidation, XOR digest, cleanup, 41-marker
 metadata/log agreement, failure exclusion, and halt preservation. Every
 failure reports `reason` and `contract_field`.
+
+The v0.8.7 CI correction makes Ring 3 ELF comparison extraction portable
+across GNU and LLVM `objdump`. The generator bounds the consumer by ELF symbol
+addresses, normalizes known equivalent comparison mnemonics, and reports
+contract-offset coverage plus comparison, success-store, second-interrupt,
+and `ud2` ordering. The validator still requires the complete comparison
+threshold and rejects missing offsets, early stores, early or missing
+`int 0x81`, and a missing fail-closed guard.

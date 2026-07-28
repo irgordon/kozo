@@ -346,11 +346,75 @@ def _elf_issue(context):
         return _issue("boot_executes_transaction", "kernel_elf_report.boot_calls_transaction", "ELF must prove boot does not enter the fixed transaction")
     if evidence.get("response_builder_store_count", 0) < 11:
         return _issue("elf_response_stores_missing", "kernel_elf_report.response_builder_store_count", "ELF must retain the complete response stores")
-    if evidence.get("ring3_response_compare_count", 0) < 14:
-        return _issue("elf_response_comparisons_missing", "kernel_elf_report.ring3_response_compare_count", "ELF must retain complete Ring3 comparisons")
+    consumer_issue = _ring3_consumer_elf_issue(evidence)
+    if consumer_issue is not None:
+        return consumer_issue
     if evidence.get("digest_xor_count", 0) < 10:
         return _issue("elf_digest_incomplete", "kernel_elf_report.digest_xor_count", "ELF must retain all ten digest XOR operations")
     return None
+
+
+def _ring3_consumer_elf_issue(evidence):
+    expected_offsets = _expected_response_offsets()
+    if (
+        evidence.get("ring3_response_consumer_symbol_found") is not True
+        or evidence.get("ring3_response_consumer_instruction_count", 0) <= 0
+    ):
+        return _issue(
+            "elf_consumer_missing",
+            "kernel_elf_report.ring3_response_consumer_symbol_found",
+            "ELF must contain the bounded Ring3 response consumer",
+        )
+    if evidence.get("ring3_response_compare_count", 0) < len(expected_offsets):
+        return _issue(
+            "elf_response_comparisons_missing",
+            "kernel_elf_report.ring3_response_compare_count",
+            "ELF must retain complete Ring3 comparisons",
+        )
+    if (
+        evidence.get("ring3_response_expected_offsets") != expected_offsets
+        or evidence.get("ring3_response_missing_offsets") != []
+        or evidence.get("ring3_response_observed_offsets") != expected_offsets
+    ):
+        return _issue(
+            "elf_response_offsets_missing",
+            "kernel_elf_report.ring3_response_missing_offsets",
+            "ELF must compare every contract-defined Ring3 response offset",
+        )
+    if evidence.get("ring3_response_success_store_count", 0) < 8:
+        return _issue(
+            "elf_success_stores_missing",
+            "kernel_elf_report.ring3_response_success_store_count",
+            "ELF must retain all fixed consumption-record stores",
+        )
+    if evidence.get("ring3_response_second_interrupt_present") is not True:
+        return _issue(
+            "elf_second_interrupt_missing",
+            "kernel_elf_report.ring3_response_second_interrupt_present",
+            "ELF must retain one fixed post-validation int 0x81",
+        )
+    required_order = (
+        "ring3_response_comparisons_before_success_store",
+        "ring3_response_success_store_before_interrupt",
+        "ring3_response_fail_closed_guard_present",
+        "ring3_response_order_valid",
+    )
+    if any(evidence.get(field) is not True for field in required_order):
+        return _issue(
+            "elf_consumer_order_invalid",
+            "kernel_elf_report.ring3_response_order_valid",
+            "Ring3 comparisons, record stores, int 0x81, and ud2 must remain ordered",
+        )
+    return None
+
+
+def _expected_response_offsets():
+    try:
+        contract = json.loads(_CONTRACT_PATH.read_text())
+        offsets = [field["offset"] for field in contract["response"]["fields"]]
+    except (OSError, json.JSONDecodeError, KeyError, TypeError):
+        return []
+    return [f"0x{offset:02x}" for offset in offsets]
 
 
 def _runtime_evidence_issue(context):

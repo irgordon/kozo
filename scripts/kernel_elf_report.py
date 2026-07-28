@@ -236,6 +236,12 @@ INSTRUCTION_LINE = re.compile(
     r"^\s*([0-9a-fA-F]+):\s+(?:(?:[0-9a-fA-F]{2})\s+)+([a-zA-Z][a-zA-Z0-9.]*)\s*(.*)$"
 )
 HEX_OPERAND = re.compile(r"(?:0x)?([0-9a-fA-F]{6,16})")
+RING3_RESPONSE_REQUIRED_SUCCESS_STORES = 8
+RUNTIME_STATUS_CONTRACT_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "contracts"
+    / "fixed_user_runtime_status_service_contract.v0.json"
+)
 
 ARCHITECTURES = {
     EM_X86_64: "x86_64",
@@ -284,6 +290,14 @@ class ProgramHeader:
     file_size: int
     memory_size: int
     alignment: int
+
+
+@dataclass(frozen=True)
+class DisassemblyInstruction:
+    address: int
+    mnemonic: str
+    operands: str
+    original_line: str
 
 
 @dataclass(frozen=True)
@@ -866,6 +880,10 @@ def fixed_user_runtime_status_service_record(
     request_handler = parse_disassembly_instructions(
         disassemble_symbol(kernel_elf, "handle_fixed_user_request")
     )
+    consumer_evidence = build_ring3_response_consumer_evidence(
+        run_text_command(["objdump", "-d", str(kernel_elf)]),
+        symbols,
+    )
     return {
         "symbols": symbol_record(symbols, FIXED_USER_RUNTIME_STATUS_SYMBOLS),
         "snapshot": {
@@ -928,11 +946,7 @@ def fixed_user_runtime_status_service_record(
         "response_builder_store_count": _memory_store_count(
             instruction_sets.get("build_fixed_user_runtime_status_response", [])
         ),
-        "ring3_response_compare_count": _comparison_count(
-            parse_disassembly_instructions(
-                disassemble_symbol(kernel_elf, "user_response_consumer_start")
-            )
-        ),
+        **consumer_evidence,
         "digest_xor_count": _mnemonic_count(
             instruction_sets.get("fixed_user_response_digest", []),
             "xor",
@@ -1384,12 +1398,391 @@ def run_text_command(command: list[str]) -> str:
 
 
 def parse_disassembly_instructions(text: str) -> list[tuple[int, str, str]]:
-    instructions = []
+    return [
+        (instruction.address, instruction.mnemonic, instruction.operands)
+        for instruction in parse_disassembly_instruction_lines(text)
+    ]
+
+
+def build_ring3_response_consumer_evidence(
+    disassembly: str,
+    symbols: dict[str, int],
+    expected_offsets: tuple[int, ...] | None = None,
+) -> dict[str, object]:
+    """Purpose:
+    Build portable ELF evidence for the fixed Ring 3 response consumer.
+
+    Inputs:
+    Full objdump text and authoritative ELF symbol addresses.
+
+    Output:
+    Bounded comparison, offset, record-store, interrupt, and ordering facts.
+
+    Failure:
+    Return false and empty evidence when the governed symbols or body are absent.
+    """
+    start = symbols.get("user_response_consumer_start")
+    end = symbols.get("user_response_consumer_end")
+    instructions = extract_function_disassembly(disassembly, start, end)
+    governed_offsets = expected_offsets or runtime_status_response_offsets()
+    analysis = _analyze_ring3_response_consumer(instructions, governed_offsets)
+    return _format_ring3_response_consumer_evidence(
+        start is not None and end is not None,
+        instructions,
+        governed_offsets,
+        analysis,
+    )
+
+
+def parse_disassembly_instruction_lines(text: str) -> list[DisassemblyInstruction]:
+    """Purpose:
+    Parse objdump instruction lines without depending on label formatting.
+
+    Inputs:
+    GNU or LLVM objdump text.
+
+    Output:
+    Parsed instruction records in disassembly order.
+
+    Failure:
+    Ignore labels, byte continuations, comments, and malformed lines.
+    """
+    instructions: list[DisassemblyInstruction] = []
     for line in text.splitlines():
         match = INSTRUCTION_LINE.match(line)
         if match is not None:
-            instructions.append((int(match.group(1), 16), match.group(2).lower(), match.group(3)))
+            instructions.append(
+                DisassemblyInstruction(
+                    int(match.group(1), 16),
+                    match.group(2).lower(),
+                    match.group(3),
+                    line,
+                )
+            )
     return instructions
+
+
+def extract_function_disassembly(
+    disassembly: str,
+    start_address: int | None,
+    end_address: int | None,
+) -> list[DisassemblyInstruction]:
+    """Purpose:
+    Return instructions inside one governed symbol range.
+
+    Inputs:
+    Full objdump text plus authoritative start and end addresses.
+
+    Output:
+    Address-ordered instructions from start inclusive to end exclusive.
+
+    Failure:
+    Return an empty list when either boundary is missing or invalid.
+    """
+    if start_address is None or end_address is None or end_address <= start_address:
+        return []
+    instructions = parse_disassembly_instruction_lines(disassembly)
+    bounded = [
+        instruction
+        for instruction in instructions
+        if start_address <= instruction.address < end_address
+    ]
+    return sorted(bounded, key=lambda instruction: instruction.address)
+
+
+def normalize_instruction_mnemonic(mnemonic: str) -> str:
+    """Purpose:
+    Treat equivalent GNU and LLVM comparison spellings the same.
+
+    Inputs:
+    One objdump mnemonic.
+
+    Output:
+    A lowercase mnemonic with cmp width suffixes removed.
+
+    Failure:
+    Leave unknown mnemonics unchanged.
+    """
+    normalized = mnemonic.lower()
+    if normalized in {"cmp", "cmpb", "cmpw", "cmpl", "cmpq"}:
+        return "cmp"
+    return normalized
+
+
+def normalize_instruction_operands(operands: str) -> str:
+    """Purpose:
+    Remove cosmetic GNU and LLVM operand differences used by evidence checks.
+
+    Inputs:
+    One objdump operand string.
+
+    Output:
+    Lowercase operands without comments, register prefixes, or spaces.
+
+    Failure:
+    Return an empty string for an empty operand list.
+    """
+    without_comment = operands.split("#", 1)[0].lower()
+    without_prefixes = without_comment.replace("%", "").replace("$", "")
+    return re.sub(r"\s+", "", without_prefixes)
+
+
+def find_ring3_response_comparisons(
+    instructions: list[DisassemblyInstruction],
+    expected_offsets: tuple[int, ...],
+) -> dict[str, object]:
+    """Purpose:
+    Find fixed-response comparisons and the response offsets they cover.
+
+    Inputs:
+    Instructions bounded to the Ring 3 response consumer.
+
+    Output:
+    Total comparison count, indices, source lines, and observed field offsets.
+
+    Failure:
+    Return empty evidence when no governed comparisons are present.
+    """
+    comparison_indices: list[int] = []
+    comparison_lines: list[str] = []
+    observed_offsets: set[int] = set()
+    for index, instruction in enumerate(instructions):
+        if normalize_instruction_mnemonic(instruction.mnemonic) != "cmp":
+            continue
+        comparison_indices.append(index)
+        comparison_lines.append(instruction.original_line)
+        offset = _memory_offset_for_register(instruction.operands, "rdi")
+        if offset in expected_offsets:
+            observed_offsets.add(offset)
+    return {
+        "count": len(comparison_indices),
+        "indices": tuple(comparison_indices),
+        "lines": tuple(comparison_lines),
+        "observed_offsets": tuple(sorted(observed_offsets)),
+    }
+
+
+def find_consumption_record_success_stores(
+    instructions: list[DisassemblyInstruction],
+) -> tuple[int, ...]:
+    """Purpose:
+    Find stores that create the fixed Ring 3 consumption record.
+
+    Inputs:
+    Instructions bounded to the Ring 3 response consumer.
+
+    Output:
+    Instruction indices for stores whose destination is based on RSI.
+
+    Failure:
+    Return an empty tuple when the fixed record stores are absent.
+    """
+    return tuple(
+        index
+        for index, instruction in enumerate(instructions)
+        if normalize_instruction_mnemonic(instruction.mnemonic).startswith("mov")
+        and _memory_destination_uses_register(instruction.operands, "rsi")
+    )
+
+
+def find_second_fixed_user_interrupt(
+    instructions: list[DisassemblyInstruction],
+) -> tuple[int, ...]:
+    """Purpose:
+    Find the fixed int 0x81 used after Ring 3 response consumption.
+
+    Inputs:
+    Instructions bounded to the Ring 3 response consumer.
+
+    Output:
+    Instruction indices for exact int 0x81 operations.
+
+    Failure:
+    Return an empty tuple when the governed interrupt is absent.
+    """
+    return tuple(
+        index
+        for index, instruction in enumerate(instructions)
+        if normalize_instruction_mnemonic(instruction.mnemonic) == "int"
+        and normalize_instruction_operands(instruction.operands) in {"0x81", "81", "81h"}
+    )
+
+
+def validate_response_consumer_order(
+    instructions: list[DisassemblyInstruction],
+    comparison_indices: tuple[int, ...],
+    success_store_indices: tuple[int, ...],
+    interrupt_indices: tuple[int, ...],
+) -> dict[str, bool]:
+    """Purpose:
+    Confirm validation, success-record stores, interrupt, and guard stay ordered.
+
+    Inputs:
+    The bounded consumer and indices for its governed operations.
+
+    Output:
+    Individual ordering facts plus one combined result.
+
+    Failure:
+    Report false facts when any required operation is missing or reordered.
+    """
+    comparisons_before_stores = bool(comparison_indices and success_store_indices)
+    if comparisons_before_stores:
+        comparisons_before_stores = max(comparison_indices) < min(success_store_indices)
+    stores_before_interrupt = bool(success_store_indices and len(interrupt_indices) == 1)
+    if stores_before_interrupt:
+        stores_before_interrupt = max(success_store_indices) < interrupt_indices[0]
+    guard_after_interrupt = _guard_follows_interrupt(instructions, interrupt_indices)
+    return {
+        "comparisons_before_success_store": comparisons_before_stores,
+        "success_store_before_interrupt": stores_before_interrupt,
+        "fail_closed_guard_after_interrupt": guard_after_interrupt,
+        "order_valid": (
+            comparisons_before_stores
+            and stores_before_interrupt
+            and guard_after_interrupt
+        ),
+    }
+
+
+def _analyze_ring3_response_consumer(
+    instructions: list[DisassemblyInstruction],
+    governed_offsets: tuple[int, ...],
+) -> dict[str, object]:
+    comparisons = find_ring3_response_comparisons(instructions, governed_offsets)
+    success_stores = find_consumption_record_success_stores(instructions)
+    interrupts = find_second_fixed_user_interrupt(instructions)
+    ordering = validate_response_consumer_order(
+        instructions,
+        comparisons["indices"],
+        success_stores,
+        interrupts,
+    )
+    observed_offsets = comparisons["observed_offsets"]
+    return {
+        "comparisons": comparisons,
+        "success_stores": success_stores,
+        "interrupts": interrupts,
+        "ordering": ordering,
+        "observed_offsets": observed_offsets,
+        "missing_offsets": tuple(
+            offset for offset in governed_offsets if offset not in observed_offsets
+        ),
+    }
+
+
+def _format_ring3_response_consumer_evidence(
+    symbol_found: bool,
+    instructions: list[DisassemblyInstruction],
+    governed_offsets: tuple[int, ...],
+    analysis: dict[str, object],
+) -> dict[str, object]:
+    comparisons = analysis["comparisons"]
+    success_stores = analysis["success_stores"]
+    interrupts = analysis["interrupts"]
+    ordering = analysis["ordering"]
+    missing_offsets = analysis["missing_offsets"]
+    return {
+        "ring3_response_consumer_symbol_found": symbol_found,
+        "ring3_response_consumer_instruction_count": len(instructions),
+        "ring3_response_compare_count": comparisons["count"],
+        "ring3_response_expected_offsets": [
+            _offset_hex(value) for value in governed_offsets
+        ],
+        "ring3_response_observed_offsets": [
+            _offset_hex(value) for value in analysis["observed_offsets"]
+        ],
+        "ring3_response_missing_offsets": [_offset_hex(value) for value in missing_offsets],
+        "ring3_response_success_store_count": len(success_stores),
+        "ring3_response_second_interrupt_present": len(interrupts) == 1,
+        "ring3_response_comparisons_before_success_store": ordering[
+            "comparisons_before_success_store"
+        ],
+        "ring3_response_success_store_before_interrupt": ordering[
+            "success_store_before_interrupt"
+        ],
+        "ring3_response_fail_closed_guard_present": ordering[
+            "fail_closed_guard_after_interrupt"
+        ],
+        "ring3_response_order_valid": (
+            symbol_found
+            and bool(instructions)
+            and comparisons["count"] >= len(governed_offsets)
+            and bool(governed_offsets)
+            and not missing_offsets
+            and len(success_stores) >= RING3_RESPONSE_REQUIRED_SUCCESS_STORES
+            and ordering["order_valid"]
+        ),
+    }
+
+
+def _memory_offset_for_register(operands: str, register: str) -> int | None:
+    normalized = normalize_instruction_operands(operands)
+    att_match = re.search(
+        rf"(?:(0x[0-9a-f]+|[0-9]+))?\({re.escape(register)}\)",
+        normalized,
+    )
+    if att_match is not None:
+        return int(att_match.group(1), 0) if att_match.group(1) else 0
+    intel_match = re.search(
+        rf"\[{re.escape(register)}(?:\+(0x[0-9a-f]+|[0-9]+))?\]",
+        normalized,
+    )
+    if intel_match is not None:
+        return int(intel_match.group(1), 0) if intel_match.group(1) else 0
+    return None
+
+
+def _memory_destination_uses_register(operands: str, register: str) -> bool:
+    normalized = normalize_instruction_operands(operands)
+    parts = normalized.split(",")
+    if len(parts) < 2:
+        return False
+    destination = parts[0] if "[" in normalized else parts[-1]
+    return f"[{register}" in destination or f"({register})" in destination
+
+
+def _guard_follows_interrupt(
+    instructions: list[DisassemblyInstruction],
+    interrupt_indices: tuple[int, ...],
+) -> bool:
+    if len(interrupt_indices) != 1:
+        return False
+    return any(
+        index > interrupt_indices[0]
+        and normalize_instruction_mnemonic(instruction.mnemonic) == "ud2"
+        for index, instruction in enumerate(instructions)
+    )
+
+
+def _offset_hex(value: int) -> str:
+    return f"0x{value:02x}"
+
+
+def runtime_status_response_offsets(
+    contract_path: Path = RUNTIME_STATUS_CONTRACT_PATH,
+) -> tuple[int, ...]:
+    """Purpose:
+    Read fixed user-response offsets from the authoritative contract.
+
+    Inputs:
+    The runtime-status service contract path.
+
+    Output:
+    Ordered integer offsets for every governed response field.
+
+    Failure:
+    Return an empty tuple when the contract cannot provide valid offsets.
+    """
+    try:
+        contract = json.loads(contract_path.read_text())
+        fields = contract["response"]["fields"]
+        offsets = tuple(field["offset"] for field in fields)
+    except (OSError, json.JSONDecodeError, KeyError, TypeError):
+        return ()
+    if not offsets or any(not isinstance(offset, int) or offset < 0 for offset in offsets):
+        return ()
+    return offsets
 
 
 def backward_branch_records(

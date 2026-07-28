@@ -33,7 +33,12 @@ KOZO_NEGATIVE_COVERAGE = {
         "snapshot_elf_geometry_invalid": "test_fails_when_snapshot_size_is_wrong",
         "elf_call_order_invalid": "test_fails_when_elf_call_order_is_wrong",
         "elf_response_stores_missing": "test_fails_when_elf_response_store_is_missing",
+        "elf_consumer_missing": "test_fails_when_elf_consumer_is_missing",
         "elf_response_comparisons_missing": "test_fails_when_elf_response_comparison_is_missing",
+        "elf_response_offsets_missing": "test_fails_when_elf_response_offset_is_missing",
+        "elf_success_stores_missing": "test_fails_when_elf_success_store_is_missing",
+        "elf_second_interrupt_missing": "test_fails_when_elf_second_interrupt_is_missing",
+        "elf_consumer_order_invalid": "test_fails_when_elf_consumer_order_is_invalid",
         "elf_digest_incomplete": "test_fails_when_elf_digest_is_incomplete",
         "runtime_outcome_invalid": "test_fails_when_qemu_is_blocked",
         "metadata_log_mismatch": "test_fails_when_metadata_is_stale",
@@ -265,6 +270,66 @@ class FixedUserRuntimeStatusServiceEvidenceTests(unittest.TestCase):
         result = self.validate_fixture(report=mutation)
         self.assertEqual(result.status, "fail")
         self.assert_failure(result, "elf_response_comparisons_missing")
+
+    def test_fails_when_elf_consumer_is_missing(self):
+        def mutation(report):
+            report["fixed_user_runtime_status_service"][
+                "ring3_response_consumer_symbol_found"
+            ] = False
+            return report
+
+        result = self.validate_fixture(report=mutation)
+        self.assertEqual(result.status, "fail")
+        self.assert_failure(result, "elf_consumer_missing")
+
+    def test_fails_when_elf_response_offset_is_missing(self):
+        def mutation(report):
+            evidence = report["fixed_user_runtime_status_service"]
+            evidence["ring3_response_observed_offsets"] = evidence[
+                "ring3_response_observed_offsets"
+            ][:-1]
+            evidence["ring3_response_missing_offsets"] = ["0x50"]
+            return report
+
+        result = self.validate_fixture(report=mutation)
+        self.assertEqual(result.status, "fail")
+        self.assert_failure(result, "elf_response_offsets_missing")
+
+    def test_fails_when_elf_success_store_is_missing(self):
+        def mutation(report):
+            report["fixed_user_runtime_status_service"][
+                "ring3_response_success_store_count"
+            ] = 7
+            return report
+
+        result = self.validate_fixture(report=mutation)
+        self.assertEqual(result.status, "fail")
+        self.assert_failure(result, "elf_success_stores_missing")
+
+    def test_fails_when_elf_second_interrupt_is_missing(self):
+        def mutation(report):
+            report["fixed_user_runtime_status_service"][
+                "ring3_response_second_interrupt_present"
+            ] = False
+            return report
+
+        result = self.validate_fixture(report=mutation)
+        self.assertEqual(result.status, "fail")
+        self.assert_failure(result, "elf_second_interrupt_missing")
+
+    def test_fails_when_elf_consumer_order_is_invalid(self):
+        def mutation(report):
+            report["fixed_user_runtime_status_service"][
+                "ring3_response_success_store_before_interrupt"
+            ] = False
+            report["fixed_user_runtime_status_service"][
+                "ring3_response_order_valid"
+            ] = False
+            return report
+
+        result = self.validate_fixture(report=mutation)
+        self.assertEqual(result.status, "fail")
+        self.assert_failure(result, "elf_consumer_order_invalid")
 
     def test_fails_when_elf_digest_is_incomplete(self):
         def mutation(report):

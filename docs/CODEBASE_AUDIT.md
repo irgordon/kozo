@@ -1160,9 +1160,10 @@ claim.
 | AUDIT-087-002 | Resolved locally | One 64-byte kernel snapshot supplies both the fixed 88-byte user response and unchanged internal capability ID 1 response. |
 | AUDIT-087-003 | Resolved locally | Ring3 and Ring0 validate every response field, the fixed record digest covers all eleven qwords, and all transaction and snapshot storage is cleared. |
 | AUDIT-087-004 | Resolved locally | Contract, source, ELF, QEMU, aggregation, failure-path, and validator-coverage checks govern the service and preserve both existing capabilities. |
-| AUDIT-087-005 | Hosted confirmation pending | Local verification passes 67 checks with 0 failures and QEMU captures all 41 markers; hosted CI must confirm identical ordering and both v0.8.7 validators. |
+| AUDIT-087-005 | Hosted correction pending | Hosted QEMU captured all 41 markers with outcome pass and blocker none, but the first hosted verification run reported 67 checks with one ELF evidence failure. Hosted CI must confirm the portable report correction with 67 checks and 0 failures. |
 | AUDIT-087-006 | Deferred | `validator_coverage.py` remains the largest structural debt item and is not split in this runtime phase. |
 | AUDIT-087-007 | Deferred | The existing Rust package-license metadata failure remains a v1.0.0 release-hardening blocker. |
+| AUDIT-087-008 | Resolved locally | GNU printed the consumer start address under the adjacent `user_privilege_probe_end` alias, so symbol-specific disassembly was empty while LLVM found 18 comparisons. The report now bounds full disassembly by authoritative consumer symbols, normalizes comparison spellings, and validates all 14 response offsets plus store, interrupt, and guard ordering without lowering policy. |
 
 The path remains intentionally fixed. It adds no general dispatcher, public
 syscall ABI, variable response, persistent userspace, process model,

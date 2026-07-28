@@ -743,3 +743,12 @@ coverage checks must agree. Hosted acceptance is pending. The evidence proves
 one post-loop fixed status transaction from the same snapshot used by internal
 capability ID 1; it does not prove a public syscall ABI, general dispatcher,
 persistent userspace, process isolation, or production readiness.
+
+The first hosted v0.8.7 run completed the full 41-marker runtime sequence with
+QEMU outcome `pass` and blocker `none`, but GNU symbol-specific disassembly
+returned an empty Ring 3 consumer body because an alias owned the printed
+start label. The corrected ELF report extracts the consumer from full
+disassembly by authoritative symbol addresses, normalizes equivalent GNU and
+LLVM comparison mnemonics, and preserves the same comparison-count,
+field-offset, record-store, interrupt, and fail-closed ordering requirements.
+No runtime evidence or marker policy changed.

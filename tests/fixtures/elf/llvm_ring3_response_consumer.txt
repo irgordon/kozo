@@ -1,0 +1,104 @@
+kozo-kernel.elf:	file format elf64-x86-64
+
+Disassembly of section .user_probe_code:
+
+ffffffff80207090 <user_response_consumer_start>:
+ffffffff80207090: 48 bf 80 10 00 00 00 40 00 00	movabsq	$0x400000001080, %rdi
+ffffffff8020709a: 66 8c c8             	movw	%cs, %ax
+ffffffff8020709d: 83 e0 03             	andl	$0x3, %eax
+ffffffff802070a0: 83 f8 03             	cmpl	$0x3, %eax
+ffffffff802070a3: 0f 85 ff 00 00 00    	jne	0xffffffff802071a8 <user_response_consumer_start.cpl_invalid>
+ffffffff802070a9: 48 89 e2             	movq	%rsp, %rdx
+ffffffff802070ac: 48 b8 f0 2f 00 00 00 40 00 00	movabsq	$0x400000002ff0, %rax
+ffffffff802070b6: 48 39 c2             	cmpq	%rax, %rdx
+ffffffff802070b9: 0f 85 f1 00 00 00    	jne	0xffffffff802071b0 <user_response_consumer_start.stack_invalid>
+ffffffff802070bf: 48 b8 52 45 53 55 4f 5a 4f 4b	movabsq	$0x4b4f5a4f55534552, %rax
+ffffffff802070c9: 50                   	pushq	%rax
+ffffffff802070ca: 59                   	popq	%rcx
+ffffffff802070cb: 48 39 c1             	cmpq	%rax, %rcx
+ffffffff802070ce: 0f 85 dc 00 00 00    	jne	0xffffffff802071b0 <user_response_consumer_start.stack_invalid>
+ffffffff802070d4: 48 39 d4             	cmpq	%rdx, %rsp
+ffffffff802070d7: 0f 85 d3 00 00 00    	jne	0xffffffff802071b0 <user_response_consumer_start.stack_invalid>
+ffffffff802070dd: 41 b8 01 00 00 00    	movl	$0x1, %r8d
+ffffffff802070e3: 83 3f 01             	cmpl	$0x1, (%rdi)
+ffffffff802070e6: 0f 85 ca 00 00 00    	jne	0xffffffff802071b6 <user_response_consumer_start.write_record>
+ffffffff802070ec: 41 b8 02 00 00 00    	movl	$0x2, %r8d
+ffffffff802070f2: 83 7f 04 02          	cmpl	$0x2, 0x4(%rdi)
+ffffffff802070f6: 0f 85 ba 00 00 00    	jne	0xffffffff802071b6 <user_response_consumer_start.write_record>
+ffffffff802070fc: 41 b8 03 00 00 00    	movl	$0x3, %r8d
+ffffffff80207102: 83 7f 08 00          	cmpl	$0x0, 0x8(%rdi)
+ffffffff80207106: 0f 85 aa 00 00 00    	jne	0xffffffff802071b6 <user_response_consumer_start.write_record>
+ffffffff8020710c: 41 b8 04 00 00 00    	movl	$0x4, %r8d
+ffffffff80207112: 83 7f 0c 58          	cmpl	$0x58, 0xc(%rdi)
+ffffffff80207116: 0f 85 9a 00 00 00    	jne	0xffffffff802071b6 <user_response_consumer_start.write_record>
+ffffffff8020711c: 41 b8 05 00 00 00    	movl	$0x5, %r8d
+ffffffff80207122: 48 83 7f 10 01       	cmpq	$0x1, 0x10(%rdi)
+ffffffff80207127: 0f 85 89 00 00 00    	jne	0xffffffff802071b6 <user_response_consumer_start.write_record>
+ffffffff8020712d: 41 b8 06 00 00 00    	movl	$0x6, %r8d
+ffffffff80207133: 83 7f 18 05          	cmpl	$0x5, 0x18(%rdi)
+ffffffff80207137: 75 7d                	jne	0xffffffff802071b6 <user_response_consumer_start.write_record>
+ffffffff80207139: 41 b8 07 00 00 00    	movl	$0x7, %r8d
+ffffffff8020713f: 83 7f 1c 00          	cmpl	$0x0, 0x1c(%rdi)
+ffffffff80207143: 75 71                	jne	0xffffffff802071b6 <user_response_consumer_start.write_record>
+ffffffff80207145: 41 b8 08 00 00 00    	movl	$0x8, %r8d
+ffffffff8020714b: 48 83 7f 20 3f       	cmpq	$0x3f, 0x20(%rdi)
+ffffffff80207150: 75 64                	jne	0xffffffff802071b6 <user_response_consumer_start.write_record>
+ffffffff80207152: 41 b8 09 00 00 00    	movl	$0x9, %r8d
+ffffffff80207158: 48 81 7f 28 00 10 00 00      	cmpq	$0x1000, 0x28(%rdi)
+ffffffff80207160: 75 54                	jne	0xffffffff802071b6 <user_response_consumer_start.write_record>
+ffffffff80207162: 41 b8 0a 00 00 00    	movl	$0xa, %r8d
+ffffffff80207168: 48 83 7f 30 03       	cmpq	$0x3, 0x30(%rdi)
+ffffffff8020716d: 75 47                	jne	0xffffffff802071b6 <user_response_consumer_start.write_record>
+ffffffff8020716f: 41 b8 0b 00 00 00    	movl	$0xb, %r8d
+ffffffff80207175: 48 83 7f 38 03       	cmpq	$0x3, 0x38(%rdi)
+ffffffff8020717a: 75 3a                	jne	0xffffffff802071b6 <user_response_consumer_start.write_record>
+ffffffff8020717c: 41 b8 0c 00 00 00    	movl	$0xc, %r8d
+ffffffff80207182: 48 83 7f 40 06       	cmpq	$0x6, 0x40(%rdi)
+ffffffff80207187: 75 2d                	jne	0xffffffff802071b6 <user_response_consumer_start.write_record>
+ffffffff80207189: 41 b8 0d 00 00 00    	movl	$0xd, %r8d
+ffffffff8020718f: 48 83 7f 48 7f       	cmpq	$0x7f, 0x48(%rdi)
+ffffffff80207194: 75 20                	jne	0xffffffff802071b6 <user_response_consumer_start.write_record>
+ffffffff80207196: 41 b8 0e 00 00 00    	movl	$0xe, %r8d
+ffffffff8020719c: 48 83 7f 50 00       	cmpq	$0x0, 0x50(%rdi)
+ffffffff802071a1: 75 13                	jne	0xffffffff802071b6 <user_response_consumer_start.write_record>
+ffffffff802071a3: 45 31 c0             	xorl	%r8d, %r8d
+ffffffff802071a6: eb 0e                	jmp	0xffffffff802071b6 <user_response_consumer_start.write_record>
+
+ffffffff802071a8 <user_response_consumer_start.cpl_invalid>:
+ffffffff802071a8: 41 b8 0a 00 00 00    	movl	$0xa, %r8d
+ffffffff802071ae: eb 06                	jmp	0xffffffff802071b6 <user_response_consumer_start.write_record>
+
+ffffffff802071b0 <user_response_consumer_start.stack_invalid>:
+ffffffff802071b0: 41 b8 0b 00 00 00    	movl	$0xb, %r8d
+
+ffffffff802071b6 <user_response_consumer_start.write_record>:
+ffffffff802071b6: 48 be 00 11 00 00 00 40 00 00	movabsq	$0x400000001100, %rsi
+ffffffff802071c0: c7 06 01 00 00 00    	movl	$0x1, (%rsi)
+ffffffff802071c6: c7 46 04 01 00 00 00 	movl	$0x1, 0x4(%rsi)
+ffffffff802071cd: c7 46 08 30 00 00 00 	movl	$0x30, 0x8(%rsi)
+ffffffff802071d4: 44 89 46 0c          	movl	%r8d, 0xc(%rsi)
+ffffffff802071d8: 48 8b 47 10          	movq	0x10(%rdi), %rax
+ffffffff802071dc: 48 89 46 10          	movq	%rax, 0x10(%rsi)
+ffffffff802071e0: 48 8b 47 20          	movq	0x20(%rdi), %rax
+ffffffff802071e4: 48 89 46 18          	movq	%rax, 0x18(%rsi)
+ffffffff802071e8: 48 8b 07             	movq	(%rdi), %rax
+ffffffff802071eb: 48 33 47 08          	xorq	0x8(%rdi), %rax
+ffffffff802071ef: 48 33 47 10          	xorq	0x10(%rdi), %rax
+ffffffff802071f3: 48 33 47 18          	xorq	0x18(%rdi), %rax
+ffffffff802071f7: 48 33 47 20          	xorq	0x20(%rdi), %rax
+ffffffff802071fb: 48 33 47 28          	xorq	0x28(%rdi), %rax
+ffffffff802071ff: 48 33 47 30          	xorq	0x30(%rdi), %rax
+ffffffff80207203: 48 33 47 38          	xorq	0x38(%rdi), %rax
+ffffffff80207207: 48 33 47 40          	xorq	0x40(%rdi), %rax
+ffffffff8020720b: 48 33 47 48          	xorq	0x48(%rdi), %rax
+ffffffff8020720f: 48 33 47 50          	xorq	0x50(%rdi), %rax
+ffffffff80207213: 48 89 46 20          	movq	%rax, 0x20(%rsi)
+ffffffff80207217: 48 c7 46 28 00 00 00 00      	movq	$0x0, 0x28(%rsi)
+ffffffff8020721f: 6a 02                	pushq	$0x2
+ffffffff80207221: 9d                   	popfq
+ffffffff80207222: cd 81                	int	$0x81
+
+ffffffff80207224 <user_response_consumer_interrupt_return>:
+ffffffff80207224: 0f 0b                	ud2
+
+ffffffff80207226 <user_response_consumer_end>:
