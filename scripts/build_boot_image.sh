@@ -81,11 +81,9 @@ prepare_directories() {
 }
 
 build_kernel_objects() {
-  odin build "$ROOT/kernel" \
+  "$ROOT/scripts/build_odin_object.sh" "$WORK_DIR/kernel.o" "$ROOT/kernel" \
     "-target:$BRIDGE_TARGET" \
-    -disable-red-zone \
-    -build-mode:obj \
-    "-out:$WORK_DIR/kernel.o"
+    -disable-red-zone
   nasm -I "$ROOT/" -f elf64 "$ROOT/kernel/arch/x86_64/boot.asm" -o "$WORK_DIR/boot.o"
   nasm -I "$ROOT/" -f elf64 "$ROOT/kernel/arch/x86_64/paging.asm" -o "$WORK_DIR/paging.o"
   nasm -I "$ROOT/" -f elf64 "$ROOT/kernel/arch/x86_64/privilege_transition.asm" -o "$WORK_DIR/privilege_transition.o"

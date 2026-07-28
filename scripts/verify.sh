@@ -166,9 +166,9 @@ build_kernel_object_artifact() {
 
   find "$ARTIFACTS_DIR" -maxdepth 1 -type f -name 'kernel*.o' -delete
 
-  if ! odin build "$ROOT/kernel" -build-mode:obj "-out:$ARTIFACTS_DIR/kernel.o" >"$log_file" 2>&1; then
+  if ! "$ROOT/scripts/build_odin_object.sh" "$ARTIFACTS_DIR/kernel.o" "$ROOT/kernel" >"$log_file" 2>&1; then
     cat "$log_file" >&2
-    fail "Command failed: odin build $ROOT/kernel -build-mode:obj -out:$ARTIFACTS_DIR/kernel.o"
+    fail "Command failed: build_odin_object.sh $ARTIFACTS_DIR/kernel.o $ROOT/kernel"
   fi
 
   shopt -s nullglob
@@ -244,7 +244,8 @@ run_logged_command "$LOG_DIR/odin-check.log" \
   odin check "$ROOT/kernel"
 
 run_logged_command "$LOG_DIR/odin-build.log" \
-  odin build "$ROOT/kernel" -target:freestanding_amd64_sysv -disable-red-zone -build-mode:obj "-out:$KERNEL_BUILD_CHECK"
+  "$ROOT/scripts/build_odin_object.sh" "$KERNEL_BUILD_CHECK" "$ROOT/kernel" \
+    -target:freestanding_amd64_sysv -disable-red-zone
 
 run_logged_command "$LOG_DIR/cargo-check.log" \
   run_pinned_cargo check --manifest-path "$ROOT/userspace/core_service/Cargo.toml" --target "$RUST_TARGET"

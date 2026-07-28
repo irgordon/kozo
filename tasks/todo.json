@@ -2979,7 +2979,13 @@
         "release/version.txt",
         "release/release_files.v1.json",
         "scripts/build_release_candidate.sh",
+        "scripts/build_odin_object.sh",
+        "scripts/build_boot_image.sh",
+        "scripts/runtime_smoke.sh",
+        "scripts/verify.sh",
+        "harness/validators_impl/entrypoint_validator.py",
         "tests/test_release_candidate_hardening.py",
+        "tests/test_odin_object_build.py",
         ".github/workflows/ci.yml",
         ".github/workflows/lint.yml",
         "docs/releases/v1.0.0-rc.1.md",
@@ -3832,7 +3838,7 @@
       {
         "tool": "v1.0.0-rc.1 release-candidate hardening validation",
         "command": "release hardening tests; full Python discovery; Odin and Rust checks; cargo-deny and cargo-audit; governed verification; two commit-bound bundle builds; direct archive, license, checksum, metadata, ELF, workflow, and GitHub protection inspection",
-        "status": "passed_1044_tests_67_checks_0_failures_qemu_pass_41_markers_two_104_file_bundles_checksums_and_inspection_passed; hosted_and_branch_protection_pending; taplo_macos_system_configuration_panic"
+        "status": "passed_1046_tests_67_checks_0_failures_qemu_pass_41_markers_two_104_file_bundles_checksums_and_inspection_passed; first_hosted_run_failed_before_qemu_on_odin_object_output_and_local_single_module_correction_passed; hosted_rerun_and_branch_protection_pending; taplo_macos_system_configuration_panic"
       }
     ],
     "logs": [

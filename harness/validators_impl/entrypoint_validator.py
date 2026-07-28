@@ -52,16 +52,14 @@ def _symbol_check() -> tuple[bool, str]:
     with tempfile.TemporaryDirectory(prefix="kozo-entrypoint-") as tmp_dir:
         output_prefix = Path(tmp_dir) / "kernel.o"
         build_cmd = [
-            "odin",
-            "build",
+            str(_ROOT / "scripts" / "build_odin_object.sh"),
+            str(output_prefix),
             str(_ROOT / "kernel"),
             f"-target:{_BRIDGE_TARGET}",
-            "-build-mode:obj",
-            f"-out:{output_prefix}",
         ]
         build_run = subprocess.run(build_cmd, cwd=_ROOT, capture_output=True, text=True)
         if build_run.returncode != 0:
-            return False, f"odin build kernel -target:{_BRIDGE_TARGET} -build-mode:obj failed: {build_run.stderr.strip() or build_run.stdout.strip()}"
+            return False, f"single-module Odin object build failed: {build_run.stderr.strip() or build_run.stdout.strip()}"
 
         kernel_objects = sorted(Path(tmp_dir).glob("*.o"))
         if not kernel_objects:
