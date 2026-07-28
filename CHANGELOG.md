@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.8.8 - 2026-07-28
+
+**Status:** Implemented and validated locally; hosted CI acceptance pending.
+
+* Added `license = "MIT"` to `core_service`, selecting the MIT option provided by the KOZO repository license set.
+* Matched the package metadata to the authoritative root `LICENSE-MIT` text and added the minimal repository cargo-deny policy required to allow that exact SPDX value.
+* Removed the existing cargo-deny missing-license failure without a crate exception.
+* Checked the package file list and retained the existing package identity, source layout, dependencies, and build behavior.
+* Changed no runtime, kernel, ABI, syscall, Ring 3, capability, mapping, or halt behavior.
+* Did not publish the package and did not claim complete v1.0.0 release readiness.
+
 ## v0.8.7 - 2026-07-27
 
 **Status:** Implemented and validated locally; hosted CI acceptance pending.

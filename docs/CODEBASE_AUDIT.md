@@ -1168,3 +1168,16 @@ claim.
 The path remains intentionally fixed. It adds no general dispatcher, public
 syscall ABI, variable response, persistent userspace, process model,
 compatibility claim, or production claim.
+
+# 37. v0.8.8 Core Service MIT License Metadata
+
+| ID | Status | Finding |
+| --- | --- | --- |
+| AUDIT-088-001 | Resolved locally | `userspace/core_service/Cargo.toml` now declares the exact SPDX value `MIT`; Cargo metadata reports `MIT` and no package-specific license file. |
+| AUDIT-073-001 | Resolved locally | The package selects the MIT option provided by the repository license set, and the minimal root cargo-deny policy allows that exact SPDX value without a crate exception or policy weakening. Both the license-only and full checks pass. |
+| AUDIT-088-002 | Resolved locally | Package-list inspection contains only Cargo metadata, the lockfile, manifest, and source; no target output, runtime evidence, local configuration, credential, log, or editor-state file is packaged. |
+| AUDIT-088-003 | Hosted confirmation pending | Local verification preserves the existing runtime evidence; hosted CI must confirm the unchanged verification and QEMU gates. |
+
+The root `LICENSE-MIT` file remains the authoritative MIT text. This metadata
+correction changes no runtime, kernel, ABI, syscall, Ring 3, capability,
+mapping, or halt behavior and does not establish complete v1.0.0 readiness.

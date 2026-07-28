@@ -398,3 +398,29 @@ Confirm:
 * both existing internal capability validators and terminal halt remain green;
 * no general dispatcher, public ABI, persistent userspace, compatibility, or
   production claim was added.
+
+# 19. v0.8.8 Core Service License Gate
+
+The `core_service` package selects the MIT option provided by the KOZO
+repository license set. Cargo records this selection as:
+
+```toml
+license = "MIT"
+```
+
+The root `LICENSE-MIT` file is the authoritative MIT license text. Confirm:
+
+* Cargo metadata reports package name `core_service`, license `MIT`, and no
+  package-specific license file;
+* the root `deny.toml` allows the exact `MIT` SPDX value without a crate
+  exception;
+* `cargo deny check licenses` passes without an exception;
+* the full `cargo deny check` passes without weakening license policy;
+* `cargo package --manifest-path userspace/core_service/Cargo.toml --list`
+  contains only the expected manifest, lockfile, Cargo metadata, and source;
+* the package version, edition, dependencies, target, and runtime behavior are
+  unchanged;
+* full KOZO verification and QEMU evidence remain green.
+
+This gate removes one package-metadata blocker. It does not publish the
+package or establish complete v1.0.0 release readiness.
