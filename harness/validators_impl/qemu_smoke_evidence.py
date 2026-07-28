@@ -389,42 +389,50 @@ def _expected_blocker_from_logs(metadata: dict[str, object]) -> str | None:
     if _EARLY_MARKERS[14] in observed and _EARLY_MARKERS[15] not in observed:
         return "privilege_transition_initialization_not_completed"
     if _EARLY_MARKERS[15] in observed and _EARLY_MARKERS[16] not in observed:
-        return "ring3_entry_not_completed"
-    if _EARLY_MARKERS[16] in observed and _EARLY_MARKERS[17] not in observed:
-        return "fixed_user_request_copy_in_not_completed"
-    if _EARLY_MARKERS[17] in observed and _EARLY_MARKERS[18] not in observed:
-        return "fixed_user_request_service_not_completed"
-    if _EARLY_MARKERS[18] in observed and _EARLY_MARKERS[19] not in observed:
-        return "fixed_user_response_copy_out_not_completed"
-    if _EARLY_MARKERS[19] in observed and _EARLY_MARKERS[20] not in observed:
-        return "fixed_user_request_boundary_not_completed"
-    if _EARLY_MARKERS[20] in observed and _EARLY_MARKERS[21] not in observed:
-        return "ring3_probe_not_completed"
-    if _EARLY_MARKERS[21] in observed and _EARLY_MARKERS[22] not in observed:
-        return "ring0_return_not_completed"
-    if _EARLY_MARKERS[22] in observed and _EARLY_MARKERS[23] not in observed:
         return "runtime_progression_entry_not_reached"
-    if _EARLY_MARKERS[23] in observed and _EARLY_MARKERS[24] not in observed:
+    if _EARLY_MARKERS[16] in observed and _EARLY_MARKERS[17] not in observed:
         return "runtime_initialization_not_proven"
-    if _EARLY_MARKERS[24] in observed and _EARLY_MARKERS[25] not in observed:
+    if _EARLY_MARKERS[17] in observed and _EARLY_MARKERS[18] not in observed:
         return "runtime_loop_entry_not_reached"
-    if _EARLY_MARKERS[25] in observed and _EARLY_MARKERS[28] not in observed:
+    if _EARLY_MARKERS[18] in observed and _EARLY_MARKERS[21] not in observed:
         return "runtime_loop_iteration_incomplete"
-    if _EARLY_MARKERS[28] in observed and _EARLY_MARKERS[29] not in observed:
+    if _EARLY_MARKERS[21] in observed and _EARLY_MARKERS[22] not in observed:
         return "runtime_loop_exit_not_reached"
+    if _EARLY_MARKERS[22] in observed and _EARLY_MARKERS[23] not in observed:
+        return "runtime_status_transaction_not_reached"
+    if _EARLY_MARKERS[23] in observed and _EARLY_MARKERS[24] not in observed:
+        return "fixed_user_request_copy_in_not_completed"
+    if _EARLY_MARKERS[24] in observed and _EARLY_MARKERS[25] not in observed:
+        return "user_runtime_status_service_not_reached"
+    if _EARLY_MARKERS[25] in observed and _EARLY_MARKERS[26] not in observed:
+        return "user_runtime_status_service_not_completed"
+    if _EARLY_MARKERS[26] in observed and _EARLY_MARKERS[27] not in observed:
+        return "fixed_user_response_copy_out_not_completed"
+    if _EARLY_MARKERS[27] in observed and _EARLY_MARKERS[28] not in observed:
+        return "ring3_response_resume_not_reached"
+    if _EARLY_MARKERS[28] in observed and _EARLY_MARKERS[29] not in observed:
+        return "user_response_consumption_not_completed"
     if _EARLY_MARKERS[29] in observed and _EARLY_MARKERS[30] not in observed:
-        return "capability_dispatch_not_reached"
+        return "fixed_user_response_boundary_not_completed"
     if _EARLY_MARKERS[30] in observed and _EARLY_MARKERS[31] not in observed:
-        return "runtime_status_query_not_completed"
+        return "fixed_user_request_boundary_not_completed"
     if _EARLY_MARKERS[31] in observed and _EARLY_MARKERS[32] not in observed:
-        return "first_governed_capability_not_proven"
+        return "ring3_probe_not_completed"
     if _EARLY_MARKERS[32] in observed and _EARLY_MARKERS[33] not in observed:
-        return "runtime_state_update_not_reached"
+        return "ring0_return_not_completed"
     if _EARLY_MARKERS[33] in observed and _EARLY_MARKERS[34] not in observed:
-        return "runtime_state_update_not_completed"
+        return "capability_dispatch_not_reached"
     if _EARLY_MARKERS[34] in observed and _EARLY_MARKERS[35] not in observed:
-        return "second_governed_capability_not_proven"
+        return "runtime_status_query_not_completed"
     if _EARLY_MARKERS[35] in observed and _EARLY_MARKERS[36] not in observed:
+        return "first_governed_capability_not_proven"
+    if _EARLY_MARKERS[36] in observed and _EARLY_MARKERS[37] not in observed:
+        return "runtime_state_update_not_reached"
+    if _EARLY_MARKERS[37] in observed and _EARLY_MARKERS[38] not in observed:
+        return "runtime_state_update_not_completed"
+    if _EARLY_MARKERS[38] in observed and _EARLY_MARKERS[39] not in observed:
+        return "second_governed_capability_not_proven"
+    if _EARLY_MARKERS[39] in observed and _EARLY_MARKERS[40] not in observed:
         return "runtime_return_not_reached"
     if observed and observed[0] != _EARLY_MARKERS[0]:
         return "qemu_timeout"

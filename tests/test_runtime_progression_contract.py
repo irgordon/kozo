@@ -20,6 +20,7 @@ KOZO_NEGATIVE_COVERAGE = {
         "missing_transition_requirement": "test_fails_when_transition_requirement_is_missing",
         "missing_forbidden_shortcut": "test_fails_when_forbidden_shortcut_is_missing",
         "missing_non_goal": "test_fails_when_non_goal_is_missing",
+        "wrong_runtime_path": "test_fails_when_runtime_path_is_stale",
         "diagnostic_names_field": "test_failure_diagnostic_names_field",
     }
 }
@@ -128,6 +129,18 @@ class RuntimeProgressionContractValidatorTests(unittest.TestCase):
         self.assertEqual(result.status, "fail")
         self.assert_progression_failure(result, "missing_non_goal", "non_goals.userspace execution")
 
+    def test_fails_when_runtime_path_is_stale(self):
+        result = self.validate_fixture(
+            mutate_contract=lambda contract: contract | {
+                "current_state": contract["current_state"] | {
+                    "path": "boot_smoke_to_stack_memory_and_runtime_progression_to_halt"
+                }
+            }
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_progression_failure(result, "wrong_runtime_path", "current_state.path")
+
     def test_failure_diagnostic_names_field(self):
         self.assertEqual("runtime_progression_contract", RuntimeProgressionContractValidator.name)
         result = self.validate_fixture(mutate_contract=lambda contract: contract | {"architecture": "aarch64"})
@@ -191,7 +204,7 @@ def valid_contract() -> dict[str, object]:
         "version": 0,
         "architecture": "x86_64",
         "current_state": {
-            "path": "boot_smoke_to_stack_memory_and_runtime_progression_to_halt",
+            "path": "boot_smoke_to_runtime_loop_to_fixed_user_status_to_capabilities_to_halt",
             "halt_contract": "contracts/runtime_halt_contract.v0.json",
             "progression_stages_contract": "contracts/runtime_progression_stages.v0.json",
             "final_smoke_marker": "KOZO_RUNTIME_RETURN_OK",

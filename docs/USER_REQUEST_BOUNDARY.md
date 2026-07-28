@@ -106,3 +106,14 @@ after copy-out validation. Response-side buffers remain governed by
 second `int 0x81` handler validates consumption and clears them. The v0.8.5
 request service, response geometry, and deterministic token rule are
 unchanged.
+
+# 9. v0.8.7 Runtime Status Request
+
+The accepted request address and 40-byte geometry remain fixed. Request ID `2`
+now selects the single runtime-status operation, requires response size `88`,
+and requires payload, flags, and reserved fields to be zero.
+
+The request is constructed only after the controlled Odin loop completes.
+Ring 0 copies and validates the complete request before emitting
+`KOZO_USER_REQUEST_COPY_IN_OK` or using the shared runtime snapshot. This
+remains one fixed service, not a generic dispatcher or public syscall ABI.

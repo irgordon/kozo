@@ -2,8 +2,13 @@ bits 64
 
 %include "kernel/arch/x86_64/runtime_layout.inc"
 
+; This file owns the fixed privilege transaction and its supervisor shadows.
+; It does not own runtime-status policy; Odin supplies the validated snapshot
+; consumed by the fixed response formatter.
+
 global initialize_privilege_transition
 global enter_bounded_ring3_probe
+global execute_fixed_user_runtime_status_transaction
 global governed_gdt
 global governed_gdt_end
 global governed_tss
@@ -26,6 +31,7 @@ global fixed_user_consumption_shadow_end
 global fixed_user_transaction_phase
 global fixed_user_transaction_phase_end
 global fixed_user_request_success_state
+global saved_odin_return_stack
 global user_probe_code_start
 global user_probe_code_end
 global user_privilege_probe_start
@@ -55,13 +61,16 @@ extern physical_for_kernel_virtual
 extern user_probe_data_start
 extern runtime_serial_write_ring3_enter_marker
 extern runtime_serial_write_user_request_copy_in_marker
-extern runtime_serial_write_user_request_service_marker
+extern runtime_serial_write_user_runtime_status_service_enter_marker
+extern runtime_serial_write_user_runtime_status_service_ok_marker
 extern runtime_serial_write_user_response_copy_out_marker
 extern runtime_serial_write_ring3_response_resume_marker
 extern runtime_serial_write_user_response_consumed_marker
 extern runtime_serial_write_fixed_user_response_marker
 extern runtime_serial_write_fixed_user_request_marker
 extern runtime_serial_write_ring3_probe_marker
+extern runtime_serial_write_ring0_return_marker
+extern runtime_status_snapshot
 extern boot_terminal_halt
 
 %define PAGE_QWORDS (KOZO_PAGE_SIZE / 8)
@@ -93,7 +102,6 @@ extern boot_terminal_halt
 %define USER_INITIAL_RSP (USER_PROBE_STACK_TOP_VA - 16)
 %define USER_RFLAGS 0x2
 %define USER_STACK_SENTINEL 0x4b4f5a4f55534552
-%define USER_PROBE_TOKEN 0x4b4f5a4f50524956
 %define USER_PROBE_FAILURE_TOKEN 0x4641494c50524956
 %define PRIVILEGE_PROBE_SUCCESS_STATE 0x4b4f5a4f52335230
 %define FIXED_USER_REQUEST_SUCCESS_STATE 0x4b4f5a4f55524251
@@ -153,11 +161,10 @@ user_privilege_probe_start:
     mov dword [rdi + 8], FIXED_USER_REQUEST_SIZE
     mov dword [rdi + 12], FIXED_USER_RESPONSE_SIZE
     mov qword [rdi + 16], FIXED_USER_REQUEST_SEQUENCE
-    mov rax, USER_PROBE_TOKEN
-    mov [rdi + 24], rax
+    mov qword [rdi + 24], 0
     mov dword [rdi + 32], FIXED_USER_REQUEST_FLAGS
     mov dword [rdi + 36], 0
-    cmp [rdi + 24], rax
+    cmp qword [rdi + 24], 0
     jne user_privilege_probe_failed
     push qword USER_RFLAGS
     popfq
@@ -207,20 +214,31 @@ user_response_consumer_start:
     cmp qword [rdi + 16], FIXED_USER_REQUEST_SEQUENCE
     jne .write_record
     mov r8d, 6
-    mov rax, USER_PROBE_TOKEN
-    cmp [rdi + 24], rax
+    cmp dword [rdi + 24], RUNTIME_STATUS_STAGE
     jne .write_record
     mov r8d, 7
-    cmp dword [rdi + 32], 3
+    cmp dword [rdi + 28], 0
     jne .write_record
     mov r8d, 8
-    cmp dword [rdi + 36], 0
+    cmp qword [rdi + 32], RUNTIME_STATUS_PROVEN_STAGE_MASK
     jne .write_record
     mov r8d, 9
-    mov rax, USER_PROBE_TOKEN
-    mov rcx, FIXED_USER_RESPONSE_MASK
-    xor rax, rcx
-    cmp [rdi + 40], rax
+    cmp qword [rdi + 40], RUNTIME_STATUS_BOOT_MEMORY_SIZE
+    jne .write_record
+    mov r8d, 10
+    cmp qword [rdi + 48], RUNTIME_STATUS_LOOP_LIMIT
+    jne .write_record
+    mov r8d, 11
+    cmp qword [rdi + 56], RUNTIME_STATUS_LOOP_FINAL_COUNT
+    jne .write_record
+    mov r8d, 12
+    cmp qword [rdi + 64], RUNTIME_STATUS_LOOP_FINAL_ACCUMULATOR
+    jne .write_record
+    mov r8d, 13
+    cmp qword [rdi + 72], RUNTIME_STATUS_FEATURE_MASK
+    jne .write_record
+    mov r8d, 14
+    cmp qword [rdi + 80], 0
     jne .write_record
     xor r8d, r8d
     jmp .write_record
@@ -239,9 +257,19 @@ user_response_consumer_start:
     mov [rsi + 12], r8d
     mov rax, [rdi + 16]
     mov [rsi + 16], rax
-    mov rax, [rdi + 24]
+    mov rax, [rdi + 32]
     mov [rsi + 24], rax
-    mov rax, [rdi + 40]
+    mov rax, [rdi]
+    xor rax, [rdi + 8]
+    xor rax, [rdi + 16]
+    xor rax, [rdi + 24]
+    xor rax, [rdi + 32]
+    xor rax, [rdi + 40]
+    xor rax, [rdi + 48]
+    xor rax, [rdi + 56]
+    xor rax, [rdi + 64]
+    xor rax, [rdi + 72]
+    xor rax, [rdi + 80]
     mov [rsi + 32], rax
     mov qword [rsi + 40], 0
     push qword USER_RFLAGS
@@ -299,6 +327,7 @@ fixed_user_request_shadow:
     resb FIXED_USER_REQUEST_SIZE
 fixed_user_request_shadow_end:
 alignb 8
+; Ring 0 writes this validated response, then retains it for revalidation.
 fixed_user_response_shadow:
     resb FIXED_USER_RESPONSE_SIZE
 fixed_user_response_shadow_end:
@@ -307,10 +336,12 @@ fixed_user_response_verify:
     resb FIXED_USER_RESPONSE_SIZE
 fixed_user_response_verify_end:
 alignb 8
+; Ring 0 copies the fixed Ring 3 validation record here before accepting it.
 fixed_user_consumption_shadow:
     resb FIXED_USER_CONSUMPTION_RECORD_SIZE
 fixed_user_consumption_shadow_end:
 alignb 8
+; Ring 0 alone writes and reads this two-stage transaction selector.
 fixed_user_transaction_phase:
     resd 1
     resd 1
@@ -318,7 +349,7 @@ fixed_user_transaction_phase_end:
 alignb 8
 fixed_user_request_success_state:
     resq 1
-saved_kernel_continuation_rsp:
+saved_odin_return_stack:
     resq 1
 observed_task_register:
     resw 1
@@ -366,7 +397,7 @@ clear_privilege_transition_storage:
     mov ecx, PAGE_QWORDS
     rep stosq
     mov qword [rel privilege_probe_state], 0
-    mov qword [rel saved_kernel_continuation_rsp], 0
+    mov qword [rel saved_odin_return_stack], 0
     mov word [rel observed_task_register], 0
     ret
 
@@ -698,11 +729,33 @@ require_mapping_flags:
     mov eax, 1
     ret
 
-; Saves a fixed kernel continuation, emits entry-attempt evidence, and iretq's.
+; Purpose: preserve the SysV call boundary around the fixed Ring3 transaction.
+; Inputs: none. Output: exact fixed-boundary status in eax.
+; Changes: aligns rsp before calling the architecture implementation.
+; Failure: returns the architecture status unchanged to Odin.
+execute_fixed_user_runtime_status_transaction:
+    sub rsp, 8
+    call enter_bounded_ring3_probe
+    add rsp, 8
+    ret
+
+; Purpose: run the fixed Ring3 status transaction after Odin collects status.
+; Inputs: an aligned bridge call frame. Output: exact fixed-boundary status.
+; Changes: saves the bridge stack and uses the fixed transaction buffers.
+; Failure: returns a nonzero status so Odin prevents later capability markers.
 enter_bounded_ring3_probe:
-    mov [rel saved_kernel_continuation_rsp], rsp
+    mov [rel saved_odin_return_stack], rsp
     mov qword [rel privilege_probe_state], 0
     mov qword [rel fixed_user_request_success_state], 0
+    call validate_privilege_transition_tables
+    test eax, eax
+    jnz .done
+    call validate_user_probe_entry
+    test eax, eax
+    jnz .done
+    call runtime_status_snapshot_fields_are_valid
+    test eax, eax
+    jnz .done
     call validate_fixed_user_buffer_ranges
     test eax, eax
     jnz .done
@@ -760,20 +813,15 @@ handle_fixed_user_request:
     test eax, eax
     jnz privilege_return_failure
     call runtime_serial_write_user_request_copy_in_marker
+    call runtime_serial_write_user_runtime_status_service_enter_marker
 
-    mov rax, [r15 + 8]
-    and eax, 3
-    mov edi, eax
-    mov ax, cs
-    and eax, 3
-    mov esi, eax
-    call execute_fixed_user_boundary_service
+    call build_fixed_user_runtime_status_response
     test eax, eax
     jnz privilege_return_failure
     call validate_fixed_user_response
     test eax, eax
     jnz privilege_return_failure
-    call runtime_serial_write_user_request_service_marker
+    call runtime_serial_write_user_runtime_status_service_ok_marker
 
     call copy_fixed_user_response_out
     test eax, eax
@@ -822,7 +870,7 @@ handle_fixed_user_response_consumption:
     mov rax, PRIVILEGE_PROBE_SUCCESS_STATE
     mov [rel privilege_probe_state], rax
     call runtime_serial_write_ring3_probe_marker
-    mov rsp, [rel saved_kernel_continuation_rsp]
+    mov rsp, [rel saved_odin_return_stack]
     jmp privilege_ring0_continuation
 
 privilege_response_phase_failure:
@@ -1024,8 +1072,7 @@ validate_fixed_user_request:
     jne .invalid
     cmp qword [rel fixed_user_request_shadow + 16], FIXED_USER_REQUEST_SEQUENCE
     jne .invalid
-    mov rax, USER_PROBE_TOKEN
-    cmp [rel fixed_user_request_shadow + 24], rax
+    cmp qword [rel fixed_user_request_shadow + 24], 0
     jne .invalid
     cmp dword [rel fixed_user_request_shadow + 32], FIXED_USER_REQUEST_FLAGS
     jne .invalid
@@ -1037,11 +1084,44 @@ validate_fixed_user_request:
     mov eax, FIXED_USER_REQUEST_INVALID
     ret
 
-; Produces one deterministic response from the validated supervisor shadow.
-execute_fixed_user_boundary_service:
-    cmp edi, 3
-    jne .failed
-    test esi, esi
+; Purpose: Check the post-loop facts collected by Odin.
+; Inputs: fixed runtime_status_snapshot.
+; Output: Zero only for exact values.
+; Changes: None.
+; Failure: Prevents Ring 3 entry or response copy-out.
+runtime_status_snapshot_fields_are_valid:
+    cmp dword [rel runtime_status_snapshot], RUNTIME_STATUS_STAGE
+    jne .invalid
+    cmp dword [rel runtime_status_snapshot + 4], 0
+    jne .invalid
+    cmp qword [rel runtime_status_snapshot + 8], RUNTIME_STATUS_PROVEN_STAGE_MASK
+    jne .invalid
+    cmp qword [rel runtime_status_snapshot + 16], RUNTIME_STATUS_BOOT_MEMORY_SIZE
+    jne .invalid
+    cmp qword [rel runtime_status_snapshot + 24], RUNTIME_STATUS_LOOP_LIMIT
+    jne .invalid
+    cmp qword [rel runtime_status_snapshot + 32], RUNTIME_STATUS_LOOP_FINAL_COUNT
+    jne .invalid
+    cmp qword [rel runtime_status_snapshot + 40], RUNTIME_STATUS_LOOP_FINAL_ACCUMULATOR
+    jne .invalid
+    cmp qword [rel runtime_status_snapshot + 48], RUNTIME_STATUS_FEATURE_MASK
+    jne .invalid
+    cmp qword [rel runtime_status_snapshot + 56], 0
+    jne .invalid
+    xor eax, eax
+    ret
+.invalid:
+    mov eax, FIXED_USER_REQUEST_SERVICE_FAILED
+    ret
+
+; Purpose: Build the fixed user response from the validated Odin snapshot.
+; Inputs: The fixed request and runtime_status_snapshot.
+; Output: An exact boundary status.
+; Changes: clears and fills fixed_user_response_shadow.
+; Failure: prevents response copy-out and later runtime capabilities.
+build_fixed_user_runtime_status_response:
+    call runtime_status_snapshot_fields_are_valid
+    test eax, eax
     jnz .failed
     cld
     lea rdi, [rel fixed_user_response_shadow]
@@ -1054,21 +1134,33 @@ execute_fixed_user_boundary_service:
     mov dword [rel fixed_user_response_shadow + 12], FIXED_USER_RESPONSE_SIZE
     mov rax, [rel fixed_user_request_shadow + 16]
     mov [rel fixed_user_response_shadow + 16], rax
-    mov rax, [rel fixed_user_request_shadow + 24]
+    mov rax, [rel runtime_status_snapshot]
     mov [rel fixed_user_response_shadow + 24], rax
-    mov dword [rel fixed_user_response_shadow + 32], 3
-    mov dword [rel fixed_user_response_shadow + 36], 0
-    mov rdx, FIXED_USER_RESPONSE_MASK
-    xor rax, rdx
+    mov rax, [rel runtime_status_snapshot + 8]
+    mov [rel fixed_user_response_shadow + 32], rax
+    mov rax, [rel runtime_status_snapshot + 16]
     mov [rel fixed_user_response_shadow + 40], rax
-    cmp [rel fixed_user_response_shadow + 40], rax
-    jne .failed
+    mov rax, [rel runtime_status_snapshot + 24]
+    mov [rel fixed_user_response_shadow + 48], rax
+    mov rax, [rel runtime_status_snapshot + 32]
+    mov [rel fixed_user_response_shadow + 56], rax
+    mov rax, [rel runtime_status_snapshot + 40]
+    mov [rel fixed_user_response_shadow + 64], rax
+    mov rax, [rel runtime_status_snapshot + 48]
+    mov [rel fixed_user_response_shadow + 72], rax
+    mov rax, [rel runtime_status_snapshot + 56]
+    mov [rel fixed_user_response_shadow + 80], rax
     xor eax, eax
     ret
 .failed:
     mov eax, FIXED_USER_REQUEST_SERVICE_FAILED
     ret
 
+; Purpose: Validate every field in the kernel-owned user response.
+; Inputs: fixed_user_response_shadow.
+; Output: An exact boundary status.
+; Changes: None.
+; Failure: Prevents response copy-out and later success markers.
 validate_fixed_user_response:
     lea rdi, [rel fixed_user_response_shadow]
     call fixed_user_response_fields_are_valid
@@ -1092,16 +1184,23 @@ fixed_user_response_fields_are_valid:
     jne .invalid
     cmp qword [rdi + 16], FIXED_USER_REQUEST_SEQUENCE
     jne .invalid
-    mov rax, USER_PROBE_TOKEN
-    cmp [rdi + 24], rax
+    cmp dword [rdi + 24], RUNTIME_STATUS_STAGE
     jne .invalid
-    cmp dword [rdi + 32], 3
+    cmp dword [rdi + 28], 0
     jne .invalid
-    cmp dword [rdi + 36], 0
+    cmp qword [rdi + 32], RUNTIME_STATUS_PROVEN_STAGE_MASK
     jne .invalid
-    mov rdx, FIXED_USER_RESPONSE_MASK
-    xor rax, rdx
-    cmp [rdi + 40], rax
+    cmp qword [rdi + 40], RUNTIME_STATUS_BOOT_MEMORY_SIZE
+    jne .invalid
+    cmp qword [rdi + 48], RUNTIME_STATUS_LOOP_LIMIT
+    jne .invalid
+    cmp qword [rdi + 56], RUNTIME_STATUS_LOOP_FINAL_COUNT
+    jne .invalid
+    cmp qword [rdi + 64], RUNTIME_STATUS_LOOP_FINAL_ACCUMULATOR
+    jne .invalid
+    cmp qword [rdi + 72], RUNTIME_STATUS_FEATURE_MASK
+    jne .invalid
+    cmp qword [rdi + 80], 0
     jne .invalid
     xor eax, eax
     ret
@@ -1109,7 +1208,7 @@ fixed_user_response_fields_are_valid:
     mov eax, 1
     ret
 
-; Copies exactly six qwords to the fixed response span and verifies each store.
+; Copies exactly eleven qwords to the fixed response span and verifies each store.
 copy_fixed_user_response_out:
     lea rsi, [rel fixed_user_response_shadow]
     mov rdi, FIXED_USER_RESPONSE_VA
@@ -1125,6 +1224,16 @@ copy_fixed_user_response_out:
     mov [rdi + 32], rax
     mov rax, [rsi + 40]
     mov [rdi + 40], rax
+    mov rax, [rsi + 48]
+    mov [rdi + 48], rax
+    mov rax, [rsi + 56]
+    mov [rdi + 56], rax
+    mov rax, [rsi + 64]
+    mov [rdi + 64], rax
+    mov rax, [rsi + 72]
+    mov [rdi + 72], rax
+    mov rax, [rsi + 80]
+    mov [rdi + 80], rax
     mov ecx, FIXED_USER_RESPONSE_QWORDS
 .verify:
     mov rax, [rsi]
@@ -1155,6 +1264,16 @@ validate_fixed_user_response_readback:
     mov [rdi + 32], rax
     mov rax, [rsi + 40]
     mov [rdi + 40], rax
+    mov rax, [rsi + 48]
+    mov [rdi + 48], rax
+    mov rax, [rsi + 56]
+    mov [rdi + 56], rax
+    mov rax, [rsi + 64]
+    mov [rdi + 64], rax
+    mov rax, [rsi + 72]
+    mov [rdi + 72], rax
+    mov rax, [rsi + 80]
+    mov [rdi + 80], rax
     lea rsi, [rel fixed_user_response_shadow]
     mov ecx, FIXED_USER_RESPONSE_QWORDS
 .compare:
@@ -1323,10 +1442,11 @@ validate_fixed_user_consumption_record:
     mov rax, [rel fixed_user_response_shadow + 16]
     cmp [rel fixed_user_consumption_shadow + 16], rax
     jne .invalid
-    mov rax, [rel fixed_user_response_shadow + 24]
+    mov rax, [rel fixed_user_response_shadow + 32]
     cmp [rel fixed_user_consumption_shadow + 24], rax
     jne .invalid
-    mov rax, [rel fixed_user_response_shadow + 40]
+    lea rdi, [rel fixed_user_response_shadow]
+    call fixed_user_response_digest
     cmp [rel fixed_user_consumption_shadow + 32], rax
     jne .invalid
     cmp qword [rel fixed_user_consumption_shadow + 40], 0
@@ -1335,6 +1455,21 @@ validate_fixed_user_consumption_record:
     ret
 .invalid:
     mov eax, USER_RESPONSE_RECORD_INVALID
+    ret
+
+; Returns the XOR digest of all eleven fixed response qwords.
+fixed_user_response_digest:
+    mov rax, [rdi]
+    xor rax, [rdi + 8]
+    xor rax, [rdi + 16]
+    xor rax, [rdi + 24]
+    xor rax, [rdi + 32]
+    xor rax, [rdi + 40]
+    xor rax, [rdi + 48]
+    xor rax, [rdi + 56]
+    xor rax, [rdi + 64]
+    xor rax, [rdi + 72]
+    xor rax, [rdi + 80]
     ret
 
 ; Clears only the remaining response-stage spans and supervisor shadows.
@@ -1453,12 +1588,12 @@ fixed_qword_span_is_zero:
     ret
 
 privilege_return_failure:
-    mov rsp, [rel saved_kernel_continuation_rsp]
+    mov rsp, [rel saved_odin_return_stack]
     test rsp, rsp
     jz boot_terminal_halt
     ret
 
-; Fixed continuation validates restored CPL0 state and returns to the boot caller.
+; Fixed continuation validates restored CPL0 state and returns through the Odin bridge.
 privilege_ring0_continuation:
     mov ax, cs
     test ax, 3
@@ -1466,7 +1601,7 @@ privilege_ring0_continuation:
     mov ax, ss
     cmp ax, KERNEL_DATA_SELECTOR
     jne .failed
-    cmp rsp, [rel saved_kernel_continuation_rsp]
+    cmp rsp, [rel saved_odin_return_stack]
     jne .failed
     mov rax, PRIVILEGE_PROBE_SUCCESS_STATE
     cmp [rel privilege_probe_state], rax
@@ -1486,6 +1621,7 @@ privilege_ring0_continuation:
     jne .boundary_failed
     mov qword [rel privilege_probe_state], 0
     mov qword [rel fixed_user_request_success_state], 0
+    call runtime_serial_write_ring0_return_marker
     xor eax, eax
     ret
 .boundary_failed:

@@ -239,3 +239,14 @@ There is no third Ring 3 transition or persistent userspace runtime. The fixed
 fault sinks provide fail-closed containment for this probe only; they do not
 prove exception recovery, diagnostic completeness, memory isolation against
 arbitrary hostile code, or production safety.
+
+# 19. Fixed User Runtime Status Service
+
+Request identity, addresses, lengths, response fields, and feature bits are
+fixed. The response exposes no pointer, physical address, stack address, or
+page-table address. Ring 3 cannot select fields or service behavior.
+
+The service reports only already proven runtime facts from one kernel-owned
+post-loop snapshot. It is not a public syscall ABI, authorization boundary,
+general status API, persistent user session, process boundary, sandbox, or
+hostile-code safety proof.

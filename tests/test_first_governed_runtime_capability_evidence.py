@@ -48,8 +48,8 @@ class FirstGovernedRuntimeCapabilityEvidenceValidatorTests(unittest.TestCase):
     def test_fails_when_progression_does_not_call_capability(self):
         result = self.validate_fixture(
             mutate_progression=lambda text: text.replace(
-                "first_capability_status := execute_first_governed_capability()",
-                "first_capability_status := RUNTIME_PROGRESSION_OK",
+                "capability_status := execute_first_governed_capability()",
+                "capability_status := RUNTIME_PROGRESSION_OK",
             )
         )
 
@@ -170,8 +170,9 @@ class FirstGovernedRuntimeCapabilityEvidenceValidatorTests(unittest.TestCase):
     def test_fails_when_controlled_loop_state_is_not_validated(self):
         result = self.validate_fixture(
             mutate_capability=lambda text: text.replace(
-                "if !controlled_runtime_loop_state_is_complete() {",
+                "if !validate_runtime_status_snapshot() {",
                 "if false {",
+                1,
             )
         )
 
@@ -181,7 +182,7 @@ class FirstGovernedRuntimeCapabilityEvidenceValidatorTests(unittest.TestCase):
     def test_fails_when_response_field_is_missing(self):
         result = self.validate_fixture(
             mutate_capability=lambda text: text.replace(
-                "response.proven_stage_mask = RUNTIME_PROVEN_STAGE_MASK",
+                "response.proven_stage_mask = runtime_status_snapshot.proven_stage_mask",
                 "",
             )
         )

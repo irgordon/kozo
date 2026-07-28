@@ -10,6 +10,7 @@ from harness.validator import BaseValidator, ValidationResult
 
 _CONTRACT_PATH = contract_module.CONTRACT_PATH
 _MARKERS = (
+    "KOZO_RUNTIME_LOOP_EXIT_OK",
     "KOZO_USER_RESPONSE_COPY_OUT_OK",
     "KOZO_RING3_RESPONSE_RESUME",
     "KOZO_USER_RESPONSE_CONSUMED_OK",
@@ -17,7 +18,7 @@ _MARKERS = (
     "KOZO_FIXED_USER_REQUEST_OK",
     "KOZO_RING3_PROBE_OK",
     "KOZO_RING0_RETURN_OK",
-    "KOZO_RUNTIME_PROGRESS_ENTRY",
+    "KOZO_CAPABILITY_DISPATCH_ENTER",
 )
 _RECORD_FIELDS = (
     ("version", 0, 4),
@@ -25,8 +26,8 @@ _RECORD_FIELDS = (
     ("record_size", 8, 4),
     ("validation_status", 12, 4),
     ("sequence", 16, 8),
-    ("echoed_payload", 24, 8),
-    ("response_token", 32, 8),
+    ("selected_status_value", 24, 8),
+    ("response_digest", 32, 8),
     ("reserved", 40, 8),
 )
 _STATUSES = {
@@ -118,6 +119,7 @@ def _execution_issue(contract) -> BoundedUserResponseContractIssue | None:
         "ring3_resume_count": 1,
         "second_gate_count": 1,
         "terminal_continuation": "privilege_ring0_continuation",
+        "continuation_owner": "active_odin_call_frame",
     }
     if contract.execution_point != expected:
         return _issue("invalid_execution_point", "execution_point", "Consumption must use one fixed resume, second int 0x81, and fixed continuation")
@@ -170,7 +172,7 @@ def _geometry_issue(contract) -> BoundedUserResponseContractIssue | None:
         response.get("alignment_bytes"),
         response.get("physical_backing_symbol"),
     )
-    if response_values != ("0x0000400000001080", 48, 8, "user_probe_data_start"):
+    if response_values != ("0x0000400000001080", 88, 8, "user_probe_data_start"):
         return _issue("invalid_response_geometry", "response", "Accepted response geometry must remain fixed")
     record_values = (
         record.get("page_offset"),
@@ -214,10 +216,14 @@ def _validation_issue(contract) -> BoundedUserResponseContractIssue | None:
         "status matches",
         "response size matches",
         "sequence matches",
-        "echoed payload matches",
-        "observed user CPL matches",
-        "observed kernel CPL matches",
-        "response token matches",
+        "current runtime stage matches",
+        "proven stage mask matches",
+        "boot memory region size matches",
+        "controlled loop iteration limit matches",
+        "controlled loop final count matches",
+        "controlled loop final accumulator matches",
+        "feature mask matches",
+        "reserved fields are zero",
     }
     if set(contract.ring3_response_checks) != required_checks:
         return _issue("missing_ring3_response_check", "ring3_response_checks", "Ring3 must validate CPL, stack, and every response field")
@@ -247,17 +253,28 @@ def _copy_clear_issue(contract) -> BoundedUserResponseContractIssue | None:
         contract.clearing.get("kernel_consumption_shadow_bytes"),
         contract.clearing.get("kernel_verify_bytes"),
     )
-    if clear_sizes != (48, 48, 48, 48, 48) or contract.clearing.get("zero_readback_required") is not True:
+    if clear_sizes != (88, 48, 88, 48, 88) or contract.clearing.get("zero_readback_required") is not True:
         return _issue("missing_clearing_policy", "clearing", "Every response-stage buffer requires exact clearing and zero readback")
-    if contract.phase_reset != {"required_before_odin": True, "reset_value": 0, "readback_required": True}:
-        return _issue("missing_phase_reset", "phase_reset", "Phase must reset to REQUEST_PENDING before Odin")
+    expected_reset = {
+        "required_before_odin": False,
+        "required_before_return_to_odin": True,
+        "reset_value": 0,
+        "readback_required": True,
+    }
+    if contract.phase_reset != expected_reset:
+        return _issue("missing_phase_reset", "phase_reset", "Phase must reset before returning to active Odin")
     return None
 
 
 def _marker_status_issue(contract) -> BoundedUserResponseContractIssue | None:
     if contract.marker_order != _MARKERS:
         return _issue("invalid_marker_order", "marker_order", "Response-consumption markers must match the governed order")
-    if set(contract.marker_ownership) != set(_MARKERS[1:4]):
+    expected_owners = {
+        "KOZO_RING3_RESPONSE_RESUME",
+        "KOZO_USER_RESPONSE_CONSUMED_OK",
+        "KOZO_FIXED_USER_RESPONSE_OK",
+    }
+    if set(contract.marker_ownership) != expected_owners:
         return _issue("invalid_marker_ownership", "marker_ownership", "Each new success marker must have one Ring0 owner")
     if contract.failure_statuses != _STATUSES:
         return _issue("invalid_failure_status", "failure_statuses", "Response-consumption statuses must use the exact 18 through 25 range")

@@ -2,6 +2,10 @@ package kernel
 
 import "base:intrinsics"
 
+// This file owns the two fixed internal runtime capabilities and the shared
+// post-loop status snapshot. It does not own Ring 3 transaction mechanics;
+// privilege_transition.asm formats and validates the fixed user response.
+
 RUNTIME_STATUS_REQUEST_VERSION :: u32(1)
 RUNTIME_STATUS_RESPONSE_VERSION :: u32(1)
 RUNTIME_STATUS_QUERY_CAPABILITY_ID :: u32(1)
@@ -16,6 +20,8 @@ RUNTIME_STATUS_REQUEST_SIZE :: uintptr(16)
 RUNTIME_STATUS_REQUEST_ALIGNMENT :: uintptr(4)
 RUNTIME_STATUS_RESPONSE_SIZE :: uintptr(64)
 RUNTIME_STATUS_RESPONSE_ALIGNMENT :: uintptr(8)
+RUNTIME_STATUS_SNAPSHOT_SIZE :: uintptr(64)
+RUNTIME_STATUS_SNAPSHOT_ALIGNMENT :: uintptr(8)
 
 RUNTIME_STATE_TRANSITION_REQUEST_SIZE :: uintptr(32)
 RUNTIME_STATE_TRANSITION_REQUEST_ALIGNMENT :: uintptr(8)
@@ -26,6 +32,7 @@ RUNTIME_STATE_CELL_ALIGNMENT :: uintptr(8)
 
 RUNTIME_STAGE_CONTROLLED_RUNTIME_LOOP :: u32(5)
 RUNTIME_PROVEN_STAGE_MASK :: u64(0x3f)
+RUNTIME_STATUS_FEATURE_MASK :: u64(0x7f)
 
 RUNTIME_STATE_READY :: u32(1)
 RUNTIME_STATE_ACTIVE :: u32(2)
@@ -70,6 +77,18 @@ Runtime_Status_Response :: struct {
 	reserved:                        u64,
 }
 
+Runtime_Status_Snapshot :: struct {
+	current_progression_stage:       u32,
+	reserved_0:                      u32,
+	proven_stage_mask:               u64,
+	boot_memory_region_size:         u64,
+	controlled_loop_iteration_limit: u64,
+	controlled_loop_final_count:     u64,
+	controlled_loop_accumulator:     u64,
+	runtime_feature_mask:            u64,
+	reserved_1:                      u64,
+}
+
 Runtime_State_Cell :: struct {
 	state:      u32,
 	reserved:   u32,
@@ -104,6 +123,8 @@ Runtime_State_Transition_Response :: struct {
 #assert(align_of(Runtime_Status_Request) == RUNTIME_STATUS_REQUEST_ALIGNMENT)
 #assert(size_of(Runtime_Status_Response) == RUNTIME_STATUS_RESPONSE_SIZE)
 #assert(align_of(Runtime_Status_Response) == RUNTIME_STATUS_RESPONSE_ALIGNMENT)
+#assert(size_of(Runtime_Status_Snapshot) == RUNTIME_STATUS_SNAPSHOT_SIZE)
+#assert(align_of(Runtime_Status_Snapshot) == RUNTIME_STATUS_SNAPSHOT_ALIGNMENT)
 #assert(size_of(Runtime_State_Cell) == RUNTIME_STATE_CELL_SIZE)
 #assert(align_of(Runtime_State_Cell) == RUNTIME_STATE_CELL_ALIGNMENT)
 #assert(size_of(Runtime_State_Transition_Request) == RUNTIME_STATE_TRANSITION_REQUEST_SIZE)
@@ -113,6 +134,12 @@ Runtime_State_Transition_Response :: struct {
 
 @(export)
 runtime_state_transition_cell: Runtime_State_Cell
+
+// Stores post-loop facts for the fixed user transaction and capability ID 1.
+// Odin writes it after the loop, assembly reads it while Ring 3 runs, and
+// Odin clears it after the internal status response has been validated.
+@(export)
+runtime_status_snapshot: Runtime_Status_Snapshot
 
 @(export)
 initialize_runtime_state_transition_cell :: proc "contextless" () -> bool {
@@ -278,10 +305,10 @@ clear_runtime_status_response :: proc "contextless" (response: ^Runtime_Status_R
 
 @(export)
 query_runtime_status :: proc "contextless" (response: ^Runtime_Status_Response) -> u32 {
-	if !controlled_runtime_loop_state_is_complete() {
+	if !validate_runtime_status_snapshot() {
 		return RUNTIME_CAPABILITY_EXECUTION_FAILURE
 	}
-	populate_runtime_status_response(response)
+	build_internal_runtime_status_response(response)
 	if !validate_runtime_status_response(response) {
 		return RUNTIME_CAPABILITY_RESPONSE_VALIDATION_FAILURE
 	}
@@ -297,16 +324,99 @@ controlled_runtime_loop_state_is_complete :: proc "contextless" () -> bool {
 	       runtime_loop_reserved() == 0
 }
 
-populate_runtime_status_response :: proc "contextless" (response: ^Runtime_Status_Response) {
+// Purpose: Collect the real status produced by the completed runtime loop.
+// Inputs: None.
+// Output: An exact runtime status code.
+// Changes: Clears and fills runtime_status_snapshot.
+// Failure: Leaves the snapshot cleared and prevents the Ring 3 transaction.
+@(export)
+collect_runtime_status :: proc "contextless" () -> u32 {
+	if !clear_runtime_status_snapshot() {
+		return RUNTIME_CAPABILITY_EXECUTION_FAILURE
+	}
+	if !controlled_runtime_loop_state_is_complete() {
+		return RUNTIME_CAPABILITY_EXECUTION_FAILURE
+	}
+	populate_runtime_status_snapshot()
+	if !validate_runtime_status_snapshot() {
+		clear_runtime_status_snapshot()
+		return RUNTIME_CAPABILITY_RESPONSE_VALIDATION_FAILURE
+	}
+	return RUNTIME_PROGRESSION_OK
+}
+
+populate_runtime_status_snapshot :: proc "contextless" () {
+	runtime_status_snapshot.current_progression_stage = RUNTIME_STAGE_CONTROLLED_RUNTIME_LOOP
+	runtime_status_snapshot.reserved_0 = 0
+	runtime_status_snapshot.proven_stage_mask = RUNTIME_PROVEN_STAGE_MASK
+	runtime_status_snapshot.boot_memory_region_size = RUNTIME_BOOT_MEMORY_SIZE
+	runtime_status_snapshot.controlled_loop_iteration_limit = runtime_loop_limit()
+	runtime_status_snapshot.controlled_loop_final_count = runtime_loop_iteration_count()
+	runtime_status_snapshot.controlled_loop_accumulator = runtime_loop_accumulator()
+	runtime_status_snapshot.runtime_feature_mask = RUNTIME_STATUS_FEATURE_MASK
+	runtime_status_snapshot.reserved_1 = 0
+}
+
+// Purpose: Check every fact in the shared post-loop status snapshot.
+// Inputs: None.
+// Output: True only for the governed completed-loop values.
+// Changes: None.
+// Failure: Callers stop before later success markers.
+@(export)
+validate_runtime_status_snapshot :: proc "contextless" () -> bool {
+	return runtime_status_snapshot.current_progression_stage == RUNTIME_STAGE_CONTROLLED_RUNTIME_LOOP &&
+	       runtime_status_snapshot.reserved_0 == 0 &&
+	       runtime_status_snapshot.proven_stage_mask == RUNTIME_PROVEN_STAGE_MASK &&
+	       runtime_status_snapshot.boot_memory_region_size == RUNTIME_BOOT_MEMORY_SIZE &&
+	       runtime_status_snapshot.controlled_loop_iteration_limit == RUNTIME_LOOP_ITERATION_LIMIT &&
+	       runtime_status_snapshot.controlled_loop_final_count == RUNTIME_LOOP_ITERATION_LIMIT &&
+	       runtime_status_snapshot.controlled_loop_accumulator == RUNTIME_LOOP_EXPECTED_ACCUMULATOR &&
+	       runtime_status_snapshot.runtime_feature_mask == RUNTIME_STATUS_FEATURE_MASK &&
+	       runtime_status_snapshot.reserved_1 == 0
+}
+
+// Purpose: Clear the shared status after both fixed consumers finish.
+// Inputs: None.
+// Output: True after zero readback.
+// Changes: Zeros runtime_status_snapshot.
+// Failure: Callers stop before later runtime success markers.
+@(export)
+clear_runtime_status_snapshot :: proc "contextless" () -> bool {
+	runtime_status_snapshot.current_progression_stage = 0
+	runtime_status_snapshot.reserved_0 = 0
+	runtime_status_snapshot.proven_stage_mask = 0
+	runtime_status_snapshot.boot_memory_region_size = 0
+	runtime_status_snapshot.controlled_loop_iteration_limit = 0
+	runtime_status_snapshot.controlled_loop_final_count = 0
+	runtime_status_snapshot.controlled_loop_accumulator = 0
+	runtime_status_snapshot.runtime_feature_mask = 0
+	runtime_status_snapshot.reserved_1 = 0
+	return runtime_status_snapshot_is_zero()
+}
+
+runtime_status_snapshot_is_zero :: proc "contextless" () -> bool {
+	return runtime_status_snapshot.current_progression_stage == 0 &&
+	       runtime_status_snapshot.reserved_0 == 0 &&
+	       runtime_status_snapshot.proven_stage_mask == 0 &&
+	       runtime_status_snapshot.boot_memory_region_size == 0 &&
+	       runtime_status_snapshot.controlled_loop_iteration_limit == 0 &&
+	       runtime_status_snapshot.controlled_loop_final_count == 0 &&
+	       runtime_status_snapshot.controlled_loop_accumulator == 0 &&
+	       runtime_status_snapshot.runtime_feature_mask == 0 &&
+	       runtime_status_snapshot.reserved_1 == 0
+}
+
+@(export)
+build_internal_runtime_status_response :: proc "contextless" (response: ^Runtime_Status_Response) {
 	response.version = RUNTIME_STATUS_RESPONSE_VERSION
 	response.capability_id = RUNTIME_STATUS_QUERY_CAPABILITY_ID
 	response.status = RUNTIME_PROGRESSION_OK
-	response.current_progression_stage = RUNTIME_STAGE_CONTROLLED_RUNTIME_LOOP
-	response.proven_stage_mask = RUNTIME_PROVEN_STAGE_MASK
-	response.boot_memory_region_size = RUNTIME_BOOT_MEMORY_SIZE
-	response.controlled_loop_iteration_limit = runtime_loop_limit()
-	response.controlled_loop_final_count = runtime_loop_iteration_count()
-	response.controlled_loop_accumulator = runtime_loop_accumulator()
+	response.current_progression_stage = runtime_status_snapshot.current_progression_stage
+	response.proven_stage_mask = runtime_status_snapshot.proven_stage_mask
+	response.boot_memory_region_size = runtime_status_snapshot.boot_memory_region_size
+	response.controlled_loop_iteration_limit = runtime_status_snapshot.controlled_loop_iteration_limit
+	response.controlled_loop_final_count = runtime_status_snapshot.controlled_loop_final_count
+	response.controlled_loop_accumulator = runtime_status_snapshot.controlled_loop_accumulator
 	response.reserved = 0
 }
 

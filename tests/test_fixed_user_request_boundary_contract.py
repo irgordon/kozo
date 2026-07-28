@@ -100,12 +100,14 @@ class FixedUserRequestBoundaryContractTests(unittest.TestCase):
         self.assert_reason(result, "invalid_shadow_policy")
 
     def test_fails_when_service_identifier_changes(self):
-        result = self.validate_fixture(mutate=self.nested("fixed_service", "request_identifier", 2))
+        result = self.validate_fixture(mutate=self.nested("fixed_service", "request_identifier", 3))
         self.assertEqual(result.status, "fail")
         self.assert_reason(result, "invalid_service_identity")
 
     def test_fails_when_response_mask_changes(self):
-        result = self.validate_fixture(mutate=self.nested("fixed_service", "response_token_mask", "0x1"))
+        result = self.validate_fixture(
+            mutate=self.nested("fixed_service", "shared_snapshot_symbol", "other_snapshot")
+        )
         self.assertEqual(result.status, "fail")
         self.assert_reason(result, "invalid_response_token_rule")
 
@@ -198,7 +200,7 @@ class FixedUserRequestBoundaryContractTests(unittest.TestCase):
         self.assert_reason(result, "claim_boundary_too_broad")
 
     def test_failure_diagnostic_names_field(self):
-        result = self.validate_fixture(mutate=self.nested("fixed_service", "request_identifier", 2))
+        result = self.validate_fixture(mutate=self.nested("fixed_service", "request_identifier", 3))
         self.assertEqual(result.code, FIXED_USER_REQUEST_BOUNDARY_CONTRACT_INVALID)
         self.assertIn("reason", result.meta)
         self.assertIn("contract_field", result.meta)

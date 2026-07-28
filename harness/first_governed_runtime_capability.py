@@ -22,6 +22,9 @@ class CapabilityDefinition:
     entry_symbol: str
     dispatcher_symbol: str
     handler_symbol: str
+    shared_status_collector: str
+    shared_status_snapshot: str
+    response_builder: str
 
 
 @dataclass(frozen=True)

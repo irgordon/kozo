@@ -12,6 +12,8 @@ from harness.codes import (
     CODES,
     FIXED_USER_REQUEST_BOUNDARY_CONTRACT_INVALID,
     FIXED_USER_REQUEST_BOUNDARY_EVIDENCE_INVALID,
+    FIXED_USER_RUNTIME_STATUS_SERVICE_CONTRACT_INVALID,
+    FIXED_USER_RUNTIME_STATUS_SERVICE_EVIDENCE_INVALID,
     MEMORY_INITIALIZATION_EVIDENCE_INVALID,
     OK,
     SCHEMA_INVALID,
@@ -135,6 +137,42 @@ class SchemaValidatorTests(unittest.TestCase):
             [
                 FIXED_USER_REQUEST_BOUNDARY_CONTRACT_INVALID,
                 FIXED_USER_REQUEST_BOUNDARY_EVIDENCE_INVALID,
+            ],
+        )
+
+    def test_user_status_checks_serialize_in_aggregate_report(self):
+        collected = [
+            (
+                "fixed_user_runtime_status_service_contract",
+                "fixed_user_runtime_status_service_contract",
+                ValidationResult.fail(
+                    code=FIXED_USER_RUNTIME_STATUS_SERVICE_CONTRACT_INVALID,
+                    detail="User status contract failure remains visible",
+                ),
+            ),
+            (
+                "fixed_user_runtime_status_service_evidence",
+                "fixed_user_runtime_status_service_evidence",
+                ValidationResult.fail(
+                    code=FIXED_USER_RUNTIME_STATUS_SERVICE_EVIDENCE_INVALID,
+                    detail="User status evidence failure remains visible",
+                ),
+            ),
+        ]
+        with patch("harness.aggregator._collect_results", return_value=collected):
+            artifact = run_aggregator(
+                {},
+                changed_files=[],
+                evidence_files=[],
+                run_id="fixed-user-status-schema-regression",
+                generated_at="2026-07-27T00:00:00Z",
+            )
+        validate_named_document("latest_verify", artifact)
+        self.assertEqual(
+            [check["code"] for check in artifact["failed_checks"]],
+            [
+                FIXED_USER_RUNTIME_STATUS_SERVICE_CONTRACT_INVALID,
+                FIXED_USER_RUNTIME_STATUS_SERVICE_EVIDENCE_INVALID,
             ],
         )
 

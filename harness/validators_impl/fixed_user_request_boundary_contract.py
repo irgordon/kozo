@@ -25,20 +25,27 @@ _RESPONSE_FIELDS = (
     ("status", 8, 4),
     ("response_size", 12, 4),
     ("sequence", 16, 8),
-    ("echoed_payload", 24, 8),
-    ("observed_user_cpl", 32, 4),
-    ("observed_kernel_cpl", 36, 4),
-    ("response_token", 40, 8),
+    ("current_runtime_stage", 24, 4),
+    ("reserved_0", 28, 4),
+    ("proven_stage_mask", 32, 8),
+    ("boot_memory_region_size", 40, 8),
+    ("controlled_loop_iteration_limit", 48, 8),
+    ("controlled_loop_final_count", 56, 8),
+    ("controlled_loop_final_accumulator", 64, 8),
+    ("feature_mask", 72, 8),
+    ("reserved_1", 80, 8),
 )
 _MARKERS = (
+    "KOZO_RUNTIME_LOOP_EXIT_OK",
     "KOZO_RING3_ENTER",
     "KOZO_USER_REQUEST_COPY_IN_OK",
-    "KOZO_USER_REQUEST_SERVICE_OK",
+    "KOZO_USER_RUNTIME_STATUS_SERVICE_ENTER",
+    "KOZO_USER_RUNTIME_STATUS_SERVICE_OK",
     "KOZO_USER_RESPONSE_COPY_OUT_OK",
     "KOZO_FIXED_USER_REQUEST_OK",
     "KOZO_RING3_PROBE_OK",
     "KOZO_RING0_RETURN_OK",
-    "KOZO_RUNTIME_PROGRESS_ENTRY",
+    "KOZO_CAPABILITY_DISPATCH_ENTER",
 )
 _STATUSES = {
     "success": 0,
@@ -128,13 +135,15 @@ def _load_contract(path: Path):
 def _execution_issue(contract) -> FixedUserRequestContractIssue | None:
     point = contract.execution_point
     expected = {
-        "after_marker": "KOZO_RING3_ENTER",
-        "before_marker": "KOZO_RING3_PROBE_OK",
+        "after_marker": "KOZO_RUNTIME_LOOP_EXIT_OK",
+        "before_marker": "KOZO_CAPABILITY_DISPATCH_ENTER",
         "ring3_symbol": "user_privilege_probe_start",
+        "runtime_bridge_symbol": "execute_fixed_user_runtime_status_transaction",
         "return_handler_symbol": "privilege_return_handler",
         "fixed_continuation_symbol": "privilege_ring0_continuation",
         "return_vector": "0x81",
         "returns_to_ring3": True,
+        "returns_to_odin": True,
     }
     if point != expected:
         return _issue("invalid_execution_point", "execution_point", "Boundary must use the fixed Ring3 stub, int 0x81 handler, and Ring0 continuation")
@@ -144,8 +153,8 @@ def _execution_issue(contract) -> FixedUserRequestContractIssue | None:
 def _request_issue(contract) -> FixedUserRequestContractIssue | None:
     request = contract.request
     expected = {
-        "name": "FIXED_USER_BOUNDARY_PROBE",
-        "identifier": 1,
+        "name": "FIXED_USER_RUNTIME_STATUS_REQUEST",
+        "identifier": 2,
         "version": 1,
         "virtual_address": "0x0000400000001000",
         "page_offset": 0,
@@ -153,7 +162,7 @@ def _request_issue(contract) -> FixedUserRequestContractIssue | None:
         "alignment_bytes": 8,
         "physical_backing_symbol": "user_probe_data_start",
         "sequence": 1,
-        "payload": "0x4b4f5a4f50524956",
+        "payload": 0,
         "flags": 0,
         "reserved": 0,
     }
@@ -169,21 +178,19 @@ def _response_issue(contract) -> FixedUserRequestContractIssue | None:
     response = contract.response
     expected = {
         "version": 1,
-        "request_identifier": 1,
+        "request_identifier": 2,
         "success_status": 0,
         "virtual_address": "0x0000400000001080",
         "page_offset": 128,
-        "size_bytes": 48,
+        "size_bytes": 88,
         "alignment_bytes": 8,
         "physical_backing_symbol": "user_probe_data_start",
-        "observed_user_cpl": 3,
-        "observed_kernel_cpl": 0,
     }
     for field, value in expected.items():
         if response.get(field) != value:
             return _issue("invalid_response_geometry", f"response.{field}", f"Fixed response {field} must be {value!r}")
     if _field_layout(response.get("fields")) != _RESPONSE_FIELDS:
-        return _issue("invalid_response_geometry", "response.fields", "Fixed response fields must occupy the exact 48-byte layout")
+        return _issue("invalid_response_geometry", "response.fields", "Fixed response fields must occupy the exact 88-byte layout")
     return None
 
 
@@ -200,8 +207,8 @@ def _span_issue(contract) -> FixedUserRequestContractIssue | None:
 def _shadow_issue(contract) -> FixedUserRequestContractIssue | None:
     expected = {
         "request": ("fixed_user_request_shadow", "fixed_user_request_shadow_end", 40),
-        "response": ("fixed_user_response_shadow", "fixed_user_response_shadow_end", 48),
-        "verify": ("fixed_user_response_verify", "fixed_user_response_verify_end", 48),
+        "response": ("fixed_user_response_shadow", "fixed_user_response_shadow_end", 88),
+        "verify": ("fixed_user_response_verify", "fixed_user_response_verify_end", 88),
     }
     for name, (start, end, size) in expected.items():
         shadow = contract.kernel_shadows.get(name, {})
@@ -216,12 +223,12 @@ def _shadow_issue(contract) -> FixedUserRequestContractIssue | None:
 
 def _service_issue(contract) -> FixedUserRequestContractIssue | None:
     service = contract.fixed_service
-    if service.get("name") != "FIXED_USER_BOUNDARY_PROBE" or service.get("request_identifier") != 1:
-        return _issue("invalid_service_identity", "fixed_service", "Only fixed request service 1 is governed")
-    if service.get("response_token_operation") != "request_payload_xor_fixed_mask":
-        return _issue("invalid_response_token_rule", "fixed_service.response_token_operation", "Response token must XOR the request payload with the fixed mask")
-    if service.get("response_token_mask") != "0xa5a55a5ac3c33c3c":
-        return _issue("invalid_response_token_rule", "fixed_service.response_token_mask", "Response token mask must remain fixed")
+    if service.get("name") != "FIXED_USER_RUNTIME_STATUS_REQUEST" or service.get("request_identifier") != 2:
+        return _issue("invalid_service_identity", "fixed_service", "Only fixed runtime-status request service 2 is governed")
+    if service.get("shared_snapshot_symbol") != "runtime_status_snapshot":
+        return _issue("invalid_response_token_rule", "fixed_service.shared_snapshot_symbol", "The service must use the shared runtime-status snapshot")
+    if service.get("response_builder_symbol") != "build_fixed_user_runtime_status_response":
+        return _issue("invalid_response_token_rule", "fixed_service.response_builder_symbol", "The service must use the fixed runtime-status response builder")
     if service.get("reads_user_memory") is not False or service.get("writes_user_memory") is not False:
         return _issue("service_crosses_copy_boundary", "fixed_service", "The fixed service must consume and produce only kernel-owned shadows")
     return None
@@ -244,8 +251,8 @@ def _copy_issue(contract) -> FixedUserRequestContractIssue | None:
         return _issue("missing_copy_requirement", "copy_boundary", "Frame, span, fixed-copy, readback, overlap, and overflow checks are mandatory")
     if boundary.get("user_supplied_pointer") is not False or boundary.get("user_supplied_length") is not False:
         return _issue("caller_controlled_copy", "copy_boundary", "No user-provided pointer or length is accepted")
-    if boundary.get("copy_in_size_bytes") != 40 or boundary.get("copy_out_size_bytes") != 48:
-        return _issue("invalid_copy_size", "copy_boundary", "Copy-in and copy-out sizes must be exactly 40 and 48 bytes")
+    if boundary.get("copy_in_size_bytes") != 40 or boundary.get("copy_out_size_bytes") != 88:
+        return _issue("invalid_copy_size", "copy_boundary", "Copy-in and copy-out sizes must be exactly 40 and 88 bytes")
     return None
 
 
@@ -270,10 +277,10 @@ def _clearing_issue(contract) -> FixedUserRequestContractIssue | None:
     clearing = contract.buffer_clearing
     expected_sizes = {
         "user_request_clear_size_bytes": 40,
-        "user_response_clear_size_bytes": 48,
+        "user_response_clear_size_bytes": 88,
         "kernel_request_shadow_clear_size_bytes": 40,
-        "kernel_response_shadow_clear_size_bytes": 48,
-        "kernel_verify_clear_size_bytes": 48,
+        "kernel_response_shadow_clear_size_bytes": 88,
+        "kernel_verify_clear_size_bytes": 88,
     }
     required = (
         clearing.get("before_ring3_entry") is True
@@ -294,7 +301,14 @@ def _clearing_issue(contract) -> FixedUserRequestContractIssue | None:
 def _marker_status_issue(contract) -> FixedUserRequestContractIssue | None:
     if contract.marker_order != _MARKERS:
         return _issue("invalid_marker_order", "marker_order", "Fixed request markers must match the governed boundary order")
-    if set(contract.marker_ownership) != set(_MARKERS[1:5]):
+    expected_owners = {
+        "KOZO_USER_REQUEST_COPY_IN_OK",
+        "KOZO_USER_RUNTIME_STATUS_SERVICE_ENTER",
+        "KOZO_USER_RUNTIME_STATUS_SERVICE_OK",
+        "KOZO_USER_RESPONSE_COPY_OUT_OK",
+        "KOZO_FIXED_USER_REQUEST_OK",
+    }
+    if set(contract.marker_ownership) != expected_owners:
         return _issue("invalid_marker_ownership", "marker_ownership", "Each fixed-request success marker must have one Ring0 owner")
     if contract.failure_statuses != _STATUSES:
         return _issue("invalid_failure_status", "failure_statuses", "Fixed request failure statuses must remain exact")

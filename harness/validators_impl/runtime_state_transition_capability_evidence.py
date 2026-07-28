@@ -144,9 +144,9 @@ def _progression_issue(context: StateTransitionContext) -> StateTransitionEviden
         "loop_status := controlled_runtime_loop()",
         "if loop_status != RUNTIME_PROGRESSION_OK {",
         "return loop_status",
-        "first_capability_status := execute_first_governed_capability()",
-        "if first_capability_status != RUNTIME_PROGRESSION_OK {",
-        "return first_capability_status",
+        "status_boundary_result := execute_runtime_status_boundaries()",
+        "if status_boundary_result != RUNTIME_PROGRESSION_OK {",
+        "return status_boundary_result",
         "return execute_second_governed_capability()",
     )
     return _ordered_issue(context.progression_lines, expected, "capability_path_missing", "execution_order")

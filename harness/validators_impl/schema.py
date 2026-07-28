@@ -35,6 +35,7 @@ _SCHEMA_PATHS = {
     "bounded_privilege_transition_probe_contract": _SCHEMA_DIR / "bounded_privilege_transition_probe_contract.schema.json",
     "fixed_user_request_boundary_contract": _SCHEMA_DIR / "fixed_user_request_boundary_contract.schema.json",
     "bounded_user_response_consumption_contract": _SCHEMA_DIR / "bounded_user_response_consumption_contract.schema.json",
+    "fixed_user_runtime_status_service_contract": _SCHEMA_DIR / "fixed_user_runtime_status_service_contract.schema.json",
 }
 
 

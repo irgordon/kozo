@@ -140,7 +140,7 @@ FIXED_USER_REQUEST_SYMBOLS = (
     "validate_fixed_user_buffer_ranges",
     "copy_fixed_user_request_in",
     "validate_fixed_user_request",
-    "execute_fixed_user_boundary_service",
+    "build_fixed_user_runtime_status_response",
     "validate_fixed_user_response",
     "copy_fixed_user_response_out",
     "validate_fixed_user_response_readback",
@@ -148,7 +148,8 @@ FIXED_USER_REQUEST_SYMBOLS = (
     "fixed_user_buffers_are_zero",
     "privilege_ring0_continuation",
     "runtime_serial_write_user_request_copy_in_marker",
-    "runtime_serial_write_user_request_service_marker",
+    "runtime_serial_write_user_runtime_status_service_enter_marker",
+    "runtime_serial_write_user_runtime_status_service_ok_marker",
     "runtime_serial_write_user_response_copy_out_marker",
     "runtime_serial_write_fixed_user_request_marker",
     "runtime_serial_write_ring3_probe_marker",
@@ -159,6 +160,24 @@ FIXED_USER_REQUEST_SYMBOLS = (
     "fixed_user_response_verify",
     "fixed_user_response_verify_end",
     "fixed_user_request_success_state",
+)
+FIXED_USER_RUNTIME_STATUS_SYMBOLS = (
+    "runtime_progression_entry",
+    "execute_runtime_status_boundaries",
+    "collect_runtime_status",
+    "validate_runtime_status_snapshot",
+    "clear_runtime_status_snapshot",
+    "build_internal_runtime_status_response",
+    "execute_fixed_user_runtime_status_transaction",
+    "enter_bounded_ring3_probe",
+    "runtime_status_snapshot",
+    "runtime_status_snapshot_fields_are_valid",
+    "build_fixed_user_runtime_status_response",
+    "fixed_user_response_fields_are_valid",
+    "fixed_user_response_digest",
+    "runtime_serial_write_user_runtime_status_service_enter_marker",
+    "runtime_serial_write_user_runtime_status_service_ok_marker",
+    "runtime_serial_write_ring0_return_marker",
 )
 BOUNDED_USER_RESPONSE_SYMBOLS = (
     "user_response_consumer_start",
@@ -316,6 +335,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
             *PRIVILEGE_TRANSITION_SYMBOLS,
             *FIXED_USER_REQUEST_SYMBOLS,
             *BOUNDED_USER_RESPONSE_SYMBOLS,
+            *FIXED_USER_RUNTIME_STATUS_SYMBOLS,
         ),
     )
     symbol_address = symbols.get("_start")
@@ -349,6 +369,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "bounded_privilege_transition_probe": bounded_privilege_transition_record(kernel_elf, symbols),
         "fixed_user_request_boundary": fixed_user_request_boundary_record(kernel_elf, symbols),
         "bounded_user_response_consumption": bounded_user_response_consumption_record(kernel_elf, symbols),
+        "fixed_user_runtime_status_service": fixed_user_runtime_status_service_record(kernel_elf, symbols),
         "program_header_count": header.program_header_count,
         "section_count": header.section_header_count,
         "load_segments": [segment_record(segment) for segment in load_segments],
@@ -538,7 +559,7 @@ def first_capability_record(
     symbols: dict[str, int],
 ) -> dict[str, object]:
     instructions = parse_disassembly_instructions(
-        disassemble_symbol(kernel_elf, "runtime_progression_entry")
+        disassemble_symbol(kernel_elf, "execute_runtime_status_boundaries")
     )
     entry_address = symbols.get("execute_first_governed_capability")
     return {
@@ -742,7 +763,7 @@ def fixed_user_request_boundary_record(
             "handle_fixed_user_response_consumption",
             "copy_fixed_user_request_in",
             "validate_fixed_user_request",
-            "execute_fixed_user_boundary_service",
+            "build_fixed_user_runtime_status_response",
             "validate_fixed_user_response",
             "copy_fixed_user_response_out",
             "validate_fixed_user_response_readback",
@@ -766,14 +787,14 @@ def fixed_user_request_boundary_record(
             symbols,
             "fixed_user_response_shadow",
             "fixed_user_response_shadow_end",
-            48,
+            88,
             8,
         ),
         "response_verify": _symbol_range_record(
             symbols,
             "fixed_user_response_verify",
             "fixed_user_response_verify_end",
-            48,
+            88,
             8,
         ),
         "ring3_request_store_count": _memory_store_count(ring3_probe),
@@ -788,9 +809,10 @@ def fixed_user_request_boundary_record(
                     "copy_fixed_user_request_in",
                     "validate_fixed_user_request",
                     "runtime_serial_write_user_request_copy_in_marker",
-                    "execute_fixed_user_boundary_service",
+                    "runtime_serial_write_user_runtime_status_service_enter_marker",
+                    "build_fixed_user_runtime_status_response",
                     "validate_fixed_user_response",
-                    "runtime_serial_write_user_request_service_marker",
+                    "runtime_serial_write_user_runtime_status_service_ok_marker",
                     "copy_fixed_user_response_out",
                     "validate_fixed_user_response_readback",
                     "runtime_serial_write_user_response_copy_out_marker",
@@ -824,6 +846,96 @@ def fixed_user_request_boundary_record(
         ),
         "prohibited_boundary_instructions": _fixed_user_request_prohibited_instructions(
             instruction_sets
+        ),
+    }
+
+
+def fixed_user_runtime_status_service_record(
+    kernel_elf: Path,
+    symbols: dict[str, int],
+) -> dict[str, object]:
+    instruction_sets = {
+        symbol: parse_disassembly_instructions(disassemble_symbol(kernel_elf, symbol))
+        for symbol in FIXED_USER_RUNTIME_STATUS_SYMBOLS
+        if symbol in symbols
+    }
+    snapshot_sizes = symbol_sizes(kernel_elf, ("runtime_status_snapshot",))
+    runtime_entry = instruction_sets.get("runtime_progression_entry", [])
+    boundaries = instruction_sets.get("execute_runtime_status_boundaries", [])
+    bridge = instruction_sets.get("execute_fixed_user_runtime_status_transaction", [])
+    request_handler = parse_disassembly_instructions(
+        disassemble_symbol(kernel_elf, "handle_fixed_user_request")
+    )
+    return {
+        "symbols": symbol_record(symbols, FIXED_USER_RUNTIME_STATUS_SYMBOLS),
+        "snapshot": {
+            "present": "runtime_status_snapshot" in symbols,
+            "address": _hex(symbols["runtime_status_snapshot"])
+            if "runtime_status_snapshot" in symbols
+            else "",
+            "size_bytes": snapshot_sizes.get("runtime_status_snapshot", -1),
+            "required_size_bytes": 64,
+            "required_alignment_bytes": 8,
+            "aligned": (
+                "runtime_status_snapshot" in symbols
+                and symbols["runtime_status_snapshot"] % 8 == 0
+            ),
+        },
+        "runtime_entry_calls_status_boundaries": _calls_address(
+            runtime_entry,
+            symbols.get("execute_runtime_status_boundaries"),
+        ),
+        "status_boundary_call_order_valid": _ordered_call_targets_present(
+            boundaries,
+            tuple(
+                symbols.get(name)
+                for name in (
+                    "collect_runtime_status",
+                    "execute_fixed_user_runtime_status_transaction",
+                    "execute_first_governed_capability",
+                    "clear_runtime_status_snapshot",
+                )
+            ),
+        ),
+        "bridge_calls_fixed_ring3_entry": _calls_address(
+            bridge,
+            symbols.get("enter_bounded_ring3_probe"),
+        ),
+        "request_handler_service_order_valid": _ordered_call_targets_present(
+            request_handler,
+            tuple(
+                symbols.get(name)
+                for name in (
+                    "runtime_serial_write_user_request_copy_in_marker",
+                    "runtime_serial_write_user_runtime_status_service_enter_marker",
+                    "build_fixed_user_runtime_status_response",
+                    "validate_fixed_user_response",
+                    "runtime_serial_write_user_runtime_status_service_ok_marker",
+                    "copy_fixed_user_response_out",
+                )
+            ),
+        ),
+        "boot_calls_transaction": any(
+            _calls_address(
+                parse_disassembly_instructions(disassemble_symbol(kernel_elf, "_start")),
+                symbols.get(name),
+            )
+            for name in (
+                "execute_fixed_user_runtime_status_transaction",
+                "enter_bounded_ring3_probe",
+            )
+        ),
+        "response_builder_store_count": _memory_store_count(
+            instruction_sets.get("build_fixed_user_runtime_status_response", [])
+        ),
+        "ring3_response_compare_count": _comparison_count(
+            parse_disassembly_instructions(
+                disassemble_symbol(kernel_elf, "user_response_consumer_start")
+            )
+        ),
+        "digest_xor_count": _mnemonic_count(
+            instruction_sets.get("fixed_user_response_digest", []),
+            "xor",
         ),
     }
 
@@ -964,7 +1076,6 @@ def _privilege_call_order_valid(kernel_elf: Path, symbols: dict[str, int]) -> bo
     instructions = _instructions_for_symbol(all_instructions, "_start", symbols)
     required = (
         symbols.get("initialize_privilege_transition"),
-        symbols.get("enter_bounded_ring3_probe"),
         symbols.get("runtime_progression_entry"),
     )
     return _ordered_call_targets_present(instructions, required)
@@ -1420,6 +1531,7 @@ def malformed_report(kernel_elf: Path, linker_script: Path, issue: str) -> dict[
         "bounded_privilege_transition_probe": bounded_privilege_transition_record(kernel_elf, {}),
         "fixed_user_request_boundary": fixed_user_request_boundary_record(kernel_elf, {}),
         "bounded_user_response_consumption": bounded_user_response_consumption_record(kernel_elf, {}),
+        "fixed_user_runtime_status_service": fixed_user_runtime_status_service_record(kernel_elf, {}),
         "program_header_count": 0,
         "section_count": 0,
         "load_segments": [],

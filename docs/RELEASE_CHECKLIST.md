@@ -382,3 +382,19 @@ Confirm:
   remains green;
 * no persistent Ring 3 runtime, general syscall ABI, arbitrary pointer,
   process, compatibility, or production claim was added.
+
+# 18. v0.8.7 Runtime Status Service Gate
+
+Confirm:
+
+* `fixed_user_runtime_status_service_contract` and
+  `fixed_user_runtime_status_service_evidence` pass;
+* hosted QEMU reports `pass`, blocker `none`, and all 41 markers exactly once;
+* the controlled-loop exit precedes Ring 3 entry;
+* service entry follows request copy-in and service success precedes copy-out;
+* the 64-byte snapshot and 88-byte response geometry match source and ELF;
+* Ring 3 and Ring 0 validate every response field and the record digest;
+* the snapshot and all transaction buffers clear before capability ID 2;
+* both existing internal capability validators and terminal halt remain green;
+* no general dispatcher, public ABI, persistent userspace, compatibility, or
+  production claim was added.

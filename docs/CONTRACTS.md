@@ -346,3 +346,16 @@ stack, response and 48-byte record geometry, second-frame policy, response
 revalidation, exact record copy, cleanup, phase reset, markers, statuses, halt
 convergence, and non-goals. It extends but does not override the accepted fixed
 request contract.
+
+# 27. Fixed User Runtime Status Service
+
+`contracts/fixed_user_runtime_status_service_contract.v0.json` owns the
+v0.8.7 request ID, 64-byte snapshot, 88-byte user response, seven feature
+bits, post-loop service order, marker ownership, complete Ring 3 and Ring 0
+validation, XOR digest, cleanup, failure statuses, claim boundary, and
+non-goals.
+
+The runtime progression contracts own stage order. The accepted request and
+response-consumption contracts own their fixed transport. This contract owns
+only the status service placed inside that transport; documentation and
+generated reports do not redefine it.

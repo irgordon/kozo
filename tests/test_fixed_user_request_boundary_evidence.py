@@ -116,7 +116,11 @@ class FixedUserRequestBoundaryEvidenceTests(unittest.TestCase):
         self.assert_reason(result, "request_validation_invalid")
 
     def test_fails_when_service_token_operation_changes(self):
-        mutation = lambda text: text.replace("    xor rax, rdx\n", "    or rax, rdx\n", 1)
+        mutation = lambda text: text.replace(
+            "    mov [rel fixed_user_response_shadow + 72], rax\n",
+            "",
+            1,
+        )
         result = self.validate_fixture(mutate_privilege=mutation)
         self.assertEqual(result.status, "fail")
         self.assert_reason(result, "service_invalid")
@@ -303,14 +307,14 @@ def valid_report():
         "fixed_user_request_boundary": {
             "symbols": symbols,
             "request_shadow": valid_range(40),
-            "response_shadow": valid_range(48),
-            "response_verify": valid_range(48),
+            "response_shadow": valid_range(88),
+            "response_verify": valid_range(88),
             "ring3_request_store_count": 8,
             "ring3_return_interrupt_present": True,
             "handler_call_order_valid": True,
             "copy_in_memory_move_count": 10,
-            "copy_out_memory_move_count": 12,
-            "readback_memory_move_count": 12,
+            "copy_out_memory_move_count": 22,
+            "readback_memory_move_count": 22,
             "clear_memory_move_count": 1,
             "clear_stosq_count": 5,
             "post_clear_zero_validation_present": True,

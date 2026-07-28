@@ -173,7 +173,9 @@ def _first_handler_issue(context):
     expected = (
         "call validate_ring3_request_frame",
         "call copy_fixed_user_request_in",
-        "call execute_fixed_user_boundary_service",
+        "call runtime_serial_write_user_runtime_status_service_enter_marker",
+        "call build_fixed_user_runtime_status_response",
+        "call runtime_serial_write_user_runtime_status_service_ok_marker",
         "call copy_fixed_user_response_out",
         "call validate_fixed_user_response_readback",
         "call runtime_serial_write_user_response_copy_out_marker",
@@ -228,10 +230,10 @@ def _ring3_consumer_issue(context):
     if issue is not None:
         return issue
     response_comparisons = sum("[rdi" in line and "cmp " in line for line in source.splitlines())
-    if response_comparisons < 9:
+    if response_comparisons < 14:
         return _issue("partial_ring3_response_validation", "ring3_response_checks", "Ring3 must compare every fixed response field")
     status_write = source.find("mov [rsi + 12], r8d")
-    final_comparison = source.rfind("cmp [rdi + 40], rax")
+    final_comparison = source.rfind("cmp qword [rdi + 80], 0")
     if status_write < final_comparison:
         return _issue("success_record_before_validation", "consumption_record", "Record construction must follow every response comparison")
     return None
@@ -304,6 +306,8 @@ def _cleanup_continuation_issue(context):
         "call fixed_user_buffers_are_zero",
         "mov qword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING",
         "cmp qword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING",
+        "call runtime_serial_write_ring0_return_marker",
+        "ret",
     )
     return _ordered_issue(continuation, expected, "phase_reset_invalid", "phase_reset")
 
@@ -362,7 +366,7 @@ def _elf_issue(context):
     if any(record.get(field) is not True for field in required_true):
         return _issue("missing_elf_evidence", "kernel_elf_report.bounded_user_response_consumption", "ELF must retain both transitions, handler order, clearing, and continuation")
     minimums = {
-        "consumer_response_compare_count": 11,
+        "consumer_response_compare_count": 18,
         "consumer_record_store_count": 8,
         "record_copy_memory_move_count": 12,
         "response_revalidation_compare_count": 1,

@@ -198,10 +198,16 @@ def _runtime_entry_flow_issue(lines: tuple[str, ...]) -> RuntimeProgressionEvide
         "loop_status := controlled_runtime_loop()",
         "if loop_status != RUNTIME_PROGRESSION_OK {",
         "return loop_status",
-        "first_capability_status := execute_first_governed_capability()",
-        "if first_capability_status != RUNTIME_PROGRESSION_OK {",
-        "return first_capability_status",
+        "status_boundary_result := execute_runtime_status_boundaries()",
+        "if status_boundary_result != RUNTIME_PROGRESSION_OK {",
+        "return status_boundary_result",
         "return execute_second_governed_capability()",
+        "collection_status := collect_runtime_status()",
+        "transaction_status := execute_fixed_user_runtime_status_transaction()",
+        "capability_status := execute_first_governed_capability()",
+        "if !clear_runtime_status_snapshot() {",
+        "return RUNTIME_CAPABILITY_EXECUTION_FAILURE",
+        "return capability_status",
     )
     return _ordered_issue(lines, expected, "runtime_entry_flow_mismatch", "runtime_initialization.success_path")
 

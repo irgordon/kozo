@@ -246,3 +246,12 @@ Full CI must run `fixed_user_request_boundary_contract` and
 must also pass the fixed request, privilege transition, user mapping,
 CPU-state, runtime capability, QEMU smoke, schema, and halt checks. Missing,
 duplicated, reordered, or metadata-only response markers are blocking.
+
+# 12. v0.8.7 Runtime Status Service Checks
+
+`fixed_user_runtime_status_service_contract` and
+`fixed_user_runtime_status_service_evidence` are required. Full verification
+must prove post-loop collection, one shared status source, fixed response
+geometry, complete Ring 3 and Ring 0 validation, digest validation, snapshot
+cleanup, exact QEMU metadata/log agreement, unchanged internal capability ID
+1 behavior, capability ID 2 continuation, and terminal halt.

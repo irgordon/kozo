@@ -1150,4 +1150,20 @@ claim.
 | AUDIT-086-002 | Resolved locally | Kernel-owned phases prevent the same interrupt gate from ambiguously dispatching request and response stages. |
 | AUDIT-086-003 | Resolved locally | Fixed record geometry, exact copy, zero readback, and reset are covered across source, linker, ELF, QEMU, and negative tests. |
 | AUDIT-086-004 | Deferred by scope | The one-shot fixed path is not a general syscall, message, process, or hostile-code boundary. |
-| AUDIT-086-005 | Hosted confirmation pending | Local QEMU captures all 40 markers; hosted CI must confirm identical ordering and both v0.8.6 validators. |
+| AUDIT-086-005 | Resolved | Hosted CI confirms all 40 markers in order and both v0.8.6 validators with 65 checks and 0 failures. |
+
+# 36. v0.8.7 Runtime-Ordered User Status Service
+
+| ID | Status | Finding |
+| --- | --- | --- |
+| AUDIT-087-001 | Resolved locally | The fixed Ring3 transaction now runs after the controlled Odin loop instead of before runtime entry. |
+| AUDIT-087-002 | Resolved locally | One 64-byte kernel snapshot supplies both the fixed 88-byte user response and unchanged internal capability ID 1 response. |
+| AUDIT-087-003 | Resolved locally | Ring3 and Ring0 validate every response field, the fixed record digest covers all eleven qwords, and all transaction and snapshot storage is cleared. |
+| AUDIT-087-004 | Resolved locally | Contract, source, ELF, QEMU, aggregation, failure-path, and validator-coverage checks govern the service and preserve both existing capabilities. |
+| AUDIT-087-005 | Hosted confirmation pending | Local verification passes 67 checks with 0 failures and QEMU captures all 41 markers; hosted CI must confirm identical ordering and both v0.8.7 validators. |
+| AUDIT-087-006 | Deferred | `validator_coverage.py` remains the largest structural debt item and is not split in this runtime phase. |
+| AUDIT-087-007 | Deferred | The existing Rust package-license metadata failure remains a v1.0.0 release-hardening blocker. |
+
+The path remains intentionally fixed. It adds no general dispatcher, public
+syscall ABI, variable response, persistent userspace, process model,
+compatibility claim, or production claim.

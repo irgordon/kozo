@@ -133,10 +133,21 @@ def _capability_issue(contract) -> FirstCapabilityIssue | None:
         "FIRST_GOVERNED_RUNTIME_CAPABILITY",
         1,
         6,
-        "implemented_pending_ci",
+        "proven",
     )
     if actual != expected:
         return _issue("invalid_capability_identity", "capability", "Capability identity or local stage status is invalid")
+    shared = (
+        capability.shared_status_collector,
+        capability.shared_status_snapshot,
+        capability.response_builder,
+    )
+    if shared != (
+        "collect_runtime_status",
+        "runtime_status_snapshot",
+        "build_internal_runtime_status_response",
+    ):
+        return _issue("invalid_capability_identity", "capability.shared_status", "Capability ID 1 must use the shared post-loop status snapshot")
     return None
 
 
@@ -176,8 +187,8 @@ def _marker_issue(contract) -> FirstCapabilityIssue | None:
     markers = contract.markers
     if markers.ordered_sequence != _MARKERS:
         return _issue("invalid_marker_order", "markers.ordered_sequence", "Capability markers must use the governed order")
-    if markers.required_after != "KOZO_RUNTIME_LOOP_EXIT_OK":
-        return _issue("invalid_marker_boundary", "markers.required_after", "Capability dispatch must follow controlled loop success")
+    if markers.required_after != "KOZO_RING0_RETURN_OK":
+        return _issue("invalid_marker_boundary", "markers.required_after", "Capability dispatch must follow the fixed user transaction return")
     if markers.required_before != "KOZO_RUNTIME_RETURN_OK":
         return _issue("invalid_marker_boundary", "markers.required_before", "Capability completion must precede runtime return")
     return None

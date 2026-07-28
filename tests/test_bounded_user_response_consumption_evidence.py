@@ -95,7 +95,7 @@ class BoundedUserResponseConsumptionEvidenceTests(unittest.TestCase):
 
     def test_fails_when_response_comparison_is_missing(self):
         result = self.validate_fixture(
-            privilege=lambda text: text.replace("    cmp dword [rdi + 36], 0\n", "", 1)
+            privilege=lambda text: text.replace("    cmp qword [rdi + 80], 0\n", "", 1)
         )
         self.assertEqual(result.status, "fail")
         self.assert_reason(result, "partial_ring3_response_validation")

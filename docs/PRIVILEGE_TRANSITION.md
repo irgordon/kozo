@@ -153,3 +153,14 @@ stack before Ring 0 accepts the response.
 The fixed fault sinks remain fail-closed containment for this probe. They do
 not establish exception recovery, diagnostic completeness, or safe execution
 of arbitrary hostile user code.
+
+# 11. Runtime-Ordered Invocation
+
+v0.8.7 does not change selectors, descriptors, stacks, `iretq`, or the DPL3
+`int 0x81` gate. It changes ownership of invocation: boot prepares the fixed
+architecture state, while Odin invokes the one-shot transition after its
+controlled loop and validated status collection.
+
+The Ring 0 continuation now returns to the saved Odin call frame. It cannot
+select an arbitrary return target. The fixed fault sinks retain their bounded
+fail-closed role and still do not establish general exception recovery.

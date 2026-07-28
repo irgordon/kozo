@@ -111,13 +111,14 @@
   },
   "probe": {
     "data_virtual_address": "0x0000400000001000",
-    "token": "0x4b4f5a4f50524956",
+    "request_identifier": 2,
+    "request_size_bytes": 40,
+    "response_size_bytes": 88,
     "failure_token": "0x4641494c50524956",
     "stack_sentinel": "0x4b4f5a4f55534552",
-    "width_bits": 64,
     "stack_probe_required": true,
-    "data_write_read_required": true,
-    "token_clear_readback_required": true,
+    "runtime_status_response_validation_required": true,
+    "transaction_clear_readback_required": true,
     "serial_io_forbidden_in_ring3": true
   },
   "return_boundary": {
@@ -125,16 +126,21 @@
     "expected_user_cpl": 3,
     "expected_kernel_cpl": 0,
     "fixed_continuation_symbol": "privilege_ring0_continuation",
+    "runtime_bridge_symbol": "execute_fixed_user_runtime_status_transaction",
+    "invocation_owner": "active_odin_runtime_after_controlled_loop",
     "kernel_stack_restore_required": true,
+    "returns_to_odin": true,
     "user_return_forbidden": true,
     "halt_on_fault_required": true
   },
   "success_markers": [
     "KOZO_PRIVILEGE_TRANSITION_INIT_START",
     "KOZO_PRIVILEGE_TABLES_OK",
+    "KOZO_RUNTIME_LOOP_EXIT_OK",
     "KOZO_RING3_ENTER",
     "KOZO_RING3_PROBE_OK",
-    "KOZO_RING0_RETURN_OK"
+    "KOZO_RING0_RETURN_OK",
+    "KOZO_CAPABILITY_DISPATCH_ENTER"
   ],
   "failure_statuses": {
     "success": 0,
@@ -150,10 +156,10 @@
   "claim_boundary": {
     "proves": [
       "one fixed iretq transition reached CPL3",
-      "one fixed CPL3 stack and data probe completed",
+      "one fixed CPL3 stack and runtime-status transaction completed",
       "one DPL3 interrupt gate returned through TSS.RSP0",
       "the Ring0 handler validated the saved CPL3 frame",
-      "the fixed CPL0 continuation restored the governed kernel stack"
+      "the fixed CPL0 continuation restored the governed Odin bridge stack"
     ],
     "does_not_prove": [
       "general userspace execution",

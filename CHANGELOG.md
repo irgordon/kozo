@@ -1,8 +1,20 @@
 # Changelog
 
-## v0.8.6 - 2026-07-26
+## v0.8.7 - 2026-07-27
 
 **Status:** Implemented and validated locally; hosted CI acceptance pending.
+
+* Exposed the existing deterministic runtime-status logic through the accepted fixed user boundary after the controlled loop.
+* Added one fixed user request ID, one fixed 64-byte runtime-status snapshot, and one fixed 88-byte user response.
+* Reused the same status source for the unchanged internal capability response and the user response.
+* Reported only proven stage, loop, memory, and seven fixed feature values.
+* Validated every response field in Ring 3 and Ring 0, validated the fixed XOR digest, and cleared all transaction and snapshot storage.
+* Preserved the accepted request, copy, privilege, response-consumption, internal capability, runtime return, and terminal halt paths.
+* Added no general dispatcher, public syscall ABI, arbitrary pointer, persistent userspace, compatibility, or production-readiness claim.
+
+## v0.8.6 - 2026-07-26
+
+**Status:** Accepted by hosted CI with 65 checks and 0 failures.
 
 * Added one sanitized return to a fixed Ring 3 response consumer and validated every fixed response field in CPL3.
 * Added one fixed 48-byte response-consumption record and invoked the accepted `int 0x81` gate a second time.

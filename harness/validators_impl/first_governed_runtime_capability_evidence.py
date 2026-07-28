@@ -149,10 +149,21 @@ def _progression_issue(context: FirstCapabilityContext) -> FirstCapabilityEviden
         "loop_status := controlled_runtime_loop()",
         "if loop_status != RUNTIME_PROGRESSION_OK {",
         "return loop_status",
-        "first_capability_status := execute_first_governed_capability()",
-        "if first_capability_status != RUNTIME_PROGRESSION_OK {",
-        "return first_capability_status",
+        "status_boundary_result := execute_runtime_status_boundaries()",
+        "if status_boundary_result != RUNTIME_PROGRESSION_OK {",
+        "return status_boundary_result",
         "return execute_second_governed_capability()",
+        "collection_status := collect_runtime_status()",
+        "if collection_status != RUNTIME_PROGRESSION_OK {",
+        "return collection_status",
+        "transaction_status := execute_fixed_user_runtime_status_transaction()",
+        "if transaction_status != RUNTIME_PROGRESSION_OK {",
+        "clear_runtime_status_snapshot()",
+        "return transaction_status",
+        "capability_status := execute_first_governed_capability()",
+        "if !clear_runtime_status_snapshot() {",
+        "return RUNTIME_CAPABILITY_EXECUTION_FAILURE",
+        "return capability_status",
     )
     return _ordered_issue(context.progression_lines, expected, "capability_path_missing", "execution_order")
 
@@ -249,9 +260,9 @@ def _dispatcher_issue(context: FirstCapabilityContext) -> FirstCapabilityEvidenc
 
 def _handler_issue(context: FirstCapabilityContext) -> FirstCapabilityEvidenceIssue | None:
     expected = (
-        "if !controlled_runtime_loop_state_is_complete() {",
+        "if !validate_runtime_status_snapshot() {",
         "return RUNTIME_CAPABILITY_EXECUTION_FAILURE",
-        "populate_runtime_status_response(response)",
+        "build_internal_runtime_status_response(response)",
         "if !validate_runtime_status_response(response) {",
         "return RUNTIME_CAPABILITY_RESPONSE_VALIDATION_FAILURE",
         "runtime_serial_write_status_query_marker()",
@@ -265,12 +276,12 @@ def _response_issue(context: FirstCapabilityContext) -> FirstCapabilityEvidenceI
         "response.version = RUNTIME_STATUS_RESPONSE_VERSION",
         "response.capability_id = RUNTIME_STATUS_QUERY_CAPABILITY_ID",
         "response.status = RUNTIME_PROGRESSION_OK",
-        "response.current_progression_stage = RUNTIME_STAGE_CONTROLLED_RUNTIME_LOOP",
-        "response.proven_stage_mask = RUNTIME_PROVEN_STAGE_MASK",
-        "response.boot_memory_region_size = RUNTIME_BOOT_MEMORY_SIZE",
-        "response.controlled_loop_iteration_limit = runtime_loop_limit()",
-        "response.controlled_loop_final_count = runtime_loop_iteration_count()",
-        "response.controlled_loop_accumulator = runtime_loop_accumulator()",
+        "response.current_progression_stage = runtime_status_snapshot.current_progression_stage",
+        "response.proven_stage_mask = runtime_status_snapshot.proven_stage_mask",
+        "response.boot_memory_region_size = runtime_status_snapshot.boot_memory_region_size",
+        "response.controlled_loop_iteration_limit = runtime_status_snapshot.controlled_loop_iteration_limit",
+        "response.controlled_loop_final_count = runtime_status_snapshot.controlled_loop_final_count",
+        "response.controlled_loop_accumulator = runtime_status_snapshot.controlled_loop_accumulator",
         "response.reserved = 0",
     )
     return _required_lines_issue(context.capability_lines, required, "response_population_missing", "response.fields")

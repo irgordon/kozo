@@ -495,3 +495,21 @@ This evidence proves only one fixed boot-time request boundary. It does not
 prove a public syscall ABI, arbitrary copy-in/copy-out, persistent userspace,
 process isolation, hostile-code safety, compatibility, or production
 readiness.
+
+---
+
+# 15. v0.8.7 Runtime Status Service Evidence
+
+Release review must include the runtime-status service contract and evidence
+validators, shared-snapshot ELF record, QEMU metadata and serial log, and the
+unchanged mapping, privilege, internal capability, return, and halt evidence.
+
+Acceptance requires the loop to complete before snapshot collection, the
+service markers to occur between request copy-in and response copy-out, all 88
+response bytes to validate in Ring 3 and Ring 0, the XOR digest to validate,
+all transaction and snapshot storage to clear, and the internal capability ID
+1 response to remain unchanged.
+
+This proves one fixed status service only. It does not prove general services,
+a public syscall ABI, arbitrary queries, persistent userspace, compatibility,
+or production readiness.

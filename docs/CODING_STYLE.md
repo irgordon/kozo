@@ -923,3 +923,15 @@ entry flags, and qword moves belong in focused assembly helpers. Marker
 emission belongs at validated policy boundaries, not generic geometry or copy
 helpers. Fixed-address evidence uses named layout constants instead of repeated
 literals.
+
+# Runtime Status Service Style
+
+Keep status collection separate from response formatting. One mid-level
+collector owns proven values; the internal and fixed user formatters own their
+different layouts. Coordinators should read as: complete loop, collect
+snapshot, execute fixed transaction, execute internal capability, clear
+snapshot.
+
+Document important fixed variables with writer, reader, validity window, and
+clear point. Avoid generic service registries, field-projection layers, and
+deep wrapper chains for this one fixed operation.

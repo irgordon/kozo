@@ -105,7 +105,7 @@ class BoundedUserResponseConsumptionContractTests(unittest.TestCase):
 
     def test_fails_when_response_check_is_missing(self):
         def mutation(data):
-            data["ring3_response_checks"].remove("response token matches")
+            data["ring3_response_checks"].remove("current runtime stage matches")
             return data
         result = self.validate_fixture(mutate=mutation)
         self.assertEqual(result.status, "fail")
@@ -117,7 +117,9 @@ class BoundedUserResponseConsumptionContractTests(unittest.TestCase):
         self.assert_reason(result, "missing_second_frame_validation")
 
     def test_fails_when_response_revalidation_is_optional(self):
-        result = self.validate_fixture(mutate=self.nested("response_revalidation", "all_six_qwords_match_shadow", False))
+        result = self.validate_fixture(
+            mutate=self.nested("response_revalidation", "all_eleven_qwords_match_shadow", False)
+        )
         self.assertEqual(result.status, "fail")
         self.assert_reason(result, "missing_response_revalidation")
 
@@ -132,7 +134,9 @@ class BoundedUserResponseConsumptionContractTests(unittest.TestCase):
         self.assert_reason(result, "missing_clearing_policy")
 
     def test_fails_when_phase_reset_is_optional(self):
-        result = self.validate_fixture(mutate=self.nested("phase_reset", "required_before_odin", False))
+        result = self.validate_fixture(
+            mutate=self.nested("phase_reset", "required_before_return_to_odin", False)
+        )
         self.assertEqual(result.status, "fail")
         self.assert_reason(result, "missing_phase_reset")
 

@@ -700,8 +700,7 @@ containment, process isolation, compatibility, or production readiness.
 
 # 19. Bounded User Response Consumption Evidence
 
-Local QEMU evidence observes the complete 40-marker sequence. The new boundary
-is:
+Hosted CI accepts the complete 40-marker sequence. The v0.8.6 boundary is:
 
 ```text
 KOZO_USER_RESPONSE_COPY_OUT_OK
@@ -718,3 +717,29 @@ Contract, source, linker, ELF, metadata, serial-log, failure-path, aggregation,
 and coverage checks must agree. Hosted acceptance remains pending. This does
 not prove persistent Ring 3 execution, general syscalls, arbitrary messages,
 process isolation, hostile-code safety, or production readiness.
+
+# 20. Runtime-Ordered User Status Evidence
+
+Local QEMU evidence observes 41 ordered markers. The new boundary is:
+
+```text
+KOZO_RUNTIME_LOOP_EXIT_OK
+KOZO_RING3_ENTER
+KOZO_USER_REQUEST_COPY_IN_OK
+KOZO_USER_RUNTIME_STATUS_SERVICE_ENTER
+KOZO_USER_RUNTIME_STATUS_SERVICE_OK
+KOZO_USER_RESPONSE_COPY_OUT_OK
+KOZO_RING3_RESPONSE_RESUME
+KOZO_USER_RESPONSE_CONSUMED_OK
+KOZO_FIXED_USER_RESPONSE_OK
+KOZO_FIXED_USER_REQUEST_OK
+KOZO_RING3_PROBE_OK
+KOZO_RING0_RETURN_OK
+KOZO_CAPABILITY_DISPATCH_ENTER
+```
+
+Contract, source, ELF, QEMU metadata/log, failure-path, aggregation, and
+coverage checks must agree. Hosted acceptance is pending. The evidence proves
+one post-loop fixed status transaction from the same snapshot used by internal
+capability ID 1; it does not prove a public syscall ABI, general dispatcher,
+persistent userspace, process isolation, or production readiness.

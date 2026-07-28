@@ -2,6 +2,10 @@ package kernel
 
 import "base:intrinsics"
 
+// This file owns the bounded Odin runtime sequence. It coordinates the
+// completed loop, fixed user transaction, and internal capabilities without
+// owning paging, privilege-transition mechanics, or terminal halt behavior.
+
 RUNTIME_BOOTSTRAP_VERSION :: u64(1)
 RUNTIME_BOOTSTRAP_SIZE :: u64(64)
 RUNTIME_BOOT_STACK_SIZE :: u64(16384)
@@ -25,6 +29,7 @@ RUNTIME_LOOP_STATUS_RUNNING :: u32(1)
 RUNTIME_LOOP_STATUS_COMPLETED :: u32(2)
 
 @require foreign import runtime_boot_bridge "arch/x86_64/boot.asm"
+@require foreign import runtime_privilege_bridge "arch/x86_64/privilege_transition.asm"
 
 foreign runtime_boot_bridge {
 	runtime_serial_write_init_marker :: proc "c" () ---
@@ -39,6 +44,10 @@ foreign runtime_boot_bridge {
 	runtime_serial_write_state_update_enter_marker :: proc "c" () ---
 	runtime_serial_write_state_update_ok_marker :: proc "c" () ---
 	runtime_serial_write_second_capability_marker :: proc "c" () ---
+}
+
+foreign runtime_privilege_bridge {
+	execute_fixed_user_runtime_status_transaction :: proc "c" () -> u32 ---
 }
 
 Runtime_Bootstrap_Context :: struct {
@@ -82,11 +91,34 @@ runtime_progression_entry :: proc "c" (bootstrap: ^Runtime_Bootstrap_Context) ->
 	if loop_status != RUNTIME_PROGRESSION_OK {
 		return loop_status
 	}
-	first_capability_status := execute_first_governed_capability()
-	if first_capability_status != RUNTIME_PROGRESSION_OK {
-		return first_capability_status
+	status_boundary_result := execute_runtime_status_boundaries()
+	if status_boundary_result != RUNTIME_PROGRESSION_OK {
+		return status_boundary_result
 	}
 	return execute_second_governed_capability()
+}
+
+// Purpose: Expose one post-loop snapshot to Ring 3 and capability ID 1.
+// Inputs: The completed controlled-loop state.
+// Output: An exact runtime status code.
+// Changes: Collects and clears runtime_status_snapshot.
+// Failure: Prevents the second capability and runtime-return markers.
+@(export)
+execute_runtime_status_boundaries :: proc "contextless" () -> u32 {
+	collection_status := collect_runtime_status()
+	if collection_status != RUNTIME_PROGRESSION_OK {
+		return collection_status
+	}
+	transaction_status := execute_fixed_user_runtime_status_transaction()
+	if transaction_status != RUNTIME_PROGRESSION_OK {
+		clear_runtime_status_snapshot()
+		return transaction_status
+	}
+	capability_status := execute_first_governed_capability()
+	if !clear_runtime_status_snapshot() {
+		return RUNTIME_CAPABILITY_EXECUTION_FAILURE
+	}
+	return capability_status
 }
 
 @(export)

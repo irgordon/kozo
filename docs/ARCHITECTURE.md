@@ -269,3 +269,16 @@ The kernel-owned phase selects exactly two handlers. Consumer RIP, RSP,
 response address, record address, and lengths are fixed. No dynamic message,
 arbitrary pointer, third Ring 3 transition, or persistent userspace runtime is
 introduced.
+
+# 16. Runtime-Ordered User Status Service
+
+v0.8.7 moves the accepted one-shot Ring 3 transaction into the Odin runtime
+sequence after the controlled loop. Odin collects one validated 64-byte
+post-loop snapshot. The assembly transaction formats the fixed 88-byte user
+response from that snapshot, and internal capability ID 1 formats its
+unchanged response from the same source.
+
+The fixed transaction returns to Odin before capabilities 1 and 2 execute.
+The assembly halt loop remains the only terminal runtime state. The path adds
+no general dispatcher, public syscall ABI, arbitrary pointer, persistent
+userspace runtime, process model, or scheduler.

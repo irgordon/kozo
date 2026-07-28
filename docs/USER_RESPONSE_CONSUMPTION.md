@@ -1,6 +1,6 @@
 # Bounded User Response Consumption
 
-Status: v0.8.6 implemented and validated locally; hosted CI acceptance pending.
+Status: v0.8.6 accepted by hosted CI with 65 checks and 0 failures.
 
 Authority: `contracts/bounded_user_response_consumption_contract.v0.json`.
 
@@ -98,7 +98,6 @@ KOZO_RUNTIME_PROGRESS_ENTRY
 ELF evidence requires the fixed phase and shadow geometry, two `iretq` sites,
 two `int 0x81` sites, response comparisons, fixed record stores and copy,
 clearing operations, fixed continuation, and prohibited-instruction scan.
-QEMU evidence must contain the complete 40-marker sequence exactly once.
 
 # 9. Failure Behavior
 
@@ -115,8 +114,14 @@ prove persistent Ring 3 execution, multiple request loops, a general syscall
 ABI, arbitrary pointers or messages, process isolation, hostile-code safety,
 scheduling, compatibility, or production readiness.
 
-# 11. Future Work
+# 11. v0.8.7 Runtime Status Consumption
 
-A later implementation may expose one existing deterministic kernel status
-service through this same fixed boundary. That work must retain fixed geometry
-and must not infer a general syscall ABI from this one-shot proof.
+The response is now 88 bytes and reports the fixed runtime stage, proven-stage
+mask, memory size, completed-loop values, and seven feature bits. Ring 3
+validates every field and writes the unchanged 48-byte record. Its digest is
+the XOR of all eleven response qwords.
+
+Ring 0 compares the complete user response with its retained shadow, validates
+every field and the record digest, and clears all response, record, and shadow
+storage before returning to Odin. This does not authorize variable response
+geometry or a persistent request loop.

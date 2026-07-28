@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO Bounded User Response Consumption v0.8.6",
+  "task_title": "KOZO Runtime-Ordered User Status Service v0.8.7",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -29,7 +29,8 @@
     "Capability ID 1 remains read-only and owns the single generic dispatch marker",
     "The accepted fixed user-mapping foundation provides the only user RX code page and user RW-NX data/stack pages consumed by this phase",
     "The accepted fixed iretq CPL3 probe and DPL3 int 0x81 return remain the only privilege transition and return mechanism",
-    "This phase adds one sanitized return to a fixed Ring3 response consumer, one fixed 48-byte consumption record, a second int 0x81 entry, complete response and record revalidation, verified clearing, focused evidence, validators, task state, and documentation; public ABI, general copy behavior, runtime capability IDs, stage order, persistent userspace, and terminal halt authority remain unchanged"
+    "v0.8.6 bounded response consumption is accepted by hosted CI with 65 checks and 0 failures",
+    "This phase moves the accepted fixed transaction after the controlled Odin loop, exposes one shared deterministic status snapshot through fixed request ID 2, preserves internal capability ID 1 geometry and behavior, and adds no general dispatcher, public ABI, arbitrary pointer, persistent userspace, compatibility, or production claim"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -2838,6 +2839,41 @@
         "verification.tests_run[146]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 82,
+      "title": "Implement the runtime-ordered user status service",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "kernel/runtime_capability.odin",
+        "kernel/runtime_progression.odin",
+        "kernel/arch/x86_64/boot.asm",
+        "kernel/arch/x86_64/privilege_transition.asm",
+        "kernel/arch/x86_64/runtime_layout.inc",
+        "linker/kernel.ld",
+        "contracts/fixed_user_runtime_status_service_contract.v0.json",
+        "schemas/fixed_user_runtime_status_service_contract.schema.json",
+        "harness/fixed_user_runtime_status_service_contract.py",
+        "harness/validators_impl/fixed_user_runtime_status_service_contract.py",
+        "harness/validators_impl/fixed_user_runtime_status_service_evidence.py",
+        "scripts/kernel_elf_report.py",
+        "scripts/qemu_smoke.sh",
+        "tests/test_fixed_user_runtime_status_service_contract.py",
+        "tests/test_fixed_user_runtime_status_service_evidence.py",
+        "docs/USER_RUNTIME_STATUS_SERVICE.md",
+        "docs/generated/governance_index.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.summary.txt"
+      ],
+      "verification_refs": [
+        "verification.tests_run[147]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -2902,7 +2938,8 @@
     "v0.7.5 implements a bounded three-iteration Odin loop with volatile boot-owned state, ordered iteration evidence, linked backward-edge proof, exact return status, and the unchanged terminal halt continuation without adding scheduler, userspace, compatibility, or production claims.",
     "v0.8.0 implements one versioned internal runtime status request with explicit field validation, one direct dispatcher, one deterministic response handler, response validation, governed capability evidence, and the unchanged return-to-halt path without adding userspace, isolation, scheduler, allocator, interrupt, ABI, syscall, compatibility, or production claims.",
     "The v0.8.0 corrective continuation replaces faulting aggregate response initialization with scalar stores, preserves strict pointer validation, hardens overlap arithmetic, and is accepted by hosted CI.",
-    "v0.8.1 detects required FPU/FXSR/SSE/SSE2 support, configures and validates CR0/CR4, initializes x87/MXCSR, validates a bounded SSE2 probe, prohibits AVX, and preserves the accepted capability and halt path."
+    "v0.8.1 detects required FPU/FXSR/SSE/SSE2 support, configures and validates CR0/CR4, initializes x87/MXCSR, validates a bounded SSE2 probe, prohibits AVX, and preserves the accepted capability and halt path.",
+    "v0.8.7 runs the accepted fixed Ring3 transaction after the controlled Odin loop, uses one validated 64-byte snapshot for the fixed 88-byte user response and unchanged internal capability ID 1 response, validates every response field in both privilege levels, clears all boundary state, and preserves capability ID 2, runtime return, and terminal halt."
   ],
   "verification": {
     "tests_run": [
@@ -3640,6 +3677,11 @@
         "tool": "bounded user response consumption validation",
         "command": "focused Python tests; full Python discovery; odin check kernel; configured build and QEMU smoke; direct response-consumption validators; nm and objdump inspection",
         "status": "passed_local_65_checks_963_tests_40_markers"
+      },
+      {
+        "tool": "runtime-ordered user status validation",
+        "command": "required focused Python tests; full Python discovery; odin check kernel; configured build and QEMU smoke; nm and objdump inspection",
+        "status": "passed_local_67_checks_0_failures_41_markers_1015_tests"
       }
     ],
     "logs": [
@@ -3873,6 +3915,7 @@
     "v0.7.45 adds a governed internal assembly-to-Odin progression boundary, bounded Odin state evidence, exact return handling, linked-symbol reporting, and progression evidence validation while preserving terminal halt authority and all subsystem, compatibility, and production non-goals.",
     "v0.7.5 adds a contract-backed three-iteration Odin loop with volatile state mutation, ordered marker bridges, deterministic status handling, ELF backward-edge reporting, the unchanged exact return-to-halt boundary, and hosted CI acceptance.",
     "v0.8.0 adds one explicit internal runtime status request, fixed response, direct dispatcher, bounded handler, source and ELF evidence validation, fixed capability markers, and the unchanged exact return-to-halt boundary, accepted by hosted CI.",
-    "The first hosted v0.8.0 attempt exposed an implicit CPU-state dependency; v0.8.1 establishes a contract-backed pre-Odin x87/SSE state gate and bounded SIMD evidence while preserving the accepted runtime suffix."
+    "The first hosted v0.8.0 attempt exposed an implicit CPU-state dependency; v0.8.1 establishes a contract-backed pre-Odin x87/SSE state gate and bounded SIMD evidence while preserving the accepted runtime suffix.",
+    "v0.8.7 moves the one-shot fixed user transaction after the controlled loop, shares one kernel-owned status snapshot with internal capability ID 1, validates the 88-byte response in Ring3 and Ring0, clears every snapshot and transaction buffer, and preserves the existing capability and halt boundaries."
   ]
 }

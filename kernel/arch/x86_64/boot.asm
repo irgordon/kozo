@@ -7,7 +7,6 @@ extern validate_fixed_user_mapping_policy
 extern activate_fixed_user_mapping_root
 extern run_fixed_user_mapping_survival_probe
 extern initialize_privilege_transition
-extern enter_bounded_ring3_probe
 global _start
 global boot_terminal_halt
 global boot_memory_region
@@ -38,13 +37,15 @@ global runtime_serial_write_state_update_ok_marker
 global runtime_serial_write_second_capability_marker
 global runtime_serial_write_ring3_enter_marker
 global runtime_serial_write_user_request_copy_in_marker
-global runtime_serial_write_user_request_service_marker
+global runtime_serial_write_user_runtime_status_service_enter_marker
+global runtime_serial_write_user_runtime_status_service_ok_marker
 global runtime_serial_write_user_response_copy_out_marker
 global runtime_serial_write_ring3_response_resume_marker
 global runtime_serial_write_user_response_consumed_marker
 global runtime_serial_write_fixed_user_response_marker
 global runtime_serial_write_fixed_user_request_marker
 global runtime_serial_write_ring3_probe_marker
+global runtime_serial_write_ring0_return_marker
 
 %define COM1 0x03f8
 %define COM1_INTERRUPT_ENABLE 0x03f9
@@ -205,9 +206,13 @@ user_request_copy_in_marker:
     db "KOZO_USER_REQUEST_COPY_IN_OK", 13, 10
 user_request_copy_in_marker_end:
 
-user_request_service_marker:
-    db "KOZO_USER_REQUEST_SERVICE_OK", 13, 10
-user_request_service_marker_end:
+user_runtime_status_service_enter_marker:
+    db "KOZO_USER_RUNTIME_STATUS_SERVICE_ENTER", 13, 10
+user_runtime_status_service_enter_marker_end:
+
+user_runtime_status_service_ok_marker:
+    db "KOZO_USER_RUNTIME_STATUS_SERVICE_OK", 13, 10
+user_runtime_status_service_ok_marker_end:
 
 user_response_copy_out_marker:
     db "KOZO_USER_RESPONSE_COPY_OUT_OK", 13, 10
@@ -386,10 +391,6 @@ _start:
     test eax, eax
     jnz .halt
     WRITE_COM1_MARKER privilege_tables_ok_marker, privilege_tables_ok_marker_end
-    call enter_bounded_ring3_probe
-    test eax, eax
-    jnz .halt
-    WRITE_COM1_MARKER ring0_return_ok_marker, ring0_return_ok_marker_end
     test rsp, 0x0f
     jnz .halt
     lea rdi, [rel runtime_bootstrap_context]
@@ -587,8 +588,12 @@ runtime_serial_write_user_request_copy_in_marker:
     WRITE_COM1_MARKER user_request_copy_in_marker, user_request_copy_in_marker_end
     ret
 
-runtime_serial_write_user_request_service_marker:
-    WRITE_COM1_MARKER user_request_service_marker, user_request_service_marker_end
+runtime_serial_write_user_runtime_status_service_enter_marker:
+    WRITE_COM1_MARKER user_runtime_status_service_enter_marker, user_runtime_status_service_enter_marker_end
+    ret
+
+runtime_serial_write_user_runtime_status_service_ok_marker:
+    WRITE_COM1_MARKER user_runtime_status_service_ok_marker, user_runtime_status_service_ok_marker_end
     ret
 
 runtime_serial_write_user_response_copy_out_marker:
@@ -613,4 +618,8 @@ runtime_serial_write_fixed_user_request_marker:
 
 runtime_serial_write_ring3_probe_marker:
     WRITE_COM1_MARKER ring3_probe_ok_marker, ring3_probe_ok_marker_end
+    ret
+
+runtime_serial_write_ring0_return_marker:
+    WRITE_COM1_MARKER ring0_return_ok_marker, ring0_return_ok_marker_end
     ret

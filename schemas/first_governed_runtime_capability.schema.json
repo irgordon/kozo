@@ -52,18 +52,24 @@
         "source_file",
         "entry_symbol",
         "dispatcher_symbol",
-        "handler_symbol"
+        "handler_symbol",
+        "shared_status_collector",
+        "shared_status_snapshot",
+        "response_builder"
       ],
       "properties": {
         "canonical_name": {"const": "RUNTIME_STATUS_QUERY"},
         "canonical_identifier": {"const": "FIRST_GOVERNED_RUNTIME_CAPABILITY"},
         "numeric_identifier": {"const": 1},
         "stage_id": {"const": 6},
-        "status": {"const": "implemented_pending_ci"},
+        "status": {"const": "proven"},
         "source_file": {"const": "kernel/runtime_capability.odin"},
         "entry_symbol": {"const": "execute_first_governed_capability"},
         "dispatcher_symbol": {"const": "dispatch_runtime_capability"},
-        "handler_symbol": {"const": "query_runtime_status"}
+        "handler_symbol": {"const": "query_runtime_status"},
+        "shared_status_collector": {"const": "collect_runtime_status"},
+        "shared_status_snapshot": {"const": "runtime_status_snapshot"},
+        "response_builder": {"const": "build_internal_runtime_status_response"}
       }
     },
     "layoutField": {
@@ -180,7 +186,7 @@
       "additionalProperties": false,
       "required": ["required_after", "required_before", "emission_owner", "ordered_sequence"],
       "properties": {
-        "required_after": {"const": "KOZO_RUNTIME_LOOP_EXIT_OK"},
+        "required_after": {"const": "KOZO_RING0_RETURN_OK"},
         "required_before": {"const": "KOZO_RUNTIME_RETURN_OK"},
         "emission_owner": {"$ref": "#/$defs/nonEmptyString"},
         "ordered_sequence": {

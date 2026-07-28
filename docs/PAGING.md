@@ -129,3 +129,14 @@ existing response and the fixed record at
 `0x0000400000001100..0x0000400000001130`. Both endpoints are revalidated by
 the software walker before Ring 0 access. The record does not overlap the
 request, response, code page, user stack, or supervisor storage.
+
+# 10. Runtime Status Response Span
+
+v0.8.7 changes no mapping or page-table permission. The fixed response grows
+within the existing user RW-NX data page to
+`0x0000400000001080..0x00004000000010d8`. The request and 48-byte consumption
+record remain non-overlapping.
+
+The 64-byte `runtime_status_snapshot` is linked in supervisor-only RW-NX
+kernel storage. Ring 3 receives values only through the fixed copied response;
+it does not receive kernel, physical, or page-table addresses.

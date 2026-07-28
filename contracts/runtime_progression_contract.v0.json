@@ -2,7 +2,7 @@
   "version": 0,
   "architecture": "x86_64",
   "current_state": {
-    "path": "boot_smoke_to_stack_memory_and_runtime_progression_to_halt",
+    "path": "boot_smoke_to_runtime_loop_to_fixed_user_status_to_capabilities_to_halt",
     "halt_contract": "contracts/runtime_halt_contract.v0.json",
     "progression_stages_contract": "contracts/runtime_progression_stages.v0.json",
     "final_smoke_marker": "KOZO_RUNTIME_RETURN_OK",
@@ -20,6 +20,7 @@
     "runtime progression must have contract-backed evidence before stage claims change",
     "runtime progression must preserve the existing QEMU smoke marker sequence until a successor evidence path is accepted",
     "first governed runtime capability evidence must follow controlled runtime loop evidence",
+    "fixed user runtime status evidence must follow controlled runtime loop evidence and precede internal capability evidence",
     "runtime progression must update release evidence and validation before claims expand"
   ],
   "forbidden_shortcuts": [
@@ -37,6 +38,7 @@
     "focused validator coverage",
     "QEMU evidence for progression entry",
     "controlled runtime loop evidence before first governed capability evidence",
+    "fixed user runtime status service contract before post-loop user transaction evidence",
     "first governed runtime capability contract before capability stage promotion",
     "release evidence update",
     "planning document update"

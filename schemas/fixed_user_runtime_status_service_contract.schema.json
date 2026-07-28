@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KOZO fixed user runtime status service contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "runtime_ordering",
+    "shared_status",
+    "request",
+    "response",
+    "feature_mask_bits",
+    "ring3_validation",
+    "ring0_revalidation",
+    "cleanup",
+    "marker_order",
+    "failure_behavior",
+    "claim_boundary",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {"const": 0},
+    "architecture": {"const": "x86_64"},
+    "runtime_ordering": {"type": "object", "minProperties": 8},
+    "shared_status": {"type": "object", "minProperties": 12},
+    "request": {"type": "object", "minProperties": 9},
+    "response": {"type": "object", "minProperties": 5},
+    "feature_mask_bits": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {"$ref": "#/$defs/featureBit"}
+    },
+    "ring3_validation": {"type": "object", "minProperties": 5},
+    "ring0_revalidation": {"type": "object", "minProperties": 4},
+    "cleanup": {"type": "object", "minProperties": 5},
+    "marker_order": {"$ref": "#/$defs/nonEmptyStrings"},
+    "failure_behavior": {"type": "object", "minProperties": 5},
+    "claim_boundary": {"type": "object", "required": ["proves", "does_not_prove"]},
+    "non_goals": {"$ref": "#/$defs/nonEmptyStrings"}
+  },
+  "$defs": {
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": ".*\\S.*"}
+    },
+    "featureBit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bit", "name"],
+      "properties": {
+        "bit": {"type": "integer", "minimum": 0, "maximum": 6},
+        "name": {"type": "string", "pattern": ".*\\S.*"}
+      }
+    }
+  }
+}

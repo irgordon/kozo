@@ -9,17 +9,19 @@
     "linker": "linker/kernel.ld"
   },
   "execution_point": {
-    "after_marker": "KOZO_RING3_ENTER",
-    "before_marker": "KOZO_RING3_PROBE_OK",
+    "after_marker": "KOZO_RUNTIME_LOOP_EXIT_OK",
+    "before_marker": "KOZO_CAPABILITY_DISPATCH_ENTER",
     "ring3_symbol": "user_privilege_probe_start",
+    "runtime_bridge_symbol": "execute_fixed_user_runtime_status_transaction",
     "return_handler_symbol": "privilege_return_handler",
     "fixed_continuation_symbol": "privilege_ring0_continuation",
     "return_vector": "0x81",
-    "returns_to_ring3": true
+    "returns_to_ring3": true,
+    "returns_to_odin": true
   },
   "request": {
-    "name": "FIXED_USER_BOUNDARY_PROBE",
-    "identifier": 1,
+    "name": "FIXED_USER_RUNTIME_STATUS_REQUEST",
+    "identifier": 2,
     "version": 1,
     "virtual_address": "0x0000400000001000",
     "page_offset": 0,
@@ -27,7 +29,7 @@
     "alignment_bytes": 8,
     "physical_backing_symbol": "user_probe_data_start",
     "sequence": 1,
-    "payload": "0x4b4f5a4f50524956",
+    "payload": 0,
     "flags": 0,
     "reserved": 0,
     "fields": [
@@ -43,25 +45,28 @@
   },
   "response": {
     "version": 1,
-    "request_identifier": 1,
+    "request_identifier": 2,
     "success_status": 0,
     "virtual_address": "0x0000400000001080",
     "page_offset": 128,
-    "size_bytes": 48,
+    "size_bytes": 88,
     "alignment_bytes": 8,
     "physical_backing_symbol": "user_probe_data_start",
-    "observed_user_cpl": 3,
-    "observed_kernel_cpl": 0,
     "fields": [
       {"name": "version", "offset": 0, "size": 4},
       {"name": "request_id", "offset": 4, "size": 4},
       {"name": "status", "offset": 8, "size": 4},
       {"name": "response_size", "offset": 12, "size": 4},
       {"name": "sequence", "offset": 16, "size": 8},
-      {"name": "echoed_payload", "offset": 24, "size": 8},
-      {"name": "observed_user_cpl", "offset": 32, "size": 4},
-      {"name": "observed_kernel_cpl", "offset": 36, "size": 4},
-      {"name": "response_token", "offset": 40, "size": 8}
+      {"name": "current_runtime_stage", "offset": 24, "size": 4},
+      {"name": "reserved_0", "offset": 28, "size": 4},
+      {"name": "proven_stage_mask", "offset": 32, "size": 8},
+      {"name": "boot_memory_region_size", "offset": 40, "size": 8},
+      {"name": "controlled_loop_iteration_limit", "offset": 48, "size": 8},
+      {"name": "controlled_loop_final_count", "offset": 56, "size": 8},
+      {"name": "controlled_loop_final_accumulator", "offset": 64, "size": 8},
+      {"name": "feature_mask", "offset": 72, "size": 8},
+      {"name": "reserved_1", "offset": 80, "size": 8}
     ]
   },
   "kernel_shadows": {
@@ -74,30 +79,26 @@
     "response": {
       "start_symbol": "fixed_user_response_shadow",
       "end_symbol": "fixed_user_response_shadow_end",
-      "size_bytes": 48,
+      "size_bytes": 88,
       "alignment_bytes": 8
     },
     "verify": {
       "start_symbol": "fixed_user_response_verify",
       "end_symbol": "fixed_user_response_verify_end",
-      "size_bytes": 48,
+      "size_bytes": 88,
       "alignment_bytes": 8
     },
     "success_state_symbol": "fixed_user_request_success_state",
     "user_accessible": false,
     "writable": true,
     "executable": false,
-    "lifetime": "one_boot_probe_transaction"
+    "lifetime": "one_post_loop_runtime_transaction"
   },
   "fixed_service": {
-    "name": "FIXED_USER_BOUNDARY_PROBE",
-    "request_identifier": 1,
-    "response_token_operation": "request_payload_xor_fixed_mask",
-    "response_token_mask": "0xa5a55a5ac3c33c3c",
-    "echo_sequence": true,
-    "echo_payload": true,
-    "record_user_cpl": 3,
-    "record_kernel_cpl": 0,
+    "name": "FIXED_USER_RUNTIME_STATUS_REQUEST",
+    "request_identifier": 2,
+    "shared_snapshot_symbol": "runtime_status_snapshot",
+    "response_builder_symbol": "build_fixed_user_runtime_status_response",
     "reads_user_memory": false,
     "writes_user_memory": false
   },
@@ -111,7 +112,7 @@
     "user_supplied_pointer": false,
     "user_supplied_length": false,
     "copy_in_size_bytes": 40,
-    "copy_out_size_bytes": 48,
+    "copy_out_size_bytes": 88,
     "copy_out_readback_required": true,
     "request_response_non_overlap_required": true,
     "overflow_safe_range_validation_required": true
@@ -132,27 +133,30 @@
     "response_clear_after_copy_out_validation": false,
     "after_response_consumption": true,
     "user_request_clear_size_bytes": 40,
-    "user_response_clear_size_bytes": 48,
+    "user_response_clear_size_bytes": 88,
     "kernel_request_shadow_clear_size_bytes": 40,
-    "kernel_response_shadow_clear_size_bytes": 48,
-    "kernel_verify_clear_size_bytes": 48,
+    "kernel_response_shadow_clear_size_bytes": 88,
+    "kernel_verify_clear_size_bytes": 88,
     "zero_readback_required": true
   },
   "marker_order": [
+    "KOZO_RUNTIME_LOOP_EXIT_OK",
     "KOZO_RING3_ENTER",
     "KOZO_USER_REQUEST_COPY_IN_OK",
-    "KOZO_USER_REQUEST_SERVICE_OK",
+    "KOZO_USER_RUNTIME_STATUS_SERVICE_ENTER",
+    "KOZO_USER_RUNTIME_STATUS_SERVICE_OK",
     "KOZO_USER_RESPONSE_COPY_OUT_OK",
     "KOZO_FIXED_USER_REQUEST_OK",
     "KOZO_RING3_PROBE_OK",
     "KOZO_RING0_RETURN_OK",
-    "KOZO_RUNTIME_PROGRESS_ENTRY"
+    "KOZO_CAPABILITY_DISPATCH_ENTER"
   ],
   "marker_ownership": {
     "KOZO_USER_REQUEST_COPY_IN_OK": "Ring0 after frame, span, copy-in, and request validation",
-    "KOZO_USER_REQUEST_SERVICE_OK": "Ring0 after fixed service and kernel response validation",
+    "KOZO_USER_RUNTIME_STATUS_SERVICE_ENTER": "Ring0 before building the response from the trusted post-loop snapshot",
+    "KOZO_USER_RUNTIME_STATUS_SERVICE_OK": "Ring0 after the complete runtime-status response validates",
     "KOZO_USER_RESPONSE_COPY_OUT_OK": "Ring0 after exact copy-out and response readback validation",
-    "KOZO_FIXED_USER_REQUEST_OK": "Ring0 after shared and kernel buffer clear validation"
+    "KOZO_FIXED_USER_REQUEST_OK": "Ring0 after the complete request and response transaction validates"
   },
   "failure_statuses": {
     "success": 0,
@@ -173,13 +177,12 @@
   },
   "claim_boundary": {
     "proves": [
-      "the fixed Ring3 stub constructed one versioned request",
+      "the fixed Ring3 stub constructed one versioned runtime-status request",
       "Ring0 copied and validated exactly 40 request bytes",
-      "one deterministic fixed kernel service completed",
-      "Ring0 validated and copied exactly 48 response bytes",
+      "Ring0 built one response from the trusted post-loop status snapshot",
+      "Ring0 validated and copied exactly 88 response bytes",
       "the copied response passed readback validation",
-      "shared and kernel transaction buffers were cleared",
-      "the fixed Ring0 continuation remained authoritative"
+      "the fixed Ring0 continuation returned to active Odin"
     ],
     "does_not_prove": [
       "general syscall ABI",

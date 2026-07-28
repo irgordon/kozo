@@ -6,11 +6,14 @@
     "canonical_identifier": "FIRST_GOVERNED_RUNTIME_CAPABILITY",
     "numeric_identifier": 1,
     "stage_id": 6,
-    "status": "implemented_pending_ci",
+    "status": "proven",
     "source_file": "kernel/runtime_capability.odin",
     "entry_symbol": "execute_first_governed_capability",
     "dispatcher_symbol": "dispatch_runtime_capability",
-    "handler_symbol": "query_runtime_status"
+    "handler_symbol": "query_runtime_status",
+    "shared_status_collector": "collect_runtime_status",
+    "shared_status_snapshot": "runtime_status_snapshot",
+    "response_builder": "build_internal_runtime_status_response"
   },
   "request": {
     "version": 1,
@@ -68,7 +71,7 @@
     "capability_execution_failure": 16
   },
   "markers": {
-    "required_after": "KOZO_RUNTIME_LOOP_EXIT_OK",
+    "required_after": "KOZO_RING0_RETURN_OK",
     "required_before": "KOZO_RUNTIME_RETURN_OK",
     "emission_owner": "executed Odin code through fixed assembly bridges",
     "ordered_sequence": [
@@ -82,8 +85,8 @@
     "clear response",
     "emit capability dispatch entry",
     "dispatch exact runtime status capability",
-    "validate controlled loop state",
-    "populate deterministic response",
+    "validate the shared post-loop runtime status snapshot",
+    "populate deterministic response from the shared snapshot",
     "validate populated response",
     "emit runtime status query success",
     "validate complete capability result",

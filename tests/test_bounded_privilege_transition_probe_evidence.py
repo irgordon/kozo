@@ -44,7 +44,7 @@ class BoundedPrivilegeTransitionProbeEvidenceTests(unittest.TestCase):
 
     def test_fails_when_runtime_entry_precedes_ring0_return(self):
         mutation = lambda text: text.replace(
-            "    WRITE_COM1_MARKER ring0_return_ok_marker, ring0_return_ok_marker_end\n",
+            "    WRITE_COM1_MARKER runtime_progress_entry_marker, runtime_progress_entry_marker_end\n",
             "",
         )
         result = self.validate_fixture(mutate_boot=mutation)

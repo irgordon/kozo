@@ -10,7 +10,7 @@ from harness.validator import BaseValidator, ValidationResult
 
 _CONTRACT_PATH = runtime_progression_contract.CONTRACT_PATH
 _EXPECTED_ARCHITECTURE = "x86_64"
-_EXPECTED_RUNTIME_PATH = "boot_smoke_to_stack_memory_and_runtime_progression_to_halt"
+_EXPECTED_RUNTIME_PATH = "boot_smoke_to_runtime_loop_to_fixed_user_status_to_capabilities_to_halt"
 _EXPECTED_HALT_CONTRACT = "contracts/runtime_halt_contract.v0.json"
 _EXPECTED_STAGES_CONTRACT = "contracts/runtime_progression_stages.v0.json"
 _EXPECTED_FINAL_MARKER = "KOZO_RUNTIME_RETURN_OK"

@@ -1,0 +1,173 @@
+{
+  "version": 0,
+  "architecture": "x86_64",
+  "runtime_ordering": {
+    "boot_prepares_privilege_state": true,
+    "boot_executes_transaction": false,
+    "runtime_entry_symbol": "runtime_progression_entry",
+    "runtime_bridge_symbol": "execute_fixed_user_runtime_status_transaction",
+    "required_after_marker": "KOZO_RUNTIME_LOOP_EXIT_OK",
+    "required_before_marker": "KOZO_CAPABILITY_DISPATCH_ENTER",
+    "return_target": "active_odin_call_frame",
+    "internal_capabilities_follow_transaction": true
+  },
+  "shared_status": {
+    "collector_symbol": "collect_runtime_status",
+    "validator_symbol": "validate_runtime_status_snapshot",
+    "internal_response_builder": "build_internal_runtime_status_response",
+    "user_response_builder": "build_fixed_user_runtime_status_response",
+    "snapshot_symbol": "runtime_status_snapshot",
+    "snapshot_size_bytes": 64,
+    "snapshot_alignment_bytes": 8,
+    "ownership": "kernel_runtime",
+    "user_accessible": false,
+    "writable": true,
+    "executable": false,
+    "collected_after_loop": true,
+    "used_by_user_transaction": true,
+    "used_by_internal_capability_1": true,
+    "cleared_after_internal_capability_1": true,
+    "fields": [
+      {"name": "current_runtime_stage", "offset": 0, "size": 4},
+      {"name": "reserved_0", "offset": 4, "size": 4},
+      {"name": "proven_stage_mask", "offset": 8, "size": 8},
+      {"name": "boot_memory_region_size", "offset": 16, "size": 8},
+      {"name": "controlled_loop_iteration_limit", "offset": 24, "size": 8},
+      {"name": "controlled_loop_final_count", "offset": 32, "size": 8},
+      {"name": "controlled_loop_final_accumulator", "offset": 40, "size": 8},
+      {"name": "feature_mask", "offset": 48, "size": 8},
+      {"name": "reserved_1", "offset": 56, "size": 8}
+    ],
+    "expected_values": {
+      "current_runtime_stage": 5,
+      "proven_stage_mask": 63,
+      "boot_memory_region_size": 4096,
+      "controlled_loop_iteration_limit": 3,
+      "controlled_loop_final_count": 3,
+      "controlled_loop_final_accumulator": 6,
+      "feature_mask": 127,
+      "reserved_0": 0,
+      "reserved_1": 0
+    }
+  },
+  "request": {
+    "name": "FIXED_USER_RUNTIME_STATUS_REQUEST",
+    "identifier": 2,
+    "version": 1,
+    "virtual_address": "0x0000400000001000",
+    "size_bytes": 40,
+    "response_size_bytes": 88,
+    "sequence": 1,
+    "payload": 0,
+    "flags": 0,
+    "reserved": 0
+  },
+  "response": {
+    "name": "FIXED_USER_RUNTIME_STATUS_RESPONSE",
+    "virtual_address": "0x0000400000001080",
+    "size_bytes": 88,
+    "alignment_bytes": 8,
+    "fields": [
+      {"name": "version", "offset": 0, "size": 4},
+      {"name": "request_id", "offset": 4, "size": 4},
+      {"name": "status", "offset": 8, "size": 4},
+      {"name": "response_size", "offset": 12, "size": 4},
+      {"name": "sequence", "offset": 16, "size": 8},
+      {"name": "current_runtime_stage", "offset": 24, "size": 4},
+      {"name": "reserved_0", "offset": 28, "size": 4},
+      {"name": "proven_stage_mask", "offset": 32, "size": 8},
+      {"name": "boot_memory_region_size", "offset": 40, "size": 8},
+      {"name": "controlled_loop_iteration_limit", "offset": 48, "size": 8},
+      {"name": "controlled_loop_final_count", "offset": 56, "size": 8},
+      {"name": "controlled_loop_final_accumulator", "offset": 64, "size": 8},
+      {"name": "feature_mask", "offset": 72, "size": 8},
+      {"name": "reserved_1", "offset": 80, "size": 8}
+    ]
+  },
+  "feature_mask_bits": [
+    {"bit": 0, "name": "fixed_user_mappings_proven"},
+    {"bit": 1, "name": "cpu_extended_state_proven"},
+    {"bit": 2, "name": "bounded_ring3_transition_proven"},
+    {"bit": 3, "name": "fixed_user_request_boundary_proven"},
+    {"bit": 4, "name": "bounded_response_consumption_proven"},
+    {"bit": 5, "name": "first_internal_runtime_capability_proven"},
+    {"bit": 6, "name": "second_internal_runtime_capability_proven"}
+  ],
+  "ring3_validation": {
+    "all_response_fields_required": true,
+    "expected_values_from_contract": true,
+    "expected_values_from_user_memory": false,
+    "consumption_record_size_bytes": 48,
+    "selected_status_value": "proven_stage_mask",
+    "digest_operation": "xor_all_eleven_response_qwords"
+  },
+  "ring0_revalidation": {
+    "complete_response_shadow_comparison": true,
+    "all_response_fields_required": true,
+    "consumption_record_required": true,
+    "digest_revalidation_required": true
+  },
+  "cleanup": {
+    "transaction_buffers_cleared_before_return_to_odin": true,
+    "transaction_phase_reset_before_return_to_odin": true,
+    "snapshot_preserved_for_internal_capability_1": true,
+    "snapshot_cleared_after_internal_capability_1": true,
+    "zero_readback_required": true
+  },
+  "marker_order": [
+    "KOZO_RUNTIME_LOOP_EXIT_OK",
+    "KOZO_RING3_ENTER",
+    "KOZO_USER_REQUEST_COPY_IN_OK",
+    "KOZO_USER_RUNTIME_STATUS_SERVICE_ENTER",
+    "KOZO_USER_RUNTIME_STATUS_SERVICE_OK",
+    "KOZO_USER_RESPONSE_COPY_OUT_OK",
+    "KOZO_RING3_RESPONSE_RESUME",
+    "KOZO_USER_RESPONSE_CONSUMED_OK",
+    "KOZO_FIXED_USER_RESPONSE_OK",
+    "KOZO_FIXED_USER_REQUEST_OK",
+    "KOZO_RING3_PROBE_OK",
+    "KOZO_RING0_RETURN_OK",
+    "KOZO_CAPABILITY_DISPATCH_ENTER",
+    "KOZO_RUNTIME_STATUS_QUERY_OK",
+    "KOZO_FIRST_CAPABILITY_OK"
+  ],
+  "failure_behavior": {
+    "unknown_status_forbidden": true,
+    "later_success_markers_forbidden": true,
+    "internal_capabilities_forbidden_after_transaction_failure": true,
+    "runtime_return_forbidden_after_transaction_failure": true,
+    "terminal_halt_remains_authoritative": true
+  },
+  "claim_boundary": {
+    "proves": [
+      "the controlled runtime loop completed before the fixed user transaction",
+      "one post-loop runtime-status snapshot supplied both user and internal status responses",
+      "Ring3 validated every fixed runtime-status response field",
+      "Ring0 independently revalidated the response and consumption record",
+      "the fixed transaction returned to the active Odin runtime",
+      "both existing internal capabilities and terminal halt remained connected"
+    ],
+    "does_not_prove": [
+      "general user service dispatch",
+      "public syscall ABI",
+      "persistent userspace execution",
+      "process isolation",
+      "production readiness"
+    ]
+  },
+  "non_goals": [
+    "pre-runtime status service",
+    "general user service dispatcher",
+    "public syscall ABI",
+    "arbitrary request identifiers",
+    "user-provided pointers",
+    "user-provided lengths",
+    "variable-sized responses",
+    "persistent Ring3 execution",
+    "process model behavior",
+    "scheduler behavior",
+    "Linux compatibility",
+    "POSIX compatibility",
+    "production readiness"
+  ]
+}

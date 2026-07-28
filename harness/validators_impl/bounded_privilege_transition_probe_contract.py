@@ -19,9 +19,11 @@ _SELECTORS = {
 _MARKERS = (
     "KOZO_PRIVILEGE_TRANSITION_INIT_START",
     "KOZO_PRIVILEGE_TABLES_OK",
+    "KOZO_RUNTIME_LOOP_EXIT_OK",
     "KOZO_RING3_ENTER",
     "KOZO_RING3_PROBE_OK",
     "KOZO_RING0_RETURN_OK",
+    "KOZO_CAPABILITY_DISPATCH_ENTER",
 )
 _STATUSES = {
     "success": 0,
@@ -166,12 +168,16 @@ def _entry_issue(contract) -> BoundedPrivilegeTransitionContractIssue | None:
 
 def _probe_issue(contract) -> BoundedPrivilegeTransitionContractIssue | None:
     probe = contract.probe
-    if probe.get("width_bits") != 64:
-        return _issue("invalid_probe_width", "probe.width_bits", "The bounded user token probe must use 64 bits")
+    if (
+        probe.get("request_identifier") != 2
+        or probe.get("request_size_bytes") != 40
+        or probe.get("response_size_bytes") != 88
+    ):
+        return _issue("invalid_probe_width", "probe.response_size_bytes", "The bounded probe must use the fixed ID 2 request and 88-byte response")
     required = (
         "stack_probe_required",
-        "data_write_read_required",
-        "token_clear_readback_required",
+        "runtime_status_response_validation_required",
+        "transaction_clear_readback_required",
         "serial_io_forbidden_in_ring3",
     )
     if any(probe.get(field) is not True for field in required):
@@ -184,6 +190,7 @@ def _return_issue(contract) -> BoundedPrivilegeTransitionContractIssue | None:
     required = (
         "saved_frame_validation_required",
         "kernel_stack_restore_required",
+        "returns_to_odin",
         "user_return_forbidden",
         "halt_on_fault_required",
     )
@@ -191,6 +198,11 @@ def _return_issue(contract) -> BoundedPrivilegeTransitionContractIssue | None:
         return _issue("invalid_return_boundary", "return_boundary", "The fixed Ring0 return must validate, restore, and fail closed")
     if boundary.get("fixed_continuation_symbol") != "privilege_ring0_continuation":
         return _issue("invalid_return_target", "return_boundary.fixed_continuation_symbol", "Return target must be the fixed Ring0 continuation")
+    if (
+        boundary.get("runtime_bridge_symbol") != "execute_fixed_user_runtime_status_transaction"
+        or boundary.get("invocation_owner") != "active_odin_runtime_after_controlled_loop"
+    ):
+        return _issue("invalid_return_target", "return_boundary.runtime_bridge_symbol", "The fixed transition must return through the active Odin bridge")
     return None
 
 

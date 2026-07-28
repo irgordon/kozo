@@ -22,9 +22,11 @@ _SERIAL_PATH = ROOT / "artifacts" / "runtime" / "qemu_smoke.log"
 _MARKERS = (
     "KOZO_PRIVILEGE_TRANSITION_INIT_START",
     "KOZO_PRIVILEGE_TABLES_OK",
+    "KOZO_RUNTIME_LOOP_EXIT_OK",
     "KOZO_RING3_ENTER",
     "KOZO_RING3_PROBE_OK",
     "KOZO_RING0_RETURN_OK",
+    "KOZO_CAPABILITY_DISPATCH_ENTER",
 )
 _GEOMETRY = {
     "gdt": (56, 16),
@@ -148,10 +150,8 @@ def _boot_sequence_issue(context):
         "call initialize_privilege_transition",
         "jnz .halt",
         "WRITE_COM1_MARKER privilege_tables_ok_marker, privilege_tables_ok_marker_end",
-        "call enter_bounded_ring3_probe",
-        "jnz .halt",
-        "WRITE_COM1_MARKER ring0_return_ok_marker, ring0_return_ok_marker_end",
         "WRITE_COM1_MARKER runtime_progress_entry_marker, runtime_progress_entry_marker_end",
+        "call runtime_progression_entry",
     )
     return _ordered_source_issue(context.boot, expected, "transition_sequence_invalid", "success_markers")
 
@@ -205,8 +205,8 @@ def _user_probe_issue(context):
         "push rax",
         "pop rcx",
         "mov rdi, FIXED_USER_REQUEST_VA",
-        "mov [rdi + 24], rax",
-        "cmp [rdi + 24], rax",
+        "mov qword [rdi + 24], 0",
+        "cmp qword [rdi + 24], 0",
         "popfq",
         "int KOZO_PRIVILEGE_RETURN_VECTOR",
         "ud2",
@@ -233,8 +233,10 @@ def _return_issue(context):
         "call validate_fixed_user_buffer_ranges",
         "call copy_fixed_user_request_in",
         "call validate_fixed_user_request",
-        "call execute_fixed_user_boundary_service",
+        "call runtime_serial_write_user_runtime_status_service_enter_marker",
+        "call build_fixed_user_runtime_status_response",
         "call validate_fixed_user_response",
+        "call runtime_serial_write_user_runtime_status_service_ok_marker",
         "call copy_fixed_user_response_out",
         "call validate_fixed_user_response_readback",
         "call prepare_user_response_resume",
@@ -244,14 +246,16 @@ def _return_issue(context):
         "call validate_user_visible_response",
         "call validate_fixed_user_consumption_record",
         "call runtime_serial_write_ring3_probe_marker",
-        "mov rsp, [rel saved_kernel_continuation_rsp]",
+        "mov rsp, [rel saved_odin_return_stack]",
         "jmp privilege_ring0_continuation",
         "privilege_ring0_continuation:",
         "test ax, 3",
         "cmp ax, KERNEL_DATA_SELECTOR",
-        "cmp rsp, [rel saved_kernel_continuation_rsp]",
+        "cmp rsp, [rel saved_odin_return_stack]",
         "cmp [rel privilege_probe_state], rax",
         "call fixed_user_buffers_are_zero",
+        "call runtime_serial_write_ring0_return_marker",
+        "ret",
     )
     return _ordered_source_issue(context.privilege, expected, "return_validation_invalid", "return_boundary")
 

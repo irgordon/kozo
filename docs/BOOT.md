@@ -406,3 +406,14 @@ Ring 0 validates the second saved frame, revalidates the response, copies and
 validates exactly 48 record bytes, clears every remaining transaction buffer,
 and resumes only the fixed continuation. Failure returns nonzero to `_start`,
 which converges on the existing terminal halt.
+
+# 12. Runtime-Ordered Status Transaction
+
+v0.8.7 preserves all boot, mapping, CPU-state, and privilege setup but does not
+enter Ring 3 from `_start`. Assembly setup completes, Odin enters, and the
+controlled loop reaches `KOZO_RUNTIME_LOOP_EXIT_OK` before Odin collects the
+runtime snapshot and invokes the fixed Ring 3 transaction.
+
+After Ring 0 accepts the response-consumption record, control returns to Odin.
+The unchanged internal status capability and state-transition capability run
+before `KOZO_RUNTIME_RETURN_OK` and the authoritative `cli`/`hlt` loop.

@@ -303,3 +303,16 @@ The evidence validator separately checks assembly order, linker assertions,
 ELF symbols and operations, two transition and entry sites, QEMU metadata/log
 agreement, exact marker multiplicity, failure exclusions, and terminal halt
 convergence. Every diagnostic includes `reason` and `contract_field`.
+
+# 20. Fixed User Runtime Status Validation
+
+`fixed_user_runtime_status_service_contract` validates request ID `2`, request
+and response geometry, snapshot fields, seven feature bits, service order,
+digest policy, cleanup, markers, failures, claim boundary, and non-goals.
+
+`fixed_user_runtime_status_service_evidence` validates one shared Odin
+collector, the unchanged internal response, post-loop transaction order,
+complete assembly formatting and validation, linked snapshot/shadow geometry,
+Ring 3 comparisons, Ring 0 revalidation, XOR digest, cleanup, 41-marker
+metadata/log agreement, failure exclusion, and halt preservation. Every
+failure reports `reason` and `contract_field`.

@@ -9,7 +9,7 @@ from harness.codes import OK, RUNTIME_PROGRESSION_ENTRY_CONTRACT_INVALID
 from harness.validator import BaseValidator, ValidationResult
 
 _CONTRACT_PATH = contract_module.CONTRACT_PATH
-_EXPECTED_PATH = "boot_smoke_to_stack_memory_and_runtime_progression_to_halt"
+_EXPECTED_PATH = "boot_smoke_to_runtime_loop_to_fixed_user_status_to_capabilities_to_halt"
 _EXPECTED_CONTEXT_FIELDS = (
     ("version", 0),
     ("structure_size", 8),

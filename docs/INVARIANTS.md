@@ -593,3 +593,16 @@ every remaining transaction span before success.
 
 No third Ring 3 entry, arbitrary pointer, variable length, persistent user
 loop, or success marker after a failed boundary is permitted.
+
+# 20. Runtime-Ordered User Status Invariants
+
+The controlled loop must complete before `runtime_status_snapshot` is
+collected. The fixed Ring 3 transaction and internal capability ID 1 must read
+the same validated snapshot. Request validation precedes snapshot use,
+response validation precedes copy-out, and Ring 0 revalidation follows Ring 3
+consumption.
+
+The 88-byte response has fixed identity and geometry, reports no planned stage
+as proven, sets only seven documented feature bits, and keeps every reserved
+field zero. All transaction buffers and the snapshot must be cleared before
+later runtime success. Failure suppresses later markers and converges on halt.

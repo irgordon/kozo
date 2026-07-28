@@ -2,7 +2,7 @@
   "version": 0,
   "architecture": "x86_64",
   "current_state": {
-    "path": "boot_smoke_to_stack_memory_and_runtime_progression_to_halt",
+    "path": "boot_smoke_to_runtime_loop_to_fixed_user_status_to_capabilities_to_halt",
     "halt_contract": "contracts/runtime_halt_contract.v0.json",
     "progression_contract": "contracts/runtime_progression_contract.v0.json",
     "progression_stages_contract": "contracts/runtime_progression_stages.v0.json",
@@ -111,6 +111,8 @@
     "CPU extended-state initialization and SIMD survival evidence must precede Odin entry",
     "KOZO_RUNTIME_INIT_OK must originate from executed Odin code",
     "first governed runtime capability execution must follow controlled runtime loop completion",
+    "fixed user runtime status transaction must follow controlled runtime loop completion",
+    "fixed Ring0 continuation must return to active Odin before internal capability dispatch",
     "KOZO_RUNTIME_RETURN_OK requires the exact success status",
     "CI QEMU evidence is required before progression stages are proven"
   ],
@@ -126,7 +128,8 @@
     "runtime_progression_stages contract owns canonical stage order and allowed transitions",
     "runtime_progression_entry_contract owns the MEMORY_INITIALIZATION_EVIDENCE to RUNTIME_PROGRESSION_ENTRY proof boundary",
     "cpu_extended_state_initialization_contract owns the pre-Odin x87 and SSE prerequisite proof boundary",
-    "runtime_progression_entry_contract owns the RUNTIME_PROGRESSION_ENTRY to RUNTIME_INITIALIZATION_EVIDENCE proof boundary"
+    "runtime_progression_entry_contract owns the RUNTIME_PROGRESSION_ENTRY to RUNTIME_INITIALIZATION_EVIDENCE proof boundary",
+    "fixed_user_runtime_status_service_contract owns the post-loop fixed user status transaction boundary"
   ],
   "non_goals": [
     "complete Odin runtime readiness",

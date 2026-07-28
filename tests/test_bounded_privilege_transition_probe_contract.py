@@ -129,12 +129,14 @@ class BoundedPrivilegeTransitionProbeContractTests(unittest.TestCase):
         self.assertEqual(result.meta["reason"], "invalid_user_code_permissions")
 
     def test_fails_when_probe_width_is_invalid(self):
-        result = self.validate_fixture(mutate=self.nested("probe", "width_bits", 32))
+        result = self.validate_fixture(mutate=self.nested("probe", "response_size_bytes", 48))
         self.assertEqual(result.status, "fail")
         self.assertEqual(result.meta["reason"], "invalid_probe_width")
 
     def test_fails_when_probe_clear_is_optional(self):
-        result = self.validate_fixture(mutate=self.nested("probe", "token_clear_readback_required", False))
+        result = self.validate_fixture(
+            mutate=self.nested("probe", "transaction_clear_readback_required", False)
+        )
         self.assertEqual(result.status, "fail")
         self.assertEqual(result.meta["reason"], "missing_probe_requirement")
 

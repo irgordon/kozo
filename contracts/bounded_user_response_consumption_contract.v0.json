@@ -13,7 +13,8 @@
     "return_vector": "0x81",
     "ring3_resume_count": 1,
     "second_gate_count": 1,
-    "terminal_continuation": "privilege_ring0_continuation"
+    "terminal_continuation": "privilege_ring0_continuation",
+    "continuation_owner": "active_odin_call_frame"
   },
   "transaction_phases": {
     "owner": "kernel",
@@ -41,19 +42,22 @@
   },
   "response": {
     "virtual_address": "0x0000400000001080",
-    "size_bytes": 48,
+    "size_bytes": 88,
     "alignment_bytes": 8,
     "physical_backing_symbol": "user_probe_data_start",
     "version": 1,
-    "request_id": 1,
+    "request_id": 2,
     "status": 0,
-    "response_size": 48,
+    "response_size": 88,
     "sequence": 1,
-    "echoed_payload": "0x4b4f5a4f50524956",
-    "observed_user_cpl": 3,
-    "observed_kernel_cpl": 0,
-    "response_token_operation": "echoed_payload_xor_fixed_mask",
-    "response_token_mask": "0xa5a55a5ac3c33c3c"
+    "current_runtime_stage": 5,
+    "proven_stage_mask": 63,
+    "boot_memory_region_size": 4096,
+    "controlled_loop_iteration_limit": 3,
+    "controlled_loop_final_count": 3,
+    "controlled_loop_final_accumulator": 6,
+    "feature_mask": 127,
+    "reserved_fields_zero": true
   },
   "consumption_record": {
     "virtual_address": "0x0000400000001100",
@@ -71,8 +75,8 @@
       {"name": "record_size", "offset": 8, "size": 4},
       {"name": "validation_status", "offset": 12, "size": 4},
       {"name": "sequence", "offset": 16, "size": 8},
-      {"name": "echoed_payload", "offset": 24, "size": 8},
-      {"name": "response_token", "offset": 32, "size": 8},
+      {"name": "selected_status_value", "offset": 24, "size": 8},
+      {"name": "response_digest", "offset": 32, "size": 8},
       {"name": "reserved", "offset": 40, "size": 8}
     ]
   },
@@ -94,10 +98,14 @@
     "status matches",
     "response size matches",
     "sequence matches",
-    "echoed payload matches",
-    "observed user CPL matches",
-    "observed kernel CPL matches",
-    "response token matches"
+    "current runtime stage matches",
+    "proven stage mask matches",
+    "boot memory region size matches",
+    "controlled loop iteration limit matches",
+    "controlled loop final count matches",
+    "controlled loop final accumulator matches",
+    "feature mask matches",
+    "reserved fields are zero"
   ],
   "second_frame_validation": {
     "saved_rip_fixed": true,
@@ -111,7 +119,7 @@
     "complete_span_required": true,
     "mapping_policy_required": true,
     "physical_backing_required": true,
-    "all_six_qwords_match_shadow": true,
+    "all_eleven_qwords_match_shadow": true,
     "semantic_field_validation_required": true
   },
   "record_copy": {
@@ -123,19 +131,21 @@
     "complete_copy_before_validation": true
   },
   "clearing": {
-    "user_response_bytes": 48,
+    "user_response_bytes": 88,
     "user_record_bytes": 48,
-    "kernel_response_shadow_bytes": 48,
+    "kernel_response_shadow_bytes": 88,
     "kernel_consumption_shadow_bytes": 48,
-    "kernel_verify_bytes": 48,
+    "kernel_verify_bytes": 88,
     "zero_readback_required": true
   },
   "phase_reset": {
-    "required_before_odin": true,
+    "required_before_odin": false,
+    "required_before_return_to_odin": true,
     "reset_value": 0,
     "readback_required": true
   },
   "marker_order": [
+    "KOZO_RUNTIME_LOOP_EXIT_OK",
     "KOZO_USER_RESPONSE_COPY_OUT_OK",
     "KOZO_RING3_RESPONSE_RESUME",
     "KOZO_USER_RESPONSE_CONSUMED_OK",
@@ -143,7 +153,7 @@
     "KOZO_FIXED_USER_REQUEST_OK",
     "KOZO_RING3_PROBE_OK",
     "KOZO_RING0_RETURN_OK",
-    "KOZO_RUNTIME_PROGRESS_ENTRY"
+    "KOZO_CAPABILITY_DISPATCH_ENTER"
   ],
   "marker_ownership": {
     "KOZO_RING3_RESPONSE_RESUME": "Ring0 after preserving and revalidating the fixed response and constructing a sanitized resume boundary",
@@ -172,9 +182,9 @@
       "Ring3 validated every fixed response field",
       "Ring3 wrote one fixed response-consumption record",
       "Ring3 invoked the existing int 0x81 gate a second time",
-      "Ring0 validated the second CPL3 frame and response",
+      "Ring0 validated the second CPL3 frame and complete 88-byte response",
       "Ring0 copied and validated exactly 48 consumption bytes",
-      "Ring0 cleared response-stage buffers and reset the phase"
+      "Ring0 cleared response-stage buffers, reset the phase, and returned to active Odin"
     ],
     "does_not_prove": [
       "persistent Ring3 execution",
