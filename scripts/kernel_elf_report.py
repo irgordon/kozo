@@ -1409,18 +1409,6 @@ def build_ring3_response_consumer_evidence(
     symbols: dict[str, int],
     expected_offsets: tuple[int, ...] | None = None,
 ) -> dict[str, object]:
-    """Purpose:
-    Build portable ELF evidence for the fixed Ring 3 response consumer.
-
-    Inputs:
-    Full objdump text and authoritative ELF symbol addresses.
-
-    Output:
-    Bounded comparison, offset, record-store, interrupt, and ordering facts.
-
-    Failure:
-    Return false and empty evidence when the governed symbols or body are absent.
-    """
     start = symbols.get("user_response_consumer_start")
     end = symbols.get("user_response_consumer_end")
     instructions = extract_function_disassembly(disassembly, start, end)
@@ -1435,18 +1423,7 @@ def build_ring3_response_consumer_evidence(
 
 
 def parse_disassembly_instruction_lines(text: str) -> list[DisassemblyInstruction]:
-    """Purpose:
-    Parse objdump instruction lines without depending on label formatting.
-
-    Inputs:
-    GNU or LLVM objdump text.
-
-    Output:
-    Parsed instruction records in disassembly order.
-
-    Failure:
-    Ignore labels, byte continuations, comments, and malformed lines.
-    """
+    """Parse GNU or LLVM instructions without relying on symbol labels."""
     instructions: list[DisassemblyInstruction] = []
     for line in text.splitlines():
         match = INSTRUCTION_LINE.match(line)
@@ -1467,18 +1444,6 @@ def extract_function_disassembly(
     start_address: int | None,
     end_address: int | None,
 ) -> list[DisassemblyInstruction]:
-    """Purpose:
-    Return instructions inside one governed symbol range.
-
-    Inputs:
-    Full objdump text plus authoritative start and end addresses.
-
-    Output:
-    Address-ordered instructions from start inclusive to end exclusive.
-
-    Failure:
-    Return an empty list when either boundary is missing or invalid.
-    """
     if start_address is None or end_address is None or end_address <= start_address:
         return []
     instructions = parse_disassembly_instruction_lines(disassembly)
@@ -1491,18 +1456,7 @@ def extract_function_disassembly(
 
 
 def normalize_instruction_mnemonic(mnemonic: str) -> str:
-    """Purpose:
-    Treat equivalent GNU and LLVM comparison spellings the same.
-
-    Inputs:
-    One objdump mnemonic.
-
-    Output:
-    A lowercase mnemonic with cmp width suffixes removed.
-
-    Failure:
-    Leave unknown mnemonics unchanged.
-    """
+    """Normalize equivalent GNU and LLVM comparison spellings."""
     normalized = mnemonic.lower()
     if normalized in {"cmp", "cmpb", "cmpw", "cmpl", "cmpq"}:
         return "cmp"
@@ -1510,18 +1464,7 @@ def normalize_instruction_mnemonic(mnemonic: str) -> str:
 
 
 def normalize_instruction_operands(operands: str) -> str:
-    """Purpose:
-    Remove cosmetic GNU and LLVM operand differences used by evidence checks.
-
-    Inputs:
-    One objdump operand string.
-
-    Output:
-    Lowercase operands without comments, register prefixes, or spaces.
-
-    Failure:
-    Return an empty string for an empty operand list.
-    """
+    """Remove cosmetic GNU and LLVM operand syntax differences."""
     without_comment = operands.split("#", 1)[0].lower()
     without_prefixes = without_comment.replace("%", "").replace("$", "")
     return re.sub(r"\s+", "", without_prefixes)
@@ -1531,18 +1474,6 @@ def find_ring3_response_comparisons(
     instructions: list[DisassemblyInstruction],
     expected_offsets: tuple[int, ...],
 ) -> dict[str, object]:
-    """Purpose:
-    Find fixed-response comparisons and the response offsets they cover.
-
-    Inputs:
-    Instructions bounded to the Ring 3 response consumer.
-
-    Output:
-    Total comparison count, indices, source lines, and observed field offsets.
-
-    Failure:
-    Return empty evidence when no governed comparisons are present.
-    """
     comparison_indices: list[int] = []
     comparison_lines: list[str] = []
     observed_offsets: set[int] = set()
@@ -1565,18 +1496,6 @@ def find_ring3_response_comparisons(
 def find_consumption_record_success_stores(
     instructions: list[DisassemblyInstruction],
 ) -> tuple[int, ...]:
-    """Purpose:
-    Find stores that create the fixed Ring 3 consumption record.
-
-    Inputs:
-    Instructions bounded to the Ring 3 response consumer.
-
-    Output:
-    Instruction indices for stores whose destination is based on RSI.
-
-    Failure:
-    Return an empty tuple when the fixed record stores are absent.
-    """
     return tuple(
         index
         for index, instruction in enumerate(instructions)
@@ -1588,18 +1507,6 @@ def find_consumption_record_success_stores(
 def find_second_fixed_user_interrupt(
     instructions: list[DisassemblyInstruction],
 ) -> tuple[int, ...]:
-    """Purpose:
-    Find the fixed int 0x81 used after Ring 3 response consumption.
-
-    Inputs:
-    Instructions bounded to the Ring 3 response consumer.
-
-    Output:
-    Instruction indices for exact int 0x81 operations.
-
-    Failure:
-    Return an empty tuple when the governed interrupt is absent.
-    """
     return tuple(
         index
         for index, instruction in enumerate(instructions)
@@ -1614,18 +1521,6 @@ def validate_response_consumer_order(
     success_store_indices: tuple[int, ...],
     interrupt_indices: tuple[int, ...],
 ) -> dict[str, bool]:
-    """Purpose:
-    Confirm validation, success-record stores, interrupt, and guard stay ordered.
-
-    Inputs:
-    The bounded consumer and indices for its governed operations.
-
-    Output:
-    Individual ordering facts plus one combined result.
-
-    Failure:
-    Report false facts when any required operation is missing or reordered.
-    """
     comparisons_before_stores = bool(comparison_indices and success_store_indices)
     if comparisons_before_stores:
         comparisons_before_stores = max(comparison_indices) < min(success_store_indices)
@@ -1762,18 +1657,6 @@ def _offset_hex(value: int) -> str:
 def runtime_status_response_offsets(
     contract_path: Path = RUNTIME_STATUS_CONTRACT_PATH,
 ) -> tuple[int, ...]:
-    """Purpose:
-    Read fixed user-response offsets from the authoritative contract.
-
-    Inputs:
-    The runtime-status service contract path.
-
-    Output:
-    Ordered integer offsets for every governed response field.
-
-    Failure:
-    Return an empty tuple when the contract cannot provide valid offsets.
-    """
     try:
         contract = json.loads(contract_path.read_text())
         fields = contract["response"]["fields"]

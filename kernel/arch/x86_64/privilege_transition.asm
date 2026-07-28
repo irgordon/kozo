@@ -357,7 +357,6 @@ observed_task_register:
 section .note.GNU-stack
 section .text
 
-; Coordinates one fixed descriptor setup. Returns one exact PRIVILEGE status.
 initialize_privilege_transition:
     call clear_privilege_transition_storage
     call initialize_governed_tss
@@ -377,7 +376,6 @@ initialize_privilege_transition:
 .done:
     ret
 
-; Clears fixed writable descriptor, stack, and probe state.
 clear_privilege_transition_storage:
     cld
     lea rdi, [rel governed_gdt]
@@ -410,7 +408,6 @@ initialize_governed_tss:
     mov word [rel governed_tss + 102], TSS_SIZE
     ret
 
-; Builds and loads the fixed GDT, then reloads all governed selectors.
 initialize_governed_gdt:
     mov rax, KERNEL_CODE_DESCRIPTOR
     mov [rel governed_gdt + 8], rax
@@ -464,7 +461,6 @@ populate_tss_descriptor:
     mov dword [rel governed_gdt + 52], 0
     ret
 
-; Loads the one boot-owned TSS and verifies TR immediately.
 load_governed_tss:
     mov ax, TSS_SELECTOR
     ltr ax
@@ -546,7 +542,6 @@ set_idt_gate:
     mov dword [r8 + 12], 0
     ret
 
-; Validates loaded tables, selectors, TSS state, and the fixed return gate.
 validate_privilege_transition_tables:
     sgdt [rel observed_governed_gdtr]
     cmp word [rel observed_governed_gdtr], GDT_LIMIT
@@ -615,7 +610,6 @@ validate_privilege_transition_tables:
     mov eax, PRIVILEGE_IDT_INVALID
     ret
 
-; Validates vector 0x81 as one fixed DPL3 interrupt gate.
 validate_privilege_return_gate:
     lea r8, [rel governed_idt + KOZO_PRIVILEGE_RETURN_VECTOR * 16]
     cmp word [r8 + 2], KERNEL_CODE_SELECTOR
@@ -729,20 +723,14 @@ require_mapping_flags:
     mov eax, 1
     ret
 
-; Purpose: preserve the SysV call boundary around the fixed Ring3 transaction.
-; Inputs: none. Output: exact fixed-boundary status in eax.
-; Changes: aligns rsp before calling the architecture implementation.
-; Failure: returns the architecture status unchanged to Odin.
+; Preserve SysV stack alignment and return the architecture status in eax.
 execute_fixed_user_runtime_status_transaction:
     sub rsp, 8
     call enter_bounded_ring3_probe
     add rsp, 8
     ret
 
-; Purpose: run the fixed Ring3 status transaction after Odin collects status.
-; Inputs: an aligned bridge call frame. Output: exact fixed-boundary status.
-; Changes: saves the bridge stack and uses the fixed transaction buffers.
-; Failure: returns a nonzero status so Odin prevents later capability markers.
+; Save the Odin stack so the fixed Ring3 transaction has one return target.
 enter_bounded_ring3_probe:
     mov [rel saved_odin_return_stack], rsp
     mov qword [rel privilege_probe_state], 0
@@ -782,7 +770,6 @@ enter_bounded_ring3_probe:
 .done:
     ret
 
-; Routes the fixed gate by the supervisor-owned transaction phase.
 privilege_return_handler:
     mov ax, KERNEL_DATA_SELECTOR
     mov ss, ax
@@ -798,7 +785,6 @@ privilege_return_handler:
     mov eax, USER_RESPONSE_PHASE_INVALID
     jmp privilege_return_failure
 
-; Completes the accepted request service and resumes one fixed Ring3 consumer.
 handle_fixed_user_request:
     call validate_ring3_request_frame
     test eax, eax
@@ -837,7 +823,6 @@ handle_fixed_user_request:
     call runtime_serial_write_ring3_response_resume_marker
     jmp resume_fixed_user_response_consumer
 
-; Accepts the fixed response-consumption record and ends user execution.
 handle_fixed_user_response_consumption:
     call validate_ring3_response_frame
     test eax, eax
@@ -877,13 +862,11 @@ privilege_response_phase_failure:
     mov eax, USER_RESPONSE_PHASE_INVALID
     jmp privilege_return_failure
 
-; Validates the first fixed CPL3 return frame.
 validate_ring3_request_frame:
     mov rax, USER_PROBE_CODE_VA + (user_privilege_probe_after_interrupt - user_probe_code_start)
     mov rdx, USER_INITIAL_RSP
     jmp validate_fixed_ring3_frame
 
-; Validates the second fixed CPL3 return frame.
 validate_ring3_response_frame:
     mov rax, USER_PROBE_CODE_VA + (user_response_consumer_interrupt_return - user_probe_code_start)
     mov rdx, USER_INITIAL_RSP
@@ -931,7 +914,6 @@ validate_fixed_ring3_frame:
     mov eax, USER_RESPONSE_RESUME_FRAME_INVALID
     ret
 
-; Validates the three fixed spans and their shared RW-NX backing page.
 validate_fixed_user_buffer_ranges:
     mov rdi, FIXED_USER_REQUEST_VA
     mov rsi, FIXED_USER_REQUEST_SIZE
@@ -1084,11 +1066,6 @@ validate_fixed_user_request:
     mov eax, FIXED_USER_REQUEST_INVALID
     ret
 
-; Purpose: Check the post-loop facts collected by Odin.
-; Inputs: fixed runtime_status_snapshot.
-; Output: Zero only for exact values.
-; Changes: None.
-; Failure: Prevents Ring 3 entry or response copy-out.
 runtime_status_snapshot_fields_are_valid:
     cmp dword [rel runtime_status_snapshot], RUNTIME_STATUS_STAGE
     jne .invalid
@@ -1114,11 +1091,6 @@ runtime_status_snapshot_fields_are_valid:
     mov eax, FIXED_USER_REQUEST_SERVICE_FAILED
     ret
 
-; Purpose: Build the fixed user response from the validated Odin snapshot.
-; Inputs: The fixed request and runtime_status_snapshot.
-; Output: An exact boundary status.
-; Changes: clears and fills fixed_user_response_shadow.
-; Failure: prevents response copy-out and later runtime capabilities.
 build_fixed_user_runtime_status_response:
     call runtime_status_snapshot_fields_are_valid
     test eax, eax
@@ -1156,11 +1128,6 @@ build_fixed_user_runtime_status_response:
     mov eax, FIXED_USER_REQUEST_SERVICE_FAILED
     ret
 
-; Purpose: Validate every field in the kernel-owned user response.
-; Inputs: fixed_user_response_shadow.
-; Output: An exact boundary status.
-; Changes: None.
-; Failure: Prevents response copy-out and later success markers.
 validate_fixed_user_response:
     lea rdi, [rel fixed_user_response_shadow]
     call fixed_user_response_fields_are_valid
@@ -1172,7 +1139,6 @@ validate_fixed_user_response:
     mov eax, FIXED_USER_RESPONSE_INVALID
     ret
 
-; Validates one kernel-owned response buffer against the request shadow.
 fixed_user_response_fields_are_valid:
     cmp dword [rdi], FIXED_USER_REQUEST_VERSION
     jne .invalid

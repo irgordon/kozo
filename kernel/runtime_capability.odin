@@ -324,11 +324,6 @@ controlled_runtime_loop_state_is_complete :: proc "contextless" () -> bool {
 	       runtime_loop_reserved() == 0
 }
 
-// Purpose: Collect the real status produced by the completed runtime loop.
-// Inputs: None.
-// Output: An exact runtime status code.
-// Changes: Clears and fills runtime_status_snapshot.
-// Failure: Leaves the snapshot cleared and prevents the Ring 3 transaction.
 @(export)
 collect_runtime_status :: proc "contextless" () -> u32 {
 	if !clear_runtime_status_snapshot() {
@@ -357,11 +352,6 @@ populate_runtime_status_snapshot :: proc "contextless" () {
 	runtime_status_snapshot.reserved_1 = 0
 }
 
-// Purpose: Check every fact in the shared post-loop status snapshot.
-// Inputs: None.
-// Output: True only for the governed completed-loop values.
-// Changes: None.
-// Failure: Callers stop before later success markers.
 @(export)
 validate_runtime_status_snapshot :: proc "contextless" () -> bool {
 	return runtime_status_snapshot.current_progression_stage == RUNTIME_STAGE_CONTROLLED_RUNTIME_LOOP &&
@@ -375,11 +365,6 @@ validate_runtime_status_snapshot :: proc "contextless" () -> bool {
 	       runtime_status_snapshot.reserved_1 == 0
 }
 
-// Purpose: Clear the shared status after both fixed consumers finish.
-// Inputs: None.
-// Output: True after zero readback.
-// Changes: Zeros runtime_status_snapshot.
-// Failure: Callers stop before later runtime success markers.
 @(export)
 clear_runtime_status_snapshot :: proc "contextless" () -> bool {
 	runtime_status_snapshot.current_progression_stage = 0

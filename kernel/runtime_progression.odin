@@ -98,11 +98,6 @@ runtime_progression_entry :: proc "c" (bootstrap: ^Runtime_Bootstrap_Context) ->
 	return execute_second_governed_capability()
 }
 
-// Purpose: Expose one post-loop snapshot to Ring 3 and capability ID 1.
-// Inputs: The completed controlled-loop state.
-// Output: An exact runtime status code.
-// Changes: Collects and clears runtime_status_snapshot.
-// Failure: Prevents the second capability and runtime-return markers.
 @(export)
 execute_runtime_status_boundaries :: proc "contextless" () -> u32 {
 	collection_status := collect_runtime_status()
