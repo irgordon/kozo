@@ -72,6 +72,9 @@ No build or verification script may depend on user-specific absolute paths.
 | QEMU smoke evidence | `scripts/qemu_smoke.sh` and `qemu_smoke_evidence` | `docs/BOOT.md` | Yes, through full verification | Yes, when the QEMU blocker is under direct review | `artifacts/runtime/qemu_smoke.log`, `artifacts/runtime/qemu_smoke.stderr.log`, `artifacts/runtime/qemu_smoke.metadata.json`, `artifacts/runtime/qemu_smoke.summary.txt` |
 | Runtime progression evidence | `runtime_progression_entry_contract` and `runtime_progression_evidence` through `scripts/verify.sh` | `docs/RUNTIME_EVIDENCE.md` | Yes, through full verification | Yes | contract, source, ELF report, QEMU metadata/log evidence |
 | Runtime state transition capability | `runtime_state_transition_capability` and `runtime_state_transition_capability_evidence` through `scripts/verify.sh` | `docs/RUNTIME_CAPABILITIES.md` | Yes, through full verification | Yes | contract, source, focused ELF report, QEMU metadata/log evidence |
+| Cargo license policy | `cargo deny --manifest-path userspace/core_service/Cargo.toml check` | `docs/RELEASE_CHECKLIST.md` | No | Yes | CI and release-review output |
+| Cargo advisory audit | `cargo audit --file userspace/core_service/Cargo.lock` | `docs/RELEASE_CHECKLIST.md` | No | Yes | CI and release-review output |
+| Release candidate bundle | `scripts/build_release_candidate.sh --version 1.0.0-rc.1 --output <directory>` | `docs/RELEASE_EVIDENCE.md` | No | Yes for v1.0.0-rc.1 | archive, release metadata, legal files, and `SHA256SUMS` |
 | CI workflow | GitHub Actions `ci / full verification` | `docs/REQUIRED_CHECKS.md` | Yes | Yes | GitHub Actions status |
 | Lint workflow | GitHub Actions `lint / static checks` | `docs/REQUIRED_CHECKS.md` | Yes | Yes | GitHub Actions status |
 
@@ -90,6 +93,12 @@ For `main`, branch protection should require:
 Bypass should not be allowed except for maintainers under a documented emergency process.
 
 An emergency bypass must not create unsupported compatibility, runtime, security, or production-readiness claims.
+
+The 2026-07-28 GitHub API review found no classic protection and no ruleset for
+`main`. The required checks and review count are therefore recommendations, not
+enforced settings. This is a P2 release-candidate promotion blocker requiring
+repository-administrator action; repository automation must not change it
+silently.
 
 ---
 
@@ -117,12 +126,12 @@ When Odin behavior is in scope, also run `odin check kernel` before full verific
 
 | Workflow | Job | Required Surface |
 | --- | --- | --- |
-| `.github/workflows/ci.yml` | `full verification` | system tools, pinned Rust toolchain, bare-metal target, Odin, pinned Limine source tooling, xorriso, QEMU, JSON validation, unit tests, Rust check, Odin check, ISO build attempt, QEMU smoke attempt, runtime smoke through full verification, boot blocker report through full verification while boot is blocked, proof artifact validation, transient artifact cleanup, whitespace check |
+| `.github/workflows/ci.yml` | `full verification` | system tools, pinned Rust toolchain, bare-metal target, authenticated Odin setup, pinned Limine source tooling, xorriso, QEMU, JSON validation, unit tests, Rust check, cargo-deny, cargo-audit, Odin check, governed full verification, release-candidate bundle and checksum validation, evidence and dry-run artifact upload, proof artifact validation, transient artifact cleanup, whitespace check |
 | `.github/workflows/lint.yml` | `static checks` | system tools, pinned Rust toolchain, bare-metal target, Odin, shell syntax, JSON syntax, unit tests, Rust check, Odin check, whitespace check |
 
 The CI workflows must keep installing `nasm`, pinned Rust, `x86_64-unknown-none`, and Odin before running checks that depend on them.
 
-Full CI must install xorriso and QEMU through apt, acquire the pinned Limine source release, verify the Limine source checksum, build Limine tooling, export `LIMINE_DIR`, `LIMINE`, and `XORRISO`, and run `scripts/build_boot_image.sh`.
+Full CI must install xorriso and QEMU through apt, acquire the pinned Limine source release, verify the Limine source checksum, build Limine tooling, export `LIMINE_DIR`, `LIMINE`, and `XORRISO`, and run the release builder. The release builder invokes `scripts/verify.sh`, which performs the boot-image, QEMU, runtime, and aggregate verification path against the committed source snapshot.
 
 CI/Linux is the authoritative portability proof for the full build, verification, ISO packaging, ELF inspection, and QEMU smoke tooling path. Local macOS development is a convenience path and must not weaken CI-required dependency declarations.
 

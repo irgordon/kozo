@@ -59,6 +59,13 @@ writes `artifacts/latest_verify.json` and reports `VERIFY: PASS`.
 User and maintainer guidance starts in `docs/wiki`. Detailed engineering,
 contract, security, validation, and historical records remain under `docs`.
 
+## Release Candidate
+
+`v1.0.0-rc.1` is a dry-run release candidate, not the final production
+release. Its [release notes](docs/releases/v1.0.0-rc.1.md) describe the scoped
+runtime claims, artifact set, verification path, and known limits. The
+candidate is not published by repository scripts.
+
 ## Maintaining KOZO
 
 Read the [Maintainer Guide](docs/wiki/MAINTAINER_GUIDE.md) before changing a

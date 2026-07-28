@@ -429,6 +429,53 @@ Documentation is descriptive unless a higher-authority document says
 otherwise. The wiki explains current behavior but does not replace contracts,
 source code, security policy, validation policy, or generated proof.
 
+# 14. v1.0.0-rc.1 Release-Candidate Bundle
+
+`release/version.txt` owns the candidate version.
+`release/release_files.v1.json` is the explicit bundle allowlist.
+`scripts/build_release_candidate.sh` verifies the committed tree in an isolated
+workspace before copying release files.
+
+The dry-run output contains:
+
+```text
+kozo-v1.0.0-rc.1.tar.xz
+kozo.iso
+kozo-kernel.elf
+latest_verify.json
+release_metadata.json
+SHA256SUMS
+```
+
+The archive contains the boot image, kernel ELF, current verification and QEMU
+evidence, generated reports, contracts, schemas, release records, required
+engineering documentation, the user/maintainer wiki, and the authoritative
+dual-license files. The `core_service` manifest is included to preserve its MIT
+selection.
+
+The packager:
+
+1. rejects a dirty source repository or version mismatch;
+2. verifies an archive of the current commit through `scripts/verify.sh`;
+3. requires verification pass, QEMU pass, blocker none, and 41 markers;
+4. copies only manifest-listed files and directories;
+5. writes metadata with `published: false`;
+6. generates internal and external SHA-256 checksums;
+7. lists and extracts the archive;
+8. rejects prohibited names and suffixes;
+9. compares all three bundled legal files with the committed originals.
+
+Build timestamps and generated verification timestamps are allowed to differ
+between packaging runs. Stable file lists and legal/release-note bytes do not
+constitute a bit-for-bit reproducible-build claim.
+
+The local v1.0.0-rc.1 hardening run produced two independent commit-bound
+bundles. Each bundle contained 104 files, passed internal and external checksum
+validation, passed prohibited-file inspection, and preserved byte-identical
+legal and release-note files. The archive hashes differed because the governed
+verification and build timestamps differed. Hosted CI and repository
+protection remain separate acceptance gates.
+
 For v0.7.5, release review must include `contracts/controlled_runtime_loop_contract.v0.json`, `controlled_runtime_loop_contract`, `controlled_runtime_loop_evidence`, the kernel ELF report, and QEMU metadata/logs. Local contract, source, and ELF checks establish only implementation readiness. The stage is proven only after hosted CI captures the ordered loop entry, three iteration, exit, and return markers and all validators pass.
 
 For v0.8.0, release review must include `contracts/first_governed_runtime_capability.v0.json`, `first_governed_runtime_capability`, `first_governed_runtime_capability_evidence`, the kernel ELF report, and QEMU metadata/logs. Local evidence proves the fixed internal request/response and dispatch path exists; promotion requires hosted evidence for dispatch, handler success, capability success, and governed return. This proves no userspace access, privilege separation, hardware syscall entry, scheduler/process behavior, compatibility, or production readiness.

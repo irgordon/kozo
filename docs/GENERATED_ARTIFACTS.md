@@ -93,6 +93,12 @@ It should be refreshed only after source and focused tests pass.
 
 Generated proof-state changes should be committed separately from source changes when practical.
 
+Dry-run files under `artifacts/release-candidate/` or a caller-selected output
+directory are generated review outputs. They are not authoritative and are not
+committed. `release/version.txt`, `release/release_files.v1.json`, repository
+governance, and the committed source tree remain authoritative. The generated
+release metadata must record `published: false`.
+
 ---
 
 # 9. Relationship to Other Governance Documents

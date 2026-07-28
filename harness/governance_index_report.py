@@ -244,7 +244,12 @@ def _non_goal_lines(non_goals: tuple[str, ...]) -> list[str]:
 
 def _latest_changelog_version(path: Path) -> ChangelogVersion:
     text = path.read_text()
-    match = re.search(r"^## (v\d+\.\d+\.\d+) - ([0-9-]+)\n\n\*\*Status:\*\* (.+)$", text, re.MULTILINE)
+    version_pattern = r"v\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?"
+    match = re.search(
+        rf"^## ({version_pattern}) - ([0-9-]+)\n\n\*\*Status:\*\* (.+)$",
+        text,
+        re.MULTILINE,
+    )
     if match is None:
         return ChangelogVersion("unknown", "unknown", "unknown")
     return ChangelogVersion(match.group(1), match.group(2), match.group(3))

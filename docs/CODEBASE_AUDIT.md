@@ -1184,7 +1184,7 @@ mapping, or halt behavior and does not establish complete v1.0.0 readiness.
 
 # 38. v0.8.9 Documentation and Adoption Readiness
 
-Status: Implemented and validated locally; hosted CI acceptance pending.
+Status: Accepted by hosted CI runs `30398906417` and `30398906359`.
 
 | ID | Status | Finding |
 | --- | --- | --- |
@@ -1198,3 +1198,23 @@ Status: Implemented and validated locally; hosted CI acceptance pending.
 findings, command and link review, term decisions, and comment-audit record.
 This phase changes no runtime, ABI, request, marker, capability, mapping, or
 halt behavior.
+
+# 39. v1.0.0-rc.1 Release-Candidate Hardening
+
+Status: Source implementation in progress; hosted CI and repository-policy
+acceptance pending.
+
+| ID | Status | Finding |
+| --- | --- | --- |
+| AUDIT-RC1-001 | Resolved locally | `release/version.txt` is the single candidate version authority for display, archive, metadata, and release-note validation. |
+| AUDIT-RC1-002 | Resolved locally | `release/release_files.v1.json` replaces whole-repository packaging with an explicit binary/evidence allowlist. |
+| AUDIT-RC1-003 | Resolved locally | One top-down script verifies the committed tree, validates evidence, copies approved files, writes metadata and checksums, creates the archive, extracts it, checks prohibited paths, and compares legal files. |
+| AUDIT-RC1-004 | Corrected in source; hosted confirmation pending | Official Node 24 checkout/upload actions replace the warned Node 20 majors, and `setup-odin` receives the existing workflow token instead of falling back to Git. |
+| AUDIT-RC1-005 | Open, P2 blocker | `main` has no classic branch protection or ruleset. Required CI/lint contexts, reviews, force-push prevention, deletion prevention, and administrator behavior are not enforced. |
+| AUDIT-RC1-006 | Deferred after RC | Bit-for-bit build reproducibility and artifact signing have no approved policy and are not claimed by this phase. |
+| AUDIT-064-002 | Deferred | `validator_coverage.py` remains the largest structural debt item; release packaging does not require its decomposition. |
+
+The release builder is intentionally commit-bound and has no publication
+option. Dry-run output remains ignored and non-authoritative. No runtime,
+kernel, ABI, request, marker, mapping, capability, or halt source changes are
+part of this phase.

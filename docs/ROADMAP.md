@@ -113,6 +113,8 @@ The current repository proves:
   and unchanged internal capability ID 1 behavior
 * accepted MIT metadata and cargo-deny policy for `core_service` with unchanged
   runtime evidence
+* hosted-CI-accepted v0.8.9 documentation and adoption path with 67 checks,
+  0 failures, QEMU pass, blocker none, and all 41 markers
 
 The latest local generated evidence may still report missing local Limine/xorriso tooling, but CI run `27894312430` proves the narrow QEMU serial smoke path.
 
@@ -122,7 +124,8 @@ The latest local generated evidence may still report missing local Limine/xorris
 
 KOZO still does not prove:
 
-* hosted acceptance of the v0.8.9 documentation and comment-only evidence
+* enforced branch protection and required-check policy for `main`
+* hosted acceptance of the v1.0.0-rc.1 dry-run release bundle
 * complete Odin runtime readiness or dynamic initialization
 * general stack readiness beyond the controlled boot stack proof
 * general memory management beyond the governed static region
@@ -146,10 +149,10 @@ KOZO still does not prove:
 
 # 9. Current Active Blocker
 
-No active runtime blocker is recorded for the accepted v0.8.8 baseline.
-v0.8.9 remains locally complete until hosted CI confirms that the
-documentation and comment-only patch preserves all verification and QEMU
-evidence.
+No active runtime blocker is recorded for the accepted v0.8.9 baseline.
+The current release-candidate blocker is repository policy: `main` has no
+branch protection or ruleset, so required checks, reviews, force-push
+prevention, deletion prevention, and administrator behavior are not enforced.
 
 ---
 
@@ -171,9 +174,10 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 12. Preserve the hosted-accepted v0.8.4 fixed `iretq` entry, CPL3 probe, `int 0x81` return, saved-frame validation, fixed continuation, and unchanged runtime suffix.
 13. Preserve hosted-accepted v0.8.5 fixed request geometry, service behavior, and evidence.
 14. Preserve hosted-accepted v0.8.6 response consumption, exact cleanup, and unchanged runtime suffix.
-15. Accept v0.8.7 only after hosted CI confirms the complete 41-marker transaction, both status-service validators, shared-snapshot equivalence, and unchanged internal capability ID 1.
-16. After acceptance, implement either one additional fixed read-only service through the same boundary or the existing package-license release blocker; do not introduce a general dispatcher.
-17. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
+15. Preserve the hosted-accepted v0.8.7 complete 41-marker transaction and both status-service validators.
+16. Preserve the accepted v0.8.8 package-license correction and v0.8.9 documentation path.
+17. Complete the v1.0.0-rc.1 artifact, license, checksum, hosted CI, and branch-protection gates before final-release work.
+18. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
 
 ---
 

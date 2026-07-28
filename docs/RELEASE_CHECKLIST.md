@@ -444,3 +444,39 @@ Confirm:
 
 This gate improves understanding and adoption readiness. It does not add a
 runtime feature or complete release-candidate hardening.
+
+# 21. v1.0.0-rc.1 Release-Candidate Hardening Gate
+
+The candidate version is owned by `release/version.txt`. The display and tag
+form is `v1.0.0-rc.1`; the archive and metadata form is `1.0.0-rc.1`.
+
+| Item | Status | Evidence | Follow-up |
+| --- | --- | --- | --- |
+| Correct branch and clean source commit | Complete locally | `git status --short --branch`; release builder clean-tree gate | Reconfirm before final approval. |
+| Version consistency | Complete locally | `release/version.txt`, archive name, release metadata, release notes | Hosted bundle must report the same version. |
+| Changelog and release notes | Complete locally | `CHANGELOG.md`, `docs/releases/v1.0.0-rc.1.md` | Maintainer approval remains required. |
+| Phase map and roadmap alignment | Complete locally | `docs/PHASEMAP.md`, `docs/ROADMAP.md` | No runtime scope added. |
+| Full verification | Complete locally | `artifacts/latest_verify.json` | Hosted run must pass 67 checks with zero failures. |
+| QEMU evidence | Complete locally | QEMU log, metadata, and summary | Hosted run must pass with blocker none and 41 markers. |
+| Python, Odin, and Rust checks | Complete locally | local command output | Hosted checks remain required. |
+| Cargo license and advisory policy | Complete locally | `cargo deny check`, `cargo audit` | Hosted CI must reproduce both. |
+| Generated reports | Complete locally | governed generators and verification | Commit generated proof separately. |
+| Contract and schema gates | Complete locally | verification report | Hosted verification must preserve all 67 checks. |
+| Compatibility and security claim review | Complete locally | release notes and security policy | Keep fixed-probe limits explicit. |
+| Explicit artifact manifest | Complete locally | `release/release_files.v1.json` | No wildcard or whole-repository packaging. |
+| Boot image and kernel ELF | Complete locally | two dry-run outputs, direct extraction, and checksums | Hosted bundle must preserve both files. |
+| Runtime and verification evidence | Complete locally | archive `evidence/` tree from both dry runs | Missing required evidence blocks packaging. |
+| MIT and Apache-2.0 legal files | Complete locally | byte-for-byte archive checks | `NOTICE` is not present or required. |
+| SHA-256 checksums | Complete locally | internal and external `SHA256SUMS` from both dry runs | Hosted entries must also validate. |
+| Prohibited-file scan | Complete locally | direct extraction inspection from both dry runs | Any match blocks the candidate. |
+| Packaging-level repeatability | Complete locally | two 104-file bundles with stable file lists and legal/release-note bytes | Generated timestamps differ; no bit-for-bit claim is authorized. |
+| Required hosted checks | Not configured, P2 blocker | GitHub protection and ruleset APIs | Require `ci / full verification` and `lint / static checks`. |
+| Pull-request review | Not configured, P2 blocker | GitHub protection API | Require at least one approval. |
+| Force-push and deletion prevention | Not configured, P2 blocker | GitHub protection API | Repository administrator must enable both. |
+| Administrator bypass policy | Open, P2 blocker | No protection policy exists | Document the approved administrator behavior. |
+| CI deprecation warnings | Corrected in source; hosted proof pending | official Node 24 actions and authenticated Odin setup | Recheck hosted logs. |
+| Publication | Not applicable | metadata records `published: false` | Do not tag, publish, or create a release in this phase. |
+
+The dry-run implementation may be reviewed locally while branch protection is
+open. Candidate promotion remains blocked until the P2 GitHub settings above
+are resolved or explicitly waived through governance.

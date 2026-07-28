@@ -45,6 +45,21 @@ class GovernanceIndexReportTests(unittest.TestCase):
         self.assertIn("## Registered validators", first)
         self.assertIn("## Non-goals", first)
 
+    def test_renderer_accepts_release_candidate_version(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = self.write_fixture(Path(temporary_directory))
+            changelog = root / "CHANGELOG.md"
+            changelog.write_text(
+                "## v1.0.0-rc.1 - 2026-07-28\n\n"
+                "**Status:** Release candidate hardening.\n\n"
+                + changelog.read_text()
+            )
+
+            inputs = governance_index_report.load_report_inputs(root)
+
+        self.assertEqual(inputs.current_version.version, "v1.0.0-rc.1")
+        self.assertEqual(inputs.current_version.status, "Release candidate hardening.")
+
     def test_current_checked_in_governance_index_matches_generated_output(self):
         result = GovernanceIndexReportValidator().validate({})
 

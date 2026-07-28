@@ -1,0 +1,273 @@
+{
+  "manifest_version": 1,
+  "bundle_kind": "binary_release_candidate",
+  "required_files": [
+    {
+      "source": "README.md",
+      "destination": "README.md",
+      "category": "project"
+    },
+    {
+      "source": "CHANGELOG.md",
+      "destination": "CHANGELOG.md",
+      "category": "project"
+    },
+    {
+      "source": "LICENSE",
+      "destination": "LICENSE",
+      "category": "license"
+    },
+    {
+      "source": "LICENSE-MIT",
+      "destination": "LICENSE-MIT",
+      "category": "license"
+    },
+    {
+      "source": "LICENSE-APACHE",
+      "destination": "LICENSE-APACHE",
+      "category": "license"
+    },
+    {
+      "source": "userspace/core_service/Cargo.toml",
+      "destination": "packages/core_service/Cargo.toml",
+      "category": "package_metadata"
+    },
+    {
+      "source": "release/version.txt",
+      "destination": "release/version.txt",
+      "category": "release"
+    },
+    {
+      "source": "release/release_files.v1.json",
+      "destination": "release/release_files.v1.json",
+      "category": "release"
+    },
+    {
+      "source": "docs/releases/v1.0.0-rc.1.md",
+      "destination": "docs/releases/v1.0.0-rc.1.md",
+      "category": "release"
+    },
+    {
+      "source": "docs/releases/v1.0.0-rc.1-evidence.md",
+      "destination": "docs/releases/v1.0.0-rc.1-evidence.md",
+      "category": "release"
+    },
+    {
+      "source": "docs/GOVERNANCE.md",
+      "destination": "docs/GOVERNANCE.md",
+      "category": "governance"
+    },
+    {
+      "source": "docs/INVARIANTS.md",
+      "destination": "docs/INVARIANTS.md",
+      "category": "governance"
+    },
+    {
+      "source": "docs/ARCHITECTURE.md",
+      "destination": "docs/ARCHITECTURE.md",
+      "category": "engineering"
+    },
+    {
+      "source": "docs/CONTRACTS.md",
+      "destination": "docs/CONTRACTS.md",
+      "category": "governance"
+    },
+    {
+      "source": "docs/CODING_STYLE.md",
+      "destination": "docs/CODING_STYLE.md",
+      "category": "governance"
+    },
+    {
+      "source": "docs/DOCUMENTATION_STANDARD.md",
+      "destination": "docs/DOCUMENTATION_STANDARD.md",
+      "category": "governance"
+    },
+    {
+      "source": "docs/VALIDATION.md",
+      "destination": "docs/VALIDATION.md",
+      "category": "governance"
+    },
+    {
+      "source": "docs/GENERATED_ARTIFACTS.md",
+      "destination": "docs/GENERATED_ARTIFACTS.md",
+      "category": "governance"
+    },
+    {
+      "source": "docs/COMPATIBILITY.md",
+      "destination": "docs/COMPATIBILITY.md",
+      "category": "governance"
+    },
+    {
+      "source": "docs/SECURITY_MODEL.md",
+      "destination": "docs/SECURITY_MODEL.md",
+      "category": "governance"
+    },
+    {
+      "source": "docs/RELEASE_CHECKLIST.md",
+      "destination": "docs/RELEASE_CHECKLIST.md",
+      "category": "release"
+    },
+    {
+      "source": "docs/RELEASE_EVIDENCE.md",
+      "destination": "docs/RELEASE_EVIDENCE.md",
+      "category": "release"
+    },
+    {
+      "source": "docs/REQUIRED_CHECKS.md",
+      "destination": "docs/REQUIRED_CHECKS.md",
+      "category": "release"
+    },
+    {
+      "source": "docs/RUNTIME_EVIDENCE.md",
+      "destination": "docs/RUNTIME_EVIDENCE.md",
+      "category": "evidence"
+    },
+    {
+      "source": "docs/RUNTIME_EVIDENCE_REVIEW.md",
+      "destination": "docs/RUNTIME_EVIDENCE_REVIEW.md",
+      "category": "evidence"
+    },
+    {
+      "source": "docs/PHASEMAP.md",
+      "destination": "docs/PHASEMAP.md",
+      "category": "release"
+    },
+    {
+      "source": "docs/ROADMAP.md",
+      "destination": "docs/ROADMAP.md",
+      "category": "release"
+    },
+    {
+      "source": "docs/generated/syscall_surface.md",
+      "destination": "evidence/reports/syscall_surface.md",
+      "category": "evidence"
+    },
+    {
+      "source": "docs/generated/abi_surface.md",
+      "destination": "evidence/reports/abi_surface.md",
+      "category": "evidence"
+    },
+    {
+      "source": "docs/generated/governance_index.md",
+      "destination": "evidence/reports/governance_index.md",
+      "category": "evidence"
+    },
+    {
+      "source": "artifacts/latest_verify.json",
+      "destination": "evidence/latest_verify.json",
+      "category": "evidence"
+    },
+    {
+      "source": "artifacts/logs/odin-check.log",
+      "destination": "evidence/logs/odin-check.log",
+      "category": "evidence"
+    },
+    {
+      "source": "artifacts/logs/odin-build.log",
+      "destination": "evidence/logs/odin-build.log",
+      "category": "evidence"
+    },
+    {
+      "source": "artifacts/logs/cargo-check.log",
+      "destination": "evidence/logs/cargo-check.log",
+      "category": "evidence"
+    },
+    {
+      "source": "artifacts/logs/nm-kernel.log",
+      "destination": "evidence/logs/nm-kernel.log",
+      "category": "evidence"
+    },
+    {
+      "source": "artifacts/runtime/runtime_smoke.log",
+      "destination": "evidence/runtime/runtime_smoke.log",
+      "category": "evidence"
+    },
+    {
+      "source": "artifacts/runtime/runtime_smoke.metadata.json",
+      "destination": "evidence/runtime/runtime_smoke.metadata.json",
+      "category": "evidence"
+    },
+    {
+      "source": "artifacts/runtime/boot_blocker_report.json",
+      "destination": "evidence/runtime/boot_blocker_report.json",
+      "category": "evidence"
+    },
+    {
+      "source": "artifacts/runtime/kernel_elf_report.json",
+      "destination": "evidence/runtime/kernel_elf_report.json",
+      "category": "evidence"
+    },
+    {
+      "source": "artifacts/runtime/boot_image/package_metadata.json",
+      "destination": "evidence/runtime/boot_image/package_metadata.json",
+      "category": "evidence"
+    },
+    {
+      "source": "artifacts/runtime/qemu_smoke.log",
+      "destination": "evidence/runtime/qemu_smoke.log",
+      "category": "evidence"
+    },
+    {
+      "source": "artifacts/runtime/qemu_smoke.stderr.log",
+      "destination": "evidence/runtime/qemu_smoke.stderr.log",
+      "category": "evidence"
+    },
+    {
+      "source": "artifacts/runtime/qemu_smoke.metadata.json",
+      "destination": "evidence/runtime/qemu_smoke.metadata.json",
+      "category": "evidence"
+    },
+    {
+      "source": "artifacts/runtime/qemu_smoke.summary.txt",
+      "destination": "evidence/runtime/qemu_smoke.summary.txt",
+      "category": "evidence"
+    },
+    {
+      "source": "artifacts/runtime/boot_image/kozo.iso",
+      "destination": "artifacts/kozo.iso",
+      "category": "boot_image"
+    },
+    {
+      "source": "artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf",
+      "destination": "artifacts/kozo-kernel.elf",
+      "category": "kernel"
+    }
+  ],
+  "required_directories": [
+    {
+      "source": "docs/wiki",
+      "destination": "docs/wiki",
+      "category": "documentation"
+    },
+    {
+      "source": "contracts",
+      "destination": "evidence/contracts",
+      "category": "evidence"
+    },
+    {
+      "source": "schemas",
+      "destination": "evidence/schemas",
+      "category": "evidence"
+    }
+  ],
+  "prohibited_names": [
+    ".git",
+    ".github",
+    ".env",
+    ".DS_Store",
+    ".idea",
+    ".vscode",
+    "build",
+    "dist",
+    "target",
+    "__pycache__"
+  ],
+  "prohibited_prefixes": [
+    ".env."
+  ],
+  "prohibited_suffixes": [
+    ".pyc",
+    ".key",
+    ".pem"
+  ]
+}

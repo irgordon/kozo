@@ -48,6 +48,7 @@ files remain authoritative.
 - [Troubleshooting](TROUBLESHOOTING.md)
 - [Plain-Language Terms](TERMS.md)
 - [Engineering Overview](ENGINEERING_OVERVIEW.md)
+- [v1.0.0-rc.1 release notes](../releases/v1.0.0-rc.1.md)
 
 ## Current Limits
 

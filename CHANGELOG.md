@@ -1,8 +1,23 @@
 # Changelog
 
+## v1.0.0-rc.1 - 2026-07-28
+
+**Status:** Release-candidate hardening implemented locally; hosted CI and branch-protection acceptance pending.
+
+* Completed the release checklist and confirmed one canonical candidate version.
+* Added an explicit binary/evidence file manifest and one commit-bound dry-run release builder.
+* Verified the required boot image, kernel ELF, generated evidence, documentation, and package metadata categories.
+* Verified the repository MIT and Apache-2.0 legal files and the `core_service` MIT package selection.
+* Generated and directly inspected a dry-run release bundle with internal and external SHA-256 checksums.
+* Reviewed branch protection and required checks; `main` remains unprotected and blocks candidate promotion pending administrator action.
+* Moved official checkout and artifact actions to Node 24 releases and authenticated Odin acquisition with the existing workflow token.
+* Added scoped release notes and a release-candidate evidence summary.
+* Changed no runtime, ABI, request, marker, mapping, capability, or halt behavior.
+* Did not publish a release and did not claim final v1.0.0 production readiness.
+
 ## v0.8.9 - 2026-07-28
 
-**Status:** Implemented and validated locally; hosted CI acceptance pending.
+**Status:** Accepted by hosted CI with 67 checks, 0 failures, QEMU pass, blocker none, and 41 markers.
 
 * Added a user and maintainer wiki under `docs/wiki`.
 * Rewrote the project entry path around purpose, use, expected results, and current limits.
@@ -16,7 +31,7 @@
 
 ## v0.8.8 - 2026-07-28
 
-**Status:** Implemented and validated locally; hosted CI acceptance pending.
+**Status:** Accepted by hosted CI with 67 checks, 0 failures, QEMU pass, blocker none, and 41 markers.
 
 * Added `license = "MIT"` to `core_service`, selecting the MIT option provided by the KOZO repository license set.
 * Matched the package metadata to the authoritative root `LICENSE-MIT` text and added the minimal repository cargo-deny policy required to allow that exact SPDX value.

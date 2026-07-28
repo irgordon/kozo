@@ -101,6 +101,21 @@ git diff --check
 Success prints `VERIFY: PASS`. The v0.8.9 acceptance gate expects 67 checks,
 no failures, QEMU outcome `pass`, and 41 ordered runtime markers.
 
+## Build the Dry-Run Release Candidate
+
+From a clean commit:
+
+```bash
+scripts/build_release_candidate.sh \
+  --version 1.0.0-rc.1 \
+  --output /tmp/kozo-release-candidate
+```
+
+The command runs governed verification against the committed tree, creates an
+explicitly allowlisted archive, validates legal files and metadata, and writes
+`SHA256SUMS`. It does not publish or tag anything. See the
+[release notes](../releases/v1.0.0-rc.1.md) for the artifact list and limits.
+
 ## Inspect the Kernel Binary
 
 Use the AArch64-prefixed tool only for ELF metadata:

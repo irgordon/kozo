@@ -324,3 +324,29 @@ contract-offset coverage plus comparison, success-store, second-interrupt,
 and `ud2` ordering. The validator still requires the complete comparison
 threshold and rejects missing offsets, early stores, early or missing
 `int 0x81`, and a missing fail-closed guard.
+
+# 21. Release-Candidate Validation
+
+From a clean commit, run:
+
+```bash
+scripts/build_release_candidate.sh \
+  --version 1.0.0-rc.1 \
+  --output /tmp/kozo-release-candidate
+```
+
+The command verifies an archived copy of `HEAD`, requires 67 passing checks,
+QEMU outcome `pass`, blocker `none`, and 41 markers, then validates the explicit
+file manifest, metadata, legal files, checksums, archive listing, clean
+extraction, and prohibited-file policy.
+
+Validate the external outputs independently:
+
+```bash
+cd /tmp/kozo-release-candidate
+shasum -a 256 -c SHA256SUMS
+python3 -m json.tool release_metadata.json
+tar -tf kozo-v1.0.0-rc.1.tar.xz
+```
+
+Use `sha256sum -c` on hosts that do not provide `shasum`.

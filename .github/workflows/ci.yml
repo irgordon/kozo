@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install system tools
         run: |
@@ -36,6 +36,7 @@ jobs:
             binutils \
             build-essential \
             curl \
+            jq \
             lld \
             llvm \
             mtools \
@@ -43,6 +44,7 @@ jobs:
             python3 \
             python3-pip \
             qemu-system-x86 \
+            xz-utils \
             xorriso
 
       - name: Acquire pinned Limine tooling
@@ -105,6 +107,13 @@ jobs:
 
       - name: Install Odin
         uses: laytan/setup-odin@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install release policy tools
+        run: |
+          cargo install --locked cargo-deny --version 0.19.6
+          cargo install --locked cargo-audit --version 0.22.1
 
       - name: Show tool versions
         run: |
@@ -122,6 +131,7 @@ jobs:
 
       - name: Validate shell syntax
         run: |
+          bash -n scripts/build_release_candidate.sh
           bash -n scripts/ci_evidence_summary.sh
           bash -n scripts/verify.sh
 
@@ -130,6 +140,7 @@ jobs:
           python3 -m json.tool tasks/todo.json >/dev/null
           python3 -m json.tool tasks/runtime.json >/dev/null
           python3 -m json.tool tasks/lessons.json >/dev/null
+          python3 -m json.tool release/release_files.v1.json >/dev/null
           python3 -m json.tool schemas/latest_verify.schema.json >/dev/null
           python3 -m json.tool schemas/agent_context.schema.json >/dev/null
           if [ -f contracts/kozo_abi_manifest.json ]; then
@@ -151,32 +162,43 @@ jobs:
             --manifest-path userspace/core_service/Cargo.toml \
             --target x86_64-unknown-none
 
+      - name: Check Rust release policy
+        run: |
+          cargo deny --manifest-path userspace/core_service/Cargo.toml check
+          cargo audit --file userspace/core_service/Cargo.lock
+
       - name: Check Odin kernel
         run: |
           odin check kernel
 
-      - name: Build boot image
+      - name: Build governed boot image preflight
         run: |
           scripts/build_boot_image.sh
-          python3 -m json.tool artifacts/runtime/boot_image/package_metadata.json >/dev/null
-
-      - name: Run QEMU smoke evidence
-        run: |
+          test -s artifacts/runtime/boot_image/kozo.iso
           scripts/qemu_smoke.sh
-          python3 -m json.tool artifacts/runtime/qemu_smoke.metadata.json >/dev/null
 
-      - name: Run KOZO verification harness
+      - name: Build and validate release candidate
         run: |
-          scripts/verify.sh
+          scripts/build_release_candidate.sh \
+            --version 1.0.0-rc.1 \
+            --output artifacts/release-candidate
+          python3 -m json.tool artifacts/release-candidate/release_metadata.json >/dev/null
+          (
+            cd artifacts/release-candidate
+            sha256sum -c SHA256SUMS
+          )
+          tar -tf artifacts/release-candidate/kozo-v1.0.0-rc.1.tar.xz >/dev/null
 
       - name: Print CI evidence summary
         if: always()
+        env:
+          KOZO_CI_EVIDENCE_ROOT: artifacts/release-candidate/evidence
         run: |
           scripts/ci_evidence_summary.sh
 
       - name: Validate generated verification artifact
         run: |
-          python3 -m json.tool artifacts/latest_verify.json >/dev/null
+          python3 -m json.tool artifacts/release-candidate/latest_verify.json >/dev/null
 
       - name: Assert transient verify output was cleaned
         run: |
@@ -188,20 +210,28 @@ jobs:
 
       - name: Upload verification logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: kozo-verification-logs
           path: |
-            artifacts/latest_verify.json
-            artifacts/logs/*.log
-            artifacts/runtime/runtime_smoke.log
-            artifacts/runtime/runtime_smoke.metadata.json
-            artifacts/runtime/boot_blocker_report.json
-            artifacts/runtime/kernel_elf_report.json
-            artifacts/runtime/boot_image/package_metadata.json
-            artifacts/runtime/boot_image/kozo.iso
-            artifacts/runtime/qemu_smoke.log
-            artifacts/runtime/qemu_smoke.metadata.json
-            artifacts/runtime/qemu_smoke.summary.txt
-            artifacts/runtime/qemu_smoke.stderr.log
+            artifacts/release-candidate/evidence/latest_verify.json
+            artifacts/release-candidate/evidence/logs/*.log
+            artifacts/release-candidate/evidence/runtime/runtime_smoke.log
+            artifacts/release-candidate/evidence/runtime/runtime_smoke.metadata.json
+            artifacts/release-candidate/evidence/runtime/boot_blocker_report.json
+            artifacts/release-candidate/evidence/runtime/kernel_elf_report.json
+            artifacts/release-candidate/evidence/runtime/boot_image/package_metadata.json
+            artifacts/release-candidate/kozo.iso
+            artifacts/release-candidate/evidence/runtime/qemu_smoke.log
+            artifacts/release-candidate/evidence/runtime/qemu_smoke.metadata.json
+            artifacts/release-candidate/evidence/runtime/qemu_smoke.summary.txt
+            artifacts/release-candidate/evidence/runtime/qemu_smoke.stderr.log
           if-no-files-found: warn
+
+      - name: Upload release candidate dry run
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: kozo-v1.0.0-rc.1-dry-run
+          path: artifacts/release-candidate/
+          if-no-files-found: error

@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO v0.8.9 Documentation and Adoption Readiness",
+  "task_title": "KOZO v1.0.0-rc.1 Release-Candidate Hardening",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -21,7 +21,8 @@
     "v0.8.7 runtime-ordered user status service and its portable Ring3 comparison correction are accepted by hosted CI with 67 checks and 0 failures",
     "The reconciled runtime progression graph is acyclic and permits first capability evidence only after controlled loop evidence",
     "Odin, pinned Rust, Python, jq, and repository verification tooling are installed",
-    "v0.8.8 core service MIT license metadata is accepted by hosted CI run 30357658912 with 67 checks, 0 failures, QEMU pass, blocker none, and all 41 runtime markers"
+    "v0.8.8 core service MIT license metadata is accepted by hosted CI run 30357658912 with 67 checks, 0 failures, QEMU pass, blocker none, and all 41 runtime markers",
+    "v0.8.9 documentation and adoption readiness is accepted by hosted CI runs 30398906417 and 30398906359 with 67 checks, 0 failures, QEMU pass, blocker none, and all 41 runtime markers"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
@@ -35,7 +36,8 @@
     "This phase moves the accepted fixed transaction after the controlled Odin loop, exposes one shared deterministic status snapshot through fixed request ID 2, preserves internal capability ID 1 geometry and behavior, and adds no general dispatcher, public ABI, arbitrary pointer, persistent userspace, compatibility, or production claim",
     "Hosted CI run 30321090604 proved QEMU outcome pass, blocker none, and the exact 41-marker runtime sequence, but verification reported 67 checks with one fixed_user_runtime_status_service_evidence failure because GNU objdump labeled the Ring3 response-consumer start address with an alias and the report parser found zero comparisons",
     "The core_service package selects the MIT option provided by the repository license set; LICENSE-MIT is the authoritative MIT text",
-    "v0.8.9 changes documentation and source comments only; user and maintainer guidance begins in docs/wiki while detailed technical authority remains in contracts, source, and docs"
+    "v0.8.9 changes documentation and source comments only; user and maintainer guidance begins in docs/wiki while detailed technical authority remains in contracts, source, and docs",
+    "v1.0.0-rc.1 changes release packaging, release documentation, and hosted release gates only; runtime behavior and the accepted 41-marker sequence remain unchanged"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -59,6 +61,7 @@
     "tests/",
     "schemas/",
     "scripts/",
+    "release/",
     "boot/",
     "linker/",
     ".github/workflows/ci.yml",
@@ -2966,6 +2969,38 @@
         "verification.tests_run[150]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 86,
+      "title": "Harden the v1.0.0-rc.1 release candidate",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "release/version.txt",
+        "release/release_files.v1.json",
+        "scripts/build_release_candidate.sh",
+        "tests/test_release_candidate_hardening.py",
+        ".github/workflows/ci.yml",
+        ".github/workflows/lint.yml",
+        "docs/releases/v1.0.0-rc.1.md",
+        "docs/releases/v1.0.0-rc.1-evidence.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/REQUIRED_CHECKS.md",
+        "docs/VALIDATION.md",
+        "docs/GENERATED_ARTIFACTS.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/CODEBASE_AUDIT.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "docs/generated/governance_index.md",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[151]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -3034,7 +3069,8 @@
     "v0.8.7 runs the accepted fixed Ring3 transaction after the controlled Odin loop, uses one validated 64-byte snapshot for the fixed 88-byte user response and unchanged internal capability ID 1 response, validates every response field in both privilege levels, clears all boundary state, and preserves capability ID 2, runtime return, and terminal halt.",
     "Portable Ring3 ELF evidence uses authoritative start/end symbol addresses over full disassembly, normalizes equivalent GNU and LLVM comparison syntax, still requires all 14 response-field offsets, and proves comparisons precede success-record stores, the second int 0x81, and the fail-closed ud2 guard without changing runtime behavior.",
     "v0.8.8 records the exact MIT SPDX value in the core_service manifest, removes the missing-license cargo-deny failure without an exception, preserves package identity and runtime behavior, and refreshes governed proof.",
-    "v0.8.9 provides a user-first wiki, tested getting-started and troubleshooting paths, maintainer and engineering navigation, plain-language terminology, documentation and source-comment audits, corrected current claims, and unchanged runtime evidence."
+    "v0.8.9 provides a user-first wiki, tested getting-started and troubleshooting paths, maintainer and engineering navigation, plain-language terminology, documentation and source-comment audits, corrected current claims, and unchanged runtime evidence.",
+    "v1.0.0-rc.1 provides one canonical version, an explicit binary/evidence allowlist, a commit-bound dry-run packager, inspected licenses and checksums, scoped release records, and hosted release gates without publishing or changing runtime behavior."
   ],
   "verification": {
     "tests_run": [
@@ -3792,6 +3828,11 @@
         "tool": "documentation and adoption readiness validation",
         "command": "documentation inventory and local-link scan; every docs/wiki command; source-comment and TODO scans; odin check kernel; cargo check; Python discovery; governed build, QEMU, and full verification; JSON and diff checks",
         "status": "passed_1032_tests_67_checks_0_failures_qemu_pass_41_markers_62_links; taplo_macos_system_configuration_panic"
+      },
+      {
+        "tool": "v1.0.0-rc.1 release-candidate hardening validation",
+        "command": "release hardening tests; full Python discovery; Odin and Rust checks; cargo-deny and cargo-audit; governed verification; two commit-bound bundle builds; direct archive, license, checksum, metadata, ELF, workflow, and GitHub protection inspection",
+        "status": "passed_1044_tests_67_checks_0_failures_qemu_pass_41_markers_two_104_file_bundles_checksums_and_inspection_passed; hosted_and_branch_protection_pending; taplo_macos_system_configuration_panic"
       }
     ],
     "logs": [

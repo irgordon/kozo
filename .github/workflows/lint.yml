@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install system tools
         run: |
@@ -63,6 +63,8 @@ jobs:
 
       - name: Install Odin
         uses: laytan/setup-odin@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Show tool versions
         run: |
@@ -77,6 +79,7 @@ jobs:
 
       - name: Shell syntax
         run: |
+          bash -n scripts/build_release_candidate.sh
           bash -n scripts/verify.sh
 
       - name: JSON syntax
@@ -84,6 +87,7 @@ jobs:
           python3 -m json.tool tasks/todo.json >/dev/null
           python3 -m json.tool tasks/runtime.json >/dev/null
           python3 -m json.tool tasks/lessons.json >/dev/null
+          python3 -m json.tool release/release_files.v1.json >/dev/null
           python3 -m json.tool schemas/latest_verify.schema.json >/dev/null
           python3 -m json.tool schemas/agent_context.schema.json >/dev/null
           if [ -f contracts/kozo_abi_manifest.json ]; then
