@@ -482,6 +482,12 @@ combined object. `scripts/build_odin_object.sh` now requests a single module and
 normalizes `.obj` or `.o` output to the caller's exact path. Every boot,
 runtime-smoke, verification, and entrypoint-symbol build uses that helper.
 
+The second hosted RC run confirmed that direct boot and QEMU preflight passed,
+then correctly failed the clean-commit packaging gate because the preflight had
+updated tracked evidence. Hosted CI now builds the commit-bound bundle before
+running that workspace-mutating preflight. The two gates remain independent;
+their order prevents preflight evidence from masquerading as source dirtiness.
+
 For v0.7.5, release review must include `contracts/controlled_runtime_loop_contract.v0.json`, `controlled_runtime_loop_contract`, `controlled_runtime_loop_evidence`, the kernel ELF report, and QEMU metadata/logs. Local contract, source, and ELF checks establish only implementation readiness. The stage is proven only after hosted CI captures the ordered loop entry, three iteration, exit, and return markers and all validators pass.
 
 For v0.8.0, release review must include `contracts/first_governed_runtime_capability.v0.json`, `first_governed_runtime_capability`, `first_governed_runtime_capability_evidence`, the kernel ELF report, and QEMU metadata/logs. Local evidence proves the fixed internal request/response and dispatch path exists; promotion requires hosted evidence for dispatch, handler success, capability success, and governed return. This proves no userspace access, privilege separation, hardware syscall entry, scheduler/process behavior, compatibility, or production readiness.

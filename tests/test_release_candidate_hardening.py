@@ -121,6 +121,12 @@ class ReleaseCandidateHardeningTests(unittest.TestCase):
         )
         self.assertIn('EVIDENCE_ROOT="${KOZO_CI_EVIDENCE_ROOT:-artifacts}"', summary)
 
+    def test_ci_packages_clean_commit_before_workspace_preflight(self):
+        ci = CI_PATH.read_text()
+        package_step = ci.index("- name: Build and validate release candidate")
+        preflight_step = ci.index("- name: Build governed boot image preflight")
+        self.assertLess(package_step, preflight_step)
+
 
 if __name__ == "__main__":
     unittest.main()

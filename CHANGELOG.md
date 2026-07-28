@@ -13,6 +13,7 @@
 * Moved official checkout and artifact actions to Node 24 releases and authenticated Odin acquisition with the existing workflow token.
 * Added scoped release notes and a release-candidate evidence summary.
 * Normalized current Odin object output into one combined object for portable hosted linking.
+* Ordered commit-bound packaging before the workspace-mutating boot preflight.
 * Changed no runtime, ABI, request, marker, mapping, capability, or halt behavior.
 * Did not publish a release and did not claim final v1.0.0 production readiness.
 
