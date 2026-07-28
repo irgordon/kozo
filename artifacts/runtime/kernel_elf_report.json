@@ -46,7 +46,7 @@
     "symbols": {
       "controlled_runtime_loop": {
         "present": true,
-        "address": "0xffffffff802024f0"
+        "address": "0xffffffff80202340"
       },
       "runtime_loop_state": {
         "present": true,
@@ -77,20 +77,20 @@
     "backward_branch_present": true,
     "backward_branches": [
       {
-        "instruction_address": "0xffffffff8020252c",
-        "target_address": "0xffffffff80202510"
+        "instruction_address": "0xffffffff8020237c",
+        "target_address": "0xffffffff80202360"
       },
       {
-        "instruction_address": "0xffffffff80202565",
-        "target_address": "0xffffffff80202510"
+        "instruction_address": "0xffffffff802023b5",
+        "target_address": "0xffffffff80202360"
       },
       {
-        "instruction_address": "0xffffffff80202567",
-        "target_address": "0xffffffff8020253d"
+        "instruction_address": "0xffffffff802023b7",
+        "target_address": "0xffffffff8020238d"
       },
       {
-        "instruction_address": "0xffffffff80202572",
-        "target_address": "0xffffffff80202510"
+        "instruction_address": "0xffffffff802023c2",
+        "target_address": "0xffffffff80202360"
       }
     ],
     "terminal_comparison_present": true
@@ -99,7 +99,7 @@
     "symbols": {
       "execute_first_governed_capability": {
         "present": true,
-        "address": "0xffffffff80202880"
+        "address": "0xffffffff80202920"
       },
       "dispatch_runtime_capability": {
         "present": true,
@@ -200,11 +200,11 @@
       },
       "initialize_runtime_state_transition_cell": {
         "present": true,
-        "address": "0xffffffff802027f0"
+        "address": "0xffffffff80202850"
       },
       "execute_second_governed_capability": {
         "present": true,
-        "address": "0xffffffff80202990"
+        "address": "0xffffffff80202a00"
       },
       "dispatch_runtime_capability": {
         "present": true,
@@ -220,19 +220,19 @@
       },
       "runtime_state_cell_store": {
         "present": true,
-        "address": "0xffffffff80203bf0"
+        "address": "0xffffffff80203ae0"
       },
       "runtime_state_cell_state": {
         "present": true,
-        "address": "0xffffffff80203c00"
+        "address": "0xffffffff80203b00"
       },
       "runtime_state_cell_reserved": {
         "present": true,
-        "address": "0xffffffff80203c10"
+        "address": "0xffffffff80203bb0"
       },
       "runtime_state_cell_generation": {
         "present": true,
-        "address": "0xffffffff80203c20"
+        "address": "0xffffffff80203bc0"
       },
       "runtime_serial_write_state_update_enter_marker": {
         "present": true,

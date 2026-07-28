@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260728T120627Z",
+  "run_id": "verify-20260728T205925Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -70,7 +70,7 @@
       "subsystem": "odin",
       "status": "pass",
       "code": "OK",
-      "detail": "No Odin kernel changes require validation in this bootstrap loop"
+      "detail": "Odin changes are backed by declared odin check evidence"
     },
     {
       "name": "abi",
@@ -494,14 +494,35 @@
   "failed_checks": [],
   "changed_files": [
     "CHANGELOG.md",
-    "artifacts/runtime/qemu_smoke.metadata.json",
+    "README.md",
+    "artifacts/runtime/kernel_elf_report.json",
     "artifacts/runtime/qemu_smoke.summary.txt",
-    "deny.toml",
+    "docs/BOOT.md",
     "docs/CODEBASE_AUDIT.md",
+    "docs/CODING_STYLE.md",
+    "docs/DOCUMENTATION_AUDIT.md",
+    "docs/DOCUMENTATION_STANDARD.md",
+    "docs/PHASEMAP.md",
     "docs/RELEASE_CHECKLIST.md",
+    "docs/RELEASE_EVIDENCE.md",
+    "docs/ROADMAP.md",
+    "docs/USER_REQUEST_BOUNDARY.md",
+    "docs/USER_RUNTIME_STATUS_SERVICE.md",
+    "docs/adr/0016-kernel-entry-and-syscall-bridge.md",
     "docs/generated/governance_index.md",
-    "tasks/todo.json",
-    "userspace/core_service/Cargo.toml"
+    "docs/wiki/ENGINEERING_OVERVIEW.md",
+    "docs/wiki/GETTING_STARTED.md",
+    "docs/wiki/MAINTAINER_GUIDE.md",
+    "docs/wiki/README.md",
+    "docs/wiki/TERMS.md",
+    "docs/wiki/TROUBLESHOOTING.md",
+    "docs/wiki/USER_GUIDE.md",
+    "docs/wiki/WHY_KOZO.md",
+    "kernel/arch/x86_64/privilege_transition.asm",
+    "kernel/runtime_capability.odin",
+    "kernel/runtime_progression.odin",
+    "scripts/kernel_elf_report.py",
+    "tasks/todo.json"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -518,5 +539,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-07-28T12:06:27Z"
+  "generated_at": "2026-07-28T20:59:25Z"
 }
