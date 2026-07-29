@@ -14,15 +14,11 @@ that problem by keeping each runtime feature bounded, recording progress over
 the serial port, and checking source, kernel-binary, and QEMU evidence against
 machine-readable rules.
 
-**Final release preparation:** v1.0.0
-
-**Current published release:** [v1.0.0-rc.1 prerelease](https://github.com/irgordon/kozo/releases/tag/v1.0.0-rc.1)
+**Current release:** [v1.0.0](https://github.com/irgordon/kozo/releases/tag/v1.0.0)
 
 Start with [Getting Started](docs/wiki/GETTING_STARTED.md), then read the
 [v1.0.0 release notes](docs/releases/v1.0.0.md) and
-[release evidence](docs/releases/v1.0.0-evidence.md). The final release is
-being prepared from the accepted kernel foundation. It has not been published
-yet.
+[release evidence](docs/releases/v1.0.0-evidence.md).
 
 ## What Works Today
 
@@ -71,15 +67,13 @@ contract, security, validation, and historical records remain under `docs`.
 
 ## Release Status
 
-`v1.0.0-rc.1` is published as a
-[GitHub prerelease](https://github.com/irgordon/kozo/releases/tag/v1.0.0-rc.1)
-for testing and review. Its
-[status page](docs/releases/v1.0.0-rc.1-status.md) records the immutable tag,
-hosted artifact checks, and current limits.
+`v1.0.0` is published as the
+[final kernel-foundation release](https://github.com/irgordon/kozo/releases/tag/v1.0.0).
+Its [release evidence](docs/releases/v1.0.0-evidence.md) records the immutable
+tag, hosted asset hashes, and accepted runtime result.
 
-Final `v1.0.0` preparation is in progress. The final release will preserve the
-accepted runtime and remain a kernel-foundation release, not a production
-desktop operating system.
+The earlier `v1.0.0-rc.1` prerelease remains immutable. KOZO v1.0.0 is not a
+production desktop operating system.
 
 ## Maintaining KOZO
 

@@ -117,10 +117,9 @@ Do not move the tag, replace an asset, or repair the release record in place.
 Record a reproducible defect and prepare a new candidate such as
 `v1.0.0-rc.2`.
 
-Final `v1.0.0` release preparation is authorized. The final tag is created only
-after the final commit passes hosted CI and lint. Once published, the
-`v1.0.0` tag, notes, and assets are immutable. A later product defect requires
-a patch release instead of replacing the final release in place.
+The final `v1.0.0` tag, notes, and assets are published and immutable. A later
+product defect requires a patch release instead of replacing the final release
+in place.
 
 ## Common Maintenance Mistakes
 

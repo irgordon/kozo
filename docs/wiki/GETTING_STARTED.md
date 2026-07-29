@@ -1,16 +1,16 @@
 # Getting Started
 
-This guide first runs the currently published prerelease ISO, then shows how
-to build KOZO from source. Final `v1.0.0` release preparation is in progress.
+This guide first runs the current final-release ISO, then shows how to build
+KOZO from source.
 
-## Run the Downloaded Prerelease ISO
+## Run the Downloaded Release ISO
 
-Download all six assets for `v1.0.0-rc.1` into an empty directory:
+Download all six assets for `v1.0.0` into an empty directory:
 
 ```bash
-mkdir kozo-v1.0.0-rc.1
-cd kozo-v1.0.0-rc.1
-gh release download v1.0.0-rc.1 \
+mkdir kozo-v1.0.0
+cd kozo-v1.0.0
+gh release download v1.0.0 \
   --repo irgordon/kozo \
   --dir .
 ```
@@ -31,8 +31,8 @@ KOZO_BOOT_ISO="/absolute/path/to/download/kozo.iso" scripts/qemu_smoke.sh
 Use the actual absolute download path for `KOZO_BOOT_ISO`. A successful run
 reports `Outcome: pass`, `Blocker: none`, 41 ordered markers, and
 `KOZO_RUNTIME_RETURN_OK` as the final marker. See the
-[current release status](../releases/v1.0.0-rc.1-status.md) for the accepted
-artifact hashes and limits.
+[release evidence](../releases/v1.0.0-evidence.md) for the accepted artifact
+hashes and limits.
 
 ## Build KOZO from Source
 

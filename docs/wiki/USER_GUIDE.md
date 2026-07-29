@@ -2,11 +2,10 @@
 
 ## Current Release Status
 
-KOZO `v1.0.0-rc.1` is available as a
-[GitHub prerelease](https://github.com/irgordon/kozo/releases/tag/v1.0.0-rc.1).
-Download and checksum instructions are in
-[Getting Started](GETTING_STARTED.md). Final `v1.0.0` release preparation is in
-progress. The accepted runtime behavior is unchanged.
+KOZO `v1.0.0` is available as the
+[final kernel-foundation release](https://github.com/irgordon/kozo/releases/tag/v1.0.0).
+Download and checksum instructions are in [Getting Started](GETTING_STARTED.md).
+The accepted runtime behavior is unchanged from `v1.0.0-rc.1`.
 
 ## What Happens When KOZO Starts
 

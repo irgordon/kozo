@@ -505,9 +505,9 @@ are not blockers for the declared release scope.
 
 # 23. v1.0.0 Final Release Gate
 
-Final release authorization is active. The `v1.0.0` tag and GitHub release
-remain pending until the final commit passes both hosted workflows and its
-downloaded CI proof is inspected.
+Final release authorization is complete. The `v1.0.0` tag and GitHub release
+are immutable publication records for accepted commit
+`1586089415a98a11d2024d606ce6301f568b7d6e`.
 
 | Item | Status | Evidence | Follow-up |
 | --- | --- | --- | --- |
@@ -515,14 +515,14 @@ downloaded CI proof is inspected.
 | Final notes and evidence | Complete locally | `docs/releases/v1.0.0.md`, `docs/releases/v1.0.0-evidence.md` | Fill hosted fields after publication. |
 | Runtime behavior | Unchanged | no kernel, ABI, contract, request, marker, mapping, capability, or halt edits | Reconfirm in local and hosted verification. |
 | Full local gate | Complete | 1,050 Python tests; Odin, Rust, cargo policy; verification run `verify-20260729T201733Z`; QEMU pass | Preserve the result in the generated proof commit. |
-| Final bundle | Pending | `kozo-v1.0.0.tar.xz` and five supporting assets | Inspect from the accepted final commit. |
-| Hosted final-commit gate | Pending | CI and lint | Must pass before tagging. |
-| Annotated final tag | Not created | `v1.0.0` | Create only after hosted acceptance. |
-| Final GitHub release | Not created | `KOZO v1.0.0` | Must be non-draft and non-prerelease. |
-| Hosted asset verification | Pending | fresh download and checksum validation | Local and hosted files must match. |
-| RC preservation | Complete before promotion | accepted tag object, notes, and six assets | Reconfirm after final publication. |
+| Final bundle | Complete | Two 104-file bundle inventories; direct extraction; internal/external checksums | Approved archive SHA-256 `bb74de23e62a87ae26f21252388007822b4764f2cf98626c157f28422dd41897`. |
+| Hosted final-commit gate | Complete | CI run `30495209451`; lint run `30495209186` | Both passed before tagging. |
+| Annotated final tag | Complete | object `059fe90572db46185c219e8b38bbd190faa40e60`; target `1586089415a98a11d2024d606ce6301f568b7d6e` | Treat as immutable. |
+| Final GitHub release | Complete | <https://github.com/irgordon/kozo/releases/tag/v1.0.0> | Non-draft and non-prerelease. |
+| Hosted asset verification | Complete | six fresh downloads; checksum and byte comparison | All hosted files match approved local files. |
+| RC preservation | Complete after promotion | tag, notes, classification, six asset names/sizes/digests | Before/after records match. |
 | Package publication | Not authorized | `core_service` remains unpublished | Do not run `cargo publish`. |
 
-The post-promotion record is one documentation/proof-only commit on `main`.
-It may record hosted facts but must not alter the final tag, release notes,
-assets, runtime, ABI, contracts, or marker sequence.
+This post-promotion record is the one authorized documentation/proof-only
+commit on `main`. It does not alter the final tag, release notes, assets,
+runtime, ABI, contracts, or marker sequence.

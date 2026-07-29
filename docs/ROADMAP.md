@@ -124,7 +124,6 @@ The latest local generated evidence may still report missing local Limine/xorris
 
 KOZO still does not prove:
 
-* a final v1.0.0 release
 * complete Odin runtime readiness or dynamic initialization
 * general stack readiness beyond the controlled boot stack proof
 * general memory management beyond the governed static region
@@ -148,13 +147,13 @@ KOZO still does not prove:
 
 # 9. Current Active Blocker
 
-No active runtime blocker is recorded for the accepted v0.8.9 baseline.
+No active runtime blocker is recorded for the published v1.0.0
+kernel-foundation scope.
 Force pushes to `main` are blocked. No broader repository policy is required
-by the final-release scope. The immutable `v1.0.0-rc.1` GitHub prerelease is
-published and has passed post-promotion artifact, boot, and user-path
-verification. No reproducible final-release blocker was found. Final v1.0.0
-preparation is authorized and in progress; publication remains gated on local
-and hosted acceptance.
+by the final-release scope. The immutable `v1.0.0-rc.1` prerelease and
+`v1.0.0` final release are published. The final hosted assets passed checksum,
+metadata, and downloaded-ISO verification. No reproducible blocker was found
+for the declared release scope.
 
 ---
 
@@ -180,8 +179,8 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 16. Preserve the accepted v0.8.8 package-license correction and v0.8.9 documentation path.
 17. Preserve the accepted v1.0.0-rc.1 tag, hosted artifacts, checksums, runtime
     evidence, and immutable release record.
-18. Complete the v1.0.0 final version, documentation, bundle, hosted gate,
-    immutable tag, and hosted asset verification without runtime changes.
+18. Preserve the published v1.0.0 version, documentation, bundle, hosted gate,
+    immutable tag, and hosted asset evidence without in-place mutation.
 19. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
 
 ---

@@ -2,7 +2,7 @@
 
 ## v1.0.0 - 2026-07-29
 
-**Status:** Final release preparation in progress; publication pending local and hosted acceptance.
+**Status:** Published as the immutable final GitHub release; hosted assets independently verified.
 
 * Finalized the accepted governed kernel foundation release scope.
 * Preserved the accepted runtime behavior from `v1.0.0-rc.1`.
@@ -20,6 +20,11 @@
 * Retained the RC tag, notes, and assets unchanged.
 * Changed no runtime, ABI, request, marker, mapping, capability, or halt
   behavior.
+* Published annotated tag `v1.0.0` at accepted commit
+  `1586089415a98a11d2024d606ce6301f568b7d6e`.
+* Published six approved assets and independently verified their hosted sizes,
+  SHA-256 values, metadata, and checksum file.
+* Booted the downloaded hosted ISO through all 41 ordered markers.
 
 ## v1.0.0-rc.1 - 2026-07-28
 

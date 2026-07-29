@@ -642,7 +642,7 @@ or production readiness.
 
 ---
 
-# 18. v1.0.0 Final Release Preparation
+# 18. v1.0.0 Final Release
 
 `release/version.txt` owns the final version `1.0.0`.
 `release/release_files.v1.json` remains the explicit allowlist, and
@@ -660,8 +660,8 @@ release_metadata.json
 SHA256SUMS
 ```
 
-The final release is authorized but not yet published. Before the annotated
-`v1.0.0` tag is created, the accepted final commit must pass:
+The final release was published only after accepted commit
+`1586089415a98a11d2024d606ce6301f568b7d6e` passed:
 
 * Python unit discovery;
 * Odin and pinned Rust checks;
@@ -675,6 +675,17 @@ The final release is authorized but not yet published. Before the annotated
 The bundle metadata keeps `published: false` because it is produced before the
 GitHub release exists. Publication is recorded by the later immutable GitHub
 release and the post-promotion evidence update.
+
+Hosted publication is recorded at
+<https://github.com/irgordon/kozo/releases/tag/v1.0.0>. Annotated tag object
+`059fe90572db46185c219e8b38bbd190faa40e60` targets the accepted commit.
+CI run `30495209451` and lint run `30495209186` passed. All six downloaded
+hosted assets matched their approved local sizes and SHA-256 values, and the
+downloaded ISO reproduced 41 ordered markers ending at
+`KOZO_RUNTIME_RETURN_OK`.
+
+The accepted `v1.0.0-rc.1` tag, hosted notes, classification, and six asset
+names, sizes, and digests remained unchanged after final publication.
 
 No runtime behavior changed after `v1.0.0-rc.1`. The final scope remains the
 documented governed kernel foundation and does not add a desktop, shell,

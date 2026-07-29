@@ -16,9 +16,9 @@ benefits.
 
 ## Current Release
 
-[KOZO v1.0.0-rc.1](https://github.com/irgordon/kozo/releases/tag/v1.0.0-rc.1)
-remains available as the accepted GitHub prerelease. Final `v1.0.0` release
-preparation is in progress. It has not been published yet.
+[KOZO v1.0.0](https://github.com/irgordon/kozo/releases/tag/v1.0.0) is the
+current final kernel-foundation release. The accepted `v1.0.0-rc.1`
+prerelease remains available as an immutable historical candidate.
 
 KOZO currently exposes its result through serial progress markers. It does not
 provide an interactive shell, desktop, or general application environment.

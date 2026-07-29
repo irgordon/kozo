@@ -1221,7 +1221,7 @@ part of this phase.
 
 # 40. v1.0.0 Final Release Authorization
 
-Status: Final release preparation in progress.
+Status: Published and independently verified.
 
 The prior section records the historical RC hardening snapshot. The RC was
 subsequently accepted, published, and independently verified. Its tag, notes,
@@ -1231,10 +1231,12 @@ and six assets remain immutable.
 | --- | --- | --- |
 | AUDIT-V1-001 | Resolved locally | The existing packager now accepts canonical final versions as well as release candidates while retaining its clean-commit, evidence, allowlist, license, checksum, and prohibited-path gates. |
 | AUDIT-V1-002 | Resolved locally | CI reads the authoritative version file instead of embedding the RC version and archive name. |
-| AUDIT-V1-003 | In progress | Final notes, evidence, current documentation, task state, and version authority are aligned to `1.0.0`; local and hosted acceptance remain required before tagging. |
+| AUDIT-V1-003 | Resolved | Final notes, evidence, current documentation, task state, and version authority align to published `v1.0.0`; local and hosted acceptance passed before tagging. |
 | AUDIT-V1-004 | Preserved | Runtime, ABI, contracts, marker order, fixed request geometry, page mappings, capabilities, and halt behavior are unchanged from the accepted RC. |
 | AUDIT-V1-005 | Deferred by scope | General userspace, scheduling, processes, filesystems, drivers, networking, compatibility, and production desktop behavior remain outside the declared release. |
+| AUDIT-V1-006 | Resolved | Annotated tag object `059fe90572db46185c219e8b38bbd190faa40e60` targets accepted commit `1586089415a98a11d2024d606ce6301f568b7d6e`; the six hosted files match the approved local hashes. |
+| AUDIT-V1-007 | Preserved | RC before/after comparison found no change to its tag, notes, classification, or asset names, sizes, and digests. |
 
-No structural cleanup or runtime refactor is included. A post-publication
-documentation/proof-only commit may record immutable hosted facts, but it may
-not modify the final tag, assets, hosted notes, runtime, ABI, or contracts.
+No structural cleanup or runtime refactor is included. This post-publication
+documentation/proof-only record does not modify the final tag, assets, hosted
+notes, runtime, ABI, or contracts.

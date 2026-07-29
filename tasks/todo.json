@@ -2,7 +2,7 @@
   "task_title": "KOZO v1.0.0 Final Release Authorization",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
-  "plan_status": "approved",
+  "plan_status": "complete",
   "replan_number": 0,
   "approval": {
     "status": "approved"
@@ -3065,7 +3065,7 @@
     {
       "id": 89,
       "title": "Prepare, publish, and verify KOZO v1.0.0",
-      "status": "pending",
+      "status": "done",
       "kind": "edit",
       "files_expected": [
         "release/version.txt",
@@ -3948,7 +3948,7 @@
       {
         "tool": "v1.0.0 final release authorization",
         "command": "final version and documentation checks; release bundle tests; Python discovery; Odin and Rust checks; cargo-deny and cargo-audit; governed verification; local and hosted bundle inspection; hosted CI and lint; annotated tag and GitHub release verification; independent hosted asset validation; RC immutability readback",
-        "status": "local_tests_1050_passed_verification_67_checks_qemu_pass_bundle_and_hosted_gates_pending"
+        "status": "passed_final_commit_1586089415a98a11d2024d606ce6301f568b7d6e_ci_30495209451_lint_30495209186_tag_object_059fe90572db46185c219e8b38bbd190faa40e60_six_hosted_assets_exact_hosted_iso_41_markers_rc_unchanged"
       }
     ],
     "logs": [

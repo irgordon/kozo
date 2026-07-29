@@ -131,6 +131,10 @@ The current local generated evidence proves:
   runtime evidence.
 * v0.8.9 is accepted by hosted CI runs `30398906417` and `30398906359` with
   67 checks, 0 failures, QEMU pass, blocker none, and all 41 markers.
+* v1.0.0 is published at accepted commit
+  `1586089415a98a11d2024d606ce6301f568b7d6e` with an immutable annotated tag,
+  six independently verified hosted assets, and unchanged 41-marker runtime
+  evidence.
 
 ## Current Active Blocker
 
@@ -141,18 +145,16 @@ deletion, ruleset, or other repository policy is required by this phase.
 The immutable `v1.0.0-rc.1` annotated tag and GitHub prerelease are published.
 Post-promotion checks reproduced the accepted hosted hashes, QEMU result, 41
 markers, and user path. No reproducible final-release blocker was found.
-Final `v1.0.0` preparation is authorized and in progress; the tag and final
-GitHub release remain pending local and hosted acceptance.
+Final `v1.0.0` is published as a non-draft, non-prerelease GitHub release.
+The final tag, notes, and assets are immutable.
 
 Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr`, `kernel_entry_not_reached`, `serial_not_initialized`, and `marker_not_emitted` are retained only as resolved historical evidence states unless a future CI artifact reintroduces one.
 
 ## Next Phase
 
-The `v1.0.0-rc.1` hardening, promotion, and post-promotion verification phases
-are complete. The active phase is `v1.0.0 Final Release Authorization`.
-Publication requires the final commit, local bundle, hosted CI proof,
-annotated tag, final GitHub release, and independent hosted asset checks to
-pass without runtime changes.
+The `v1.0.0-rc.1` and `v1.0.0` release phases are complete. Future work must
+start from a separately scoped task. A product defect requires a patch release;
+the existing final tag and hosted assets must not be changed in place.
 
 ---
 
