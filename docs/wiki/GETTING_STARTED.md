@@ -1,6 +1,40 @@
 # Getting Started
 
-This guide builds KOZO, runs it in QEMU, and checks the result.
+This guide first runs the published prerelease ISO, then shows how to build
+KOZO from source.
+
+## Run the Downloaded Prerelease ISO
+
+Download all six assets for `v1.0.0-rc.1` into an empty directory:
+
+```bash
+mkdir kozo-v1.0.0-rc.1
+cd kozo-v1.0.0-rc.1
+gh release download v1.0.0-rc.1 \
+  --repo irgordon/kozo \
+  --dir .
+```
+
+Verify the downloaded files:
+
+```bash
+shasum -a 256 -c SHA256SUMS
+```
+
+Run the downloaded ISO from a KOZO source checkout so the existing bounded
+smoke script can classify the result:
+
+```bash
+KOZO_BOOT_ISO="/absolute/path/to/download/kozo.iso" scripts/qemu_smoke.sh
+```
+
+Use the actual absolute download path for `KOZO_BOOT_ISO`. A successful run
+reports `Outcome: pass`, `Blocker: none`, 41 ordered markers, and
+`KOZO_RUNTIME_RETURN_OK` as the final marker. See the
+[current release status](../releases/v1.0.0-rc.1-status.md) for the accepted
+artifact hashes and limits.
+
+## Build KOZO from Source
 
 ## Requirements
 
@@ -24,7 +58,7 @@ python3 --version
 odin version
 cargo --version
 nasm -v
-lld --version
+ld.lld --version
 xorriso -version
 qemu-system-x86_64 --version
 jq --version
@@ -101,7 +135,7 @@ git diff --check
 Success prints `VERIFY: PASS`. The v0.8.9 acceptance gate expects 67 checks,
 no failures, QEMU outcome `pass`, and 41 ordered runtime markers.
 
-## Build the Dry-Run Release Candidate
+## Build a Dry-Run Release Bundle
 
 From a clean commit:
 
@@ -113,7 +147,8 @@ scripts/build_release_candidate.sh \
 
 The command runs governed verification against the committed tree, creates an
 explicitly allowlisted archive, validates legal files and metadata, and writes
-`SHA256SUMS`. It does not publish or tag anything. See the
+`SHA256SUMS`. It does not publish or tag anything. It is not the command that
+created the existing GitHub prerelease. See the
 [release notes](../releases/v1.0.0-rc.1.md) for the artifact list and limits.
 
 ## Inspect the Kernel Binary

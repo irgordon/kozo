@@ -14,6 +14,16 @@ reader can connect the code, built kernel, and QEMU output.
 Read [Why KOZO](WHY_KOZO.md) for the problem, the project approach, and who
 benefits.
 
+## Current Release
+
+[KOZO v1.0.0-rc.1](https://github.com/irgordon/kozo/releases/tag/v1.0.0-rc.1)
+is available as a GitHub prerelease for testing and review. It is the current
+release of the kernel-foundation scope described below. The final v1.0.0
+release has not been published.
+
+KOZO currently exposes its result through serial progress markers. It does not
+provide an interactive shell, desktop, or general application environment.
+
 ## Who Should Use KOZO
 
 KOZO is useful to:
@@ -48,6 +58,7 @@ files remain authoritative.
 - [Troubleshooting](TROUBLESHOOTING.md)
 - [Plain-Language Terms](TERMS.md)
 - [Engineering Overview](ENGINEERING_OVERVIEW.md)
+- [v1.0.0-rc.1 current status](../releases/v1.0.0-rc.1-status.md)
 - [v1.0.0-rc.1 release notes](../releases/v1.0.0-rc.1.md)
 
 ## Current Limits

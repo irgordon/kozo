@@ -112,6 +112,11 @@ Use [Required Checks](../REQUIRED_CHECKS.md), the
 [Release Evidence](../RELEASE_EVIDENCE.md). Record the release commit, current
 generated proof, CI status, limits, and explicit non-goals.
 
+The `v1.0.0-rc.1` annotated tag and its hosted prerelease assets are immutable.
+Do not move the tag, replace an asset, or repair the release record in place.
+Record a reproducible defect and prepare a new candidate such as
+`v1.0.0-rc.2`. Final v1.0.0 promotion requires separate authorization.
+
 ## Common Maintenance Mistakes
 
 - treating generated output as authority;

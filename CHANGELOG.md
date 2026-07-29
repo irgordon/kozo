@@ -2,7 +2,7 @@
 
 ## v1.0.0-rc.1 - 2026-07-28
 
-**Status:** Release-candidate hardening and final promotion readiness complete; publication awaits explicit authorization.
+**Status:** Published as an immutable GitHub prerelease; post-promotion verification complete.
 
 * Completed the release checklist and confirmed one canonical candidate version.
 * Added an explicit binary/evidence file manifest and one commit-bound dry-run release builder.
@@ -16,8 +16,18 @@
 * Added scoped release notes and a release-candidate evidence summary.
 * Normalized current Odin object output into one combined object for portable hosted linking.
 * Ordered commit-bound packaging before the workspace-mutating boot preflight.
+* Published the accepted annotated tag and six approved assets as a GitHub
+  prerelease without rebuilding the candidate.
+* Downloaded the hosted assets, validated every checksum and metadata record,
+  and reproduced the complete 41-marker runtime sequence from the hosted ISO.
+* Added the current prerelease status page and aligned user, maintainer,
+  checklist, evidence, roadmap, and phase documentation.
+* Clarified that bundled `published: false` metadata records the pre-promotion
+  dry-run state while the GitHub prerelease is now published.
+* Found no reproducible final-release blocker; final v1.0.0 still requires
+  explicit authorization.
 * Changed no runtime, ABI, request, marker, mapping, capability, or halt behavior.
-* Did not publish a release and did not claim final v1.0.0 production readiness.
+* Did not create the final v1.0.0 release or claim production readiness.
 
 ## v0.8.9 - 2026-07-28
 

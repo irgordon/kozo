@@ -445,10 +445,13 @@ Confirm:
 This gate improves understanding and adoption readiness. It does not add a
 runtime feature or complete release-candidate hardening.
 
-# 21. v1.0.0-rc.1 Release-Candidate Hardening Gate
+# 21. v1.0.0-rc.1 Pre-Promotion Hardening Gate
 
 The candidate version is owned by `release/version.txt`. The display and tag
 form is `v1.0.0-rc.1`; the archive and metadata form is `1.0.0-rc.1`.
+
+This section records the gate before promotion. Current post-promotion status
+is recorded in section 22.
 
 | Item | Status | Evidence | Follow-up |
 | --- | --- | --- | --- |
@@ -480,3 +483,22 @@ form is `v1.0.0-rc.1`; the archive and metadata form is `1.0.0-rc.1`.
 Final promotion readiness requires only the force-push block authorized for
 this phase, a fresh directly inspected dry-run bundle, preserved runtime
 evidence, and separate authorization before tag or prerelease publication.
+
+# 22. v1.0.0-rc.1 Post-Promotion Gate
+
+| Item | Status | Evidence | Follow-up |
+| --- | --- | --- | --- |
+| Annotated tag | Complete | local Git, remote Git, and GitHub tag readback | Treat the tag as immutable. |
+| GitHub prerelease | Complete | live release API; prerelease true and draft false | Do not edit the hosted record in place. |
+| Approved asset set | Complete | exactly six hosted assets | A correction requires a new candidate. |
+| Hosted checksums | Complete | downloaded `SHA256SUMS`; accepted archive hash | Preserve the accepted files. |
+| Distributed ISO boot | Complete | hosted ISO QEMU smoke | 41 ordered markers; final marker `KOZO_RUNTIME_RETURN_OK`. |
+| Hosted ELF and JSON | Complete | direct ELF inspection and JSON validation | Architecture, symbols, metadata, and proof match the candidate. |
+| Clean user path | Complete | clean tagged clone and extracted hosted archive | `ld.lld --version` is the portable linker check used by the guide. |
+| Technical gate | Accepted | 67 checks, zero failures, QEMU pass, blocker none | Runtime behavior remains unchanged. |
+| RC promotion | Complete | [current status](releases/v1.0.0-rc.1-status.md) | Observe the candidate; do not repair it in place. |
+| Final v1.0.0 release | Not created | no `v1.0.0` promotion record | Requires separate explicit authorization. |
+
+No reproducible final-release blocker was found during post-promotion
+verification. General cleanup wishes and unimplemented out-of-scope features
+are not blockers for the declared release scope.

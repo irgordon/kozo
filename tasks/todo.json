@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO v1.0.0-rc.1 Final Promotion Readiness",
+  "task_title": "KOZO v1.0.0-rc.1 Post-Promotion Verification and Documentation Alignment",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -23,7 +23,8 @@
     "Odin, pinned Rust, Python, jq, and repository verification tooling are installed",
     "v0.8.8 core service MIT license metadata is accepted by hosted CI run 30357658912 with 67 checks, 0 failures, QEMU pass, blocker none, and all 41 runtime markers",
     "v0.8.9 documentation and adoption readiness is accepted by hosted CI runs 30398906417 and 30398906359 with 67 checks, 0 failures, QEMU pass, blocker none, and all 41 runtime markers",
-    "v1.0.0-rc.1 technical hardening is accepted by hosted CI run 30409678216 and lint run 30409678072"
+    "v1.0.0-rc.1 technical hardening is accepted by hosted CI run 30409678216 and lint run 30409678072",
+    "The annotated v1.0.0-rc.1 tag and immutable GitHub prerelease exist at accepted commit 2debd995634d977458de0c1697f21dc0016b4bf9"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
@@ -38,7 +39,8 @@
     "Hosted CI run 30321090604 proved QEMU outcome pass, blocker none, and the exact 41-marker runtime sequence, but verification reported 67 checks with one fixed_user_runtime_status_service_evidence failure because GNU objdump labeled the Ring3 response-consumer start address with an alias and the report parser found zero comparisons",
     "The core_service package selects the MIT option provided by the repository license set; LICENSE-MIT is the authoritative MIT text",
     "v0.8.9 changes documentation and source comments only; user and maintainer guidance begins in docs/wiki while detailed technical authority remains in contracts, source, and docs",
-    "v1.0.0-rc.1 final promotion readiness blocks only force pushes, rebuilds and inspects one unpublished dry-run bundle, and preserves runtime behavior and the accepted 41-marker sequence"
+    "v1.0.0-rc.1 final promotion readiness blocks only force pushes, rebuilds and inspects one unpublished dry-run bundle, and preserves runtime behavior and the accepted 41-marker sequence",
+    "The promoted v1.0.0-rc.1 tag, hosted notes, and hosted assets are immutable; a reproducible defect requires a new release candidate"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -3030,6 +3032,32 @@
         "verification.tests_run[152]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 88,
+      "title": "Verify promoted v1.0.0-rc.1 and align current documentation",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "README.md",
+        "docs/wiki/README.md",
+        "docs/wiki/GETTING_STARTED.md",
+        "docs/wiki/USER_GUIDE.md",
+        "docs/wiki/MAINTAINER_GUIDE.md",
+        "docs/releases/v1.0.0-rc.1-status.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "docs/generated/governance_index.md",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[153]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -3100,7 +3128,8 @@
     "v0.8.8 records the exact MIT SPDX value in the core_service manifest, removes the missing-license cargo-deny failure without an exception, preserves package identity and runtime behavior, and refreshes governed proof.",
     "v0.8.9 provides a user-first wiki, tested getting-started and troubleshooting paths, maintainer and engineering navigation, plain-language terminology, documentation and source-comment audits, corrected current claims, and unchanged runtime evidence.",
     "v1.0.0-rc.1 provides one canonical version, an explicit binary/evidence allowlist, a commit-bound dry-run packager, inspected licenses and checksums, scoped release records, and hosted release gates without publishing or changing runtime behavior.",
-    "Final promotion readiness blocks force pushes to main without adding review, required-check, administrator, deletion, conversation, ruleset, or other repository policy; rebuilds and directly inspects one unpublished dry-run bundle; and preserves 67 checks and all 41 runtime markers."
+    "Final promotion readiness blocks force pushes to main without adding review, required-check, administrator, deletion, conversation, ruleset, or other repository policy; rebuilds and directly inspects one unpublished dry-run bundle; and preserves 67 checks and all 41 runtime markers.",
+    "Post-promotion verification preserves the immutable v1.0.0-rc.1 tag and hosted release, revalidates all hosted assets, boots the distributed ISO through all 41 markers, tests the clean user path, and aligns current documentation without runtime changes."
   ],
   "verification": {
     "tests_run": [
@@ -3868,6 +3897,11 @@
         "tool": "v1.0.0-rc.1 final promotion readiness",
         "command": "live GitHub protection readback and force-push-only mutation; full Python, Odin, Rust, cargo-deny, cargo-audit, governed verification, fresh bundle build, direct extraction, checksum, license, prohibited-file, metadata, tag, and release inspection",
         "status": "passed_force_push_blocked_no_other_policy_1047_tests_67_checks_0_failures_qemu_pass_41_markers_unpublished_bundle_inspected"
+      },
+      {
+        "tool": "v1.0.0-rc.1 post-promotion verification and documentation alignment",
+        "command": "immutable tag and release readback; hosted asset download and checksum validation; hosted ISO QEMU smoke; hosted ELF and JSON inspection; extracted bundle and clean tagged clone user-path checks; documentation link scan; full Python, Odin, Rust, cargo-deny, cargo-audit, and governed verification",
+        "status": "passed_hosted_assets_exact_checksums_valid_hosted_iso_qemu_pass_41_markers_clean_clone_build_and_qemu_pass_no_reproducible_final_release_blocker"
       }
     ],
     "logs": [
@@ -3946,7 +3980,8 @@
       "v0.6.5 centralizes QEMU serial smoke marker order, expected marker, outcomes, and blocker vocabulary in a governed runtime evidence taxonomy contract without changing runtime behavior or smoke pass criteria.",
       "v0.6.6 centralizes future runtime progression stage definitions without changing runtime behavior, halt behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke behavior, compatibility claims, or production-readiness claims.",
       "v0.7.2 requires an acyclic progression graph, earlier mandatory prerequisites, monotonic proven status, forward-only transitions, known authorities, and one owner per transition without changing runtime behavior.",
-      "v0.7.3 requires exact future region geometry and ownership, full-region zero fill, a bounded sentinel write/read/compare/restore probe, and marker placement before the unchanged halt loop while memory evidence remains planned."
+      "v0.7.3 requires exact future region geometry and ownership, full-region zero fill, a bounded sentinel write/read/compare/restore probe, and marker placement before the unchanged halt loop while memory evidence remains planned.",
+      "Post-promotion verification must preserve the accepted tag and hosted release, validate the distributed artifacts and runtime independently, and align only current status documentation."
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -4026,7 +4061,8 @@
       "v0.7.2 orders BOOT_SMOKE, STACK_INITIALIZATION_EVIDENCE, MEMORY_INITIALIZATION_EVIDENCE, and RUNTIME_PROGRESSION_ENTRY monotonically, leaves stack proven and later stages planned, and validates graph and authority integrity.",
       "v0.7.4 implements the contract-owned 4096-byte static memory region, explicit zero fill, bounded sentinel write/read/compare/restore probe, KOZO_MEMORY_INIT_OK marker, and unchanged terminal halt loop.",
       "v0.7.45 is accepted by hosted CI marker and validator evidence for the bounded assembly-to-Odin call, fixed bootstrap context validation, volatile static-state probe, exact return status, and preserved terminal halt.",
-      "The portable Ring3 evidence correction resolves GNU/LLVM function-label differences by extracting the consumer from its ELF address range and preserves the full comparison, response-offset, success-store, int 0x81, and ud2 ordering requirements."
+      "The portable Ring3 evidence correction resolves GNU/LLVM function-label differences by extracting the consumer from its ELF address range and preserves the full comparison, response-offset, success-store, int 0x81, and ud2 ordering requirements.",
+      "The immutable v1.0.0-rc.1 tag and prerelease remain unchanged; all six hosted assets validate, the distributed ISO produces the accepted 41-marker sequence, the clean user path works with ld.lld, and current documentation distinguishes publication from dry-run metadata."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -4106,6 +4142,7 @@
     "The first hosted v0.8.0 attempt exposed an implicit CPU-state dependency; v0.8.1 establishes a contract-backed pre-Odin x87/SSE state gate and bounded SIMD evidence while preserving the accepted runtime suffix.",
     "v0.8.7 moves the one-shot fixed user transaction after the controlled loop, shares one kernel-owned status snapshot with internal capability ID 1, validates the 88-byte response in Ring3 and Ring0, clears every snapshot and transaction buffer, and preserves the existing capability and halt boundaries.",
     "Corrected the CI-only Ring3 ELF evidence failure by parsing GNU and LLVM full disassembly within authoritative consumer symbol bounds, while retaining all field-coverage and success-path ordering checks and leaving the accepted runtime marker sequence unchanged.",
-    "Added the exact MIT SPDX license metadata to core_service, validated Cargo metadata and package contents, removed the cargo-deny blocker without policy exceptions, and preserved runtime evidence."
+    "Added the exact MIT SPDX license metadata to core_service, validated Cargo metadata and package contents, removed the cargo-deny blocker without policy exceptions, and preserved runtime evidence.",
+    "Verified the immutable promoted release from fresh hosted downloads, reproduced the accepted runtime from the distributed ISO, tested a clean tagged clone, and aligned current release documentation without changing runtime behavior or historical release records."
   ]
 }

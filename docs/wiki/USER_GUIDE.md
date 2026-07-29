@@ -1,5 +1,13 @@
 # User Guide
 
+## Current Prerelease
+
+KOZO `v1.0.0-rc.1` is available as a
+[GitHub prerelease](https://github.com/irgordon/kozo/releases/tag/v1.0.0-rc.1).
+Download and checksum instructions are in
+[Getting Started](GETTING_STARTED.md). The prerelease is intended for testing
+the current kernel foundation; it is not the final v1.0.0 release.
+
 ## What Happens When KOZO Starts
 
 KOZO starts under Limine in a virtual x86-64 computer. It prepares a controlled
@@ -46,7 +54,11 @@ Blocker: none
 Expected Marker: KOZO_RUNTIME_RETURN_OK
 ```
 
-Full repository verification must also print `VERIFY: PASS`.
+The accepted prerelease produces 41 ordered markers. Full repository
+verification must also print `VERIFY: PASS`.
+
+KOZO stops after the final marker. There is no prompt, shell, desktop, settings
+screen, or other interactive application interface in this prerelease.
 
 ## What the Fixed User Program Does
 

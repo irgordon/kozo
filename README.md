@@ -14,6 +14,13 @@ that problem by keeping each runtime feature bounded, recording progress over
 the serial port, and checking source, kernel-binary, and QEMU evidence against
 machine-readable rules.
 
+**Current release:** [v1.0.0-rc.1 prerelease](https://github.com/irgordon/kozo/releases/tag/v1.0.0-rc.1)
+
+Start with [Getting Started](docs/wiki/GETTING_STARTED.md), then read the
+[current release status](docs/releases/v1.0.0-rc.1-status.md) and
+[release notes](docs/releases/v1.0.0-rc.1.md). This is a test release of the
+current kernel foundation, not the final v1.0.0 release.
+
 ## What Works Today
 
 KOZO currently boots on the governed x86-64 QEMU path, prepares a controlled
@@ -61,10 +68,12 @@ contract, security, validation, and historical records remain under `docs`.
 
 ## Release Candidate
 
-`v1.0.0-rc.1` is a dry-run release candidate, not the final production
-release. Its [release notes](docs/releases/v1.0.0-rc.1.md) describe the scoped
-runtime claims, artifact set, verification path, and known limits. The
-candidate is not published by repository scripts.
+`v1.0.0-rc.1` is published as a
+[GitHub prerelease](https://github.com/irgordon/kozo/releases/tag/v1.0.0-rc.1)
+for testing and review. Its
+[status page](docs/releases/v1.0.0-rc.1-status.md) records the immutable tag,
+hosted artifact checks, and current limits. It is not the final v1.0.0 release
+and is not production-ready.
 
 ## Maintaining KOZO
 

@@ -503,6 +503,43 @@ updated tracked evidence. Hosted CI now builds the commit-bound bundle before
 running that workspace-mutating preflight. The two gates remain independent;
 their order prevents preflight evidence from masquerading as source dirtiness.
 
+# 15. v1.0.0-rc.1 Post-Promotion Evidence
+
+The historical dry-run statements above describe the state of the bundle and
+repository during pre-promotion hardening. Promotion was later authorized
+without rebuilding the accepted bundle.
+
+`v1.0.0-rc.1` is now an immutable GitHub prerelease at:
+
+```text
+https://github.com/irgordon/kozo/releases/tag/v1.0.0-rc.1
+```
+
+Post-promotion verification confirmed:
+
+* annotated unsigned tag object
+  `f4c500b9215869a62dc5dce2b2f655d6a2277be4`;
+* target commit `2debd995634d977458de0c1697f21dc0016b4bf9`;
+* prerelease true and draft false;
+* exactly the six approved hosted assets;
+* archive SHA-256
+  `dc3e4dc98d97c15c4b1c7d47456dbc505456e0ddecc88fd20031f9350bb2b9fe`;
+* all downloaded checksums valid;
+* hosted ISO QEMU pass, blocker none, and 41 ordered markers ending in
+  `KOZO_RUNTIME_RETURN_OK`;
+* hosted ELF64 x86-64 geometry, runtime symbols, privilege path, and halt path;
+* hosted verification JSON pass with 67 checks and zero failures;
+* clean tagged clone source build and extracted-bundle documentation paths.
+
+The GitHub prerelease is published. The bundled `release_metadata.json` retains
+`published: false` because it records the dry-run build state before promotion.
+The hosted file must not be edited to rewrite that history.
+
+No runtime or hosted-artifact defect was reproduced. No concrete final-release
+blocker is active. Final v1.0.0 promotion remains a separate authorization.
+Current details are in
+`docs/releases/v1.0.0-rc.1-status.md`.
+
 For v0.7.5, release review must include `contracts/controlled_runtime_loop_contract.v0.json`, `controlled_runtime_loop_contract`, `controlled_runtime_loop_evidence`, the kernel ELF report, and QEMU metadata/logs. Local contract, source, and ELF checks establish only implementation readiness. The stage is proven only after hosted CI captures the ordered loop entry, three iteration, exit, and return markers and all validators pass.
 
 For v0.8.0, release review must include `contracts/first_governed_runtime_capability.v0.json`, `first_governed_runtime_capability`, `first_governed_runtime_capability_evidence`, the kernel ELF report, and QEMU metadata/logs. Local evidence proves the fixed internal request/response and dispatch path exists; promotion requires hosted evidence for dispatch, handler success, capability success, and governed return. This proves no userspace access, privilege separation, hardware syscall entry, scheduler/process behavior, compatibility, or production readiness.

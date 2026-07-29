@@ -138,18 +138,20 @@ No active runtime blocker is recorded for the accepted v0.8.9 baseline.
 Force pushes to `main` are blocked by the narrowly authorized classic
 protection rule. No review, required-check, administrator, conversation,
 deletion, ruleset, or other repository policy is required by this phase.
-Tagging and prerelease publication remain pending explicit authorization.
+The immutable `v1.0.0-rc.1` annotated tag and GitHub prerelease are published.
+Post-promotion checks reproduced the accepted hosted hashes, QEMU result, 41
+markers, and user path. No reproducible final-release blocker was found.
 
 Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr`, `kernel_entry_not_reached`, `serial_not_initialized`, and `marker_not_emitted` are retained only as resolved historical evidence states unless a future CI artifact reintroduces one.
 
 ## Next Phase
 
-The current phase is `v1.0.0-rc.1 Release-Candidate Hardening`. It establishes
-one version authority, explicit bundle manifest, dry-run packaging path,
-release notes, license and checksum inspection, and hosted release checks
-without changing runtime behavior. Final promotion readiness adds only the
-force-push block and a fresh directly inspected dry-run bundle. Tagging and
-GitHub prerelease publication are separate authorized actions.
+The `v1.0.0-rc.1` hardening, promotion, and post-promotion verification phases
+are complete. The candidate remains available for observation and defect
+reporting. If no evidence-backed defect emerges, the next separately
+authorized phase is `v1.0.0 Final Release Authorization`. A reproducible defect
+requires a new candidate such as `v1.0.0-rc.2`; the existing tag and hosted
+assets must not be modified.
 
 ---
 
@@ -214,7 +216,7 @@ GitHub prerelease publication are separate authorized actions.
 | `v0.8.7` | Runtime-Ordered User Status Service | Invoke the accepted fixed user transaction after the controlled loop and expose the existing deterministic status source through one fixed response. | Shared 64-byte snapshot, fixed request ID 2, fixed 88-byte response, complete Ring3/Ring0 validation, contracts, validators, ELF/QEMU evidence, docs, and tests. | Hosted CI captures all 41 markers in order; both status-service validators pass; internal capability ID 1 remains unchanged; no general dispatcher, public ABI, persistent userspace, compatibility, or production claim is added. |
 | `v0.8.8` | Core Service MIT License Metadata | Record the repository's MIT license choice in the Rust package and remove the cargo-deny metadata blocker. | Exact Cargo SPDX metadata, minimal cargo-deny policy, package-content inspection, release records, and refreshed proof. | Cargo reports MIT, cargo-deny passes without exceptions, package identity and contents remain stable, and runtime verification is unchanged. |
 | `v0.8.9` | Documentation and Adoption Readiness | Give users, maintainers, and engineers a clear entry path and remove stale or redundant explanatory text. | User/maintainer wiki, rewritten README, documentation audit, terminology guide, tested commands and links, comment audit, and refreshed proof. | Readers can move from purpose to operation to maintenance to engineering detail; commands and links validate; runtime evidence remains unchanged. |
-| `v1.0.0-rc.1` | Release candidate hardening | Freeze release scope and release gates, produce evidence bundle, block force pushes, and dry-run release notes. | Release evidence bundle, completed release checklist, current generated reports, changelog/release notes dry run, hosted CI evidence, and live force-push readback. | The dry-run bundle validates without new scope, hosted checks pass, force pushes are blocked, and publication awaits explicit authorization. |
+| `v1.0.0-rc.1` | Published release candidate | Freeze release scope and gates, publish the accepted immutable candidate, and verify the distributed artifacts and documented user path. | Release evidence bundle, annotated tag, GitHub prerelease, six approved hosted assets, post-promotion status page, hosted ISO/ELF/JSON checks, and live force-push readback. | The hosted bundle matches the accepted hashes, QEMU reproduces all 41 markers, documentation reflects the prerelease, and no in-place release mutation occurs. |
 | `v1.0.0` | Scoped production release | Release only the proven, scoped KOZO surface. | Final release evidence bundle, final changelog and release notes, passing required gates, explicit non-goals. | v1.0.0 claims only evidence-backed behavior and preserves all compatibility non-goals. |
 
 ---

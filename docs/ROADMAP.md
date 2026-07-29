@@ -124,7 +124,7 @@ The latest local generated evidence may still report missing local Limine/xorris
 
 KOZO still does not prove:
 
-* a published v1.0.0-rc.1 tag or GitHub prerelease
+* a final v1.0.0 release
 * complete Odin runtime readiness or dynamic initialization
 * general stack readiness beyond the controlled boot stack proof
 * general memory management beyond the governed static region
@@ -150,8 +150,10 @@ KOZO still does not prove:
 
 No active runtime blocker is recorded for the accepted v0.8.9 baseline.
 Force pushes to `main` are blocked. No broader repository policy is required
-by the final promotion-readiness phase. Tag and GitHub prerelease publication
-remain pending explicit authorization.
+by the release-candidate scope. The immutable `v1.0.0-rc.1` GitHub prerelease
+is published and has passed post-promotion artifact, boot, and user-path
+verification. No reproducible final-release blocker was found. Final v1.0.0
+promotion requires explicit authorization.
 
 ---
 
@@ -175,7 +177,8 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 14. Preserve hosted-accepted v0.8.6 response consumption, exact cleanup, and unchanged runtime suffix.
 15. Preserve the hosted-accepted v0.8.7 complete 41-marker transaction and both status-service validators.
 16. Preserve the accepted v0.8.8 package-license correction and v0.8.9 documentation path.
-17. Complete the v1.0.0-rc.1 artifact, license, checksum, hosted CI, and force-push gate before final-release work.
+17. Preserve the accepted v1.0.0-rc.1 tag, hosted artifacts, checksums, runtime
+    evidence, and immutable release record.
 18. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
 
 ---
@@ -265,7 +268,7 @@ Deferred until separately scoped runtime or cleanup phases:
 | `v0.8.7` | Runtime-Ordered User Status Service | Collect one post-loop snapshot and expose it through the existing fixed transaction while preserving internal capability ID 1. | General dispatch, variable fields or messages, public syscall ABI, persistent userspace, process model, compatibility, production readiness. |
 | `v0.8.8` | Core Service MIT License Metadata | Add exact MIT package metadata, pass cargo-deny, and inspect package contents without changing runtime behavior. | Publication, packaging frameworks, dependency changes, runtime changes, complete release readiness. |
 | `v0.8.9` | Documentation and Adoption Readiness | Add a user-first wiki, maintainer path, engineering overview, terminology guide, documentation audit, and focused comment cleanup. | Runtime features, documentation frameworks, publication, compatibility, complete release readiness. |
-| `v1.0.0-rc.1` | Release candidate hardening | Freeze scope, freeze gates, produce evidence bundle, block force pushes, and dry-run release notes. | New feature scope after RC. |
+| `v1.0.0-rc.1` | Published release candidate | Freeze scope and gates, publish the accepted immutable prerelease, and verify the distributed artifacts and user path. | In-place tag, note, or asset changes; new feature scope after RC. |
 | `v1.0.0` | Scoped release | Release only evidence-backed behavior with explicit non-goals. | Any unimplemented compatibility or runtime subsystem claim. |
 
 ---
