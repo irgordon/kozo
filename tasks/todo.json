@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO v1.0.0-rc.1 Release-Candidate Hardening",
+  "task_title": "KOZO v1.0.0-rc.1 Final Promotion Readiness",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -22,7 +22,8 @@
     "The reconciled runtime progression graph is acyclic and permits first capability evidence only after controlled loop evidence",
     "Odin, pinned Rust, Python, jq, and repository verification tooling are installed",
     "v0.8.8 core service MIT license metadata is accepted by hosted CI run 30357658912 with 67 checks, 0 failures, QEMU pass, blocker none, and all 41 runtime markers",
-    "v0.8.9 documentation and adoption readiness is accepted by hosted CI runs 30398906417 and 30398906359 with 67 checks, 0 failures, QEMU pass, blocker none, and all 41 runtime markers"
+    "v0.8.9 documentation and adoption readiness is accepted by hosted CI runs 30398906417 and 30398906359 with 67 checks, 0 failures, QEMU pass, blocker none, and all 41 runtime markers",
+    "v1.0.0-rc.1 technical hardening is accepted by hosted CI run 30409678216 and lint run 30409678072"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
@@ -37,7 +38,7 @@
     "Hosted CI run 30321090604 proved QEMU outcome pass, blocker none, and the exact 41-marker runtime sequence, but verification reported 67 checks with one fixed_user_runtime_status_service_evidence failure because GNU objdump labeled the Ring3 response-consumer start address with an alias and the report parser found zero comparisons",
     "The core_service package selects the MIT option provided by the repository license set; LICENSE-MIT is the authoritative MIT text",
     "v0.8.9 changes documentation and source comments only; user and maintainer guidance begins in docs/wiki while detailed technical authority remains in contracts, source, and docs",
-    "v1.0.0-rc.1 changes release packaging, release documentation, and hosted release gates only; runtime behavior and the accepted 41-marker sequence remain unchanged"
+    "v1.0.0-rc.1 final promotion readiness blocks only force pushes, rebuilds and inspects one unpublished dry-run bundle, and preserves runtime behavior and the accepted 41-marker sequence"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -3007,6 +3008,28 @@
         "verification.tests_run[151]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 87,
+      "title": "Finalize v1.0.0-rc.1 promotion readiness",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/releases/v1.0.0-rc.1.md",
+        "docs/releases/v1.0.0-rc.1-evidence.md",
+        "tasks/todo.json",
+        "docs/generated/governance_index.md",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[152]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -3076,7 +3099,8 @@
     "Portable Ring3 ELF evidence uses authoritative start/end symbol addresses over full disassembly, normalizes equivalent GNU and LLVM comparison syntax, still requires all 14 response-field offsets, and proves comparisons precede success-record stores, the second int 0x81, and the fail-closed ud2 guard without changing runtime behavior.",
     "v0.8.8 records the exact MIT SPDX value in the core_service manifest, removes the missing-license cargo-deny failure without an exception, preserves package identity and runtime behavior, and refreshes governed proof.",
     "v0.8.9 provides a user-first wiki, tested getting-started and troubleshooting paths, maintainer and engineering navigation, plain-language terminology, documentation and source-comment audits, corrected current claims, and unchanged runtime evidence.",
-    "v1.0.0-rc.1 provides one canonical version, an explicit binary/evidence allowlist, a commit-bound dry-run packager, inspected licenses and checksums, scoped release records, and hosted release gates without publishing or changing runtime behavior."
+    "v1.0.0-rc.1 provides one canonical version, an explicit binary/evidence allowlist, a commit-bound dry-run packager, inspected licenses and checksums, scoped release records, and hosted release gates without publishing or changing runtime behavior.",
+    "Final promotion readiness blocks force pushes to main without adding review, required-check, administrator, deletion, conversation, ruleset, or other repository policy; rebuilds and directly inspects one unpublished dry-run bundle; and preserves 67 checks and all 41 runtime markers."
   ],
   "verification": {
     "tests_run": [
@@ -3839,6 +3863,11 @@
         "tool": "v1.0.0-rc.1 release-candidate hardening validation",
         "command": "release hardening tests; full Python discovery; Odin and Rust checks; cargo-deny and cargo-audit; governed verification; two commit-bound bundle builds; direct archive, license, checksum, metadata, ELF, workflow, and GitHub protection inspection",
         "status": "passed_1047_tests_67_checks_0_failures_qemu_pass_41_markers_two_104_file_bundles_checksums_and_inspection_passed; first_hosted_run_exposed_odin_object_output; second_hosted_run_passed_boot_qemu_preflight_then_exposed_clean_gate_ordering; local_order_correction_passed; hosted_rerun_and_branch_protection_pending; taplo_macos_system_configuration_panic"
+      },
+      {
+        "tool": "v1.0.0-rc.1 final promotion readiness",
+        "command": "live GitHub protection readback and force-push-only mutation; full Python, Odin, Rust, cargo-deny, cargo-audit, governed verification, fresh bundle build, direct extraction, checksum, license, prohibited-file, metadata, tag, and release inspection",
+        "status": "passed_force_push_blocked_no_other_policy_1047_tests_67_checks_0_failures_qemu_pass_41_markers_unpublished_bundle_inspected"
       }
     ],
     "logs": [

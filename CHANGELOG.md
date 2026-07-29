@@ -2,14 +2,16 @@
 
 ## v1.0.0-rc.1 - 2026-07-28
 
-**Status:** Release-candidate hardening implemented locally; hosted CI and branch-protection acceptance pending.
+**Status:** Release-candidate hardening and final promotion readiness complete; publication awaits explicit authorization.
 
 * Completed the release checklist and confirmed one canonical candidate version.
 * Added an explicit binary/evidence file manifest and one commit-bound dry-run release builder.
 * Verified the required boot image, kernel ELF, generated evidence, documentation, and package metadata categories.
 * Verified the repository MIT and Apache-2.0 legal files and the `core_service` MIT package selection.
 * Generated and directly inspected a dry-run release bundle with internal and external SHA-256 checksums.
-* Reviewed branch protection and required checks; `main` remains unprotected and blocks candidate promotion pending administrator action.
+* Blocked force pushes to `main` and verified the live setting through REST and GraphQL.
+* Added no review, required-check, administrator, conversation, deletion, ruleset, or other repository policy.
+* Rebuilt and directly inspected the unpublished release-candidate dry-run bundle.
 * Moved official checkout and artifact actions to Node 24 releases and authenticated Odin acquisition with the existing workflow token.
 * Added scoped release notes and a release-candidate evidence summary.
 * Normalized current Odin object output into one combined object for portable hosted linking.

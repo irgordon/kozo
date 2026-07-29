@@ -476,6 +476,21 @@ legal and release-note files. The archive hashes differed because the governed
 verification and build timestamps differed. Hosted CI and repository
 protection remain separate acceptance gates.
 
+Final promotion readiness was checked against live GitHub state on 2026-07-28.
+Initially, `main` had no classic branch protection and the repository had no
+rulesets. The classic branch-protection API was used to set only
+`allow_force_pushes.enabled: false`. Final REST and GraphQL readback confirmed:
+
+* force pushes are blocked by the `main` protection rule;
+* required status checks and pull-request reviews are disabled;
+* administrator enforcement, conversation resolution, linear history,
+  required signatures, branch locking, and creation blocking are disabled;
+* branch deletion remains allowed;
+* repository rulesets remain absent.
+
+No tag, GitHub release, package publication, or artifact upload was performed.
+The fresh final-readiness bundle remains a dry run with `published: false`.
+
 The first hosted RC run exposed a current-Odin portability change: object mode
 emitted package-specific `.obj` files while the governed linker expected one
 combined object. `scripts/build_odin_object.sh` now requests a single module and

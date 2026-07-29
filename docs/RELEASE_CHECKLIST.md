@@ -470,13 +470,13 @@ form is `v1.0.0-rc.1`; the archive and metadata form is `1.0.0-rc.1`.
 | SHA-256 checksums | Complete locally | internal and external `SHA256SUMS` from both dry runs | Hosted entries must also validate. |
 | Prohibited-file scan | Complete locally | direct extraction inspection from both dry runs | Any match blocks the candidate. |
 | Packaging-level repeatability | Complete locally | two 104-file bundles with stable file lists and legal/release-note bytes | Generated timestamps differ; no bit-for-bit claim is authorized. |
-| Required hosted checks | Not configured, P2 blocker | GitHub protection and ruleset APIs | Require `ci / full verification` and `lint / static checks`. |
-| Pull-request review | Not configured, P2 blocker | GitHub protection API | Require at least one approval. |
-| Force-push and deletion prevention | Not configured, P2 blocker | GitHub protection API | Repository administrator must enable both. |
-| Administrator bypass policy | Open, P2 blocker | No protection policy exists | Document the approved administrator behavior. |
-| CI deprecation warnings | Corrected in source; hosted proof pending | official Node 24 actions and authenticated Odin setup | Recheck hosted logs. |
+| Hosted checks | Complete | CI run `30409678216`; lint run `30409678072` | No required-check branch policy is authorized by this phase. |
+| Pull-request review | Not required by this phase | live REST and GraphQL protection readback | No review policy was added. |
+| Force-push prevention | Complete | `allow_force_pushes.enabled: false`; `allowsForcePushes: false` | Branch deletion remains allowed. |
+| Administrator enforcement | Not required by this phase | `enforce_admins.enabled: false`; `isAdminEnforced: false` | No administrator policy was added. |
+| CI deprecation warnings | Complete | hosted Node 24 action and authenticated Odin setup runs | Hosted logs contain no matching warning. |
 | Publication | Not applicable | metadata records `published: false` | Do not tag, publish, or create a release in this phase. |
 
-The dry-run implementation may be reviewed locally while branch protection is
-open. Candidate promotion remains blocked until the P2 GitHub settings above
-are resolved or explicitly waived through governance.
+Final promotion readiness requires only the force-push block authorized for
+this phase, a fresh directly inspected dry-run bundle, preserved runtime
+evidence, and separate authorization before tag or prerelease publication.
