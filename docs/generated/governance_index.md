@@ -14,7 +14,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Version: `v1.0.0-rc.1`
 * Date: `2026-07-28`
-* Status: Release-candidate hardening implemented locally; hosted CI and branch-protection acceptance pending.
+* Status: Release-candidate hardening and final promotion readiness complete; publication awaits explicit authorization.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 67
 * Failed checks: 0
-* Run ID: `verify-20260728T235744Z`
-* Generated at: `2026-07-28T23:57:44Z`
+* Run ID: `verify-20260729T014533Z`
+* Generated at: `2026-07-29T01:45:33Z`
 
 ## Registered validators
 
