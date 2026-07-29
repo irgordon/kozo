@@ -14,7 +14,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 * Version: `v1.0.0-rc.1`
 * Date: `2026-07-28`
-* Status: Release-candidate hardening and final promotion readiness complete; publication awaits explicit authorization.
+* Status: Published as an immutable GitHub prerelease; post-promotion verification complete.
 
 ## Verification status
 
