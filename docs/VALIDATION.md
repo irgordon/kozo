@@ -325,14 +325,14 @@ and `ud2` ordering. The validator still requires the complete comparison
 threshold and rejects missing offsets, early stores, early or missing
 `int 0x81`, and a missing fail-closed guard.
 
-# 21. Release-Candidate Validation
+# 21. Release Bundle Validation
 
 From a clean commit, run:
 
 ```bash
 scripts/build_release_candidate.sh \
-  --version 1.0.0-rc.1 \
-  --output /tmp/kozo-release-candidate
+  --version 1.0.0 \
+  --output /tmp/kozo-release
 ```
 
 The command verifies an archived copy of `HEAD`, requires 67 passing checks,
@@ -343,10 +343,14 @@ extraction, and prohibited-file policy.
 Validate the external outputs independently:
 
 ```bash
-cd /tmp/kozo-release-candidate
+cd /tmp/kozo-release
 shasum -a 256 -c SHA256SUMS
 python3 -m json.tool release_metadata.json
-tar -tf kozo-v1.0.0-rc.1.tar.xz
+tar -tf kozo-v1.0.0.tar.xz
 ```
 
 Use `sha256sum -c` on hosts that do not provide `shasum`.
+
+The same script accepts canonical `X.Y.Z-rc.N` candidate versions and canonical
+`X.Y.Z` final versions. It has no publication interface and always records
+`published: false` because publication occurs only after bundle acceptance.

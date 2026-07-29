@@ -1,7 +1,7 @@
 # Getting Started
 
-This guide first runs the published prerelease ISO, then shows how to build
-KOZO from source.
+This guide first runs the currently published prerelease ISO, then shows how
+to build KOZO from source. Final `v1.0.0` release preparation is in progress.
 
 ## Run the Downloaded Prerelease ISO
 
@@ -132,8 +132,8 @@ jq '{status, summary}' artifacts/latest_verify.json
 git diff --check
 ```
 
-Success prints `VERIFY: PASS`. The v0.8.9 acceptance gate expects 67 checks,
-no failures, QEMU outcome `pass`, and 41 ordered runtime markers.
+Success prints `VERIFY: PASS`. The v1.0.0 release gate expects 67 checks, no
+failures, QEMU outcome `pass`, and 41 ordered runtime markers.
 
 ## Build a Dry-Run Release Bundle
 
@@ -141,15 +141,14 @@ From a clean commit:
 
 ```bash
 scripts/build_release_candidate.sh \
-  --version 1.0.0-rc.1 \
-  --output /tmp/kozo-release-candidate
+  --version 1.0.0 \
+  --output /tmp/kozo-release
 ```
 
 The command runs governed verification against the committed tree, creates an
 explicitly allowlisted archive, validates legal files and metadata, and writes
-`SHA256SUMS`. It does not publish or tag anything. It is not the command that
-created the existing GitHub prerelease. See the
-[release notes](../releases/v1.0.0-rc.1.md) for the artifact list and limits.
+`SHA256SUMS`. It does not publish or tag anything. See the
+[v1.0.0 release notes](../releases/v1.0.0.md) for the artifact list and limits.
 
 ## Inspect the Kernel Binary
 

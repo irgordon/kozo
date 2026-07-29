@@ -74,7 +74,7 @@ No build or verification script may depend on user-specific absolute paths.
 | Runtime state transition capability | `runtime_state_transition_capability` and `runtime_state_transition_capability_evidence` through `scripts/verify.sh` | `docs/RUNTIME_CAPABILITIES.md` | Yes, through full verification | Yes | contract, source, focused ELF report, QEMU metadata/log evidence |
 | Cargo license policy | `cargo deny --manifest-path userspace/core_service/Cargo.toml check` | `docs/RELEASE_CHECKLIST.md` | No | Yes | CI and release-review output |
 | Cargo advisory audit | `cargo audit --file userspace/core_service/Cargo.lock` | `docs/RELEASE_CHECKLIST.md` | No | Yes | CI and release-review output |
-| Release candidate bundle | `scripts/build_release_candidate.sh --version 1.0.0-rc.1 --output <directory>` | `docs/RELEASE_EVIDENCE.md` | No | Yes for v1.0.0-rc.1 | archive, release metadata, legal files, and `SHA256SUMS` |
+| Release bundle | `scripts/build_release_candidate.sh --version 1.0.0 --output <directory>` | `docs/RELEASE_EVIDENCE.md` | No | Yes | archive, release metadata, legal files, and `SHA256SUMS` |
 | CI workflow | GitHub Actions `ci / full verification` | `docs/REQUIRED_CHECKS.md` | Yes | Yes | GitHub Actions status |
 | Lint workflow | GitHub Actions `lint / static checks` | `docs/REQUIRED_CHECKS.md` | Yes | Yes | GitHub Actions status |
 
@@ -94,11 +94,11 @@ Bypass should not be allowed except for maintainers under a documented emergency
 
 An emergency bypass must not create unsupported compatibility, runtime, security, or production-readiness claims.
 
-The 2026-07-28 GitHub API review found no classic protection and no ruleset for
-`main`. The required checks and review count are therefore recommendations, not
-enforced settings. This is a P2 release-candidate promotion blocker requiring
-repository-administrator action; repository automation must not change it
-silently.
+The live 2026-07-29 GitHub API readback confirms that force pushes to `main`
+are blocked. No required status checks, pull-request reviews, administrator
+enforcement, conversation-resolution rule, deletion restriction, or repository
+ruleset was added by the release work. Those broader settings are not required
+for the declared v1.0.0 release scope.
 
 ---
 
@@ -126,7 +126,7 @@ When Odin behavior is in scope, also run `odin check kernel` before full verific
 
 | Workflow | Job | Required Surface |
 | --- | --- | --- |
-| `.github/workflows/ci.yml` | `full verification` | system tools, pinned Rust toolchain, bare-metal target, authenticated Odin setup, pinned Limine source tooling, xorriso, QEMU, JSON validation, unit tests, Rust check, cargo-deny, cargo-audit, Odin check, governed full verification, release-candidate bundle and checksum validation, evidence and dry-run artifact upload, proof artifact validation, transient artifact cleanup, whitespace check |
+| `.github/workflows/ci.yml` | `full verification` | system tools, pinned Rust toolchain, bare-metal target, authenticated Odin setup, pinned Limine source tooling, xorriso, QEMU, JSON validation, unit tests, Rust check, cargo-deny, cargo-audit, Odin check, governed full verification, release-bundle and checksum validation, evidence and dry-run artifact upload, proof artifact validation, transient artifact cleanup, whitespace check |
 | `.github/workflows/lint.yml` | `static checks` | system tools, pinned Rust toolchain, bare-metal target, Odin, shell syntax, JSON syntax, unit tests, Rust check, Odin check, whitespace check |
 
 The CI workflows must keep installing `nasm`, pinned Rust, `x86_64-unknown-none`, and Odin before running checks that depend on them.

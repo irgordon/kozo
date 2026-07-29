@@ -141,17 +141,18 @@ deletion, ruleset, or other repository policy is required by this phase.
 The immutable `v1.0.0-rc.1` annotated tag and GitHub prerelease are published.
 Post-promotion checks reproduced the accepted hosted hashes, QEMU result, 41
 markers, and user path. No reproducible final-release blocker was found.
+Final `v1.0.0` preparation is authorized and in progress; the tag and final
+GitHub release remain pending local and hosted acceptance.
 
 Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr`, `kernel_entry_not_reached`, `serial_not_initialized`, and `marker_not_emitted` are retained only as resolved historical evidence states unless a future CI artifact reintroduces one.
 
 ## Next Phase
 
 The `v1.0.0-rc.1` hardening, promotion, and post-promotion verification phases
-are complete. The candidate remains available for observation and defect
-reporting. If no evidence-backed defect emerges, the next separately
-authorized phase is `v1.0.0 Final Release Authorization`. A reproducible defect
-requires a new candidate such as `v1.0.0-rc.2`; the existing tag and hosted
-assets must not be modified.
+are complete. The active phase is `v1.0.0 Final Release Authorization`.
+Publication requires the final commit, local bundle, hosted CI proof,
+annotated tag, final GitHub release, and independent hosted asset checks to
+pass without runtime changes.
 
 ---
 
@@ -217,7 +218,7 @@ assets must not be modified.
 | `v0.8.8` | Core Service MIT License Metadata | Record the repository's MIT license choice in the Rust package and remove the cargo-deny metadata blocker. | Exact Cargo SPDX metadata, minimal cargo-deny policy, package-content inspection, release records, and refreshed proof. | Cargo reports MIT, cargo-deny passes without exceptions, package identity and contents remain stable, and runtime verification is unchanged. |
 | `v0.8.9` | Documentation and Adoption Readiness | Give users, maintainers, and engineers a clear entry path and remove stale or redundant explanatory text. | User/maintainer wiki, rewritten README, documentation audit, terminology guide, tested commands and links, comment audit, and refreshed proof. | Readers can move from purpose to operation to maintenance to engineering detail; commands and links validate; runtime evidence remains unchanged. |
 | `v1.0.0-rc.1` | Published release candidate | Freeze release scope and gates, publish the accepted immutable candidate, and verify the distributed artifacts and documented user path. | Release evidence bundle, annotated tag, GitHub prerelease, six approved hosted assets, post-promotion status page, hosted ISO/ELF/JSON checks, and live force-push readback. | The hosted bundle matches the accepted hashes, QEMU reproduces all 41 markers, documentation reflects the prerelease, and no in-place release mutation occurs. |
-| `v1.0.0` | Scoped production release | Release only the proven, scoped KOZO surface. | Final release evidence bundle, final changelog and release notes, passing required gates, explicit non-goals. | v1.0.0 claims only evidence-backed behavior and preserves all compatibility non-goals. |
+| `v1.0.0` | Final kernel-foundation release | Publish only the proven, scoped KOZO kernel foundation. | Final release evidence bundle, final changelog and notes, passing local and hosted gates, annotated tag, six verified assets, explicit non-goals. | v1.0.0 claims only evidence-backed behavior, preserves the accepted runtime and RC record, and keeps all compatibility and production-desktop non-goals. |
 
 ---
 

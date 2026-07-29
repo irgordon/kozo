@@ -13,13 +13,13 @@ LINT_PATH = ROOT / ".github" / "workflows" / "lint.yml"
 SUMMARY_PATH = ROOT / "scripts" / "ci_evidence_summary.sh"
 
 
-class ReleaseCandidateHardeningTests(unittest.TestCase):
+class ReleaseBundleTests(unittest.TestCase):
     def setUp(self):
         self.manifest = json.loads(MANIFEST_PATH.read_text())
         self.script = SCRIPT_PATH.read_text()
 
     def test_version_authority_is_canonical(self):
-        self.assertEqual(VERSION_PATH.read_text(), "1.0.0-rc.1\n")
+        self.assertEqual(VERSION_PATH.read_text(), "1.0.0\n")
 
     def test_manifest_destinations_are_explicit_and_unique(self):
         destinations = [
@@ -40,9 +40,13 @@ class ReleaseCandidateHardeningTests(unittest.TestCase):
             "artifacts/runtime/boot_image/kozo.iso",
             "artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf",
             "artifacts/runtime/qemu_smoke.metadata.json",
-            "docs/releases/v1.0.0-rc.1.md",
+            "docs/releases/v1.0.0.md",
+            "docs/releases/v1.0.0-evidence.md",
         }
         self.assertTrue(required.issubset(sources))
+
+    def test_manifest_describes_a_final_release_bundle(self):
+        self.assertEqual(self.manifest["bundle_kind"], "binary_release")
 
     def test_manifest_excludes_repository_and_private_state(self):
         all_sources = [
@@ -60,6 +64,17 @@ class ReleaseCandidateHardeningTests(unittest.TestCase):
         self.assertNotRegex(self.script, r"cargo\s+publish")
         self.assertNotIn("--publish", self.script)
         self.assertIn('"published": False', self.script)
+
+    def test_script_accepts_final_and_candidate_versions(self):
+        self.assertIn(
+            "canonicalVersionPattern='^[0-9]+\\.[0-9]+\\.[0-9]+"
+            "(-rc\\.[0-9]+)?$'",
+            self.script,
+        )
+        self.assertIn(
+            '[[ "$releaseVersion" =~ $canonicalVersionPattern ]]',
+            self.script,
+        )
 
     def test_script_requires_clean_commit_and_passing_evidence(self):
         required = (
@@ -123,9 +138,18 @@ class ReleaseCandidateHardeningTests(unittest.TestCase):
 
     def test_ci_packages_clean_commit_before_workspace_preflight(self):
         ci = CI_PATH.read_text()
-        package_step = ci.index("- name: Build and validate release candidate")
+        package_step = ci.index("- name: Build and validate release bundle")
         preflight_step = ci.index("- name: Build governed boot image preflight")
         self.assertLess(package_step, preflight_step)
+
+    def test_ci_reads_the_authoritative_release_version(self):
+        ci = CI_PATH.read_text()
+        self.assertIn(
+            "release_version=\"$(tr -d '[:space:]' < release/version.txt)\"",
+            ci,
+        )
+        self.assertIn('--version "$release_version"', ci)
+        self.assertNotIn("--version 1.0.0-rc.1", ci)
 
 
 if __name__ == "__main__":

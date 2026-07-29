@@ -150,10 +150,11 @@ KOZO still does not prove:
 
 No active runtime blocker is recorded for the accepted v0.8.9 baseline.
 Force pushes to `main` are blocked. No broader repository policy is required
-by the release-candidate scope. The immutable `v1.0.0-rc.1` GitHub prerelease
-is published and has passed post-promotion artifact, boot, and user-path
+by the final-release scope. The immutable `v1.0.0-rc.1` GitHub prerelease is
+published and has passed post-promotion artifact, boot, and user-path
 verification. No reproducible final-release blocker was found. Final v1.0.0
-promotion requires explicit authorization.
+preparation is authorized and in progress; publication remains gated on local
+and hosted acceptance.
 
 ---
 
@@ -179,7 +180,9 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
 16. Preserve the accepted v0.8.8 package-license correction and v0.8.9 documentation path.
 17. Preserve the accepted v1.0.0-rc.1 tag, hosted artifacts, checksums, runtime
     evidence, and immutable release record.
-18. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
+18. Complete the v1.0.0 final version, documentation, bundle, hosted gate,
+    immutable tag, and hosted asset verification without runtime changes.
+19. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
 
 ---
 
@@ -269,7 +272,7 @@ Deferred until separately scoped runtime or cleanup phases:
 | `v0.8.8` | Core Service MIT License Metadata | Add exact MIT package metadata, pass cargo-deny, and inspect package contents without changing runtime behavior. | Publication, packaging frameworks, dependency changes, runtime changes, complete release readiness. |
 | `v0.8.9` | Documentation and Adoption Readiness | Add a user-first wiki, maintainer path, engineering overview, terminology guide, documentation audit, and focused comment cleanup. | Runtime features, documentation frameworks, publication, compatibility, complete release readiness. |
 | `v1.0.0-rc.1` | Published release candidate | Freeze scope and gates, publish the accepted immutable prerelease, and verify the distributed artifacts and user path. | In-place tag, note, or asset changes; new feature scope after RC. |
-| `v1.0.0` | Scoped release | Release only evidence-backed behavior with explicit non-goals. | Any unimplemented compatibility or runtime subsystem claim. |
+| `v1.0.0` | Final kernel-foundation release | Publish the accepted governed kernel foundation with final versioning, evidence, and immutable assets. | Any unimplemented compatibility or runtime subsystem claim; any in-place mutation of the final tag or assets. |
 
 ---
 

@@ -1,6 +1,6 @@
 {
   "manifest_version": 1,
-  "bundle_kind": "binary_release_candidate",
+  "bundle_kind": "binary_release",
   "required_files": [
     {
       "source": "README.md",
@@ -43,13 +43,13 @@
       "category": "release"
     },
     {
-      "source": "docs/releases/v1.0.0-rc.1.md",
-      "destination": "docs/releases/v1.0.0-rc.1.md",
+      "source": "docs/releases/v1.0.0.md",
+      "destination": "docs/releases/v1.0.0.md",
       "category": "release"
     },
     {
-      "source": "docs/releases/v1.0.0-rc.1-evidence.md",
-      "destination": "docs/releases/v1.0.0-rc.1-evidence.md",
+      "source": "docs/releases/v1.0.0-evidence.md",
+      "destination": "docs/releases/v1.0.0-evidence.md",
       "category": "release"
     },
     {

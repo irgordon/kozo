@@ -639,3 +639,44 @@ all transaction and snapshot storage to clear, and the internal capability ID
 This proves one fixed status service only. It does not prove general services,
 a public syscall ABI, arbitrary queries, persistent userspace, compatibility,
 or production readiness.
+
+---
+
+# 18. v1.0.0 Final Release Preparation
+
+`release/version.txt` owns the final version `1.0.0`.
+`release/release_files.v1.json` remains the explicit allowlist, and
+`scripts/build_release_candidate.sh` now accepts both canonical candidate and
+final versions without adding a publication interface.
+
+The final output is:
+
+```text
+kozo-v1.0.0.tar.xz
+kozo.iso
+kozo-kernel.elf
+latest_verify.json
+release_metadata.json
+SHA256SUMS
+```
+
+The final release is authorized but not yet published. Before the annotated
+`v1.0.0` tag is created, the accepted final commit must pass:
+
+* Python unit discovery;
+* Odin and pinned Rust checks;
+* cargo-deny and cargo-audit;
+* 67 verification checks with zero failures;
+* QEMU outcome `pass`, blocker `none`, and 41 ordered markers;
+* direct archive, license, prohibited-path, checksum, metadata, and ELF review;
+* hosted CI and lint;
+* downloaded hosted-CI proof inspection.
+
+The bundle metadata keeps `published: false` because it is produced before the
+GitHub release exists. Publication is recorded by the later immutable GitHub
+release and the post-promotion evidence update.
+
+No runtime behavior changed after `v1.0.0-rc.1`. The final scope remains the
+documented governed kernel foundation and does not add a desktop, shell,
+scheduler, process model, general syscall layer, filesystem, drivers,
+networking, compatibility claim, or production desktop claim.

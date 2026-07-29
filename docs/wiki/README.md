@@ -17,9 +17,8 @@ benefits.
 ## Current Release
 
 [KOZO v1.0.0-rc.1](https://github.com/irgordon/kozo/releases/tag/v1.0.0-rc.1)
-is available as a GitHub prerelease for testing and review. It is the current
-release of the kernel-foundation scope described below. The final v1.0.0
-release has not been published.
+remains available as the accepted GitHub prerelease. Final `v1.0.0` release
+preparation is in progress. It has not been published yet.
 
 KOZO currently exposes its result through serial progress markers. It does not
 provide an interactive shell, desktop, or general application environment.
@@ -60,6 +59,8 @@ files remain authoritative.
 - [Engineering Overview](ENGINEERING_OVERVIEW.md)
 - [v1.0.0-rc.1 current status](../releases/v1.0.0-rc.1-status.md)
 - [v1.0.0-rc.1 release notes](../releases/v1.0.0-rc.1.md)
+- [v1.0.0 release notes](../releases/v1.0.0.md)
+- [v1.0.0 release evidence](../releases/v1.0.0-evidence.md)
 
 ## Current Limits
 

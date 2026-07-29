@@ -1218,3 +1218,23 @@ The release builder is intentionally commit-bound and has no publication
 option. Dry-run output remains ignored and non-authoritative. No runtime,
 kernel, ABI, request, marker, mapping, capability, or halt source changes are
 part of this phase.
+
+# 40. v1.0.0 Final Release Authorization
+
+Status: Final release preparation in progress.
+
+The prior section records the historical RC hardening snapshot. The RC was
+subsequently accepted, published, and independently verified. Its tag, notes,
+and six assets remain immutable.
+
+| ID | Status | Finding |
+| --- | --- | --- |
+| AUDIT-V1-001 | Resolved locally | The existing packager now accepts canonical final versions as well as release candidates while retaining its clean-commit, evidence, allowlist, license, checksum, and prohibited-path gates. |
+| AUDIT-V1-002 | Resolved locally | CI reads the authoritative version file instead of embedding the RC version and archive name. |
+| AUDIT-V1-003 | In progress | Final notes, evidence, current documentation, task state, and version authority are aligned to `1.0.0`; local and hosted acceptance remain required before tagging. |
+| AUDIT-V1-004 | Preserved | Runtime, ABI, contracts, marker order, fixed request geometry, page mappings, capabilities, and halt behavior are unchanged from the accepted RC. |
+| AUDIT-V1-005 | Deferred by scope | General userspace, scheduling, processes, filesystems, drivers, networking, compatibility, and production desktop behavior remain outside the declared release. |
+
+No structural cleanup or runtime refactor is included. A post-publication
+documentation/proof-only commit may record immutable hosted facts, but it may
+not modify the final tag, assets, hosted notes, runtime, ABI, or contracts.

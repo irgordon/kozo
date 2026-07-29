@@ -171,17 +171,18 @@ jobs:
         run: |
           odin check kernel
 
-      - name: Build and validate release candidate
+      - name: Build and validate release bundle
         run: |
+          release_version="$(tr -d '[:space:]' < release/version.txt)"
           scripts/build_release_candidate.sh \
-            --version 1.0.0-rc.1 \
+            --version "$release_version" \
             --output artifacts/release-candidate
           python3 -m json.tool artifacts/release-candidate/release_metadata.json >/dev/null
           (
             cd artifacts/release-candidate
             sha256sum -c SHA256SUMS
           )
-          tar -tf artifacts/release-candidate/kozo-v1.0.0-rc.1.tar.xz >/dev/null
+          tar -tf "artifacts/release-candidate/kozo-v${release_version}.tar.xz" >/dev/null
 
       - name: Build governed boot image preflight
         run: |
@@ -228,10 +229,10 @@ jobs:
             artifacts/release-candidate/evidence/runtime/qemu_smoke.stderr.log
           if-no-files-found: warn
 
-      - name: Upload release candidate dry run
+      - name: Upload release bundle dry run
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: kozo-v1.0.0-rc.1-dry-run
+          name: kozo-v1.0.0-dry-run
           path: artifacts/release-candidate/
           if-no-files-found: error

@@ -3,6 +3,7 @@ set -euo pipefail
 
 rootDir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 versionFile="$rootDir/release/version.txt"
+canonicalVersionPattern='^[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$'
 verifiedReleaseManifest=""
 requestedVersion=""
 outputDir=""
@@ -51,7 +52,7 @@ read_release_version() {
   [[ -f "$versionFile" ]] || fail "Version authority missing: $versionFile"
   releaseVersion="$(tr -d '[:space:]' <"$versionFile")"
   [[ "$releaseVersion" == "$requestedVersion" ]] || fail "Requested version does not match release/version.txt"
-  [[ "$releaseVersion" =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]] || fail "Release version is not canonical"
+  [[ "$releaseVersion" =~ $canonicalVersionPattern ]] || fail "Release version is not canonical"
 }
 
 ensure_output_directory_empty() {
@@ -296,7 +297,7 @@ validate_checksum_file() {
 }
 
 report_outputs() {
-  printf "Release candidate: v%s\n" "$releaseVersion"
+  printf "Release bundle: v%s\n" "$releaseVersion"
   printf "Commit: %s\n" "$releaseCommit"
   printf "Verification: %s (%s checks)\n" "$verificationStatus" "$verificationCheckCount"
   printf "QEMU: %s (blocker: %s, markers: %s)\n" "$qemuOutcome" "$qemuBlocker" "$markerCount"

@@ -1,5 +1,26 @@
 # Changelog
 
+## v1.0.0 - 2026-07-29
+
+**Status:** Final release preparation in progress; publication pending local and hosted acceptance.
+
+* Finalized the accepted governed kernel foundation release scope.
+* Preserved the accepted runtime behavior from `v1.0.0-rc.1`.
+* Required 67 checks, QEMU pass, blocker none, and 41 ordered markers.
+* Added final versioning, release notes, release evidence, licenses, and an
+  explicit final bundle path.
+* Extended the existing commit-bound packager to accept canonical final
+  versions without adding a publication interface.
+* Made hosted CI consume `release/version.txt` instead of hardcoding the RC
+  version or archive name.
+* Added no desktop, shell, scheduler, process model, general syscall layer,
+  filesystem, driver stack, networking, compatibility, or production-desktop
+  claim.
+* Published no Rust crate.
+* Retained the RC tag, notes, and assets unchanged.
+* Changed no runtime, ABI, request, marker, mapping, capability, or halt
+  behavior.
+
 ## v1.0.0-rc.1 - 2026-07-28
 
 **Status:** Published as an immutable GitHub prerelease; post-promotion verification complete.
