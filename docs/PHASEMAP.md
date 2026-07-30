@@ -135,6 +135,8 @@ The current local generated evidence proves:
   `1586089415a98a11d2024d606ce6301f568b7d6e` with an immutable annotated tag,
   six independently verified hosted assets, and unchanged 41-marker runtime
   evidence.
+* The post-publication documentation audit aligns the user, maintainer, and
+  engineering paths on `main` without changing the tagged release.
 
 ## Current Active Blocker
 
@@ -152,9 +154,10 @@ Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr
 
 ## Next Phase
 
-The `v1.0.0-rc.1` and `v1.0.0` release phases are complete. Future work must
-start from a separately scoped task. A product defect requires a patch release;
-the existing final tag and hosted assets must not be changed in place.
+The `v1.0.0-rc.1`, `v1.0.0`, and post-publication documentation phases are
+complete. Future work must be selected from reproduced defects or an explicitly
+scoped capability plan. A product defect requires a patch release; the existing
+final tag and hosted assets must not be changed in place.
 
 ---
 

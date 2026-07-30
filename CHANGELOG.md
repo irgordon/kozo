@@ -1,5 +1,22 @@
 # Changelog
 
+## Post-publication documentation audit - 2026-07-29
+
+**Status:** Documentation-only alignment on `main`; not a new product release.
+
+* Audited all eight wiki pages against the published v1.0.0 implementation.
+* Routed users, maintainers, and engineers to separate entry paths.
+* Put the hosted ISO first and documented checksum failure, portable QEMU
+  resolution, the 41-marker result, and governed timeout behavior.
+* Added safe-change, generated-file, immutable-release, and patch-release rules
+  for maintainers.
+* Added a top-down runtime sequence, source map, evidence model, and explicit
+  architectural limits for engineers.
+* Expanded troubleshooting for observed QEMU, Limine, xorriso, linker, Cargo,
+  checksum, version, and tool-output behavior.
+* Preserved the v1.0.0 and v1.0.0-rc.1 tags, hosted notes, hosted assets,
+  runtime, ABI, contracts, schemas, marker order, and product version.
+
 ## v1.0.0 - 2026-07-29
 
 **Status:** Published as the immutable final GitHub release; hosted assets independently verified.

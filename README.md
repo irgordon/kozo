@@ -4,10 +4,9 @@
 
 # KOZO
 
-KOZO is a small operating-system kernel built to make low-level behavior easy
-to inspect and verify. It is for people who want to learn how a kernel starts,
-crosses CPU privilege levels, handles one fixed request, and proves each step
-without hiding the details behind a large system.
+KOZO is a small x86-64 operating-system kernel built to make low-level behavior
+easy to inspect and verify. It is for people who want to study or extend a
+kernel whose claimed behavior is tied to explicit tests and runtime evidence.
 
 Low-level software can fail before normal debugging tools exist. KOZO addresses
 that problem by keeping each runtime feature bounded, recording progress over
@@ -16,9 +15,11 @@ machine-readable rules.
 
 **Current release:** [v1.0.0](https://github.com/irgordon/kozo/releases/tag/v1.0.0)
 
-Start with [Getting Started](docs/wiki/GETTING_STARTED.md), then read the
+Start with the [wiki](docs/wiki/README.md), which routes users, maintainers,
+and engineers to the right level of detail. The
 [v1.0.0 release notes](docs/releases/v1.0.0.md) and
-[release evidence](docs/releases/v1.0.0-evidence.md).
+[release evidence](docs/releases/v1.0.0-evidence.md) describe the published
+product and its immutable artifacts.
 
 ## What Works Today
 
@@ -35,11 +36,13 @@ or production readiness.
 
 ## Start Here
 
-1. Read [Why KOZO](docs/wiki/WHY_KOZO.md).
-2. Follow [Getting Started](docs/wiki/GETTING_STARTED.md).
-3. Use the [User Guide](docs/wiki/USER_GUIDE.md) to understand the result.
-4. Open the [wiki index](docs/wiki/README.md) for maintainer and engineering
-   paths.
+| I want to... | Start here |
+| --- | --- |
+| Download and run KOZO | [Getting Started](docs/wiki/GETTING_STARTED.md) |
+| Understand why KOZO exists | [Why KOZO](docs/wiki/WHY_KOZO.md) |
+| Understand the serial result | [User Guide](docs/wiki/USER_GUIDE.md) |
+| Maintain or change KOZO | [Maintainer Guide](docs/wiki/MAINTAINER_GUIDE.md) |
+| Study the implementation | [Engineering Overview](docs/wiki/ENGINEERING_OVERVIEW.md) |
 
 From a configured development environment:
 
@@ -61,9 +64,11 @@ writes `artifacts/latest_verify.json` and reports `VERIFY: PASS`.
 - [Security boundaries](docs/SECURITY_MODEL.md)
 - [Release checklist](docs/RELEASE_CHECKLIST.md)
 - [Documentation audit](docs/DOCUMENTATION_AUDIT.md)
+- [v1.0.0 documentation audit](docs/releases/v1.0.0-documentation-audit.md)
 
-User and maintainer guidance starts in `docs/wiki`. Detailed engineering,
-contract, security, validation, and historical records remain under `docs`.
+User, maintainer, and engineering entry paths start in `docs/wiki`. Detailed
+architecture, contract, security, validation, and historical authority remains
+under `docs`.
 
 ## Release Status
 

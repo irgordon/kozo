@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO v1.0.0 Final Release Authorization",
+  "task_title": "KOZO v1.0.0 Post-Publication Documentation Audit and Wiki Alignment",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -25,7 +25,10 @@
     "v0.8.9 documentation and adoption readiness is accepted by hosted CI runs 30398906417 and 30398906359 with 67 checks, 0 failures, QEMU pass, blocker none, and all 41 runtime markers",
     "v1.0.0-rc.1 technical hardening is accepted by hosted CI run 30409678216 and lint run 30409678072",
     "The annotated v1.0.0-rc.1 tag and immutable GitHub prerelease exist at accepted commit 2debd995634d977458de0c1697f21dc0016b4bf9",
-    "Post-promotion documentation alignment is accepted at b71f511e87d492464525a5446898d839698c4917 with hosted CI and lint success"
+    "Post-promotion documentation alignment is accepted at b71f511e87d492464525a5446898d839698c4917 with hosted CI and lint success",
+    "The immutable final v1.0.0 tag targets 1586089415a98a11d2024d606ce6301f568b7d6e and its six hosted assets remain accepted",
+    "The immutable v1.0.0-rc.1 tag and prerelease remain accepted historical release records",
+    "The post-publication documentation baseline is fad5f5305299a7b9ff7a63df5b1fbeaa021dd7f7"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
@@ -43,7 +46,9 @@
     "v1.0.0-rc.1 final promotion readiness blocks only force pushes, rebuilds and inspects one unpublished dry-run bundle, and preserves runtime behavior and the accepted 41-marker sequence",
     "The promoted v1.0.0-rc.1 tag, hosted notes, and hosted assets are immutable; a reproducible defect requires a new release candidate",
     "Final v1.0.0 publication is authorized only after local and hosted gates accept one final commit",
-    "One post-promotion documentation/proof-only commit may record immutable hosted v1.0.0 facts without changing runtime, ABI, contracts, markers, tag target, notes, or assets"
+    "One post-promotion documentation/proof-only commit may record immutable hosted v1.0.0 facts without changing runtime, ABI, contracts, markers, tag target, notes, or assets",
+    "This phase changes documentation and task state only; runtime, ABI, contracts, schemas, marker order, release tags, hosted notes, hosted assets, and published metadata remain unchanged",
+    "docs/DOCUMENTATION_STANDARD.md remains the authority for audience-aware documentation; no duplicate documentation authority is introduced"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -3099,6 +3104,37 @@
         "verification.tests_run[154]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 90,
+      "title": "Audit and align post-publication v1.0.0 documentation",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "README.md",
+        "docs/wiki/README.md",
+        "docs/wiki/WHY_KOZO.md",
+        "docs/wiki/GETTING_STARTED.md",
+        "docs/wiki/USER_GUIDE.md",
+        "docs/wiki/MAINTAINER_GUIDE.md",
+        "docs/wiki/TROUBLESHOOTING.md",
+        "docs/wiki/TERMS.md",
+        "docs/wiki/ENGINEERING_OVERVIEW.md",
+        "docs/releases/v1.0.0-documentation-audit.md",
+        "docs/ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "tasks/runtime.json",
+        "docs/generated/governance_index.md",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.summary.txt"
+      ],
+      "verification_refs": [
+        "verification.tests_run[155]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -3171,7 +3207,8 @@
     "v1.0.0-rc.1 provides one canonical version, an explicit binary/evidence allowlist, a commit-bound dry-run packager, inspected licenses and checksums, scoped release records, and hosted release gates without publishing or changing runtime behavior.",
     "Final promotion readiness blocks force pushes to main without adding review, required-check, administrator, deletion, conversation, ruleset, or other repository policy; rebuilds and directly inspects one unpublished dry-run bundle; and preserves 67 checks and all 41 runtime markers.",
     "Post-promotion verification preserves the immutable v1.0.0-rc.1 tag and hosted release, revalidates all hosted assets, boots the distributed ISO through all 41 markers, tests the clean user path, and aligns current documentation without runtime changes.",
-    "v1.0.0 publishes one hosted-CI-accepted final commit as an immutable annotated tag and final GitHub release, verifies all six hosted assets independently, preserves the RC record, and records publication through one documentation/proof-only follow-up commit."
+    "v1.0.0 publishes one hosted-CI-accepted final commit as an immutable annotated tag and final GitHub release, verifies all six hosted assets independently, preserves the RC record, and records publication through one documentation/proof-only follow-up commit.",
+    "The post-publication documentation audit routes users, maintainers, and engineers through distinct wiki paths, validates the hosted ISO user path, records product limits plainly, and preserves all immutable release and runtime state."
   ],
   "verification": {
     "tests_run": [
@@ -3949,6 +3986,11 @@
         "tool": "v1.0.0 final release authorization",
         "command": "final version and documentation checks; release bundle tests; Python discovery; Odin and Rust checks; cargo-deny and cargo-audit; governed verification; local and hosted bundle inspection; hosted CI and lint; annotated tag and GitHub release verification; independent hosted asset validation; RC immutability readback",
         "status": "passed_final_commit_1586089415a98a11d2024d606ce6301f568b7d6e_ci_30495209451_lint_30495209186_tag_object_059fe90572db46185c219e8b38bbd190faa40e60_six_hosted_assets_exact_hosted_iso_41_markers_rc_unchanged"
+      },
+      {
+        "tool": "v1.0.0 post-publication documentation audit",
+        "command": "immutable final and RC release readback; wiki inventory and claim audit; local Markdown link validation; hosted asset download and checksums; hosted ISO QEMU smoke; clean-clone user-path checks; Python, Odin, Rust, cargo-deny, cargo-audit, and governed verification",
+        "status": "passed_72_local_links_six_hosted_assets_checksums_valid_hosted_and_clean_clone_qemu_41_markers_1050_tests_67_checks_0_failures"
       }
     ],
     "logs": [
@@ -4028,7 +4070,8 @@
       "v0.6.6 centralizes future runtime progression stage definitions without changing runtime behavior, halt behavior, ABI contracts, syscall behavior, linker layout, QEMU smoke behavior, compatibility claims, or production-readiness claims.",
       "v0.7.2 requires an acyclic progression graph, earlier mandatory prerequisites, monotonic proven status, forward-only transitions, known authorities, and one owner per transition without changing runtime behavior.",
       "v0.7.3 requires exact future region geometry and ownership, full-region zero fill, a bounded sentinel write/read/compare/restore probe, and marker placement before the unchanged halt loop while memory evidence remains planned.",
-      "Post-promotion verification must preserve the accepted tag and hosted release, validate the distributed artifacts and runtime independently, and align only current status documentation."
+      "Post-promotion verification must preserve the accepted tag and hosted release, validate the distributed artifacts and runtime independently, and align only current status documentation.",
+      "Post-publication documentation must route users, maintainers, and engineers separately while preserving product limits, release immutability, and the accepted runtime evidence."
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -4109,7 +4152,8 @@
       "v0.7.4 implements the contract-owned 4096-byte static memory region, explicit zero fill, bounded sentinel write/read/compare/restore probe, KOZO_MEMORY_INIT_OK marker, and unchanged terminal halt loop.",
       "v0.7.45 is accepted by hosted CI marker and validator evidence for the bounded assembly-to-Odin call, fixed bootstrap context validation, volatile static-state probe, exact return status, and preserved terminal halt.",
       "The portable Ring3 evidence correction resolves GNU/LLVM function-label differences by extracting the consumer from its ELF address range and preserves the full comparison, response-offset, success-store, int 0x81, and ud2 ordering requirements.",
-      "The immutable v1.0.0-rc.1 tag and prerelease remain unchanged; all six hosted assets validate, the distributed ISO produces the accepted 41-marker sequence, the clean user path works with ld.lld, and current documentation distinguishes publication from dry-run metadata."
+      "The immutable v1.0.0-rc.1 tag and prerelease remain unchanged; all six hosted assets validate, the distributed ISO produces the accepted 41-marker sequence, the clean user path works with ld.lld, and current documentation distinguishes publication from dry-run metadata.",
+      "The post-publication wiki provides distinct user, maintainer, and engineer paths, states the v1.0.0 product boundary directly, validates the hosted ISO workflow, and preserves immutable final and RC release records without runtime changes."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -4190,6 +4234,7 @@
     "v0.8.7 moves the one-shot fixed user transaction after the controlled loop, shares one kernel-owned status snapshot with internal capability ID 1, validates the 88-byte response in Ring3 and Ring0, clears every snapshot and transaction buffer, and preserves the existing capability and halt boundaries.",
     "Corrected the CI-only Ring3 ELF evidence failure by parsing GNU and LLVM full disassembly within authoritative consumer symbol bounds, while retaining all field-coverage and success-path ordering checks and leaving the accepted runtime marker sequence unchanged.",
     "Added the exact MIT SPDX license metadata to core_service, validated Cargo metadata and package contents, removed the cargo-deny blocker without policy exceptions, and preserved runtime evidence.",
-    "Verified the immutable promoted release from fresh hosted downloads, reproduced the accepted runtime from the distributed ISO, tested a clean tagged clone, and aligned current release documentation without changing runtime behavior or historical release records."
+    "Verified the immutable promoted release from fresh hosted downloads, reproduced the accepted runtime from the distributed ISO, tested a clean tagged clone, and aligned current release documentation without changing runtime behavior or historical release records.",
+    "Audited every wiki page against the published v1.0.0 product, separated user, maintainer, and engineer paths, corrected stale and incomplete guidance, and retained all runtime and release records unchanged."
   ]
 }

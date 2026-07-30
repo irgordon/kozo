@@ -1,80 +1,70 @@
 # KOZO Wiki
 
-KOZO is a small operating-system kernel that makes early system behavior
-visible and testable. It shows each important startup step, checks the result,
-and stops safely when a required condition is not proven.
+## What KOZO Is
 
-## Why KOZO Exists
+KOZO is a small x86-64 kernel for people who want to study or extend low-level
+software whose claims are tied to explicit tests and runtime evidence. It boots
+in QEMU, crosses one fixed kernel-to-user boundary, completes a bounded request,
+and stops in a known halt state.
 
-Kernel failures often happen before a screen, filesystem, or normal debugger is
-available. Large systems can also make it hard to identify which assumption
-failed. KOZO keeps its current runtime path small and records progress so a
-reader can connect the code, built kernel, and QEMU output.
-
-Read [Why KOZO](WHY_KOZO.md) for the problem, the project approach, and who
-benefits.
+KOZO is useful as an auditable kernel foundation and as a learning environment
+for evidence-driven operating-system engineering. It is not a desktop or a
+general-purpose operating system.
 
 ## Current Release
 
-[KOZO v1.0.0](https://github.com/irgordon/kozo/releases/tag/v1.0.0) is the
-current final kernel-foundation release. The accepted `v1.0.0-rc.1`
-prerelease remains available as an immutable historical candidate.
+Current final release:
+[v1.0.0](https://github.com/irgordon/kozo/releases/tag/v1.0.0)
 
-KOZO currently exposes its result through serial progress markers. It does not
-provide an interactive shell, desktop, or general application environment.
+Previous prerelease:
+[v1.0.0-rc.1](https://github.com/irgordon/kozo/releases/tag/v1.0.0-rc.1)
 
-## Who Should Use KOZO
+The final release provides six immutable hosted assets. Read the
+[release notes](../releases/v1.0.0.md), the
+[release evidence](../releases/v1.0.0-evidence.md), or the
+[documentation audit](../releases/v1.0.0-documentation-audit.md).
 
-KOZO is useful to:
+## Choose Your Path
 
-- learners studying how a kernel reaches user mode;
-- engineers testing low-level boot and privilege boundaries;
-- maintainers who need exact, reproducible proof for a small system;
-- reviewers who want claims tied to source and runtime evidence.
+| I want to... | Start here |
+| --- | --- |
+| Download and run KOZO | [Getting Started](GETTING_STARTED.md) |
+| Understand why KOZO exists | [Why KOZO](WHY_KOZO.md) |
+| Understand the output | [User Guide](USER_GUIDE.md) |
+| Diagnose a problem | [Troubleshooting](TROUBLESHOOTING.md) |
+| Maintain or change KOZO | [Maintainer Guide](MAINTAINER_GUIDE.md) |
+| Study the architecture | [Engineering Overview](ENGINEERING_OVERVIEW.md) |
+| Look up a term | [Terms](TERMS.md) |
 
-It is not yet a general-purpose operating system.
+## For Users
 
-## What KOZO Proves Today
+Start with the downloaded `kozo.iso`. KOZO reports progress over the QEMU
+serial console. A successful accepted run reaches 41 ordered markers ending in
+`KOZO_RUNTIME_RETURN_OK`; it does not open a prompt or graphical interface.
 
-The accepted x86-64 QEMU path proves a controlled startup sequence through:
+## For Maintainers
 
-- boot, stack, memory, and CPU-state preparation;
-- fixed page tables with separate kernel and user permissions;
-- one fixed switch to user mode and back;
-- one fixed runtime-status request and response;
-- two fixed internal kernel operations;
-- a final safe stop.
+Read the authority and generated-file rules before editing. A safe change
+updates the owning source, runs focused checks and full verification, and keeps
+generated proof separate. Published tags, notes, and assets are immutable.
 
-The current accepted run has 41 ordered progress markers and 67 passing
-verification checks. Generated reports support review, but contracts and source
-files remain authoritative.
+## For Engineers
 
-## Quick Links
-
-- [Getting Started](GETTING_STARTED.md)
-- [User Guide](USER_GUIDE.md)
-- [Maintainer Guide](MAINTAINER_GUIDE.md)
-- [Troubleshooting](TROUBLESHOOTING.md)
-- [Plain-Language Terms](TERMS.md)
-- [Engineering Overview](ENGINEERING_OVERVIEW.md)
-- [v1.0.0-rc.1 current status](../releases/v1.0.0-rc.1-status.md)
-- [v1.0.0-rc.1 release notes](../releases/v1.0.0-rc.1.md)
-- [v1.0.0 release notes](../releases/v1.0.0.md)
-- [v1.0.0 release evidence](../releases/v1.0.0-evidence.md)
+The engineering path connects boot, memory, CPU state, paging, privilege
+transition, the fixed request boundary, Odin runtime operations, evidence, and
+halt behavior to their source files and authoritative documents.
 
 ## Current Limits
 
-KOZO does not prove general userspace, process isolation, scheduling, files,
-devices, networking, Linux compatibility, POSIX compatibility, or production
-readiness. Its current user-mode code is one fixed boot-time probe, not an
-arbitrary program.
+KOZO v1.0.0 does not provide a desktop, window manager, settings application,
+interactive terminal, shell, scheduler, persistent processes, general-purpose
+userspace, general system-call interface, filesystem, drivers, networking,
+dynamic virtual memory, executable loader, Linux or POSIX compatibility,
+hostile user-code containment, stable public ABI, or production readiness.
 
-## Recommended Reading Order
+## Where to Report a Problem
 
-1. [Why KOZO](WHY_KOZO.md)
-2. [Getting Started](GETTING_STARTED.md)
-3. [User Guide](USER_GUIDE.md)
-4. [Maintainer Guide](MAINTAINER_GUIDE.md)
-5. [Engineering Overview](ENGINEERING_OVERVIEW.md)
-6. Detailed [architecture](../ARCHITECTURE.md), [security](../SECURITY_MODEL.md),
-   and [evidence](../RUNTIME_EVIDENCE.md) documents
+First use [Troubleshooting](TROUBLESHOOTING.md) to capture the checksum result,
+QEMU outcome, last marker, and exact command. Then open a focused issue in the
+[KOZO repository](https://github.com/irgordon/kozo/issues). Do not work around a
+failed checksum or weaken a validator.

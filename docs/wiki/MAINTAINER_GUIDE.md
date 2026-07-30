@@ -1,5 +1,12 @@
 # Maintainer Guide
 
+## Maintainer Responsibilities
+
+A maintainer keeps repository claims aligned with authoritative source,
+contracts, generated evidence, and published release records. The job is not
+only to make a command pass. A safe change preserves scope, diagnoses failures,
+and records what the repository can honestly prove.
+
 ## Repository Layout
 
 | Path | Responsibility |
@@ -16,20 +23,25 @@
 | `artifacts/` | Generated evidence; never a source of truth |
 | `tasks/` | Governed task and verification state |
 
-## Sources of Truth
+## Authority and Generated Files
 
 | Area | Source of truth | Generated or supporting files |
 | --- | --- | --- |
 | Runtime behavior | `kernel/` and `kernel/arch/x86_64/` | ELF and QEMU reports |
 | Marker order | `contracts/runtime_evidence_taxonomy.v0.json` | QEMU metadata and summaries |
 | Contract shape | Contract JSON and matching schema | Generated verification records |
-| Release state | `docs/RELEASE_CHECKLIST.md` and `tasks/todo.json` | Governance index |
+| Release state | Release notes, checklist, evidence, and task state | Governance index |
 | User guidance | `docs/wiki/` | Links to detailed `docs/` pages |
 
 Read [Governance](../GOVERNANCE.md) for precedence. Generated reports never
 override source, contracts, schemas, or validators.
 
-## Making a Safe Change
+Generated reports include `artifacts/latest_verify.json`,
+`artifacts/runtime/*.json`, and `docs/generated/*.md`. Change the authoritative
+input or generator, then run the governed generator. Do not edit generated
+output by hand. See [Generated Artifacts](../GENERATED_ARTIFACTS.md).
+
+## Safe Change Workflow
 
 1. Identify the authority that owns the behavior.
 2. Read its contract, schema, validator, and focused tests.
@@ -40,6 +52,26 @@ override source, contracts, schemas, or validators.
 7. Keep source and generated-proof commits separate when practical.
 
 Do not weaken a validator because a fixture or generated report is stale.
+
+## Runtime-Change Workflow
+
+1. Confirm the requested behavior is inside the declared product boundary.
+2. Update runtime code and the authoritative contract together.
+3. Preserve failure paths and marker ownership.
+4. Add focused positive and consequential negative tests.
+5. Inspect source, linked ELF, and QEMU evidence as required.
+6. Run full verification before refreshing checked-in proof.
+
+Runtime changes require a separately scoped feature or defect task. They must
+not be hidden inside documentation, release, or generated-proof work.
+
+## Documentation-Only Workflow
+
+1. Verify claims against source, contracts, and current release evidence.
+2. Keep user, maintainer, and engineering audiences separate.
+3. Test every changed command and local link.
+4. Confirm no runtime, ABI, contract, schema, or release artifact changed.
+5. Commit documentation before generated proof.
 
 ## Contracts and Schemas
 
@@ -68,20 +100,11 @@ python3 -m unittest discover -s tests
 Every validator needs consequential negative coverage and diagnostics that name
 the failed field.
 
-## Generated Files
-
-Generated reports include `artifacts/latest_verify.json`,
-`artifacts/runtime/*.json`, and `docs/generated/*.md`. Change the authoritative
-input or generator, then run the governed command. Do not edit generated output
-by hand.
-
-The governance index is refreshed with:
+The governance index is refreshed from the repository root with:
 
 ```bash
-python3 -c 'from harness.governance_index_report import write_report; write_report()'
+python3 -c 'from pathlib import Path; from harness.governance_index_report import write_report; root=Path.cwd(); write_report(root, root / "docs/generated/governance_index.md")'
 ```
-
-See [Generated Artifacts](../GENERATED_ARTIFACTS.md).
 
 ## Runtime Markers
 
@@ -89,7 +112,7 @@ Add or change a marker only through the runtime evidence taxonomy contract.
 Update runtime emission, blocker classification, QEMU evidence validation, and
 negative tests together. A marker in source is not proof that it executed.
 
-## Full Verification
+## Verification Expectations
 
 ```bash
 scripts/verify.sh
@@ -105,21 +128,48 @@ cat artifacts/runtime/qemu_smoke.summary.txt
 jq '{outcome, blocker_category, observed_markers}' artifacts/runtime/qemu_smoke.metadata.json
 ```
 
-## Release Workflow
+## Fail-Closed Behavior
+
+KOZO stops when required evidence is missing. A missing marker, checksum
+mismatch, stale generated report, or unknown runtime status is a failure to
+diagnose, not a reason to weaken the gate. Preserve the last trustworthy
+evidence and fix the owning source.
+
+## Release Immutability
 
 Use [Required Checks](../REQUIRED_CHECKS.md), the
 [Release Checklist](../RELEASE_CHECKLIST.md), and
 [Release Evidence](../RELEASE_EVIDENCE.md). Record the release commit, current
 generated proof, CI status, limits, and explicit non-goals.
 
-The `v1.0.0-rc.1` annotated tag and its hosted prerelease assets are immutable.
-Do not move the tag, replace an asset, or repair the release record in place.
-Record a reproducible defect and prepare a new candidate such as
-`v1.0.0-rc.2`.
+The repository states are distinct:
 
-The final `v1.0.0` tag, notes, and assets are published and immutable. A later
-product defect requires a patch release instead of replacing the final release
-in place.
+| State | Meaning |
+| --- | --- |
+| `v1.0.0` tag | Immutable accepted source and artifact record |
+| `main` | May contain later documentation or development commits |
+| `v1.0.0-rc.1` tag | Immutable accepted prerelease record |
+
+The final tag targets
+`1586089415a98a11d2024d606ce6301f568b7d6e`. The post-publication
+documentation commit is later on `main` and is not part of the tagged release.
+
+Do not move a published tag. Do not replace published assets. Do not rewrite
+hosted notes to hide a defect.
+
+## Patch-Release Process
+
+A reproduced product defect requires a new patch version such as `v1.0.1`.
+Record the defect, fix it in a scoped task, rebuild and verify new artifacts,
+and obtain explicit release authorization. Never repair `v1.0.0` in place.
+
+## Current Warning Policy
+
+Warnings remain visible. Classify each as a product failure, governed
+non-blocking warning, or local tooling limitation. Examples include generated
+Rust ABI naming warnings, xorriso portability warnings, and known Taplo macOS
+panics. Do not suppress a warning merely to make output quiet, and do not call
+a failed tool successful.
 
 ## Common Maintenance Mistakes
 
@@ -129,4 +179,6 @@ in place.
 - editing fixtures instead of fixing a real contract mismatch;
 - mixing runtime work with broad cleanup;
 - using local tool paths as portable policy;
+- confusing current `main` with a published tag target;
+- replacing a release artifact instead of issuing a patch release;
 - removing a hardware or fail-closed comment without understanding it.

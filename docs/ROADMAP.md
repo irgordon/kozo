@@ -155,6 +155,10 @@ by the final-release scope. The immutable `v1.0.0-rc.1` prerelease and
 metadata, and downloaded-ISO verification. No reproducible blocker was found
 for the declared release scope.
 
+Post-publication documentation on `main` now routes users, maintainers, and
+engineers through separate paths while preserving the immutable release
+records. This alignment changes no runtime or release artifact.
+
 ---
 
 # 10. Near-Term Runtime Work
@@ -181,7 +185,9 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
     evidence, and immutable release record.
 18. Preserve the published v1.0.0 version, documentation, bundle, hosted gate,
     immutable tag, and hosted asset evidence without in-place mutation.
-19. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
+19. Preserve the post-publication user, maintainer, and engineering entry paths
+    without making the wiki authoritative over contracts or governance.
+20. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
 
 ---
 

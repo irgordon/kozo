@@ -1,64 +1,80 @@
 # User Guide
 
-## Current Release Status
+KOZO v1.0.0 runs one fixed governed runtime demonstration. Using KOZO currently
+means booting its ISO in QEMU and observing serial evidence. It does not accept
+keyboard commands and does not provide a shell or graphical interface.
+
+## Current Release
 
 KOZO `v1.0.0` is available as the
 [final kernel-foundation release](https://github.com/irgordon/kozo/releases/tag/v1.0.0).
 Download and checksum instructions are in [Getting Started](GETTING_STARTED.md).
-The accepted runtime behavior is unchanged from `v1.0.0-rc.1`.
 
 ## What Happens When KOZO Starts
 
-KOZO starts under Limine in a virtual x86-64 computer. It prepares a controlled
-stack and memory area, enables the CPU math state needed by compiled Odin code,
-and activates its own memory map.
+Limine loads KOZO in a virtual x86-64 computer. The kernel prepares a controlled
+stack and memory region, initializes required CPU state, and activates fixed
+page tables.
 
-The kernel then prepares kernel mode and one fixed user-mode path. Odin runs a
-small three-step loop. KOZO enters the fixed user program, accepts one fixed
-runtime-status request, returns a fixed response, and checks that response in
-both user mode and kernel mode. It then completes two internal kernel
-operations and reaches its final safe stop.
+It then prepares one fixed kernel-to-user path. Odin runs a three-iteration
+loop. KOZO enters fixed user-mode code, handles one fixed runtime-status
+request, returns a fixed response, and checks that response in both user mode
+and kernel mode. It completes two internal kernel operations and reaches its
+final safe stop.
 
-## What Progress Markers Mean
+## What the Runtime Proves
 
-A progress marker is a short serial message emitted only after a specific check
-succeeds. Markers make a silent early-boot path observable.
+The accepted path proves that:
 
-The marker order is owned by
-`contracts/runtime_evidence_taxonomy.v0.json`. To view the exact sequence from
-the latest run:
+- the kernel reached its assembly entry;
+- controlled stack, memory, CPU, and paging initialization succeeded;
+- fixed descriptor and interrupt tables supported one user-mode transition;
+- one fixed request and response crossed the privilege boundary;
+- Odin completed a bounded loop and two governed kernel operations;
+- all successful paths converged on the final halt loop.
 
-```bash
-jq -r '.observed_markers[]' artifacts/runtime/qemu_smoke.metadata.json
-```
+This is a narrow demonstration. It does not prove a general application or
+process environment.
 
-The sequence groups into boot, memory and CPU setup, page-table setup,
-user-mode entry, fixed request handling, internal capabilities, and runtime
-return. The final marker is `KOZO_RUNTIME_RETURN_OK`.
+## What the Output Means
+
+The serial lines beginning with `KOZO_` are ordered evidence that each accepted
+runtime stage completed. They are progress markers, not commands or an
+interactive user interface.
+
+The sequence groups into startup, memory and CPU setup, paging, user-mode
+entry, fixed request handling, internal capabilities, runtime return, and halt.
+The authoritative marker order is owned by the runtime evidence taxonomy
+contract; the plain-language purpose is explained in
+[Runtime Evidence](../RUNTIME_EVIDENCE.md).
 
 ## How to Recognize Success
-
-Run:
-
-```bash
-scripts/qemu_smoke.sh
-cat artifacts/runtime/qemu_smoke.summary.txt
-```
 
 A successful summary reports:
 
 ```text
 Outcome: pass
 Blocker: none
+Observed Markers: 41
 Expected Marker: KOZO_RUNTIME_RETURN_OK
 ```
 
-The accepted runtime produces 41 ordered markers. Full repository verification
-must also print `VERIFY: PASS`.
+The final serial marker must be:
 
-KOZO stops after the final marker. There is no prompt, shell, desktop, settings
-screen, or other interactive application interface in this kernel-foundation
-release.
+```text
+KOZO_RUNTIME_RETURN_OK
+```
+
+Do not treat an empty log, missing marker, or out-of-order sequence as success.
+
+## Why QEMU Eventually Times Out
+
+After the final marker, KOZO disables interrupts and repeatedly halts. There is
+no shutdown service yet, so the bounded smoke script eventually terminates
+QEMU. Exit status `124` can therefore accompany a successful run.
+
+The timeout is successful only when the script first reports `Outcome: pass`,
+no blocker, and the complete sequence through `KOZO_RUNTIME_RETURN_OK`.
 
 ## What the Fixed User Program Does
 
@@ -82,18 +98,30 @@ The response contains only bounded facts already known by the kernel:
 The response contains no kernel pointer, physical address, variable length, or
 caller-selected field.
 
-## How Failures Are Reported
+## What Users Can Experiment With Safely
 
-Before QEMU starts, tool or image failures are recorded as exact failure
-reasons. During execution, the last observed progress marker identifies the
-boundary that was reached. A failed runtime check stops before later success
-markers and converges on a halt path.
+- Re-run the hosted ISO and compare the marker sequence.
+- Inspect `qemu_smoke.summary.txt` and the generated metadata.
+- Inspect the released kernel ELF with the documented read-only tools.
+- Build a local copy and compare its governed evidence with the release.
+- Change a local source checkout only after reading the maintainer workflow.
 
-Use [Troubleshooting](TROUBLESHOOTING.md) to interpret the last marker.
+Do not modify the published tag or hosted assets. A local experiment is not the
+published release and must not be described as such.
 
 ## Current Limits
 
-This fixed path does not provide a process model, persistent user program,
-general syscall interface, scheduler, files, devices, networking, memory-fault
-recovery, hostile-code containment, compatibility promise, or production
+KOZO does not provide a desktop, window manager, settings application,
+interactive terminal, shell, scheduler, persistent processes, preemption,
+general-purpose userspace, general system-call interface, filesystem, drivers,
+networking, dynamic virtual memory, executable loader, Linux or POSIX
+compatibility, hostile user-code containment, stable public ABI, or production
 readiness.
+
+## Where to Go Next
+
+- [Getting Started](GETTING_STARTED.md) for commands.
+- [Troubleshooting](TROUBLESHOOTING.md) for failed runs.
+- [Why KOZO](WHY_KOZO.md) for project value and scope.
+- [Engineering Overview](ENGINEERING_OVERVIEW.md) for implementation.
+- [Maintainer Guide](MAINTAINER_GUIDE.md) before changing the repository.

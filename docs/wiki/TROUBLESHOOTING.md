@@ -1,83 +1,182 @@
 # Troubleshooting
 
-Each section separates the symptom, likely cause, checks, and unsafe shortcut.
+Use the last trustworthy result. Do not weaken a validator, replace a checksum,
+or classify a missing marker as success.
 
-## QEMU Is Not Found
+## QEMU Command Not Found
 
-**What you see:** metadata reports `missing_qemu_tooling`.
+**Symptom:** the script reports `missing_qemu_tooling`.
 
-**What it usually means:** `KOZO_QEMU_BIN` is unset and
-`qemu-system-x86_64` is not discoverable.
+**Likely cause:** `qemu-system-x86_64` is outside `PATH` and
+`KOZO_QEMU_BIN` is unset.
 
-**What to check:**
+**Safe check:**
 
 ```bash
 command -v qemu-system-x86_64
-qemu-system-x86_64 --version
 ```
 
-**What not to do:** do not hardcode one developer-specific path into a script.
+**Expected result:** an executable path. Set `KOZO_QEMU_BIN` to that path when
+running the script.
 
-## QEMU Produces No Serial Output
+**Stop when:** no suitable x86-64 QEMU executable is installed. Do not hardcode
+one developer's path into repository policy.
 
-**What you see:** the serial log is empty or the run times out before a marker.
+## QEMU Exits With 124
 
-**What it usually means:** QEMU did not launch the image, firmware did not reach
-Limine, or the kernel stopped before serial entry.
+**Symptom:** the bounded smoke command exits with status `124`.
 
-**What to check:**
+**Likely cause:** KOZO reached its terminal halt loop and the smoke timeout
+stopped QEMU, or execution stalled before success.
+
+**Safe check:**
+
+```bash
+cat artifacts/runtime/qemu_smoke.summary.txt
+jq '{outcome, observed_markers}' artifacts/runtime/qemu_smoke.metadata.json
+```
+
+**Expected result:** `Outcome: pass`, 41 ordered markers, and final marker
+`KOZO_RUNTIME_RETURN_OK`.
+
+**Stop when:** the final marker is missing, the marker order differs, or the
+summary reports a blocker. Exit `124` alone never proves success.
+
+## No Serial Output
+
+**Symptom:** the serial log has zero bytes or contains firmware output but no
+KOZO marker.
+
+**Likely cause:** QEMU did not launch the ISO, firmware did not reach Limine, or
+the kernel stopped before serial initialization.
+
+**Safe check:**
 
 ```bash
 wc -c artifacts/runtime/qemu_smoke.log artifacts/runtime/qemu_smoke.stderr.log
 cat artifacts/runtime/qemu_smoke.stderr.log
-jq '{outcome, blocker_category, qemu_exit_code}' artifacts/runtime/qemu_smoke.metadata.json
+jq '{outcome, qemu_exit_code}' artifacts/runtime/qemu_smoke.metadata.json
 ```
 
-**What not to do:** do not convert an empty run into pass evidence with a retry.
+**Expected result:** nonzero serial output and an exact blocker when the run
+cannot pass.
 
-## Limine Is Not Reached
+**Stop when:** the serial log remains empty. Preserve stderr and do not convert
+an automatic retry into silent pass evidence.
 
-**What you see:** no Limine text and no KOZO entry marker.
+## Final Marker Is Missing
 
-**What it usually means:** the ISO, firmware path, or Limine artifacts are
-wrong.
+**Symptom:** markers stop before `KOZO_RUNTIME_RETURN_OK`.
 
-**What to check:**
+**Likely cause:** the stage after the last observed marker failed.
 
-```bash
-ls -lh artifacts/runtime/boot_image/kozo.iso
-cat artifacts/runtime/boot_image/iso_contents.txt
-cat artifacts/runtime/qemu_smoke.stderr.log
-```
-
-**What not to do:** do not debug Odin runtime code before the bootloader path is
-proven.
-
-## A Marker Is Missing
-
-**What you see:** the marker list ends before `KOZO_RUNTIME_RETURN_OK`.
-
-**What it usually means:** execution stopped at the boundary after the last
-observed marker.
-
-**What to check:**
+**Safe check:**
 
 ```bash
 jq -r '.observed_markers[]' artifacts/runtime/qemu_smoke.metadata.json
 cat artifacts/runtime/qemu_smoke.summary.txt
 ```
 
-**What not to do:** do not reorder the taxonomy or weaken pass criteria.
+**Expected result:** the summary names the last trusted marker and a
+mechanically distinguishable blocker.
 
-## ELF Reports Differ on macOS and Linux
+**Stop when:** a required marker is absent or duplicated. Do not reorder the
+taxonomy or relax pass criteria.
 
-**What you see:** labels or instruction spelling differ between GNU and LLVM
-tools.
+## Limine Tree Is Incomplete
 
-**What it usually means:** the tools printed equivalent binary data
-differently.
+**Symptom:** the boot-image script cannot find Limine binaries, BIOS stages, or
+UEFI files.
 
-**What to check:**
+**Likely cause:** the pinned Limine tree was not built or `LIMINE_DIR` and
+`LIMINE` refer to different installations.
+
+**Safe check:**
+
+```bash
+test -x "$LIMINE"
+test -f "$LIMINE_DIR/limine-bios.sys"
+test -f "$LIMINE_DIR/limine-bios-cd.bin"
+test -f "$LIMINE_DIR/limine-uefi-cd.bin"
+```
+
+**Expected result:** all four checks succeed for the pinned version described
+in [Boot Tooling](../BOOT_TOOLING.md).
+
+**Stop when:** any required file is absent. Rebuild the pinned tree instead of
+copying files from an unknown Limine version.
+
+## xorriso Prints Portability Warnings
+
+**Symptom:** xorriso warns about EFI directory visibility, active partitions,
+or hybrid-media compatibility.
+
+**Likely cause:** the image builder is describing platform-specific boot-media
+details. A warning is not automatically an ISO failure.
+
+**Safe check:**
+
+```bash
+scripts/build_boot_image.sh
+scripts/qemu_smoke.sh
+```
+
+**Expected result:** the ISO is nonzero, Limine packaging completes, and the
+governed QEMU result passes.
+
+**Stop when:** xorriso exits nonzero, the ISO is missing, or QEMU fails. Record
+warnings accurately; do not suppress them to make logs quiet.
+
+## `ld.lld` and `lld` Are Confused
+
+**Symptom:** setup instructions appear satisfied, but the linker command is not
+found.
+
+**Likely cause:** the LLVM package is installed while the executable name
+`ld.lld` is outside `PATH`; `lld` is a project/tool family name, not the linker
+command used here.
+
+**Safe check:**
+
+```bash
+command -v ld.lld
+ld.lld --version
+```
+
+**Expected result:** an executable `ld.lld`.
+
+**Stop when:** only an unrelated `lld` command exists. Do not substitute a
+different linker without validating the build policy.
+
+## Cargo Reports Generated-ABI Warnings
+
+**Symptom:** `cargo check` succeeds but prints naming or dead-code warnings from
+generated ABI bindings.
+
+**Likely cause:** generated names preserve the canonical ABI rather than Rust
+style.
+
+**Safe check:**
+
+```bash
+cargo check --manifest-path userspace/core_service/Cargo.toml
+cargo deny --manifest-path userspace/core_service/Cargo.toml check
+```
+
+**Expected result:** both commands pass; existing warnings remain visible and
+do not conceal an error.
+
+**Stop when:** either command fails or a new warning indicates behavior drift.
+Do not hand-edit generated bindings.
+
+## GNU and LLVM Disassembly Differ
+
+**Symptom:** symbol labels or equivalent instruction spellings differ between
+hosts.
+
+**Likely cause:** GNU and LLVM tools format the same x86-64 binary differently.
+
+**Safe check:**
 
 ```bash
 aarch64-elf-readelf -h -l -S -s artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf
@@ -85,18 +184,74 @@ nm -n artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf
 objdump -d artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf
 ```
 
-**What not to do:** do not lower required instruction or symbol evidence to
-hide a formatting difference.
+**Expected result:** ELF64 x86-64 metadata and equivalent required symbols and
+instructions. The AArch64-prefixed tool is used only for ELF metadata.
+
+**Stop when:** required structure or instructions are absent. Do not lower
+evidence counts to hide formatting differences.
+
+## Checksum Mismatch
+
+**Symptom:** `shasum -a 256 -c SHA256SUMS` reports `FAILED`.
+
+**Likely cause:** an incomplete, corrupted, or wrong-version download.
+
+**Safe check:** confirm all files came from the same
+[v1.0.0 release](https://github.com/irgordon/kozo/releases/tag/v1.0.0), then run
+the checksum command again.
+
+**Expected result:** every listed file reports `OK`.
+
+**Stop when:** any mismatch remains. Delete the suspect download, download it
+again, and do not run it until validation succeeds.
+
+## Wrong Release Version
+
+**Symptom:** asset names or metadata mention `v1.0.0-rc.1` instead of `v1.0.0`,
+or the expected final archive is absent.
+
+**Likely cause:** assets were downloaded from the historical prerelease.
+
+**Safe check:**
+
+```bash
+jq '{version, display_version, commit}' release_metadata.json
+```
+
+**Expected result:** version `1.0.0`, display version `v1.0.0`, and commit
+`1586089415a98a11d2024d606ce6301f568b7d6e`.
+
+**Stop when:** metadata identifies another release. Do not combine files from
+different release pages.
+
+## A Local Rebuild Is Mistaken for the Hosted ISO
+
+**Symptom:** a local ISO boots, but the result is being used to claim that the
+downloaded release works.
+
+**Likely cause:** `KOZO_BOOT_ISO` points to
+`artifacts/runtime/boot_image/kozo.iso` instead of the downloaded file.
+
+**Safe check:**
+
+```bash
+jq '.boot_image' artifacts/runtime/qemu_smoke.metadata.json
+```
+
+**Expected result:** the recorded path is the intended downloaded ISO during a
+release-artifact test.
+
+**Stop when:** the path names a local rebuild. Re-run against the hosted ISO;
+do not substitute one evidence source for the other.
 
 ## A Generated Report Is Stale
 
-**What you see:** a drift validator reports that checked-in output differs from
-the renderer.
+**Symptom:** a drift validator reports that checked-in output differs from the
+renderer.
 
-**What it usually means:** an authoritative input changed without a governed
-refresh.
+**Likely cause:** an authoritative input changed without a governed refresh.
 
-**What to check:**
+**Safe check:**
 
 ```bash
 git status --short
@@ -104,72 +259,27 @@ scripts/verify.sh
 git diff -- docs/generated artifacts
 ```
 
-**What not to do:** do not edit the generated report manually.
+**Expected result:** generated changes are explained by current authoritative
+inputs and pass the drift validator.
 
-## The Governance Index Fails
-
-**What you see:** `governance_index_report` reports stale content.
-
-**What it usually means:** contracts, schemas, validators, tasks, or version
-state changed.
-
-**What to check:**
-
-```bash
-python3 -c 'from harness.governance_index_report import write_report; write_report()'
-python3 -m unittest tests/test_governance_index_report.py
-```
-
-**What not to do:** do not delete the validator or hand-edit the index.
-
-## cargo-deny Fails
-
-**What you see:** an advisory, ban, source, or license check fails.
-
-**What it usually means:** package metadata or dependency policy does not match
-`deny.toml`.
-
-**What to check:**
-
-```bash
-cargo deny --manifest-path userspace/core_service/Cargo.toml check licenses
-cargo deny --manifest-path userspace/core_service/Cargo.toml check
-```
-
-**What not to do:** do not add a crate exception merely to make the command
-green.
-
-## Taplo Crashes on macOS
-
-**What you see:** Taplo exits with a `system-configuration` or NULL-object
-panic.
-
-**What it usually means:** the local Taplo build failed while reading macOS
-network configuration, not that the TOML is valid or invalid.
-
-**What to check:**
-
-```bash
-taplo fmt --check .
-taplo check
-```
-
-**What not to do:** do not report Taplo success after a panic. Record the
-tooling limitation and rely on the governed checks that actually ran.
+**Stop when:** the reason for the generated change is unknown. Never edit the
+report manually.
 
 ## A Documented Command No Longer Works
 
-**What you see:** a command fails even though the guide describes it as current.
+**Symptom:** a current guide command fails in a clean checkout.
 
-**What it usually means:** tooling or repository behavior changed without a
+**Likely cause:** tooling or repository behavior changed without a
 documentation update.
 
-**What to check:**
+**Safe check:**
 
 ```bash
 git log -1 --oneline
 git status --short --branch
 ```
 
-**What not to do:** do not replace the command with an untested workaround.
-Open a focused documentation or tooling correction.
+**Expected result:** the checkout and guide refer to the same branch or tag.
+
+**Stop when:** an untested workaround would change governance or evidence.
+Open a focused documentation or tooling correction instead.
