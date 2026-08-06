@@ -1,5 +1,21 @@
 # Changelog
 
+## Post-release issue triage - 2026-08-05
+
+**Status:** Documentation-only triage on `main`; not a new product release.
+
+* Reviewed all project-visible GitHub issues and post-publication Actions runs.
+* Rechecked repository issue records, live source annotations, and post-tag
+  changes without finding a defect report in the reviewed sources.
+* Downloaded and validated all six immutable v1.0.0 assets and reproduced the
+  accepted 41-marker result from the hosted ISO.
+* Recorded zero triage cases, no reproduced defect, and no security-sensitive
+  finding while disclosing private and third-party report-source limitations.
+* Did not authorize v1.0.1 preparation; the current release remains v1.0.0 and
+  post-release observation continues.
+* Preserved the v1.0.0 and v1.0.0-rc.1 tags, notes, assets, runtime, ABI,
+  contracts, schemas, marker order, and product version.
+
 ## Post-publication documentation audit - 2026-07-29
 
 **Status:** Documentation-only alignment on `main`; not a new product release.

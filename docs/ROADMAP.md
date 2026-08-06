@@ -159,6 +159,12 @@ Post-publication documentation on `main` now routes users, maintainers, and
 engineers through separate paths while preserving the immutable release
 records. This alignment changes no runtime or release artifact.
 
+The v1.0.0 post-release issue triage reviewed all project-visible GitHub
+issues, Actions runs after publication, repository issue records, the six
+hosted assets, and the downloaded ISO. No defect reports were found in those
+sources, the hosted baseline still passes, and no case authorizes v1.0.1
+preparation. The current release remains v1.0.0 while observation continues.
+
 ---
 
 # 10. Near-Term Runtime Work
@@ -187,7 +193,9 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
     immutable tag, and hosted asset evidence without in-place mutation.
 19. Preserve the post-publication user, maintainer, and engineering entry paths
     without making the wiki authoritative over contracts or governance.
-20. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
+20. Preserve the completed post-release triage record and require a reproduced,
+    in-scope patch defect before authorizing v1.0.1 preparation.
+21. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
 
 ---
 

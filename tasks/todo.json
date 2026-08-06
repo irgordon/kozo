@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO v1.0.0 Post-Publication Documentation Audit and Wiki Alignment",
+  "task_title": "KOZO v1.0.0 Post-Release Issue Triage",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -28,7 +28,8 @@
     "Post-promotion documentation alignment is accepted at b71f511e87d492464525a5446898d839698c4917 with hosted CI and lint success",
     "The immutable final v1.0.0 tag targets 1586089415a98a11d2024d606ce6301f568b7d6e and its six hosted assets remain accepted",
     "The immutable v1.0.0-rc.1 tag and prerelease remain accepted historical release records",
-    "The post-publication documentation baseline is fad5f5305299a7b9ff7a63df5b1fbeaa021dd7f7"
+    "The post-publication documentation baseline is fad5f5305299a7b9ff7a63df5b1fbeaa021dd7f7",
+    "Post-publication documentation and generated proof are accepted on main at df54696098a03509f0575325a9addb03804bed18"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
@@ -48,7 +49,8 @@
     "Final v1.0.0 publication is authorized only after local and hosted gates accept one final commit",
     "One post-promotion documentation/proof-only commit may record immutable hosted v1.0.0 facts without changing runtime, ABI, contracts, markers, tag target, notes, or assets",
     "This phase changes documentation and task state only; runtime, ABI, contracts, schemas, marker order, release tags, hosted notes, hosted assets, and published metadata remain unchanged",
-    "docs/DOCUMENTATION_STANDARD.md remains the authority for audience-aware documentation; no duplicate documentation authority is introduced"
+    "docs/DOCUMENTATION_STANDARD.md remains the authority for audience-aware documentation; no duplicate documentation authority is introduced",
+    "Post-release triage may record evidence and decide patch preparation, but it may not implement v1.0.1 or modify the immutable v1.0.0 and v1.0.0-rc.1 release records"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -3135,6 +3137,28 @@
         "verification.tests_run[155]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 91,
+      "title": "Triage post-release v1.0.0 issue evidence",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "docs/releases/v1.0.0-post-release-triage.md",
+        "docs/ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "tasks/runtime.json",
+        "docs/generated/governance_index.md",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.summary.txt"
+      ],
+      "verification_refs": [
+        "verification.tests_run[156]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -3208,7 +3232,8 @@
     "Final promotion readiness blocks force pushes to main without adding review, required-check, administrator, deletion, conversation, ruleset, or other repository policy; rebuilds and directly inspects one unpublished dry-run bundle; and preserves 67 checks and all 41 runtime markers.",
     "Post-promotion verification preserves the immutable v1.0.0-rc.1 tag and hosted release, revalidates all hosted assets, boots the distributed ISO through all 41 markers, tests the clean user path, and aligns current documentation without runtime changes.",
     "v1.0.0 publishes one hosted-CI-accepted final commit as an immutable annotated tag and final GitHub release, verifies all six hosted assets independently, preserves the RC record, and records publication through one documentation/proof-only follow-up commit.",
-    "The post-publication documentation audit routes users, maintainers, and engineers through distinct wiki paths, validates the hosted ISO user path, records product limits plainly, and preserves all immutable release and runtime state."
+    "The post-publication documentation audit routes users, maintainers, and engineers through distinct wiki paths, validates the hosted ISO user path, records product limits plainly, and preserves all immutable release and runtime state.",
+    "Post-release triage records zero reports and zero cases from the reviewed sources, preserves the passing immutable release baseline, does not authorize v1.0.1 preparation, and changes no product behavior."
   ],
   "verification": {
     "tests_run": [
@@ -3991,6 +4016,11 @@
         "tool": "v1.0.0 post-publication documentation audit",
         "command": "immutable final and RC release readback; wiki inventory and claim audit; local Markdown link validation; hosted asset download and checksums; hosted ISO QEMU smoke; clean-clone user-path checks; Python, Odin, Rust, cargo-deny, cargo-audit, and governed verification",
         "status": "passed_72_local_links_six_hosted_assets_checksums_valid_hosted_and_clean_clone_qemu_41_markers_1050_tests_67_checks_0_failures"
+      },
+      {
+        "tool": "v1.0.0 post-release issue triage",
+        "command": "immutable final and RC release readback; GitHub issue and post-publication Actions inventory; repository issue-record and source-annotation scan; post-tag diff review; hosted asset download, checksum, JSON, and ISO validation; clean tagged clone; Python, Odin, Rust, cargo-deny, cargo-audit, governed verification, JSON, and diff checks",
+        "status": "passed_zero_reports_zero_cases_zero_reproduced_highest_impact_none_highest_severity_none_v1.0.1_unauthorized_1050_tests_67_checks_0_failures_qemu_pass_41_markers"
       }
     ],
     "logs": [
@@ -4009,7 +4039,8 @@
       "runtime evidence taxonomy is authoritative for marker and blocker vocabulary; generated smoke metadata remains evidence and does not define taxonomy authority.",
       "Runtime progression stages are authoritative stage governance; the graph remains acyclic and monotonic, and the halt loop remains authoritative after the bounded progression call.",
       "Hosted CI run 29459278491 captured the complete ordered runtime marker sequence and passed runtime_progression_evidence.",
-      "Ring3 response-consumer ELF evidence must be bounded by authoritative start and end symbol addresses so GNU and LLVM label aliases cannot change the governed comparison result."
+      "Ring3 response-consumer ELF evidence must be bounded by authoritative start and end symbol addresses so GNU and LLVM label aliases cannot change the governed comparison result.",
+      "Published v1.0.0 and v1.0.0-rc.1 tags, notes, and assets remain immutable; patch preparation requires a reproduced, in-scope defect that satisfies the complete authorization gate."
     ],
     "expected_behavior": [
       "verify.sh succeeds on a clean tree and prints the generated artifact JSON before VERIFY: PASS",
@@ -4071,7 +4102,8 @@
       "v0.7.2 requires an acyclic progression graph, earlier mandatory prerequisites, monotonic proven status, forward-only transitions, known authorities, and one owner per transition without changing runtime behavior.",
       "v0.7.3 requires exact future region geometry and ownership, full-region zero fill, a bounded sentinel write/read/compare/restore probe, and marker placement before the unchanged halt loop while memory evidence remains planned.",
       "Post-promotion verification must preserve the accepted tag and hosted release, validate the distributed artifacts and runtime independently, and align only current status documentation.",
-      "Post-publication documentation must route users, maintainers, and engineers separately while preserving product limits, release immutability, and the accepted runtime evidence."
+      "Post-publication documentation must route users, maintainers, and engineers separately while preserving product limits, release immutability, and the accepted runtime evidence.",
+      "Post-release triage must distinguish absence of reports from absence of defects, classify every available report independently, and leave v1.0.1 unauthorized unless a reproduced U2-U4 and R3-R4 defect satisfies the patch gate."
     ],
     "actual_behavior": [
       "verify.sh handles an empty changed-files set without aborting and prints the generated verify artifact.",
@@ -4153,7 +4185,8 @@
       "v0.7.45 is accepted by hosted CI marker and validator evidence for the bounded assembly-to-Odin call, fixed bootstrap context validation, volatile static-state probe, exact return status, and preserved terminal halt.",
       "The portable Ring3 evidence correction resolves GNU/LLVM function-label differences by extracting the consumer from its ELF address range and preserves the full comparison, response-offset, success-store, int 0x81, and ud2 ordering requirements.",
       "The immutable v1.0.0-rc.1 tag and prerelease remain unchanged; all six hosted assets validate, the distributed ISO produces the accepted 41-marker sequence, the clean user path works with ld.lld, and current documentation distinguishes publication from dry-run metadata.",
-      "The post-publication wiki provides distinct user, maintainer, and engineer paths, states the v1.0.0 product boundary directly, validates the hosted ISO workflow, and preserves immutable final and RC release records without runtime changes."
+      "The post-publication wiki provides distinct user, maintainer, and engineer paths, states the v1.0.0 product boundary directly, validates the hosted ISO workflow, and preserves immutable final and RC release records without runtime changes.",
+      "Post-release triage found no defect reports in project-visible GitHub issues, post-publication Actions, repository records, or live annotations; created zero cases; reproduced the accepted hosted baseline; recorded U0-U4 and R0-R4 counts as zero; and did not authorize v1.0.1 preparation."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -4235,6 +4268,7 @@
     "Corrected the CI-only Ring3 ELF evidence failure by parsing GNU and LLVM full disassembly within authoritative consumer symbol bounds, while retaining all field-coverage and success-path ordering checks and leaving the accepted runtime marker sequence unchanged.",
     "Added the exact MIT SPDX license metadata to core_service, validated Cargo metadata and package contents, removed the cargo-deny blocker without policy exceptions, and preserved runtime evidence.",
     "Verified the immutable promoted release from fresh hosted downloads, reproduced the accepted runtime from the distributed ISO, tested a clean tagged clone, and aligned current release documentation without changing runtime behavior or historical release records.",
-    "Audited every wiki page against the published v1.0.0 product, separated user, maintainer, and engineer paths, corrected stale and incomplete guidance, and retained all runtime and release records unchanged."
+    "Audited every wiki page against the published v1.0.0 product, separated user, maintainer, and engineer paths, corrected stale and incomplete guidance, and retained all runtime and release records unchanged.",
+    "Reviewed project-visible post-release issue sources, reproduced the immutable hosted baseline, recorded no available defect reports or triage cases, and left v1.0.1 preparation unauthorized without changing runtime or release state."
   ]
 }
