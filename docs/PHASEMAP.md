@@ -142,7 +142,9 @@ The current local generated evidence proves:
   baseline. No user-filed report was present. Hosted acceptance and an
   immutable-tag rerun reproduced `KOZO-TRIAGE-001`, where current Odin emits a
   suffixless request as `.o` and the object helper does not normalize it.
-  Bounded v1.0.1 patch preparation is authorized; publication is not.
+  Current `main` now contains the bounded normalization correction and focused
+  regression coverage. Full local verification passes; hosted acceptance
+  remains pending, and publication is not authorized.
 
 ## Current Active Blocker
 
@@ -162,10 +164,11 @@ Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr
 
 The `v1.0.0-rc.1`, `v1.0.0`, and post-publication documentation phases are
 complete. Post-release triage reproduced `KOZO-TRIAGE-001` and authorizes the
-next task, `KOZO v1.0.1 Patch Preparation`, limited to current-Odin object
-output normalization and its focused regression coverage. Publication remains
-unauthorized. The existing final tag and hosted assets must not be changed in
-place.
+active `KOZO v1.0.1 Patch Preparation` task, limited to current-Odin object
+output normalization and its focused regression coverage. The implementation
+passes its full local gates; hosted acceptance remains. Patch publication is
+unauthorized, and the existing final tag and hosted assets must not be changed
+in place.
 
 ---
 

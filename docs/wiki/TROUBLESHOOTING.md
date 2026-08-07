@@ -155,8 +155,8 @@ requested object`, but a file with the same name and an added `.o` suffix
 exists.
 
 **Likely cause:** Odin `dev-2026-08` changed a suffixless `-out` request to
-produce `<name>.o`. The v1.0.0 object helper recognizes the prior output forms
-but not this one. This is tracked as `KOZO-TRIAGE-001`.
+produce `<name>.o`. The immutable v1.0.0 source helper recognizes the prior
+output forms but not this one. This is tracked as `KOZO-TRIAGE-001`.
 
 **Safe check:**
 
@@ -165,11 +165,13 @@ odin version
 find artifacts -maxdepth 1 -name 'kernel-build-check*' -print
 ```
 
-**Expected result:** the affected toolchain reports `dev-2026-08`, the exact
-requested path is absent, and `artifacts/kernel-build-check.o` exists.
+**Expected result:** tagged v1.0.0 source leaves
+`artifacts/kernel-build-check.o` and fails the build. Current `main` normalizes
+the supported output to `artifacts/kernel-build-check`; its hosted acceptance
+remains required before the patch is accepted.
 
-**Supported workaround:** use the accepted Odin `dev-2026-07` toolchain for
-the v1.0.0 source and release-bundle path until the bounded patch is accepted.
+**Supported workaround:** use the accepted Odin `dev-2026-07` toolchain with
+the immutable v1.0.0 source. The future v1.0.1 patch remains unpublished.
 
 **Stop when:** the exact requested object is absent. Do not rename the file,
 weaken the release validator, or treat the failed bundle as accepted proof.

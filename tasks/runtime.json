@@ -1,9 +1,9 @@
 {
   "artifact_version": "1",
-  "task_id": "kozo-v1.0.0-post-release-triage",
-  "task_title": "KOZO v1.0.0 Post-Release Issue Triage",
-  "plan_status": "complete",
-  "current_step_id": 91,
+  "task_id": "kozo-v1.0.1-odin-object-normalization",
+  "task_title": "KOZO v1.0.1 Patch Preparation - Cross-Host Odin Object Normalization",
+  "plan_status": "approved",
+  "current_step_id": 92,
   "replan_required": false,
   "halted": false,
   "failure_state": {
@@ -12,8 +12,8 @@
   },
   "execution": {
     "step_attempt": 1,
-    "last_step_started_at": "2026-08-06T00:18:16Z",
+    "last_step_started_at": "2026-08-06T22:00:00Z",
     "last_step_completed_at": "2026-08-06T21:35:56Z"
   },
-  "updated_at": "2026-08-06T21:35:56Z"
+  "updated_at": "2026-08-06T22:00:00Z"
 }

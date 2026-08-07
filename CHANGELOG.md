@@ -1,5 +1,25 @@
 # Changelog
 
+## v1.0.1 patch preparation - 2026-08-06
+
+**Status:** Build-tooling correction on `main`; `v1.0.1` is not published.
+
+* Normalized Odin object output at the canonical build boundary when the
+  compiler emits either the exact requested path, an appended `.o`, or the
+  accepted legacy `.obj` form.
+* Removed known stale candidates before compilation and rejected missing,
+  ambiguous, non-regular, or symlink output instead of accepting uncertain
+  build state.
+* Added deterministic fake-compiler coverage for the accepted forms, compiler
+  failure, missing and stale output, ambiguity, invalid output, and paths with
+  spaces.
+* Passed 1,058 Python tests and the governed 67-check, 41-marker QEMU
+  verification locally; hosted regression acceptance remains pending.
+* Preserved `release/version.txt` at `1.0.0`; patch publication, a `v1.0.1`
+  tag, and a `v1.0.1` GitHub release remain unauthorized.
+* Changed no kernel, userspace runtime, ABI, contract, schema, marker, or
+  immutable release record.
+
 ## Post-release issue triage - 2026-08-05
 
 **Status:** Documentation-only triage on `main`; not a new product release.

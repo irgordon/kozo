@@ -165,8 +165,16 @@ hosted assets, and the downloaded ISO. No user-filed report was present, but
 hosted acceptance exposed `KOZO-TRIAGE-001`: current Odin emits `.o` for a
 suffixless object output, while the accepted helper normalizes only the prior
 path forms. Tagged-source and direct compiler reproductions classify the case
-`BUILD_TOOLING`, `U2`, and `R3`. Preparation of a bounded v1.0.1 correction is
-authorized; implementation and publication remain separately gated.
+`BUILD_TOOLING`, `U2`, and `R3`. Current `main` implements the bounded
+normalization correction and focused regression coverage. Local governed
+verification passes; hosted acceptance remains gated, and publication remains
+unauthorized.
+
+Future general-userspace releases must preserve a defined minimum usable
+hardware profile. Additional CPU, memory, and storage should increase capacity
+and performance without making core supported functionality depend on
+high-end development hardware. KOZO does not yet define host or guest resource
+minimums, and this tooling correction introduces none.
 
 ---
 
@@ -196,9 +204,9 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
     immutable tag, and hosted asset evidence without in-place mutation.
 19. Preserve the post-publication user, maintainer, and engineering entry paths
     without making the wiki authoritative over contracts or governance.
-20. Prepare a bounded v1.0.1 correction for `KOZO-TRIAGE-001`: normalize the
-    current Odin `.o` output for suffixless requested paths, add one focused
-    regression test, and preserve all runtime and release boundaries.
+20. Validate the bounded v1.0.1 correction for `KOZO-TRIAGE-001`: normalize
+    supported Odin object outputs at one canonical boundary, retain focused
+    failure coverage, and preserve all runtime and release boundaries.
 21. Keep v1.0.1 publication unauthorized until local and hosted gates pass.
 22. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
 
