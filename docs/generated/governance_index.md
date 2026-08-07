@@ -12,9 +12,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Current version
 
-* Version: `v1.0.0`
-* Date: `2026-07-29`
-* Status: Published as the immutable final GitHub release; hosted assets independently verified.
+* Version: `v1.0.1`
+* Date: `2026-08-07`
+* Status: Patch release preparation; current published release remains
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 67
 * Failed checks: 0
-* Run ID: `verify-20260806T221237Z`
-* Generated at: `2026-08-06T22:12:37Z`
+* Run ID: `verify-20260807T214144Z`
+* Generated at: `2026-08-07T21:41:44Z`
 
 ## Registered validators
 
