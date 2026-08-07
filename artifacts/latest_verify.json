@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260806T221237Z",
+  "run_id": "verify-20260807T031159Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -497,11 +497,12 @@
     "artifacts/runtime/qemu_smoke.summary.txt",
     "docs/PHASEMAP.md",
     "docs/ROADMAP.md",
-    "docs/generated/governance_index.md",
     "docs/releases/v1.0.0-post-release-triage.md",
     "docs/wiki/TROUBLESHOOTING.md",
+    "scripts/build_odin_object.sh",
     "tasks/runtime.json",
-    "tasks/todo.json"
+    "tasks/todo.json",
+    "tests/test_odin_object_build.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -518,5 +519,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-08-06T22:12:37Z"
+  "generated_at": "2026-08-07T03:11:59Z"
 }
