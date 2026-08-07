@@ -167,8 +167,8 @@ find artifacts -maxdepth 1 -name 'kernel-build-check*' -print
 
 **Expected result:** tagged v1.0.0 source leaves
 `artifacts/kernel-build-check.o` and fails the build. Current `main` normalizes
-the supported output to `artifacts/kernel-build-check`; its hosted acceptance
-remains required before the patch is accepted.
+the supported output to `artifacts/kernel-build-check` and is accepted by
+hosted CI. The future v1.0.1 release remains unpublished.
 
 **Supported workaround:** use the accepted Odin `dev-2026-07` toolchain with
 the immutable v1.0.0 source. The future v1.0.1 patch remains unpublished.

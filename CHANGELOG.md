@@ -14,7 +14,8 @@
   failure, missing and stale output, ambiguity, invalid output, and paths with
   spaces.
 * Passed 1,058 Python tests and the governed 67-check, 41-marker QEMU
-  verification locally; hosted regression acceptance remains pending.
+  verification locally and in hosted CI run `31143730244`; hosted lint run
+  `31143730243` also passed.
 * Preserved `release/version.txt` at `1.0.0`; patch publication, a `v1.0.1`
   tag, and a `v1.0.1` GitHub release remain unauthorized.
 * Changed no kernel, userspace runtime, ABI, contract, schema, marker, or

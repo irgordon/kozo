@@ -2,7 +2,7 @@
   "task_title": "KOZO v1.0.1 Patch Preparation - Cross-Host Odin Object Normalization",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
-  "plan_status": "approved",
+  "plan_status": "complete",
   "replan_number": 0,
   "approval": {
     "status": "approved"
@@ -3166,7 +3166,7 @@
     {
       "id": 92,
       "title": "Normalize cross-host Odin object output for v1.0.1 patch preparation",
-      "status": "pending",
+      "status": "done",
       "kind": "edit",
       "files_expected": [
         "scripts/build_odin_object.sh",
@@ -4053,8 +4053,8 @@
       },
       {
         "tool": "v1.0.1 cross-host Odin object normalization",
-        "command": "version-governance review; exact pre-fix Odin dev-2026-08 reproduction; fake-Odin boundary tests; Bash syntax and shellcheck; real Odin dev-2026-07 and dev-2026-08 normalization checks; Python, Odin, Rust, cargo-deny, cargo-audit, and governed verification",
-        "status": "local_pass_10_focused_1058_full_tests_67_checks_0_failures_qemu_pass_41_markers; hosted_pending; publication_unauthorized"
+        "command": "version-governance review; exact pre-fix Odin dev-2026-08 reproduction; fake-Odin boundary tests; Bash syntax and shellcheck; real Odin dev-2026-07 and dev-2026-08 normalization checks; Python, Odin, Rust, cargo-deny, cargo-audit, governed verification; local release-bundle regression; hosted CI, lint, proof download, and immutable release readback",
+        "status": "accepted_local_and_hosted_10_focused_1058_full_tests_67_checks_0_failures_qemu_pass_41_markers_ci_31143730244_lint_31143730243_release_bundle_stage_pass; publication_unauthorized"
       }
     ],
     "logs": [
@@ -4222,7 +4222,7 @@
       "The immutable v1.0.0-rc.1 tag and prerelease remain unchanged; all six hosted assets validate, the distributed ISO produces the accepted 41-marker sequence, the clean user path works with ld.lld, and current documentation distinguishes publication from dry-run metadata.",
       "The post-publication wiki provides distinct user, maintainer, and engineer paths, states the v1.0.0 product boundary directly, validates the hosted ISO workflow, and preserves immutable final and RC release records without runtime changes.",
       "Post-release triage found no user-filed reports in project-visible GitHub issues, then reproduced KOZO-TRIAGE-001 against tagged v1.0.0 source and current Odin; recorded one BUILD_TOOLING/U2/R3 case; preserved the accepted runtime baseline; and authorized bounded v1.0.1 patch preparation without authorizing implementation or publication.",
-      "Current main accepts the exact Odin output and supported .o or legacy .obj variation at one helper boundary, rejects uncertain output provenance, and leaves all kernel and release records unchanged; full local validation passes while hosted acceptance remains pending."
+      "Current main accepts the exact Odin output and supported .o or legacy .obj variation at one helper boundary, rejects uncertain output provenance, and leaves all kernel and release records unchanged; local and hosted acceptance pass while publication remains unauthorized."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -4306,6 +4306,6 @@
     "Verified the immutable promoted release from fresh hosted downloads, reproduced the accepted runtime from the distributed ISO, tested a clean tagged clone, and aligned current release documentation without changing runtime behavior or historical release records.",
     "Audited every wiki page against the published v1.0.0 product, separated user, maintainer, and engineer paths, corrected stale and incomplete guidance, and retained all runtime and release records unchanged.",
     "Reviewed project-visible post-release issue sources, reproduced the immutable hosted baseline, classified current-Odin object normalization as KOZO-TRIAGE-001 BUILD_TOOLING/U2/R3, and authorized bounded v1.0.1 patch preparation without changing runtime or immutable release state.",
-    "Normalized supported Odin object filenames at one portable build boundary, added fail-closed fake-compiler regression coverage, kept release/version.txt at 1.0.0, and preserved runtime and immutable release state while hosted acceptance remains pending."
+    "Normalized supported Odin object filenames at one portable build boundary, added fail-closed fake-compiler regression coverage, passed the formerly failing hosted release-bundle stage, kept release/version.txt at 1.0.0, and preserved runtime and immutable release state without authorizing publication."
   ]
 }
