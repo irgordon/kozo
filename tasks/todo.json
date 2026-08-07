@@ -31,7 +31,9 @@
     "The post-publication documentation baseline is fad5f5305299a7b9ff7a63df5b1fbeaa021dd7f7",
     "Post-publication documentation and generated proof are accepted on main at df54696098a03509f0575325a9addb03804bed18",
     "KOZO-TRIAGE-001 is reproduced as a BUILD_TOOLING/U2/R3 defect and bounded v1.0.1 patch preparation is authorized",
-    "KOZO-TRIAGE-001 patch preparation is accepted on main at b2bc296dbfd7fdeda5c6ab48c861ff569850f350 with hosted CI run 31153444797 and lint run 31153445341"
+    "KOZO-TRIAGE-001 patch preparation is accepted on main at b2bc296dbfd7fdeda5c6ab48c861ff569850f350 with hosted CI run 31153444797 and lint run 31153445341",
+    "The exact v1.0.1 release commit 02f1b0113458b988562b7e03362ec9ae716cebd0 is accepted by hosted CI run 31223062540 and lint run 31223061928",
+    "Annotated v1.0.1 tag object 7896c767376a666ad7f7d8f294beadb473b0290c targets the accepted release commit and its six hosted assets are independently verified"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
@@ -53,10 +55,10 @@
     "This phase changes documentation and task state only; runtime, ABI, contracts, schemas, marker order, release tags, hosted notes, hosted assets, and published metadata remain unchanged",
     "docs/DOCUMENTATION_STANDARD.md remains the authority for audience-aware documentation; no duplicate documentation authority is introduced",
     "Post-release triage may record evidence and decide patch preparation, but it may not implement v1.0.1 or modify the immutable v1.0.0 and v1.0.0-rc.1 release records",
-    "release/version.txt remains the published final version 1.0.0 until a separately authorized patch-release preparation advances it",
-    "This patch changes only the Odin object-build boundary, focused tests, current status documentation, task state, and generated proof; publication remains unauthorized",
-    "The explicitly authorized v1.0.1 release boundary advances release/version.txt, prepares one commit-bound six-asset release, and publishes only after the exact tag target passes local and hosted gates",
-    "The v1.0.1 tag must target a new hosted-accepted descendant of b2bc296dbfd7fdeda5c6ab48c861ff569850f350 and must never be moved after publication"
+    "release/version.txt records the current published patch version 1.0.1; later version changes require a separately authorized release boundary",
+    "The published patch changes only the Odin object-build boundary, focused tests, current status documentation, task state, and generated proof",
+    "The authorized v1.0.1 release boundary advanced release/version.txt and published one commit-bound six-asset release only after the exact tag target passed local and hosted gates",
+    "The immutable v1.0.1 tag targets hosted-accepted descendant 02f1b0113458b988562b7e03362ec9ae716cebd0 of b2bc296dbfd7fdeda5c6ab48c861ff569850f350 and must never be moved"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -3194,7 +3196,7 @@
     {
       "id": 93,
       "title": "Prepare, publish, and verify KOZO v1.0.1",
-      "status": "pending",
+      "status": "done",
       "kind": "edit",
       "files_expected": [
         ".github/workflows/ci.yml",
@@ -4105,8 +4107,8 @@
       },
       {
         "tool": "v1.0.1 patch release authorization",
-        "command": "version and immutable-release review; release and task schema checks; 27 focused tests; Python discovery; Odin and Rust checks; cargo-deny and cargo-audit; governed verification; commit-bound bundle, hosted gate, tag, release, and hosted asset validation pending",
-        "status": "local_gate_passed_27_focused_1058_full_tests_67_checks_0_failures_qemu_pass_41_markers; first_qemu_attempts_used_removed_qemu_11.0.2_path; portable_qemu_11.0.3_retry_passed; publication_pending"
+        "command": "version and immutable-release review; release and task schema checks; 27 focused tests; Python discovery; Odin and Rust checks; cargo-deny and cargo-audit; governed verification; commit-bound local and hosted bundle inspection; hosted CI and lint; annotated tag and final GitHub release verification; independent hosted asset, metadata, checksum, and ISO validation",
+        "status": "published_commit_02f1b0113458b988562b7e03362ec9ae716cebd0_ci_31223062540_lint_31223061928_tag_object_7896c767376a666ad7f7d8f294beadb473b0290c_six_hosted_assets_exact_hosted_iso_qemu_pass_41_markers_core_service_unpublished"
       }
     ],
     "logs": [
@@ -4126,7 +4128,7 @@
       "Runtime progression stages are authoritative stage governance; the graph remains acyclic and monotonic, and the halt loop remains authoritative after the bounded progression call.",
       "Hosted CI run 29459278491 captured the complete ordered runtime marker sequence and passed runtime_progression_evidence.",
       "Ring3 response-consumer ELF evidence must be bounded by authoritative start and end symbol addresses so GNU and LLVM label aliases cannot change the governed comparison result.",
-      "Published v1.0.0 and v1.0.0-rc.1 tags, notes, and assets remain immutable; patch preparation requires a reproduced, in-scope defect that satisfies the complete authorization gate."
+      "Published v1.0.0, v1.0.0-rc.1, and v1.0.1 tags, notes, and assets remain immutable; later patch preparation requires a reproduced, in-scope defect that satisfies the complete authorization gate."
     ],
     "expected_behavior": [
       "verify.sh succeeds on a clean tree and prints the generated artifact JSON before VERIFY: PASS",
@@ -4274,7 +4276,7 @@
       "The immutable v1.0.0-rc.1 tag and prerelease remain unchanged; all six hosted assets validate, the distributed ISO produces the accepted 41-marker sequence, the clean user path works with ld.lld, and current documentation distinguishes publication from dry-run metadata.",
       "The post-publication wiki provides distinct user, maintainer, and engineer paths, states the v1.0.0 product boundary directly, validates the hosted ISO workflow, and preserves immutable final and RC release records without runtime changes.",
       "Post-release triage found no user-filed reports in project-visible GitHub issues, then reproduced KOZO-TRIAGE-001 against tagged v1.0.0 source and current Odin; recorded one BUILD_TOOLING/U2/R3 case; preserved the accepted runtime baseline; and authorized bounded v1.0.1 patch preparation without authorizing implementation or publication.",
-      "Current main accepts the exact Odin output and supported .o or legacy .obj variation at one helper boundary, rejects uncertain output provenance, and leaves all kernel and release records unchanged; local and hosted acceptance pass while publication remains unauthorized."
+      "Published v1.0.1 accepts the exact Odin output and supported .o or legacy .obj variation at one helper boundary, rejects uncertain output provenance, and preserves the v1.0.0 runtime; local, hosted, release-asset, and downloaded-ISO acceptance pass."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -4358,6 +4360,7 @@
     "Verified the immutable promoted release from fresh hosted downloads, reproduced the accepted runtime from the distributed ISO, tested a clean tagged clone, and aligned current release documentation without changing runtime behavior or historical release records.",
     "Audited every wiki page against the published v1.0.0 product, separated user, maintainer, and engineer paths, corrected stale and incomplete guidance, and retained all runtime and release records unchanged.",
     "Reviewed project-visible post-release issue sources, reproduced the immutable hosted baseline, classified current-Odin object normalization as KOZO-TRIAGE-001 BUILD_TOOLING/U2/R3, and authorized bounded v1.0.1 patch preparation without changing runtime or immutable release state.",
-    "Normalized supported Odin object filenames at one portable build boundary, added fail-closed fake-compiler regression coverage, passed the formerly failing hosted release-bundle stage, kept release/version.txt at 1.0.0, and preserved runtime and immutable release state without authorizing publication."
+    "Normalized supported Odin object filenames at one portable build boundary, added fail-closed fake-compiler regression coverage, passed the formerly failing hosted release-bundle stage, and preserved runtime and immutable prior releases.",
+    "Published immutable v1.0.1 from hosted-accepted commit 02f1b0113458b988562b7e03362ec9ae716cebd0, independently verified all six hosted assets and the downloaded ISO, resolved KOZO-TRIAGE-001, and did not publish core_service."
   ]
 }

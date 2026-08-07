@@ -14,14 +14,17 @@ general-purpose operating system.
 ## Current Release
 
 Current final release:
+[v1.0.1](https://github.com/irgordon/kozo/releases/tag/v1.0.1)
+
+Previous final release:
 [v1.0.0](https://github.com/irgordon/kozo/releases/tag/v1.0.0)
 
 Previous prerelease:
 [v1.0.0-rc.1](https://github.com/irgordon/kozo/releases/tag/v1.0.0-rc.1)
 
-The final release provides six immutable hosted assets. Read the
-[release notes](../releases/v1.0.0.md), the
-[release evidence](../releases/v1.0.0-evidence.md), or the
+The current release provides six immutable hosted assets. Read the
+[release notes](../releases/v1.0.1.md), the
+[release evidence](../releases/v1.0.1-evidence.md), or the
 [documentation audit](../releases/v1.0.0-documentation-audit.md).
 
 ## Choose Your Path
@@ -56,7 +59,7 @@ halt behavior to their source files and authoritative documents.
 
 ## Current Limits
 
-KOZO v1.0.0 does not provide a desktop, window manager, settings application,
+KOZO v1.0.1 does not provide a desktop, window manager, settings application,
 interactive terminal, shell, scheduler, persistent processes, general-purpose
 userspace, general system-call interface, filesystem, drivers, networking,
 dynamic virtual memory, executable loader, Linux or POSIX compatibility,

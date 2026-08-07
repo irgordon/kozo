@@ -147,7 +147,7 @@ KOZO still does not prove:
 
 # 9. Current Active Blocker
 
-No active runtime blocker is recorded for the published v1.0.0
+No active runtime blocker is recorded for the published v1.0.1
 kernel-foundation scope.
 Force pushes to `main` are blocked. No broader repository policy is required
 by the final-release scope. The immutable `v1.0.0-rc.1` prerelease and
@@ -168,9 +168,8 @@ path forms. Tagged-source and direct compiler reproductions classify the case
 `BUILD_TOOLING`, `U2`, and `R3`. Current `main` implements the bounded
 normalization correction and focused regression coverage. Local and hosted
 governed verification pass, including the formerly failing release-bundle
-stage. Patch preparation is accepted. The v1.0.1 release boundary is now
-authorized; publication remains pending the exact commit-bound local and
-hosted gates.
+stage. Patch preparation and release gates passed. v1.0.1 is published from
+the exact hosted-accepted commit, and `KOZO-TRIAGE-001` is resolved.
 
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity
@@ -208,7 +207,8 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
     without making the wiki authoritative over contracts or governance.
 20. Preserve the accepted bounded v1.0.1 correction for `KOZO-TRIAGE-001` at
     one canonical object-build boundary with its focused failure coverage.
-21. Keep v1.0.1 publication unauthorized until a separate release task.
+21. Preserve the immutable v1.0.1 tag, notes, six assets, checksums, and hosted
+    ISO evidence; use a later patch version for any product correction.
 22. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
 
 ---

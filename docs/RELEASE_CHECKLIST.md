@@ -529,20 +529,21 @@ runtime, ABI, contracts, or marker sequence.
 
 # 24. v1.0.1 Patch Release Gate
 
-Patch release authorization is active only for `KOZO-TRIAGE-001`. The current
-published release remains `v1.0.0` until the new annotated tag, final GitHub
-release, and hosted asset verification complete.
+Patch release authorization was limited to `KOZO-TRIAGE-001`. Publication and
+independent hosted-asset verification are complete; `v1.0.1` is the current
+published release.
 
 | Item | Status | Evidence | Follow-up |
 | --- | --- | --- | --- |
-| Version authority | Prepared locally | `release/version.txt` contains `1.0.1` | Hosted metadata must match. |
-| Patch notes and evidence | Prepared locally | `docs/releases/v1.0.1.md`, `docs/releases/v1.0.1-evidence.md` | Record hosted facts only after publication. |
+| Version authority | Complete | `release/version.txt` and hosted metadata contain `1.0.1` | Advance only through a later authorized release. |
+| Patch notes and evidence | Complete | `docs/releases/v1.0.1.md`, `docs/releases/v1.0.1-evidence.md` | Treat hosted notes as immutable. |
 | Authorized correction | Complete on `main` | exact, `.o`, and legacy `.obj` outputs normalize through one fail-closed helper | Preserve the accepted implementation. |
 | Runtime behavior | Unchanged | no kernel, userspace runtime, ABI, contract, schema, marker, mapping, capability, or halt edits | Reconfirm locally and in hosted CI. |
-| Full local gate | Complete | 27 focused tests; 1,058 full tests; Odin, Rust, and cargo policy pass; verification `verify-20260807T213826Z`; QEMU pass with 41 markers | Preserve in generated proof. |
-| Final bundle | Pending | `kozo-v1.0.1.tar.xz` plus five supporting assets | Inspect contents, metadata, and checksums. |
-| Hosted release-commit gate | Pending | CI and lint at the exact tag target | Both must pass before tagging. |
-| Annotated patch tag | Not created | `v1.0.1` | Create only after hosted acceptance. |
-| Final GitHub release | Not created | six approved assets | Must be non-draft and non-prerelease. |
-| Prior release preservation | Confirmed before preparation | v1.0.0 and v1.0.0-rc.1 tags and releases | Reconfirm after publication. |
+| Full local gate | Complete | 27 focused tests; 1,058 full tests; Odin, Rust, and cargo policy pass; verification `verify-20260807T214144Z`; QEMU pass with 41 markers | Runtime behavior remains unchanged. |
+| Final bundle | Complete | 104-file archive plus five supporting assets; direct metadata, license, checksum, and prohibited-path inspection | Hosted CI bundle selected as publication source. |
+| Hosted release-commit gate | Complete | CI `31223062540`; lint `31223061928` at `02f1b0113458b988562b7e03362ec9ae716cebd0` | Both passed before tagging. |
+| Annotated patch tag | Complete | object `7896c767376a666ad7f7d8f294beadb473b0290c`; exact hosted-approved target | Treat as immutable. |
+| Final GitHub release | Complete | <https://github.com/irgordon/kozo/releases/tag/v1.0.1>; six approved assets | Non-draft and non-prerelease. |
+| Hosted asset verification | Complete | fresh download, `SHA256SUMS`, byte comparison, JSON validation, hosted ISO QEMU | 41 markers; final marker `KOZO_RUNTIME_RETURN_OK`. |
+| Prior release preservation | Complete | v1.0.0 and v1.0.0-rc.1 tag objects, classifications, and asset digests | Records remain unchanged. |
 | Package publication | Not authorized | `core_service` remains unpublished | Do not run `cargo publish`. |

@@ -142,11 +142,10 @@ The current local generated evidence proves:
   baseline. No user-filed report was present. Hosted acceptance and an
   immutable-tag rerun reproduced `KOZO-TRIAGE-001`, where current Odin emits a
   suffixless request as `.o` and the object helper does not normalize it.
-  Current `main` now contains the bounded normalization correction and focused
+  Current `main` contains the bounded normalization correction and focused
   regression coverage. Local and hosted verification pass, including the
-  formerly failing release-bundle stage. Patch preparation is accepted and
-  the separate v1.0.1 release boundary is authorized. Publication remains
-  pending the commit-bound local and hosted gates.
+  formerly failing release-bundle stage. v1.0.1 is published from the exact
+  accepted commit with six independently verified assets.
 
 ## Current Active Blocker
 
@@ -157,20 +156,18 @@ deletion, ruleset, or other repository policy is required by this phase.
 The immutable `v1.0.0-rc.1` annotated tag and GitHub prerelease are published.
 Post-promotion checks reproduced the accepted hosted hashes, QEMU result, 41
 markers, and user path. No reproducible final-release blocker was found.
-Final `v1.0.0` is published as a non-draft, non-prerelease GitHub release.
-The final tag, notes, and assets are immutable.
+Final `v1.0.1` is published as the current non-draft, non-prerelease GitHub
+release. Its tag, notes, and assets are immutable. The v1.0.0 and RC records
+remain unchanged.
 
 Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr`, `kernel_entry_not_reached`, `serial_not_initialized`, and `marker_not_emitted` are retained only as resolved historical evidence states unless a future CI artifact reintroduces one.
 
 ## Next Phase
 
-The `v1.0.0-rc.1`, `v1.0.0`, and post-publication documentation phases are
-complete. `KOZO v1.0.1 Patch Preparation` resolves `KOZO-TRIAGE-001` on
-`main` through one canonical object-output boundary and is accepted by local
-and hosted gates. `KOZO v1.0.1 Patch Release Authorization` is active.
-Publication may occur only after one exact release commit passes the complete
-hosted gate. The existing final and RC tags and hosted assets must not be
-changed in place.
+The `v1.0.0-rc.1`, `v1.0.0`, post-publication documentation, and v1.0.1 patch
+phases are complete. v1.0.1 resolves `KOZO-TRIAGE-001` through one canonical
+object-output boundary and preserves the runtime. Future work begins from
+evidence; all published tags and hosted assets remain immutable.
 
 ---
 

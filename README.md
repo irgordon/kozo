@@ -13,17 +13,18 @@ that problem by keeping each runtime feature bounded, recording progress over
 the serial port, and checking source, kernel-binary, and QEMU evidence against
 machine-readable rules.
 
-**Current release:** [v1.0.0](https://github.com/irgordon/kozo/releases/tag/v1.0.0)
+**Current release:** [v1.0.1](https://github.com/irgordon/kozo/releases/tag/v1.0.1)
 
-**Patch status:** [v1.0.1](docs/releases/v1.0.1.md) is prepared for the
-authorized release gate. Publication is pending, so v1.0.0 remains the
-current downloadable release.
+**Previous release:** [v1.0.0](https://github.com/irgordon/kozo/releases/tag/v1.0.0)
+
+v1.0.1 fixes cross-host Odin object-output normalization. Its kernel runtime,
+ABI, marker sequence, and terminal halt behavior are unchanged from v1.0.0.
 
 Start with the [wiki](docs/wiki/README.md), which routes users, maintainers,
 and engineers to the right level of detail. The
-[v1.0.0 release notes](docs/releases/v1.0.0.md) and
-[release evidence](docs/releases/v1.0.0-evidence.md) describe the published
-product and its immutable artifacts.
+[v1.0.1 release notes](docs/releases/v1.0.1.md) and
+[release evidence](docs/releases/v1.0.1-evidence.md) describe the current
+published product and its immutable artifacts.
 
 ## What Works Today
 

@@ -166,12 +166,12 @@ find artifacts -maxdepth 1 -name 'kernel-build-check*' -print
 ```
 
 **Expected result:** tagged v1.0.0 source leaves
-`artifacts/kernel-build-check.o` and fails the build. Current `main` normalizes
-the supported output to `artifacts/kernel-build-check` and is accepted by
-hosted CI. The future v1.0.1 release remains unpublished.
+`artifacts/kernel-build-check.o` and fails the build. The published v1.0.1
+helper normalizes the supported output to `artifacts/kernel-build-check` and
+is accepted by hosted CI.
 
-**Supported workaround:** use the accepted Odin `dev-2026-07` toolchain with
-the immutable v1.0.0 source. The future v1.0.1 patch remains unpublished.
+**Supported correction:** use the immutable v1.0.1 release. When reproducing
+the historical defect on v1.0.0, use the accepted Odin `dev-2026-07` toolchain.
 
 **Stop when:** the exact requested object is absent. Do not rename the file,
 weaken the release validator, or treat the failed bundle as accepted proof.
@@ -225,7 +225,7 @@ evidence counts to hide formatting differences.
 **Likely cause:** an incomplete, corrupted, or wrong-version download.
 
 **Safe check:** confirm all files came from the same
-[v1.0.0 release](https://github.com/irgordon/kozo/releases/tag/v1.0.0), then run
+[v1.0.1 release](https://github.com/irgordon/kozo/releases/tag/v1.0.1), then run
 the checksum command again.
 
 **Expected result:** every listed file reports `OK`.
@@ -235,7 +235,7 @@ again, and do not run it until validation succeeds.
 
 ## Wrong Release Version
 
-**Symptom:** asset names or metadata mention `v1.0.0-rc.1` instead of `v1.0.0`,
+**Symptom:** asset names or metadata mention an older version instead of `v1.0.1`,
 or the expected final archive is absent.
 
 **Likely cause:** assets were downloaded from the historical prerelease.
@@ -246,8 +246,8 @@ or the expected final archive is absent.
 jq '{version, display_version, commit}' release_metadata.json
 ```
 
-**Expected result:** version `1.0.0`, display version `v1.0.0`, and commit
-`1586089415a98a11d2024d606ce6301f568b7d6e`.
+**Expected result:** version `1.0.1`, display version `v1.0.1`, and commit
+`02f1b0113458b988562b7e03362ec9ae716cebd0`.
 
 **Stop when:** metadata identifies another release. Do not combine files from
 different release pages.

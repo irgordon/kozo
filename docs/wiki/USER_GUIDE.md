@@ -1,13 +1,13 @@
 # User Guide
 
-KOZO v1.0.0 runs one fixed governed runtime demonstration. Using KOZO currently
+KOZO v1.0.1 runs one fixed governed runtime demonstration. Using KOZO currently
 means booting its ISO in QEMU and observing serial evidence. It does not accept
 keyboard commands and does not provide a shell or graphical interface.
 
 ## Current Release
 
-KOZO `v1.0.0` is available as the
-[final kernel-foundation release](https://github.com/irgordon/kozo/releases/tag/v1.0.0).
+KOZO `v1.0.1` is available as the
+[current kernel-foundation release](https://github.com/irgordon/kozo/releases/tag/v1.0.1).
 Download and checksum instructions are in [Getting Started](GETTING_STARTED.md).
 
 ## What Happens When KOZO Starts

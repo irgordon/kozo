@@ -696,8 +696,8 @@ networking, compatibility claim, or production desktop claim.
 
 # 19. v1.0.1 Patch Release
 
-`release/version.txt` owns patch version `1.0.1`. The current published
-release remains `v1.0.0` until the patch tag and GitHub release exist.
+`release/version.txt` owns patch version `1.0.1`. The patch is published as
+the current final GitHub release.
 
 The only authorized correction is `KOZO-TRIAGE-001`: normalize one exact
 current Odin object result from the requested path, appended `.o`, or legacy
@@ -715,11 +715,24 @@ release_metadata.json
 SHA256SUMS
 ```
 
-Publication requires focused regression success, full Python/Odin/Rust policy
-checks, 67 verification checks with zero failures, QEMU pass with no blocker,
-41 ordered markers ending at `KOZO_RUNTIME_RETURN_OK`, direct bundle and
-checksum inspection, and hosted CI/lint acceptance at the exact tag target.
+The release was published after 27 focused tests, 1,058 full Python tests,
+Odin/Rust policy checks, 67 verification checks with zero failures, QEMU pass
+with no blocker, 41 ordered markers ending at `KOZO_RUNTIME_RETURN_OK`, direct
+bundle inspection, and hosted CI/lint acceptance at the exact tag target.
+
+Hosted CI run `31223062540` and lint run `31223061928` accepted commit
+`02f1b0113458b988562b7e03362ec9ae716cebd0`. Annotated tag object
+`7896c767376a666ad7f7d8f294beadb473b0290c` targets that commit. The final,
+non-draft, non-prerelease release is published at
+<https://github.com/irgordon/kozo/releases/tag/v1.0.1>.
+
+The six release assets were downloaded into a new directory. Their checksum
+file passed, each downloaded file matched the approved hosted-CI bundle byte
+for byte, both JSON files validated, and the downloaded ISO reproduced all 41
+ordered markers. Build metadata retains `published: false` because it records
+the pre-publication bundle state.
 
 The runtime, ABI, contracts, schemas, fixed request geometry, mappings,
 capabilities, marker order, and halt behavior remain unchanged. The
-`v1.0.0` and `v1.0.0-rc.1` release records remain immutable.
+`v1.0.0` and `v1.0.0-rc.1` release records remain immutable. The v1.0.1 tag,
+notes, and six assets are also immutable after publication.

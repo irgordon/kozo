@@ -2,8 +2,7 @@
 
 ## v1.0.1 - 2026-08-07
 
-**Status:** Patch release preparation; current published release remains
-`v1.0.0` and `v1.0.1` publication is pending.
+**Status:** Published as the immutable final GitHub patch release; hosted assets independently verified.
 
 * Normalized Odin object output at the canonical build boundary when the
   compiler emits either the exact requested path, an appended `.o`, or the
@@ -21,6 +20,13 @@
   release boundary and added scoped release notes and evidence.
 * Required local and hosted release-bundle validation before creating the
   annotated tag or final GitHub release.
+* Published annotated tag `v1.0.1` at hosted-accepted commit
+  `02f1b0113458b988562b7e03362ec9ae716cebd0` after CI run `31223062540`
+  and lint run `31223061928` passed.
+* Published exactly six approved assets and independently verified their
+  hosted sizes, SHA-256 values, metadata, checksum file, and downloaded ISO.
+* Resolved `KOZO-TRIAGE-001` in v1.0.1 while retaining v1.0.0 and
+  v1.0.0-rc.1 as unchanged immutable records.
 * Changed no kernel, userspace runtime, ABI, contract, schema, marker, or
   immutable release record.
 

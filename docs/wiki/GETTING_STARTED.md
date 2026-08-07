@@ -7,22 +7,22 @@ source is a separate path for contributors and engineers.
 
 ### 1. Open the Release
 
-Open [KOZO v1.0.0](https://github.com/irgordon/kozo/releases/tag/v1.0.0).
+Open [KOZO v1.0.1](https://github.com/irgordon/kozo/releases/tag/v1.0.1).
 Download `kozo.iso` and `SHA256SUMS`. The GitHub CLI can download the complete
 six-file release set:
 
 ```bash
-mkdir kozo-v1.0.0
-gh release download v1.0.0 \
+mkdir kozo-v1.0.1
+gh release download v1.0.1 \
   --repo irgordon/kozo \
-  --dir kozo-v1.0.0
+  --dir kozo-v1.0.1
 ```
 
 ### 2. Verify the Download
 
 ```bash
 (
-  cd kozo-v1.0.0
+  cd kozo-v1.0.1
   shasum -a 256 -c SHA256SUMS
 )
 ```
@@ -36,7 +36,7 @@ Run this command from a KOZO source checkout so the bounded smoke script can
 classify the serial output:
 
 ```bash
-release_iso="$(cd kozo-v1.0.0 && pwd)/kozo.iso"
+release_iso="$(cd kozo-v1.0.1 && pwd)/kozo.iso"
 env \
   KOZO_BOOT_ISO="$release_iso" \
   KOZO_QEMU_BIN="$(command -v qemu-system-x86_64)" \
@@ -176,7 +176,7 @@ jq '{status, summary}' artifacts/latest_verify.json
 git diff --check
 ```
 
-Success prints `VERIFY: PASS`. The v1.0.0 release gate expects 67 checks, no
+Success prints `VERIFY: PASS`. The v1.0.1 release gate expects 67 checks, no
 failures, QEMU outcome `pass`, and 41 ordered runtime markers.
 
 ### Build a Dry-Run Release Bundle
@@ -186,14 +186,14 @@ From a clean commit:
 ```bash
 release_output="$(mktemp -d)"
 scripts/build_release_candidate.sh \
-  --version 1.0.0 \
+  --version 1.0.1 \
   --output "$release_output"
 ```
 
 The command runs governed verification against the committed tree, creates an
 explicitly allowlisted archive, validates legal files and metadata, and writes
 `SHA256SUMS`. It does not publish or tag anything. See the
-[v1.0.0 release notes](../releases/v1.0.0.md) for the artifact list and limits.
+[v1.0.1 release notes](../releases/v1.0.1.md) for the artifact list and limits.
 
 ### Inspect the Kernel Binary
 
