@@ -139,8 +139,10 @@ The current local generated evidence proves:
   engineering paths on `main` without changing the tagged release.
 * Post-release issue triage reviewed project-visible issues, all Actions runs
   after publication, repository issue records, and the immutable hosted
-  baseline. No defect reports were found in those sources, and v1.0.1
-  preparation is not authorized.
+  baseline. No user-filed report was present. Hosted acceptance and an
+  immutable-tag rerun reproduced `KOZO-TRIAGE-001`, where current Odin emits a
+  suffixless request as `.o` and the object helper does not normalize it.
+  Bounded v1.0.1 patch preparation is authorized; publication is not.
 
 ## Current Active Blocker
 
@@ -158,11 +160,12 @@ Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr
 
 ## Next Phase
 
-The `v1.0.0-rc.1`, `v1.0.0`, post-publication documentation, and post-release
-triage phases are complete. Continue observation. Do not create `v1.0.1`
-unless a reproduced, in-scope defect satisfies the patch authorization gate.
-Future capability work requires a separately scoped plan. The existing final
-tag and hosted assets must not be changed in place.
+The `v1.0.0-rc.1`, `v1.0.0`, and post-publication documentation phases are
+complete. Post-release triage reproduced `KOZO-TRIAGE-001` and authorizes the
+next task, `KOZO v1.0.1 Patch Preparation`, limited to current-Odin object
+output normalization and its focused regression coverage. Publication remains
+unauthorized. The existing final tag and hosted assets must not be changed in
+place.
 
 ---
 

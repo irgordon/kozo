@@ -3233,7 +3233,7 @@
     "Post-promotion verification preserves the immutable v1.0.0-rc.1 tag and hosted release, revalidates all hosted assets, boots the distributed ISO through all 41 markers, tests the clean user path, and aligns current documentation without runtime changes.",
     "v1.0.0 publishes one hosted-CI-accepted final commit as an immutable annotated tag and final GitHub release, verifies all six hosted assets independently, preserves the RC record, and records publication through one documentation/proof-only follow-up commit.",
     "The post-publication documentation audit routes users, maintainers, and engineers through distinct wiki paths, validates the hosted ISO user path, records product limits plainly, and preserves all immutable release and runtime state.",
-    "Post-release triage records zero reports and zero cases from the reviewed sources, preserves the passing immutable release baseline, does not authorize v1.0.1 preparation, and changes no product behavior."
+    "Post-release triage records no user-filed reports and one hosted-workflow case, reproduces KOZO-TRIAGE-001 against tagged v1.0.0 source, classifies it BUILD_TOOLING/U2/R3, authorizes bounded v1.0.1 patch preparation, and changes no product behavior."
   ],
   "verification": {
     "tests_run": [
@@ -4020,7 +4020,7 @@
       {
         "tool": "v1.0.0 post-release issue triage",
         "command": "immutable final and RC release readback; GitHub issue and post-publication Actions inventory; repository issue-record and source-annotation scan; post-tag diff review; hosted asset download, checksum, JSON, and ISO validation; clean tagged clone; Python, Odin, Rust, cargo-deny, cargo-audit, governed verification, JSON, and diff checks",
-        "status": "passed_zero_reports_zero_cases_zero_reproduced_highest_impact_none_highest_severity_none_v1.0.1_unauthorized_1050_tests_67_checks_0_failures_qemu_pass_41_markers"
+        "status": "local_pass_hosted_blocked_one_reproduced_case_KOZO-TRIAGE-001_BUILD_TOOLING_U2_R3_v1.0.1_preparation_authorized_publication_unauthorized_1050_tests_67_checks_0_failures_qemu_pass_41_markers"
       }
     ],
     "logs": [
@@ -4186,7 +4186,7 @@
       "The portable Ring3 evidence correction resolves GNU/LLVM function-label differences by extracting the consumer from its ELF address range and preserves the full comparison, response-offset, success-store, int 0x81, and ud2 ordering requirements.",
       "The immutable v1.0.0-rc.1 tag and prerelease remain unchanged; all six hosted assets validate, the distributed ISO produces the accepted 41-marker sequence, the clean user path works with ld.lld, and current documentation distinguishes publication from dry-run metadata.",
       "The post-publication wiki provides distinct user, maintainer, and engineer paths, states the v1.0.0 product boundary directly, validates the hosted ISO workflow, and preserves immutable final and RC release records without runtime changes.",
-      "Post-release triage found no defect reports in project-visible GitHub issues, post-publication Actions, repository records, or live annotations; created zero cases; reproduced the accepted hosted baseline; recorded U0-U4 and R0-R4 counts as zero; and did not authorize v1.0.1 preparation."
+      "Post-release triage found no user-filed reports in project-visible GitHub issues, then reproduced KOZO-TRIAGE-001 against tagged v1.0.0 source and current Odin; recorded one BUILD_TOOLING/U2/R3 case; preserved the accepted runtime baseline; and authorized bounded v1.0.1 patch preparation without authorizing implementation or publication."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -4269,6 +4269,6 @@
     "Added the exact MIT SPDX license metadata to core_service, validated Cargo metadata and package contents, removed the cargo-deny blocker without policy exceptions, and preserved runtime evidence.",
     "Verified the immutable promoted release from fresh hosted downloads, reproduced the accepted runtime from the distributed ISO, tested a clean tagged clone, and aligned current release documentation without changing runtime behavior or historical release records.",
     "Audited every wiki page against the published v1.0.0 product, separated user, maintainer, and engineer paths, corrected stale and incomplete guidance, and retained all runtime and release records unchanged.",
-    "Reviewed project-visible post-release issue sources, reproduced the immutable hosted baseline, recorded no available defect reports or triage cases, and left v1.0.1 preparation unauthorized without changing runtime or release state."
+    "Reviewed project-visible post-release issue sources, reproduced the immutable hosted baseline, classified current-Odin object normalization as KOZO-TRIAGE-001 BUILD_TOOLING/U2/R3, and authorized bounded v1.0.1 patch preparation without changing runtime or immutable release state."
   ]
 }

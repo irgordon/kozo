@@ -161,9 +161,12 @@ records. This alignment changes no runtime or release artifact.
 
 The v1.0.0 post-release issue triage reviewed all project-visible GitHub
 issues, Actions runs after publication, repository issue records, the six
-hosted assets, and the downloaded ISO. No defect reports were found in those
-sources, the hosted baseline still passes, and no case authorizes v1.0.1
-preparation. The current release remains v1.0.0 while observation continues.
+hosted assets, and the downloaded ISO. No user-filed report was present, but
+hosted acceptance exposed `KOZO-TRIAGE-001`: current Odin emits `.o` for a
+suffixless object output, while the accepted helper normalizes only the prior
+path forms. Tagged-source and direct compiler reproductions classify the case
+`BUILD_TOOLING`, `U2`, and `R3`. Preparation of a bounded v1.0.1 correction is
+authorized; implementation and publication remain separately gated.
 
 ---
 
@@ -193,9 +196,11 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
     immutable tag, and hosted asset evidence without in-place mutation.
 19. Preserve the post-publication user, maintainer, and engineering entry paths
     without making the wiki authoritative over contracts or governance.
-20. Preserve the completed post-release triage record and require a reproduced,
-    in-scope patch defect before authorizing v1.0.1 preparation.
-21. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
+20. Prepare a bounded v1.0.1 correction for `KOZO-TRIAGE-001`: normalize the
+    current Odin `.o` output for suffixless requested paths, add one focused
+    regression test, and preserve all runtime and release boundaries.
+21. Keep v1.0.1 publication unauthorized until local and hosted gates pass.
+22. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
 
 ---
 

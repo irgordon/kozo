@@ -148,6 +148,32 @@ ld.lld --version
 **Stop when:** only an unrelated `lld` command exists. Do not substitute a
 different linker without validating the build policy.
 
+## Current Odin Leaves a `.o` Object Behind
+
+**Symptom:** release-bundle validation reports `Odin did not emit the
+requested object`, but a file with the same name and an added `.o` suffix
+exists.
+
+**Likely cause:** Odin `dev-2026-08` changed a suffixless `-out` request to
+produce `<name>.o`. The v1.0.0 object helper recognizes the prior output forms
+but not this one. This is tracked as `KOZO-TRIAGE-001`.
+
+**Safe check:**
+
+```bash
+odin version
+find artifacts -maxdepth 1 -name 'kernel-build-check*' -print
+```
+
+**Expected result:** the affected toolchain reports `dev-2026-08`, the exact
+requested path is absent, and `artifacts/kernel-build-check.o` exists.
+
+**Supported workaround:** use the accepted Odin `dev-2026-07` toolchain for
+the v1.0.0 source and release-bundle path until the bounded patch is accepted.
+
+**Stop when:** the exact requested object is absent. Do not rename the file,
+weaken the release validator, or treat the failed bundle as accepted proof.
+
 ## Cargo Reports Generated-ABI Warnings
 
 **Symptom:** `cargo check` succeeds but prints naming or dead-code warnings from

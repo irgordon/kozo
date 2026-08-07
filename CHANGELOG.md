@@ -6,13 +6,14 @@
 
 * Reviewed all project-visible GitHub issues and post-publication Actions runs.
 * Rechecked repository issue records, live source annotations, and post-tag
-  changes without finding a defect report in the reviewed sources.
+  changes without finding a user-filed defect report.
 * Downloaded and validated all six immutable v1.0.0 assets and reproduced the
   accepted 41-marker result from the hosted ISO.
-* Recorded zero triage cases, no reproduced defect, and no security-sensitive
-  finding while disclosing private and third-party report-source limitations.
-* Did not authorize v1.0.1 preparation; the current release remains v1.0.0 and
-  post-release observation continues.
+* Recorded `KOZO-TRIAGE-001` after current Odin changed suffixless object output
+  to `.o`, reproduced the release-bundle failure against tagged v1.0.0 source,
+  and classified it `BUILD_TOOLING`, `U2`, and `R3`.
+* Authorized bounded v1.0.1 patch preparation for that case only; did not
+  implement or publish the patch, and recorded no security-sensitive finding.
 * Preserved the v1.0.0 and v1.0.0-rc.1 tags, notes, assets, runtime, ABI,
   contracts, schemas, marker order, and product version.
 
