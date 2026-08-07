@@ -144,8 +144,9 @@ The current local generated evidence proves:
   suffixless request as `.o` and the object helper does not normalize it.
   Current `main` now contains the bounded normalization correction and focused
   regression coverage. Local and hosted verification pass, including the
-  formerly failing release-bundle stage. Patch preparation is accepted;
-  publication is not authorized.
+  formerly failing release-bundle stage. Patch preparation is accepted and
+  the separate v1.0.1 release boundary is authorized. Publication remains
+  pending the commit-bound local and hosted gates.
 
 ## Current Active Blocker
 
@@ -166,10 +167,10 @@ Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr
 The `v1.0.0-rc.1`, `v1.0.0`, and post-publication documentation phases are
 complete. `KOZO v1.0.1 Patch Preparation` resolves `KOZO-TRIAGE-001` on
 `main` through one canonical object-output boundary and is accepted by local
-and hosted gates. The next task may be `KOZO v1.0.1 Patch Release
-Authorization`, but publication remains unauthorized until that separate
-decision. The existing final tag and hosted assets must not be changed in
-place.
+and hosted gates. `KOZO v1.0.1 Patch Release Authorization` is active.
+Publication may occur only after one exact release commit passes the complete
+hosted gate. The existing final and RC tags and hosted assets must not be
+changed in place.
 
 ---
 
@@ -236,6 +237,7 @@ place.
 | `v0.8.9` | Documentation and Adoption Readiness | Give users, maintainers, and engineers a clear entry path and remove stale or redundant explanatory text. | User/maintainer wiki, rewritten README, documentation audit, terminology guide, tested commands and links, comment audit, and refreshed proof. | Readers can move from purpose to operation to maintenance to engineering detail; commands and links validate; runtime evidence remains unchanged. |
 | `v1.0.0-rc.1` | Published release candidate | Freeze release scope and gates, publish the accepted immutable candidate, and verify the distributed artifacts and documented user path. | Release evidence bundle, annotated tag, GitHub prerelease, six approved hosted assets, post-promotion status page, hosted ISO/ELF/JSON checks, and live force-push readback. | The hosted bundle matches the accepted hashes, QEMU reproduces all 41 markers, documentation reflects the prerelease, and no in-place release mutation occurs. |
 | `v1.0.0` | Final kernel-foundation release | Publish only the proven, scoped KOZO kernel foundation. | Final release evidence bundle, final changelog and notes, passing local and hosted gates, annotated tag, six verified assets, explicit non-goals. | v1.0.0 claims only evidence-backed behavior, preserves the accepted runtime and RC record, and keeps all compatibility and production-desktop non-goals. |
+| `v1.0.1` | Cross-host Odin object normalization patch | Publish the accepted build-tooling correction without changing runtime behavior. | Canonical object-output normalization, focused regressions, scoped release notes and evidence, exact commit-bound bundle, annotated tag, six verified assets. | Local and hosted gates pass at the tagged commit; hosted assets match the approved bundle; KOZO-TRIAGE-001 is resolved; v1.0.0 and v1.0.0-rc.1 remain immutable. |
 
 ---
 

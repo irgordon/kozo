@@ -168,7 +168,9 @@ path forms. Tagged-source and direct compiler reproductions classify the case
 `BUILD_TOOLING`, `U2`, and `R3`. Current `main` implements the bounded
 normalization correction and focused regression coverage. Local and hosted
 governed verification pass, including the formerly failing release-bundle
-stage. Patch preparation is accepted; publication remains unauthorized.
+stage. Patch preparation is accepted. The v1.0.1 release boundary is now
+authorized; publication remains pending the exact commit-bound local and
+hosted gates.
 
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity

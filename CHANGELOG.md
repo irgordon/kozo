@@ -1,8 +1,9 @@
 # Changelog
 
-## v1.0.1 patch preparation - 2026-08-06
+## v1.0.1 - 2026-08-07
 
-**Status:** Build-tooling correction on `main`; `v1.0.1` is not published.
+**Status:** Patch release preparation; current published release remains
+`v1.0.0` and `v1.0.1` publication is pending.
 
 * Normalized Odin object output at the canonical build boundary when the
   compiler emits either the exact requested path, an appended `.o`, or the
@@ -16,8 +17,10 @@
 * Passed 1,058 Python tests and the governed 67-check, 41-marker QEMU
   verification locally and in hosted CI run `31143730244`; hosted lint run
   `31143730243` also passed.
-* Preserved `release/version.txt` at `1.0.0`; patch publication, a `v1.0.1`
-  tag, and a `v1.0.1` GitHub release remain unauthorized.
+* Advanced `release/version.txt` to `1.0.1` at the explicitly authorized patch
+  release boundary and added scoped release notes and evidence.
+* Required local and hosted release-bundle validation before creating the
+  annotated tag or final GitHub release.
 * Changed no kernel, userspace runtime, ABI, contract, schema, marker, or
   immutable release record.
 

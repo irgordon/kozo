@@ -15,6 +15,10 @@ machine-readable rules.
 
 **Current release:** [v1.0.0](https://github.com/irgordon/kozo/releases/tag/v1.0.0)
 
+**Patch status:** [v1.0.1](docs/releases/v1.0.1.md) is prepared for the
+authorized release gate. Publication is pending, so v1.0.0 remains the
+current downloadable release.
+
 Start with the [wiki](docs/wiki/README.md), which routes users, maintainers,
 and engineers to the right level of detail. The
 [v1.0.0 release notes](docs/releases/v1.0.0.md) and
@@ -79,6 +83,9 @@ tag, hosted asset hashes, and accepted runtime result.
 
 The earlier `v1.0.0-rc.1` prerelease remains immutable. KOZO v1.0.0 is not a
 production desktop operating system.
+
+The [v1.0.1 release evidence](docs/releases/v1.0.1-evidence.md) records the
+bounded Odin build correction and the gates required before publication.
 
 ## Maintaining KOZO
 

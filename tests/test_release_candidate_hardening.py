@@ -19,7 +19,7 @@ class ReleaseBundleTests(unittest.TestCase):
         self.script = SCRIPT_PATH.read_text()
 
     def test_version_authority_is_canonical(self):
-        self.assertEqual(VERSION_PATH.read_text(), "1.0.0\n")
+        self.assertEqual(VERSION_PATH.read_text(), "1.0.1\n")
 
     def test_manifest_destinations_are_explicit_and_unique(self):
         destinations = [
@@ -40,8 +40,8 @@ class ReleaseBundleTests(unittest.TestCase):
             "artifacts/runtime/boot_image/kozo.iso",
             "artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf",
             "artifacts/runtime/qemu_smoke.metadata.json",
-            "docs/releases/v1.0.0.md",
-            "docs/releases/v1.0.0-evidence.md",
+            "docs/releases/v1.0.1.md",
+            "docs/releases/v1.0.1-evidence.md",
         }
         self.assertTrue(required.issubset(sources))
 
@@ -150,6 +150,7 @@ class ReleaseBundleTests(unittest.TestCase):
         )
         self.assertIn('--version "$release_version"', ci)
         self.assertNotIn("--version 1.0.0-rc.1", ci)
+        self.assertIn("name: kozo-v1.0.1-dry-run", ci)
 
 
 if __name__ == "__main__":

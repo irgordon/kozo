@@ -331,7 +331,7 @@ From a clean commit, run:
 
 ```bash
 scripts/build_release_candidate.sh \
-  --version 1.0.0 \
+  --version 1.0.1 \
   --output /tmp/kozo-release
 ```
 

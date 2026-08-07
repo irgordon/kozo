@@ -1,8 +1,8 @@
 {
-  "task_title": "KOZO v1.0.1 Patch Preparation - Cross-Host Odin Object Normalization",
+  "task_title": "KOZO v1.0.1 Patch Release Authorization",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
-  "plan_status": "complete",
+  "plan_status": "approved",
   "replan_number": 0,
   "approval": {
     "status": "approved"
@@ -30,7 +30,8 @@
     "The immutable v1.0.0-rc.1 tag and prerelease remain accepted historical release records",
     "The post-publication documentation baseline is fad5f5305299a7b9ff7a63df5b1fbeaa021dd7f7",
     "Post-publication documentation and generated proof are accepted on main at df54696098a03509f0575325a9addb03804bed18",
-    "KOZO-TRIAGE-001 is reproduced as a BUILD_TOOLING/U2/R3 defect and bounded v1.0.1 patch preparation is authorized"
+    "KOZO-TRIAGE-001 is reproduced as a BUILD_TOOLING/U2/R3 defect and bounded v1.0.1 patch preparation is authorized",
+    "KOZO-TRIAGE-001 patch preparation is accepted on main at b2bc296dbfd7fdeda5c6ab48c861ff569850f350 with hosted CI run 31153444797 and lint run 31153445341"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
@@ -53,7 +54,9 @@
     "docs/DOCUMENTATION_STANDARD.md remains the authority for audience-aware documentation; no duplicate documentation authority is introduced",
     "Post-release triage may record evidence and decide patch preparation, but it may not implement v1.0.1 or modify the immutable v1.0.0 and v1.0.0-rc.1 release records",
     "release/version.txt remains the published final version 1.0.0 until a separately authorized patch-release preparation advances it",
-    "This patch changes only the Odin object-build boundary, focused tests, current status documentation, task state, and generated proof; publication remains unauthorized"
+    "This patch changes only the Odin object-build boundary, focused tests, current status documentation, task state, and generated proof; publication remains unauthorized",
+    "The explicitly authorized v1.0.1 release boundary advances release/version.txt, prepares one commit-bound six-asset release, and publishes only after the exact tag target passes local and hosted gates",
+    "The v1.0.1 tag must target a new hosted-accepted descendant of b2bc296dbfd7fdeda5c6ab48c861ff569850f350 and must never be moved after publication"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -3187,6 +3190,50 @@
         "verification.tests_run[157]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 93,
+      "title": "Prepare, publish, and verify KOZO v1.0.1",
+      "status": "pending",
+      "kind": "edit",
+      "files_expected": [
+        ".github/workflows/ci.yml",
+        "release/version.txt",
+        "release/release_files.v1.json",
+        "docs/releases/v1.0.1.md",
+        "docs/releases/v1.0.1-evidence.md",
+        "README.md",
+        "CHANGELOG.md",
+        "docs/VALIDATION.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/releases/v1.0.0-post-release-triage.md",
+        "docs/wiki/README.md",
+        "docs/wiki/GETTING_STARTED.md",
+        "docs/wiki/USER_GUIDE.md",
+        "docs/wiki/MAINTAINER_GUIDE.md",
+        "docs/wiki/TROUBLESHOOTING.md",
+        "docs/wiki/TERMS.md",
+        "docs/wiki/ENGINEERING_OVERVIEW.md",
+        "tests/test_release_candidate_hardening.py",
+        "tasks/todo.json",
+        "tasks/runtime.json",
+        "docs/generated/governance_index.md",
+        "docs/generated/abi_surface.md",
+        "docs/generated/syscall_surface.md",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/boot_blocker_report.json",
+        "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.summary.txt",
+        "artifacts/runtime/runtime_smoke.metadata.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[158]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -4055,6 +4102,11 @@
         "tool": "v1.0.1 cross-host Odin object normalization",
         "command": "version-governance review; exact pre-fix Odin dev-2026-08 reproduction; fake-Odin boundary tests; Bash syntax and shellcheck; real Odin dev-2026-07 and dev-2026-08 normalization checks; Python, Odin, Rust, cargo-deny, cargo-audit, governed verification; local release-bundle regression; hosted CI, lint, proof download, and immutable release readback",
         "status": "accepted_local_and_hosted_10_focused_1058_full_tests_67_checks_0_failures_qemu_pass_41_markers_ci_31143730244_lint_31143730243_release_bundle_stage_pass; publication_unauthorized"
+      },
+      {
+        "tool": "v1.0.1 patch release authorization",
+        "command": "version and immutable-release review; release and task schema checks; 27 focused tests; Python discovery; Odin and Rust checks; cargo-deny and cargo-audit; governed verification; commit-bound bundle, hosted gate, tag, release, and hosted asset validation pending",
+        "status": "local_gate_passed_27_focused_1058_full_tests_67_checks_0_failures_qemu_pass_41_markers; first_qemu_attempts_used_removed_qemu_11.0.2_path; portable_qemu_11.0.3_retry_passed; publication_pending"
       }
     ],
     "logs": [

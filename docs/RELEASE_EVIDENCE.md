@@ -691,3 +691,35 @@ No runtime behavior changed after `v1.0.0-rc.1`. The final scope remains the
 documented governed kernel foundation and does not add a desktop, shell,
 scheduler, process model, general syscall layer, filesystem, drivers,
 networking, compatibility claim, or production desktop claim.
+
+---
+
+# 19. v1.0.1 Patch Release
+
+`release/version.txt` owns patch version `1.0.1`. The current published
+release remains `v1.0.0` until the patch tag and GitHub release exist.
+
+The only authorized correction is `KOZO-TRIAGE-001`: normalize one exact
+current Odin object result from the requested path, appended `.o`, or legacy
+`.obj` form. Stale, missing, ambiguous, symlink, and non-regular results fail
+closed. No host or Odin-version branch is introduced.
+
+The approved output set is:
+
+```text
+kozo-v1.0.1.tar.xz
+kozo.iso
+kozo-kernel.elf
+latest_verify.json
+release_metadata.json
+SHA256SUMS
+```
+
+Publication requires focused regression success, full Python/Odin/Rust policy
+checks, 67 verification checks with zero failures, QEMU pass with no blocker,
+41 ordered markers ending at `KOZO_RUNTIME_RETURN_OK`, direct bundle and
+checksum inspection, and hosted CI/lint acceptance at the exact tag target.
+
+The runtime, ABI, contracts, schemas, fixed request geometry, mappings,
+capabilities, marker order, and halt behavior remain unchanged. The
+`v1.0.0` and `v1.0.0-rc.1` release records remain immutable.

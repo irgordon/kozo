@@ -526,3 +526,23 @@ are immutable publication records for accepted commit
 This post-promotion record is the one authorized documentation/proof-only
 commit on `main`. It does not alter the final tag, release notes, assets,
 runtime, ABI, contracts, or marker sequence.
+
+# 24. v1.0.1 Patch Release Gate
+
+Patch release authorization is active only for `KOZO-TRIAGE-001`. The current
+published release remains `v1.0.0` until the new annotated tag, final GitHub
+release, and hosted asset verification complete.
+
+| Item | Status | Evidence | Follow-up |
+| --- | --- | --- | --- |
+| Version authority | Prepared locally | `release/version.txt` contains `1.0.1` | Hosted metadata must match. |
+| Patch notes and evidence | Prepared locally | `docs/releases/v1.0.1.md`, `docs/releases/v1.0.1-evidence.md` | Record hosted facts only after publication. |
+| Authorized correction | Complete on `main` | exact, `.o`, and legacy `.obj` outputs normalize through one fail-closed helper | Preserve the accepted implementation. |
+| Runtime behavior | Unchanged | no kernel, userspace runtime, ABI, contract, schema, marker, mapping, capability, or halt edits | Reconfirm locally and in hosted CI. |
+| Full local gate | Complete | 27 focused tests; 1,058 full tests; Odin, Rust, and cargo policy pass; verification `verify-20260807T213826Z`; QEMU pass with 41 markers | Preserve in generated proof. |
+| Final bundle | Pending | `kozo-v1.0.1.tar.xz` plus five supporting assets | Inspect contents, metadata, and checksums. |
+| Hosted release-commit gate | Pending | CI and lint at the exact tag target | Both must pass before tagging. |
+| Annotated patch tag | Not created | `v1.0.1` | Create only after hosted acceptance. |
+| Final GitHub release | Not created | six approved assets | Must be non-draft and non-prerelease. |
+| Prior release preservation | Confirmed before preparation | v1.0.0 and v1.0.0-rc.1 tags and releases | Reconfirm after publication. |
+| Package publication | Not authorized | `core_service` remains unpublished | Do not run `cargo publish`. |
