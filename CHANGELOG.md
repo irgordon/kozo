@@ -1,5 +1,26 @@
 # Changelog
 
+## v1.1.0 Phase 0 - Cross-host portability matrix - 2026-08-08
+
+**Status:** Repository governance and validation work after v1.0.1; not a new product release. Hosted acceptance is pending.
+
+* Added ADR 0017 and a host-portability invariant that treats local macOS as
+  one validation environment rather than a reference platform.
+* Defined separate build, guest-runtime, and future resource-scaling evidence
+  classes with explicit compatibility promotion rules.
+* Added a pinned `ubuntu-24.04`, `windows-2025`, and `macos-15` required build
+  matrix plus a non-blocking latest-runner observation lane.
+* Expanded the KOZO-TRIAGE-001 object-boundary regression to 34 focused cases,
+  including exact, `.o`, `.obj`, stale-output, and path-with-spaces behavior.
+* Added 39 portability-focused tests in total, moving full discovery from the
+  accepted 1,058-test baseline to 1,097 tests without changing runtime code.
+* Added a portable host-contract runner for task/schema checks, Python tests,
+  real Odin object normalization, release inventory, and SHA-256 validation.
+* Kept Linux QEMU runtime verification separate and unchanged; Windows runtime
+  remains `NOT_EXECUTED` unless a future governed runtime job proves it.
+* Changed no kernel, userspace runtime, ABI, contract, schema, release tag,
+  hosted asset, or product version. The current published release is v1.0.1.
+
 ## v1.0.1 post-release observation - 2026-08-08
 
 **Status:** Documentation-only observation on `main`; not a new product release.

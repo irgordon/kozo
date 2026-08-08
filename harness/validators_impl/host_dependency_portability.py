@@ -10,6 +10,8 @@ from harness.validator import BaseValidator, ValidationResult
 _ROOT = Path(__file__).resolve().parents[2]
 _CI_WORKFLOW_PATH = _ROOT / ".github" / "workflows" / "ci.yml"
 _LINT_WORKFLOW_PATH = _ROOT / ".github" / "workflows" / "lint.yml"
+_PORTABILITY_WORKFLOW_PATH = _ROOT / ".github" / "workflows" / "portability.yml"
+_PORTABILITY_ADR_PATH = _ROOT / "docs" / "adr" / "0017-host-portability-evidence.md"
 _VERIFY_SCRIPT_PATH = _ROOT / "scripts" / "verify.sh"
 _BUILD_BOOT_IMAGE_PATH = _ROOT / "scripts" / "build_boot_image.sh"
 _QEMU_SMOKE_PATH = _ROOT / "scripts" / "qemu_smoke.sh"
@@ -70,6 +72,31 @@ _LINT_TOOLING_ANCHORS = (
     "x86_64-unknown-none",
 )
 
+_PORTABILITY_WORKFLOW_ANCHORS = (
+    "name: portability",
+    "portability-build:",
+    "fail-fast: false",
+    "ubuntu-24.04",
+    "windows-2025",
+    "macos-15",
+    "shell: bash",
+    "scripts/host_portability_contract.py",
+    "portability-observation:",
+    "continue-on-error: true",
+    "actions/upload-artifact@v7",
+)
+
+_PORTABILITY_ADR_ANCHORS = (
+    "# ADR-0017: Host Portability Evidence",
+    "VALIDATED_BUILD",
+    "VALIDATED_RUNTIME",
+    "Host portability",
+    "Guest portability",
+    "Resource scaling",
+    "Git Bash",
+    "does not set any CPU, memory, or storage minimum",
+)
+
 _BUILD_SCRIPT_ENV_ANCHORS = (
     "${LIMINE:-}",
     "${LIMINE_DIR:-}",
@@ -88,9 +115,10 @@ _QEMU_FAIL_CLOSED_ANCHORS = (
 )
 
 _DOC_POLICY_ANCHORS = (
-    "CI/Linux is the authoritative portability proof",
-    "Local macOS development is a convenience path",
-    "No build or verification script may depend on user-specific absolute paths",
+    "VALIDATED_BUILD",
+    "VALIDATED_RUNTIME",
+    "Linux hosted QEMU",
+    "Local macOS development is one validation environment",
 )
 
 
@@ -122,6 +150,16 @@ def _host_portability_issue() -> HostPortabilityIssue | None:
         _anchor_file_issue(_VERIFY_SCRIPT_PATH, _VERIFY_RUST_ANCHORS, "verify.rust_toolchain"),
         _anchor_file_issue(_CI_WORKFLOW_PATH, _CI_TOOLING_ANCHORS, "ci.tooling"),
         _anchor_file_issue(_LINT_WORKFLOW_PATH, _LINT_TOOLING_ANCHORS, "lint.tooling"),
+        _anchor_file_issue(
+            _PORTABILITY_WORKFLOW_PATH,
+            _PORTABILITY_WORKFLOW_ANCHORS,
+            "portability.workflow",
+        ),
+        _anchor_file_issue(
+            _PORTABILITY_ADR_PATH,
+            _PORTABILITY_ADR_ANCHORS,
+            "portability.adr",
+        ),
         _anchor_file_issue(_BUILD_BOOT_IMAGE_PATH, _BUILD_SCRIPT_ENV_ANCHORS, "boot_image.env"),
         _anchor_file_issue(_QEMU_SMOKE_PATH, _QEMU_FAIL_CLOSED_ANCHORS, "qemu_smoke.fail_closed"),
         _documentation_policy_issue(),

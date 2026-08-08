@@ -354,3 +354,67 @@ Use `sha256sum -c` on hosts that do not provide `shasum`.
 The same script accepts canonical `X.Y.Z-rc.N` candidate versions and canonical
 `X.Y.Z` final versions. It has no publication interface and always records
 `published: false` because publication occurs only after bundle acceptance.
+
+---
+
+# 22. Host Portability Validation
+
+Host portability and guest runtime are separate validation contracts.
+
+## 22.1 Build Contract
+
+A development host may be `VALIDATED_BUILD` only after its required hosted job
+passes the governed build/tooling contract. The contract covers, where
+applicable:
+
+* repository checkout and environment identification;
+* required executable discovery and version reporting;
+* task, schema, and JSON validation;
+* the full Python test suite;
+* all focused `KOZO-TRIAGE-001` object-output regressions;
+* one real Odin object build through the canonical normalization helper;
+* paths with spaces, stale-output rejection, and accepted exact, `.o`, and
+  `.obj` forms;
+* Odin and Rust build checks;
+* release-helper syntax, release inventory, license, metadata, and
+  prohibited-path policy;
+* portable SHA-256 generation and validation; and
+* shell and tool compatibility declared for that host.
+
+The required runner generations are `ubuntu-24.04`, `windows-2025`, and
+`macos-15`. Required cells use `fail-fast: false`. The Windows build contract
+uses the Git Bash environment supplied by the hosted runner for KOZO's existing
+Bash helpers; it does not claim native PowerShell or `cmd.exe` compatibility.
+
+Each required host stages the portable release allowlist into a path containing
+spaces, checks the exact staged inventory, writes and parses host-build
+metadata, rejects prohibited paths, and validates SHA-256 checksums. Sources
+under `artifacts/` are runtime-generated and therefore remain part of the
+separate Linux runtime/release gate. The final `.tar.xz`, ISO, and kernel ELF
+are not constructed by Windows or macOS Phase 0 build jobs; their host artifact
+records `final_archive_contract: NOT_EXECUTED` rather than implying success.
+
+Required jobs produce a compact host-portability JSON artifact containing the
+host, runner image, architecture, commit, tool versions, object-output form,
+test counts, build result, and explicit runtime result. The artifact is
+generated evidence, not compatibility authority.
+
+## 22.2 Runtime Contract
+
+A successful build contract does not imply QEMU validation, ISO boot, or guest
+runtime validation. A host may be `VALIDATED_RUNTIME` only when its separately
+declared runtime job executes and passes.
+
+Linux full verification remains the required guest-runtime authority and must
+retain 67 checks with zero failures, QEMU outcome `pass`, blocker `none`, 41
+ordered markers, and final marker `KOZO_RUNTIME_RETURN_OK`. Windows runtime is
+`NOT_EXECUTED` until a governed Windows runtime job exists and passes. macOS
+runtime is reported only from an actual governed runtime job.
+
+## 22.3 Observation Contract
+
+Latest-runner or current-toolchain observation jobs are informational and
+non-blocking. Their failures remain visible but do not change required
+compatibility unless governance promotes that environment. A deterministic
+required-cell failure must be preserved and triaged; it must not be skipped or
+repeated until green.

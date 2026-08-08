@@ -42,9 +42,10 @@ This document does not claim process model, VFS, scheduler, ELF loading, or file
 
 This document does not make generated reports authoritative.
 
-CI/Linux is the authoritative portability proof.
-
-Local macOS development is a convenience path.
+Required host-build evidence is authoritative only for the host and contract
+that executed. Linux hosted QEMU remains the authoritative guest-runtime
+proof. Local macOS development is one validation environment, not a reference
+platform.
 
 No build or verification script may depend on user-specific absolute paths.
 
@@ -295,11 +296,54 @@ Full CI must also print a concise evidence summary into the Actions log with `sc
 
 Authenticated artifact download is useful for release review, but it is not required for first-level failure triage. If artifact download, `gh`, or API log access is unavailable, reviewers must still be able to classify the active blocker from the visible CI log summary.
 
-Release review must treat CI/Linux as the authoritative portability proof for declared build and verification dependencies. Local macOS development may provide convenience evidence, but local host state must not replace CI dependency declarations or CI artifact review.
+Release review must use the required host matrix for build/tooling portability
+claims and the separately governed runtime job for guest-runtime claims. Local
+host state must not replace hosted dependency declarations, job results, or CI
+artifact review.
 
 Release evidence must not depend on user-specific absolute paths. Required tools must be declared in documentation and supplied by CI, controlled environment variables, command discovery, or repository-relative paths.
 
 The lint workflow is static-check only. It does not own runtime smoke evidence unless it is changed to run full verification.
+
+## 7.1 Per-Host Portability Evidence
+
+Every claimed host must record:
+
+* host operating system;
+* pinned runner image and runner architecture;
+* workflow name and run ID;
+* commit SHA;
+* Python, Odin, Rust, and Cargo versions where used;
+* build contract result;
+* runtime contract result;
+* release inventory and checksum result; and
+* hosted evidence artifact name.
+
+Blank values never imply success. Release review must record all six gate
+fields explicitly:
+
+| Gate | Allowed result |
+| --- | --- |
+| Linux build | `PASS`, `FAIL`, or `NOT_EXECUTED` |
+| Linux runtime | `PASS`, `FAIL`, or `NOT_EXECUTED` |
+| Windows build | `PASS`, `FAIL`, or `NOT_EXECUTED` |
+| Windows runtime | `PASS`, `FAIL`, or `NOT_EXECUTED` |
+| macOS build | `PASS`, `FAIL`, or `NOT_EXECUTED` |
+| macOS runtime | `PASS`, `FAIL`, or `NOT_EXECUTED` |
+
+The host-portability artifact proves only the required build/tooling contract.
+It does not replace `artifacts/latest_verify.json`, QEMU metadata, serial logs,
+or the Linux runtime evidence bundle. Observation-job results are labeled
+informational and cannot promote a required compatibility state. A passing
+host build may establish `VALIDATED_BUILD`; only Linux hosted QEMU or another
+explicit governed runtime job may establish `VALIDATED_RUNTIME`. Local macOS
+development is one validation environment, not the reference platform.
+
+Phase 0 host artifacts distinguish portable staging, inventory, metadata, and
+checksum checks from final archive construction. Windows and macOS may pass
+the common portable release-policy boundary while recording final archive,
+ISO, and kernel artifact construction as `NOT_EXECUTED`. Linux full CI remains
+the release/runtime evidence owner for those generated binary artifacts.
 
 ---
 

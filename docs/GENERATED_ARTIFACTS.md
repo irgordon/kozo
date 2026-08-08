@@ -41,6 +41,7 @@ This document does not claim production readiness.
 | Artifact path | Source of truth | Generator | Validator or drift check | Manual edits allowed | Refresh command |
 | --- | --- | --- | --- | --- | --- |
 | `artifacts/latest_verify.json` | validators, task state, evidence logs | `scripts/verify.sh` | schema, harness aggregator, evidence validator | No | `scripts/verify.sh` |
+| `artifacts/portability/<host>.json` | required hosted build contract, runner context, and tool output | `scripts/host_portability_contract.py` in `.github/workflows/portability.yml` | portability workflow steps and focused host-portability tests | No | Run the required portability workflow |
 | `docs/generated/syscall_surface.md` | syscall catalog, table contract, class contract, ABI manifest | `harness.syscall_surface_report.write_report()` | `syscall_surface_report` | No | `python3 -c 'from harness.syscall_surface_report import write_report; write_report()'` |
 | `docs/generated/abi_surface.md` | ABI manifest | `harness.abi_surface_report.write_report()` | `abi_surface_report` | No | `python3 -c 'from harness.abi_surface_report import write_report; write_report()'` |
 | `docs/generated/governance_index.md` | checked-in contracts, schemas, validator registry, latest verification artifact, generated reports, and `CHANGELOG.md` | `harness/governance_index_report.py` | `governance_index_report` | No | Regenerate through the governed report renderer and run `scripts/verify.sh` |
@@ -98,6 +99,11 @@ directory are generated review outputs. They are not authoritative and are not
 committed. `release/version.txt`, `release/release_files.v1.json`, repository
 governance, and the committed source tree remain authoritative. The generated
 release metadata must record `published: false`.
+
+Host portability files under `artifacts/portability/` are generated CI review
+outputs. They report the host contract that ran but do not own compatibility or
+runtime truth. Required workflow artifacts are retained by GitHub Actions and
+are not committed.
 
 ---
 

@@ -61,8 +61,23 @@ normalize_object_output() {
   [[ "${#emittedPaths[@]}" -gt 0 ]] || fail "Odin completed but emitted no supported object for: $outputPath"
   [[ "${#emittedPaths[@]}" -eq 1 ]] || fail "Odin emitted multiple supported objects for: $outputPath"
 
+  report_object_output_form "$outputPath" "${emittedPaths[0]}"
   [[ "${emittedPaths[0]}" == "$outputPath" ]] && return
   mv -- "${emittedPaths[0]}" "$outputPath" || fail "Failed to normalize Odin object output: $outputPath"
+}
+
+report_object_output_form() {
+  local outputPath=$1
+  local emittedPath=$2
+  local outputForm="exact"
+
+  if [[ "$emittedPath" == "${outputPath}.o" ]]; then
+    outputForm="dot_o"
+  elif [[ "$emittedPath" != "$outputPath" ]]; then
+    outputForm="dot_obj"
+  fi
+
+  printf 'KOZO_ODIN_OBJECT_OUTPUT_FORM=%s\n' "$outputForm"
 }
 
 supported_object_paths() {

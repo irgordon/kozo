@@ -64,9 +64,9 @@ Generated reports alone are not compatibility evidence.
 
 Verification passing is not production readiness.
 
-CI/Linux is the authoritative portability proof for declared build and verification dependencies.
+Host build claims require the corresponding governed GitHub Actions runner.
 
-Local macOS development is a convenience path and does not create a compatibility claim.
+Linux hosted QEMU remains the authoritative guest-runtime proof. Local macOS development is one validation environment and does not create a compatibility claim by itself.
 
 No build or verification script may depend on user-specific absolute paths.
 
@@ -108,7 +108,40 @@ Host portability evidence proves only that declared tools and controlled paths c
 
 ---
 
-# 8. Userspace Claims
+# 8. Host Evidence Ladder
+
+Every claimed development host uses one explicit status:
+
+| Status | Meaning |
+| --- | --- |
+| `NOT_EXECUTED` | No governed hosted contract has run. |
+| `DESIGNED` | No intentional blocker is known, but hosted evidence is absent. |
+| `VALIDATED_BUILD` | The required hosted build/tooling contract passed. |
+| `VALIDATED_RUNTIME` | The build/tooling contract and the separate guest-runtime contract passed. |
+| `UNSUPPORTED` | The host is outside the declared contract or has a known blocking incompatibility. |
+
+Claim promotion is one-way and evidence-backed:
+
+```text
+DESIGNED
+    -> required hosted build evidence -> VALIDATED_BUILD
+    -> actual governed runtime evidence -> VALIDATED_RUNTIME
+```
+
+No inference is allowed between levels. In particular, a passing Windows build
+job does not prove Windows QEMU or guest-runtime behavior. Terms such as
+"supported," "portable," or unqualified "validated" must name the exact
+status and evidence.
+
+The Phase 0 required build hosts are Linux `ubuntu-24.04`, Windows
+`windows-2025`, and macOS `macos-15`. Until the required workflow completes,
+their new build-contract status remains `NOT_EXECUTED`. Linux runtime retains
+its separately accepted hosted QEMU evidence; Windows and macOS runtime remain
+`NOT_EXECUTED` unless a governed runtime job actually runs.
+
+---
+
+# 9. Userspace Claims
 
 Do not claim userspace execution unless the claim names the exact userspace path, syscall surface, ABI boundary, and evidence.
 
@@ -116,13 +149,13 @@ Rust userspace services existing in the repository do not prove a general usersp
 
 ---
 
-# 9. Process, VFS, and File Descriptor Claims
+# 10. Process, VFS, and File Descriptor Claims
 
 Do not claim process model behavior, VFS behavior, or file descriptor behavior unless each surface has scoped contracts, implementation, tests, validators, and evidence.
 
 ---
 
-# 10. Relationship to Other Governance Documents
+# 11. Relationship to Other Governance Documents
 
 `GOVERNANCE.md` owns precedence.
 

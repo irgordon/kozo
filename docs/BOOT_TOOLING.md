@@ -14,9 +14,11 @@ It records the acquisition path for Limine and ISO generation tooling.
 
 This document does not claim that KOZO currently produces a bootable ISO in every environment.
 
-CI/Linux is the authoritative portability proof for boot image tooling.
+Linux hosted QEMU remains the authoritative guest-runtime proof for boot image
+tooling. Host build portability is governed separately through
+`VALIDATED_BUILD` and `VALIDATED_RUNTIME` evidence states.
 
-Local macOS development is a convenience path, not a release authority.
+Local macOS development is one validation environment, not a release authority or reference platform.
 
 No build or verification script may depend on user-specific absolute paths.
 
@@ -108,7 +110,10 @@ The CI path installs xorriso from the GitHub Actions Ubuntu package repository a
 
 Local development environments may use the same Limine release, a platform package, or another reviewed source build, but release evidence must record the exact tool versions used.
 
-Local development may use macOS, Linux, or another host only as a convenience path. Missing local Limine, xorriso, or QEMU tooling must fail closed and must not redefine the release blocker when CI/Linux provides the declared tooling.
+Local development may use macOS, Linux, or another host as a preflight path.
+Missing local Limine, xorriso, or QEMU tooling must fail closed and must not
+redefine the runtime blocker when Linux hosted QEMU provides the declared
+guest-runtime tooling.
 
 ---
 
@@ -148,7 +153,12 @@ CI may produce `artifacts/runtime/boot_image/kozo.iso` when the pinned toolchain
 
 If ISO generation fails, CI must fail closed or produce blocker metadata without making a boot claim.
 
-CI/Linux is the authoritative portability proof because it installs the declared system packages, acquires pinned Limine source tooling, exports controlled `LIMINE_DIR`, `LIMINE`, and `XORRISO` paths, and runs the governed scripts from repository-relative paths.
+Linux hosted QEMU is the authoritative guest-runtime proof because it installs
+the declared system packages, acquires pinned Limine source tooling, exports
+controlled `LIMINE_DIR`, `LIMINE`, and `XORRISO` paths, and runs the governed
+runtime scripts from repository-relative paths. The separate portability
+matrix proves the scoped build/tooling contract on Linux, Windows, and macOS;
+it does not imply ISO boot or QEMU validation on those hosts.
 
 ---
 

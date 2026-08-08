@@ -1,0 +1,148 @@
+name: portability
+
+on:
+  pull_request:
+    branches:
+      - main
+      - godan
+  push:
+    branches:
+      - main
+      - godan
+  workflow_dispatch:
+  schedule:
+    - cron: "17 5 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portability-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portability-build:
+    name: required build contract (${{ matrix.host }}, ${{ matrix.runner }})
+    if: github.event_name != 'schedule'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - host: linux
+            runner: ubuntu-24.04
+          - host: windows
+            runner: windows-2025
+          - host: macos
+            runner: macos-15
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Set up pinned Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.96.0"
+          targets: x86_64-unknown-none
+
+      - name: Set up Odin
+        uses: laytan/setup-odin@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Report runner environment
+        env:
+          KOZO_MATRIX_HOST: ${{ matrix.host }}
+          KOZO_MATRIX_RUNNER: ${{ matrix.runner }}
+        run: |
+          python - <<'PY'
+          import os
+          import platform
+
+          print(f"matrix.host={os.environ['KOZO_MATRIX_HOST']}")
+          print(f"matrix.runner={os.environ['KOZO_MATRIX_RUNNER']}")
+          print(f"runner.os={os.environ['RUNNER_OS']}")
+          print(f"runner.arch={os.environ['RUNNER_ARCH']}")
+          print(f"runner.image={os.environ.get('ImageOS', 'unknown')}")
+          print(f"runner.image_version={os.environ.get('ImageVersion', 'unknown')}")
+          print(f"platform={platform.platform()}")
+          PY
+
+      - name: Run required host build contract
+        run: |
+          python scripts/host_portability_contract.py \
+            --output "artifacts/portability/${{ matrix.host }}.json"
+
+      - name: Check repository whitespace
+        run: git diff --check
+
+      - name: Upload host portability evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: kozo-portability-${{ matrix.host }}
+          path: artifacts/portability/${{ matrix.host }}.json
+          if-no-files-found: error
+
+  portability-observation:
+    name: observation build contract (${{ matrix.host }}, ${{ matrix.runner }})
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    continue-on-error: true
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - host: linux-latest
+            runner: ubuntu-latest
+          - host: windows-latest
+            runner: windows-latest
+          - host: macos-latest
+            runner: macos-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Set up pinned Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.96.0"
+          targets: x86_64-unknown-none
+
+      - name: Set up current Odin
+        uses: laytan/setup-odin@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run informational host build contract
+        run: |
+          python scripts/host_portability_contract.py \
+            --output "artifacts/portability/${{ matrix.host }}.json"
+
+      - name: Upload observation evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: kozo-portability-${{ matrix.host }}
+          path: artifacts/portability/${{ matrix.host }}.json
+          if-no-files-found: error

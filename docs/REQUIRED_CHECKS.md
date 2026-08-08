@@ -77,6 +77,7 @@ No build or verification script may depend on user-specific absolute paths.
 | Release bundle | `scripts/build_release_candidate.sh --version 1.0.0 --output <directory>` | `docs/RELEASE_EVIDENCE.md` | No | Yes | archive, release metadata, legal files, and `SHA256SUMS` |
 | CI workflow | GitHub Actions `ci / full verification` | `docs/REQUIRED_CHECKS.md` | Yes | Yes | GitHub Actions status |
 | Lint workflow | GitHub Actions `lint / static checks` | `docs/REQUIRED_CHECKS.md` | Yes | Yes | GitHub Actions status |
+| Host portability workflow | GitHub Actions `portability / required build contract` on all pinned matrix hosts | `docs/VALIDATION.md`, `docs/COMPATIBILITY.md` | Yes | Yes | GitHub Actions status and `kozo-portability-<host>` artifacts |
 
 ---
 
@@ -128,12 +129,18 @@ When Odin behavior is in scope, also run `odin check kernel` before full verific
 | --- | --- | --- |
 | `.github/workflows/ci.yml` | `full verification` | system tools, pinned Rust toolchain, bare-metal target, authenticated Odin setup, pinned Limine source tooling, xorriso, QEMU, JSON validation, unit tests, Rust check, cargo-deny, cargo-audit, Odin check, governed full verification, release-bundle and checksum validation, evidence and dry-run artifact upload, proof artifact validation, transient artifact cleanup, whitespace check |
 | `.github/workflows/lint.yml` | `static checks` | system tools, pinned Rust toolchain, bare-metal target, Odin, shell syntax, JSON syntax, unit tests, Rust check, Odin check, whitespace check |
+| `.github/workflows/portability.yml` | `required build contract` | pinned Ubuntu, Windows, and macOS runners; task/schema validation; 34 Odin object regressions; full Python tests; real Odin object normalization; Rust and Odin checks; release inventory, license, prohibited-path, and portable checksum validation; per-host evidence upload |
+| `.github/workflows/portability.yml` | `observation build contract` | non-blocking latest-runner observation on schedule or manual dispatch; no compatibility promotion |
 
 The CI workflows must keep installing `nasm`, pinned Rust, `x86_64-unknown-none`, and Odin before running checks that depend on them.
 
 Full CI must install xorriso and QEMU through apt, acquire the pinned Limine source release, verify the Limine source checksum, build Limine tooling, export `LIMINE_DIR`, `LIMINE`, and `XORRISO`, and run the release builder. The release builder invokes `scripts/verify.sh`, which performs the boot-image, QEMU, runtime, and aggregate verification path against the committed source snapshot.
 
-CI/Linux is the authoritative portability proof for the full build, verification, ISO packaging, ELF inspection, and QEMU smoke tooling path. Local macOS development is a convenience path and must not weaken CI-required dependency declarations.
+The required portability matrix owns host build claims through
+`VALIDATED_BUILD`; only a separately executed runtime contract can promote a
+host to `VALIDATED_RUNTIME`. Linux hosted QEMU remains the authoritative
+guest-runtime proof for full verification, ISO packaging, ELF inspection, and
+QEMU smoke. Local macOS development is one validation environment and must not weaken hosted dependency declarations.
 
 No build or verification script may depend on user-specific absolute paths; required tools must be found through CI installation, pinned toolchain resolution, controlled environment variables, command discovery, or repository-relative paths.
 

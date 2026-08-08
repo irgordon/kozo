@@ -171,12 +171,18 @@ governed verification pass, including the formerly failing release-bundle
 stage. Patch preparation and release gates passed. v1.0.1 is published from
 the exact hosted-accepted commit, and `KOZO-TRIAGE-001` is resolved.
 
-The bounded v1.0.1 post-release observation is complete locally. It reviewed
+The bounded v1.0.1 post-release observation is complete. It reviewed
 all project-visible issues and post-publication Actions, revalidated the six
 hosted assets, booted the downloaded ISO through all 41 markers, and observed
 the accepted cross-host Odin output boundary against tagged source. No
-qualifying defect was reproduced. v1.0.2 is not authorized, v1.1.0 has not
-started, and the current release remains v1.0.1.
+qualifying defect was reproduced. v1.0.2 is not authorized, and the current
+release remains v1.0.1.
+
+v1.1.0 Phase 0 is now the active repository-development gate. It establishes
+host portability as an evidence-backed invariant and requires pinned Linux,
+Windows, and macOS build-contract results while keeping guest runtime evidence
+separate. The hosted matrix is pending. No v1.1.0 product capability work is
+authorized until Phase 0 is accepted.
 
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity
@@ -216,7 +222,12 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
     one canonical object-build boundary with its focused failure coverage.
 21. Preserve the immutable v1.0.1 tag, notes, six assets, checksums, and hosted
     ISO evidence; use a later patch version for any product correction.
-22. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
+22. Complete v1.1.0 Phase 0 by proving the governed build contract on pinned
+    Linux, Windows, and macOS runners while retaining Linux as the required
+    guest/runtime gate.
+23. Keep v1.1.0 product capability work blocked until Phase 0 hosted evidence
+    is accepted.
+24. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
 
 ---
 

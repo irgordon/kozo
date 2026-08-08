@@ -456,6 +456,33 @@ Production readiness requires separate governance, threat analysis, testing, ope
 
 ---
 
+## 12.3 Host portability requires hosted evidence
+
+Local macOS development is one validation environment, not the reference
+platform.
+
+Supported build and validation behavior must be proven through governed hosted
+validation on every operating system KOZO claims to support. Correctness must
+not depend on developer CPU count, memory capacity, storage capacity, Homebrew
+paths, macOS filesystem behavior, POSIX-only path assumptions where Windows is
+claimed, or one incidental compiler-output convention.
+
+A portability claim cannot move from designed to validated until the
+corresponding required GitHub Actions runner passes the governed host contract.
+A build result cannot be promoted to guest-runtime validation unless the
+separate runtime contract actually executes and passes.
+
+Firm build prerequisites are allowed only when they are explicit, documented,
+validated, and governed. An incidental developer-machine assumption is not an
+allowed prerequisite.
+
+Future general-userspace releases must define a minimum usable guest profile.
+Additional CPU, memory, and storage should increase capacity or performance
+without unlocking basic correctness. No specific resource minimum is defined
+by this invariant.
+
+---
+
 # 13. Coding and Review Invariants
 
 ## 13.1 Code must prefer explicit structure over cleverness
@@ -535,6 +562,9 @@ Syscall behavior stays classed, contracted, and validated.
 Validators stay covered by behavioral negative tests.
 
 Compatibility claims stay scoped and evidence-backed.
+
+Host portability stays tied to required hosted evidence, and build evidence
+stays distinct from guest-runtime evidence.
 
 Boot code must not enter Odin until every governed architecture prerequisite
 for the allowed generated instruction class has succeeded. Control-register

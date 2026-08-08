@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO v1.0.1 Post-Release Observation and Issue Triage",
+  "task_title": "KOZO v1.1.0 Phase 0 - GitHub Actions Cross-Host Portability Matrix",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "approved",
@@ -34,7 +34,9 @@
     "KOZO-TRIAGE-001 patch preparation is accepted on main at b2bc296dbfd7fdeda5c6ab48c861ff569850f350 with hosted CI run 31153444797 and lint run 31153445341",
     "The exact v1.0.1 release commit 02f1b0113458b988562b7e03362ec9ae716cebd0 is accepted by hosted CI run 31223062540 and lint run 31223061928",
     "Annotated v1.0.1 tag object 7896c767376a666ad7f7d8f294beadb473b0290c targets the accepted release commit and its six hosted assets are independently verified",
-    "Post-publication CI run 31226436612 and lint run 31226436655 accepted main commit 71cbd8651747c9088f426de20f111e49b5d2d8ee"
+    "Post-publication CI run 31226436612 and lint run 31226436655 accepted main commit 71cbd8651747c9088f426de20f111e49b5d2d8ee",
+    "v1.1.0 Phase 0 starts from clean synchronized main at f472472fb7a41b14c80df3e17fad48e783d5e749",
+    "The published v1.0.1 tag object 7896c767376a666ad7f7d8f294beadb473b0290c and historical release records remain immutable"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
@@ -60,11 +62,15 @@
     "The published patch changes only the Odin object-build boundary, focused tests, current status documentation, task state, and generated proof",
     "The authorized v1.0.1 release boundary advanced release/version.txt and published one commit-bound six-asset release only after the exact tag target passed local and hosted gates",
     "The immutable v1.0.1 tag targets hosted-accepted descendant 02f1b0113458b988562b7e03362ec9ae716cebd0 of b2bc296dbfd7fdeda5c6ab48c861ff569850f350 and must never be moved",
-    "Post-release observation may record evidence and classify reports, but it may not implement a fix, advance release/version.txt, authorize v1.0.2, or start v1.1.0"
+    "Post-release observation may record evidence and classify reports, but it may not implement a fix or advance release/version.txt",
+    "Host portability, guest portability, and resource scaling are separate evidence classes",
+    "v1.1.0 Phase 0 changes governance and hosted validation only; product capability work remains unauthorized until hosted acceptance",
+    "release/version.txt remains 1.0.1 and no resource minimum is defined by this phase"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
     ".github/",
+    ".gitattributes",
     ".gitignore",
     "deny.toml",
     "rust-toolchain.toml",
@@ -3263,6 +3269,45 @@
         "verification.tests_run[159]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 95,
+      "title": "Establish the v1.1.0 Phase 0 host portability matrix",
+      "status": "pending",
+      "kind": "edit",
+      "files_expected": [
+        ".gitattributes",
+        ".github/workflows/portability.yml",
+        ".gitignore",
+        "docs/adr/0017-host-portability-evidence.md",
+        "docs/INVARIANTS.md",
+        "docs/VALIDATION.md",
+        "docs/COMPATIBILITY.md",
+        "docs/GENERATED_ARTIFACTS.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/BOOT_TOOLING.md",
+        "docs/REQUIRED_CHECKS.md",
+        "docs/ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "scripts/build_odin_object.sh",
+        "scripts/host_portability_contract.py",
+        "tests/test_odin_object_build.py",
+        "tests/test_host_portability_contract.py",
+        "tests/test_host_dependency_portability.py",
+        "harness/validators_impl/host_dependency_portability.py",
+        "harness/validators_impl/validator_coverage.py",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "tasks/runtime.json",
+        "docs/generated/governance_index.md",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.summary.txt"
+      ],
+      "verification_refs": [
+        "verification.tests_run[160]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -3339,7 +3384,8 @@
     "The post-publication documentation audit routes users, maintainers, and engineers through distinct wiki paths, validates the hosted ISO user path, records product limits plainly, and preserves all immutable release and runtime state.",
     "Post-release triage records no user-filed reports and one hosted-workflow case, reproduces KOZO-TRIAGE-001 against tagged v1.0.0 source, classifies it BUILD_TOOLING/U2/R3, authorizes bounded v1.0.1 patch preparation, and changes no product behavior.",
     "The v1.0.1 patch-preparation boundary normalizes exact, appended .o, and accepted legacy .obj Odin output to one canonical caller path while failing closed on compiler failure, missing output, ambiguity, stale candidates, invalid output types, and unsafe provenance.",
-    "v1.0.1 post-release observation revalidates immutable release assets and runtime evidence, reviews project-visible reports and workflows, records cross-host Odin evidence without overclaiming, and authorizes no later release or capability work."
+    "v1.0.1 post-release observation revalidates immutable release assets and runtime evidence, reviews project-visible reports and workflows, records cross-host Odin evidence without overclaiming, and authorizes no later release or capability work.",
+    "v1.1.0 Phase 0 governs host portability through pinned Linux, Windows, and macOS build contracts, keeps guest runtime evidence separate, defines no resource minimum, preserves v1.0.1, and leaves product capability work unauthorized pending hosted acceptance."
   ],
   "verification": {
     "tests_run": [
@@ -4142,6 +4188,11 @@
         "tool": "v1.0.1 post-release observation and issue triage",
         "command": "immutable release and historical tag readback; project-visible GitHub issue and post-publication Actions inventory; hosted release notes, asset, checksum, JSON, and ISO validation; clean tagged-source Odin observation; Python, shell, Odin, Rust, policy, governed verification, task JSON, and diff checks",
         "status": "local_observation_complete_zero_project_visible_issues_two_successful_post_publication_runs_six_assets_exact_1058_tests_67_checks_0_failures_hosted_iso_and_current_main_qemu_pass_41_markers_no_new_odin_form_no_new_case_v1.0.2_unauthorized_v1.1.0_not_started_hosted_acceptance_pending"
+      },
+      {
+        "tool": "v1.1.0 Phase 0 cross-host portability matrix",
+        "command": "ADR and governance review; actionlint; 34 focused Odin object regressions; host portability contract; Python, Odin, Rust, task/schema, release inventory, checksum, governed runtime, GitHub Actions matrix, hosted artifacts, and immutable release readback",
+        "status": "local_pass_34_focused_1097_full_tests_67_checks_0_failures_qemu_pass_41_markers_hosted_matrix_pending_capability_work_unauthorized"
       }
     ],
     "logs": [
@@ -4395,6 +4446,7 @@
     "Audited every wiki page against the published v1.0.0 product, separated user, maintainer, and engineer paths, corrected stale and incomplete guidance, and retained all runtime and release records unchanged.",
     "Reviewed project-visible post-release issue sources, reproduced the immutable hosted baseline, classified current-Odin object normalization as KOZO-TRIAGE-001 BUILD_TOOLING/U2/R3, and authorized bounded v1.0.1 patch preparation without changing runtime or immutable release state.",
     "Normalized supported Odin object filenames at one portable build boundary, added fail-closed fake-compiler regression coverage, passed the formerly failing hosted release-bundle stage, and preserved runtime and immutable prior releases.",
-    "Published immutable v1.0.1 from hosted-accepted commit 02f1b0113458b988562b7e03362ec9ae716cebd0, independently verified all six hosted assets and the downloaded ISO, resolved KOZO-TRIAGE-001, and did not publish core_service."
+    "Published immutable v1.0.1 from hosted-accepted commit 02f1b0113458b988562b7e03362ec9ae716cebd0, independently verified all six hosted assets and the downloaded ISO, resolved KOZO-TRIAGE-001, and did not publish core_service.",
+    "Established ADR-backed host portability governance, a pinned required build matrix, a non-blocking observation lane, a portable host contract, and 34 cross-host object-boundary regressions without changing runtime or the published product version."
   ]
 }

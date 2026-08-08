@@ -16,6 +16,10 @@ KOZO_NEGATIVE_COVERAGE = {
         "missing_ci_xorriso_install": "test_fails_when_ci_xorriso_install_is_missing",
         "missing_ci_limine_acquisition": "test_fails_when_ci_limine_acquisition_is_missing",
         "missing_ci_qemu_install": "test_fails_when_ci_qemu_install_is_missing",
+        "missing_windows_runner": "test_fails_when_windows_runner_is_missing",
+        "missing_fail_fast_false": "test_fails_when_matrix_fail_fast_is_enabled",
+        "missing_observation_non_blocking": "test_fails_when_observation_is_blocking",
+        "missing_runtime_separation": "test_fails_when_runtime_separation_is_missing",
         "missing_qemu_override": "test_fails_when_qemu_override_is_missing",
         "missing_rust_toolchain_selection": "test_fails_when_verify_script_does_not_select_rust_toolchain",
         "diagnostic_names_field": "test_failure_diagnostic_names_field",
@@ -91,6 +95,56 @@ class HostDependencyPortabilityValidatorTests(unittest.TestCase):
             "host_dependency_portability.qemu_smoke.fail_closed.${KOZO_QEMU_BIN:-}",
         )
 
+    def test_fails_when_windows_runner_is_missing(self):
+        result = self.validate_fixture(
+            mutate_portability=lambda text: text.replace("windows-2025", "windows-missing")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_portability_failure(
+            result,
+            "missing_anchor",
+            "host_dependency_portability.portability.workflow.windows-2025",
+        )
+
+    def test_fails_when_matrix_fail_fast_is_enabled(self):
+        result = self.validate_fixture(
+            mutate_portability=lambda text: text.replace("fail-fast: false", "fail-fast: true")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_portability_failure(
+            result,
+            "missing_anchor",
+            "host_dependency_portability.portability.workflow.fail-fast: false",
+        )
+
+    def test_fails_when_observation_is_blocking(self):
+        result = self.validate_fixture(
+            mutate_portability=lambda text: text.replace(
+                "continue-on-error: true", "continue-on-error: false"
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_portability_failure(
+            result,
+            "missing_anchor",
+            "host_dependency_portability.portability.workflow.continue-on-error: true",
+        )
+
+    def test_fails_when_runtime_separation_is_missing(self):
+        result = self.validate_fixture(
+            mutate_adr=lambda text: text.replace("Guest portability", "Guest execution")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_portability_failure(
+            result,
+            "missing_anchor",
+            "host_dependency_portability.portability.adr.Guest portability",
+        )
+
     def test_does_not_fail_when_changelog_contains_historical_host_reference(self):
         self.assertEqual("host_dependency_portability", HostDependencyPortabilityValidator.name)
         result = self.validate_fixture(extra_file=("CHANGELOG.md", "Historical /Users/godzilla/local note"))
@@ -114,6 +168,8 @@ class HostDependencyPortabilityValidatorTests(unittest.TestCase):
         mutate_verify=None,
         mutate_build=None,
         mutate_qemu=None,
+        mutate_portability=None,
+        mutate_adr=None,
         extra_file: tuple[str, str] | None = None,
     ):
         with tempfile.TemporaryDirectory() as tmp:
@@ -128,6 +184,12 @@ class HostDependencyPortabilityValidatorTests(unittest.TestCase):
                 paths["build"].write_text(mutate_build(paths["build"].read_text()))
             if mutate_qemu is not None:
                 paths["qemu"].write_text(mutate_qemu(paths["qemu"].read_text()))
+            if mutate_portability is not None:
+                paths["portability"].write_text(
+                    mutate_portability(paths["portability"].read_text())
+                )
+            if mutate_adr is not None:
+                paths["adr"].write_text(mutate_adr(paths["adr"].read_text()))
             if extra_file is not None:
                 path = root / extra_file[0]
                 path.parent.mkdir(parents=True, exist_ok=True)
@@ -150,6 +212,8 @@ def write_fixture_files(root: Path) -> dict[str, object]:
     paths = {
         "ci": root / ".github" / "workflows" / "ci.yml",
         "lint": root / ".github" / "workflows" / "lint.yml",
+        "portability": root / ".github" / "workflows" / "portability.yml",
+        "adr": root / "docs" / "adr" / "0017-host-portability-evidence.md",
         "verify": root / "scripts" / "verify.sh",
         "build": root / "scripts" / "build_boot_image.sh",
         "qemu": root / "scripts" / "qemu_smoke.sh",
@@ -165,6 +229,8 @@ def write_fixture_files(root: Path) -> dict[str, object]:
         path.parent.mkdir(parents=True, exist_ok=True)
     paths["ci"].write_text(valid_ci_text())
     paths["lint"].write_text(valid_lint_text())
+    paths["portability"].write_text(valid_portability_text())
+    paths["adr"].write_text(valid_adr_text())
     paths["verify"].write_text(valid_verify_text())
     paths["build"].write_text(valid_build_text())
     paths["qemu"].write_text(valid_qemu_text())
@@ -211,6 +277,39 @@ def valid_lint_text() -> str:
     )
 
 
+def valid_portability_text() -> str:
+    return "\n".join(
+        (
+            "name: portability",
+            "portability-build:",
+            "fail-fast: false",
+            "ubuntu-24.04",
+            "windows-2025",
+            "macos-15",
+            "shell: bash",
+            "scripts/host_portability_contract.py",
+            "portability-observation:",
+            "continue-on-error: true",
+            "actions/upload-artifact@v7",
+        )
+    )
+
+
+def valid_adr_text() -> str:
+    return "\n".join(
+        (
+            "# ADR-0017: Host Portability Evidence",
+            "VALIDATED_BUILD",
+            "VALIDATED_RUNTIME",
+            "Host portability",
+            "Guest portability",
+            "Resource scaling",
+            "Git Bash",
+            "does not set any CPU, memory, or storage minimum",
+        )
+    )
+
+
 def valid_verify_text() -> str:
     return "\n".join(
         (
@@ -252,9 +351,10 @@ def valid_qemu_text() -> str:
 def valid_doc_text() -> str:
     return "\n".join(
         (
-            "CI/Linux is the authoritative portability proof",
-            "Local macOS development is a convenience path",
-            "No build or verification script may depend on user-specific absolute paths",
+            "VALIDATED_BUILD",
+            "VALIDATED_RUNTIME",
+            "Linux hosted QEMU",
+            "Local macOS development is one validation environment",
         )
     )
 
@@ -264,6 +364,8 @@ def patch_validator_paths(paths: dict[str, object]):
         validator_module._ROOT,
         validator_module._CI_WORKFLOW_PATH,
         validator_module._LINT_WORKFLOW_PATH,
+        validator_module._PORTABILITY_WORKFLOW_PATH,
+        validator_module._PORTABILITY_ADR_PATH,
         validator_module._VERIFY_SCRIPT_PATH,
         validator_module._BUILD_BOOT_IMAGE_PATH,
         validator_module._QEMU_SMOKE_PATH,
@@ -276,6 +378,8 @@ def patch_validator_paths(paths: dict[str, object]):
     validator_module._ROOT = paths["ci"].parents[2]
     validator_module._CI_WORKFLOW_PATH = paths["ci"]
     validator_module._LINT_WORKFLOW_PATH = paths["lint"]
+    validator_module._PORTABILITY_WORKFLOW_PATH = paths["portability"]
+    validator_module._PORTABILITY_ADR_PATH = paths["adr"]
     validator_module._VERIFY_SCRIPT_PATH = paths["verify"]
     validator_module._BUILD_BOOT_IMAGE_PATH = paths["build"]
     validator_module._QEMU_SMOKE_PATH = paths["qemu"]
@@ -292,6 +396,8 @@ def restore_validator_paths(old_paths) -> None:
         validator_module._ROOT,
         validator_module._CI_WORKFLOW_PATH,
         validator_module._LINT_WORKFLOW_PATH,
+        validator_module._PORTABILITY_WORKFLOW_PATH,
+        validator_module._PORTABILITY_ADR_PATH,
         validator_module._VERIFY_SCRIPT_PATH,
         validator_module._BUILD_BOOT_IMAGE_PATH,
         validator_module._QEMU_SMOKE_PATH,
