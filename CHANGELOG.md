@@ -1,5 +1,22 @@
 # Changelog
 
+## v1.0.1 post-release observation - 2026-08-08
+
+**Status:** Documentation-only observation on `main`; not a new product release.
+
+* Revalidated the immutable v1.0.1 tag, notes, six hosted assets, checksums,
+  metadata, and downloaded ISO.
+* Reviewed all project-visible issues and all Actions runs after publication;
+  no qualifying defect report or failed, cancelled, or timed-out run existed.
+* Observed accepted `.obj` output from local Odin and successful canonical
+  normalization; hosted Linux also passed with its recorded Odin nightly.
+* Reproduced QEMU pass, blocker none, all 41 ordered markers, and final marker
+  `KOZO_RUNTIME_RETURN_OK` from the hosted ISO.
+* Created no new triage case, authorized no v1.0.2 preparation, and did not
+  start v1.1.0 development.
+* Changed no runtime, kernel, userspace, build tool, ABI, contract, schema,
+  marker, tag, hosted note, asset, or product version.
+
 ## v1.0.1 - 2026-08-07
 
 **Status:** Published as the immutable final GitHub patch release; hosted assets independently verified.

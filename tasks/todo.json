@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO v1.0.1 Patch Release Authorization",
+  "task_title": "KOZO v1.0.1 Post-Release Observation and Issue Triage",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "approved",
@@ -33,7 +33,8 @@
     "KOZO-TRIAGE-001 is reproduced as a BUILD_TOOLING/U2/R3 defect and bounded v1.0.1 patch preparation is authorized",
     "KOZO-TRIAGE-001 patch preparation is accepted on main at b2bc296dbfd7fdeda5c6ab48c861ff569850f350 with hosted CI run 31153444797 and lint run 31153445341",
     "The exact v1.0.1 release commit 02f1b0113458b988562b7e03362ec9ae716cebd0 is accepted by hosted CI run 31223062540 and lint run 31223061928",
-    "Annotated v1.0.1 tag object 7896c767376a666ad7f7d8f294beadb473b0290c targets the accepted release commit and its six hosted assets are independently verified"
+    "Annotated v1.0.1 tag object 7896c767376a666ad7f7d8f294beadb473b0290c targets the accepted release commit and its six hosted assets are independently verified",
+    "Post-publication CI run 31226436612 and lint run 31226436655 accepted main commit 71cbd8651747c9088f426de20f111e49b5d2d8ee"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
@@ -58,7 +59,8 @@
     "release/version.txt records the current published patch version 1.0.1; later version changes require a separately authorized release boundary",
     "The published patch changes only the Odin object-build boundary, focused tests, current status documentation, task state, and generated proof",
     "The authorized v1.0.1 release boundary advanced release/version.txt and published one commit-bound six-asset release only after the exact tag target passed local and hosted gates",
-    "The immutable v1.0.1 tag targets hosted-accepted descendant 02f1b0113458b988562b7e03362ec9ae716cebd0 of b2bc296dbfd7fdeda5c6ab48c861ff569850f350 and must never be moved"
+    "The immutable v1.0.1 tag targets hosted-accepted descendant 02f1b0113458b988562b7e03362ec9ae716cebd0 of b2bc296dbfd7fdeda5c6ab48c861ff569850f350 and must never be moved",
+    "Post-release observation may record evidence and classify reports, but it may not implement a fix, advance release/version.txt, authorize v1.0.2, or start v1.1.0"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -3236,6 +3238,31 @@
         "verification.tests_run[158]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 94,
+      "title": "Observe v1.0.1 and classify project-visible reports",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "docs/releases/v1.0.1-post-release-observation.md",
+        "docs/ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "tasks/runtime.json",
+        "docs/generated/governance_index.md",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/boot_blocker_report.json",
+        "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.summary.txt",
+        "artifacts/runtime/runtime_smoke.metadata.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[159]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -3311,7 +3338,8 @@
     "v1.0.0 publishes one hosted-CI-accepted final commit as an immutable annotated tag and final GitHub release, verifies all six hosted assets independently, preserves the RC record, and records publication through one documentation/proof-only follow-up commit.",
     "The post-publication documentation audit routes users, maintainers, and engineers through distinct wiki paths, validates the hosted ISO user path, records product limits plainly, and preserves all immutable release and runtime state.",
     "Post-release triage records no user-filed reports and one hosted-workflow case, reproduces KOZO-TRIAGE-001 against tagged v1.0.0 source, classifies it BUILD_TOOLING/U2/R3, authorizes bounded v1.0.1 patch preparation, and changes no product behavior.",
-    "The v1.0.1 patch-preparation boundary normalizes exact, appended .o, and accepted legacy .obj Odin output to one canonical caller path while failing closed on compiler failure, missing output, ambiguity, stale candidates, invalid output types, and unsafe provenance."
+    "The v1.0.1 patch-preparation boundary normalizes exact, appended .o, and accepted legacy .obj Odin output to one canonical caller path while failing closed on compiler failure, missing output, ambiguity, stale candidates, invalid output types, and unsafe provenance.",
+    "v1.0.1 post-release observation revalidates immutable release assets and runtime evidence, reviews project-visible reports and workflows, records cross-host Odin evidence without overclaiming, and authorizes no later release or capability work."
   ],
   "verification": {
     "tests_run": [
@@ -4109,6 +4137,11 @@
         "tool": "v1.0.1 patch release authorization",
         "command": "version and immutable-release review; release and task schema checks; 27 focused tests; Python discovery; Odin and Rust checks; cargo-deny and cargo-audit; governed verification; commit-bound local and hosted bundle inspection; hosted CI and lint; annotated tag and final GitHub release verification; independent hosted asset, metadata, checksum, and ISO validation",
         "status": "published_commit_02f1b0113458b988562b7e03362ec9ae716cebd0_ci_31223062540_lint_31223061928_tag_object_7896c767376a666ad7f7d8f294beadb473b0290c_six_hosted_assets_exact_hosted_iso_qemu_pass_41_markers_core_service_unpublished"
+      },
+      {
+        "tool": "v1.0.1 post-release observation and issue triage",
+        "command": "immutable release and historical tag readback; project-visible GitHub issue and post-publication Actions inventory; hosted release notes, asset, checksum, JSON, and ISO validation; clean tagged-source Odin observation; Python, shell, Odin, Rust, policy, governed verification, task JSON, and diff checks",
+        "status": "local_observation_complete_zero_project_visible_issues_two_successful_post_publication_runs_six_assets_exact_1058_tests_67_checks_0_failures_hosted_iso_and_current_main_qemu_pass_41_markers_no_new_odin_form_no_new_case_v1.0.2_unauthorized_v1.1.0_not_started_hosted_acceptance_pending"
       }
     ],
     "logs": [
@@ -4128,7 +4161,8 @@
       "Runtime progression stages are authoritative stage governance; the graph remains acyclic and monotonic, and the halt loop remains authoritative after the bounded progression call.",
       "Hosted CI run 29459278491 captured the complete ordered runtime marker sequence and passed runtime_progression_evidence.",
       "Ring3 response-consumer ELF evidence must be bounded by authoritative start and end symbol addresses so GNU and LLVM label aliases cannot change the governed comparison result.",
-      "Published v1.0.0, v1.0.0-rc.1, and v1.0.1 tags, notes, and assets remain immutable; later patch preparation requires a reproduced, in-scope defect that satisfies the complete authorization gate."
+      "Published v1.0.0, v1.0.0-rc.1, and v1.0.1 tags, notes, and assets remain immutable; later patch preparation requires a reproduced, in-scope defect that satisfies the complete authorization gate.",
+      "A post-release observation record cannot authorize a version change, patch implementation, feature implementation, tag mutation, release mutation, or asset replacement."
     ],
     "expected_behavior": [
       "verify.sh succeeds on a clean tree and prints the generated artifact JSON before VERIFY: PASS",

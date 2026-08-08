@@ -146,6 +146,10 @@ The current local generated evidence proves:
   regression coverage. Local and hosted verification pass, including the
   formerly failing release-bundle stage. v1.0.1 is published from the exact
   accepted commit with six independently verified assets.
+* v1.0.1 post-release observation reviewed all project-visible issues and all
+  post-publication Actions, revalidated the immutable six-asset release,
+  reproduced all 41 runtime markers from the hosted ISO, and observed only
+  accepted Odin object forms. No qualifying defect was reproduced.
 
 ## Current Active Blocker
 
@@ -160,6 +164,9 @@ Final `v1.0.1` is published as the current non-draft, non-prerelease GitHub
 release. Its tag, notes, and assets are immutable. The v1.0.0 and RC records
 remain unchanged.
 
+The v1.0.1 post-release observation is complete locally with zero reproduced
+defects. v1.0.2 is not authorized and v1.1.0 has not started.
+
 Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr`, `kernel_entry_not_reached`, `serial_not_initialized`, and `marker_not_emitted` are retained only as resolved historical evidence states unless a future CI artifact reintroduces one.
 
 ## Next Phase
@@ -168,6 +175,10 @@ The `v1.0.0-rc.1`, `v1.0.0`, post-publication documentation, and v1.0.1 patch
 phases are complete. v1.0.1 resolves `KOZO-TRIAGE-001` through one canonical
 object-output boundary and preserves the runtime. Future work begins from
 evidence; all published tags and hosted assets remain immutable.
+
+No patch phase follows this observation. Continue observing v1.0.1 until a
+specific, reproducible, in-scope defect justifies a separately authorized
+task.
 
 ---
 
@@ -235,6 +246,7 @@ evidence; all published tags and hosted assets remain immutable.
 | `v1.0.0-rc.1` | Published release candidate | Freeze release scope and gates, publish the accepted immutable candidate, and verify the distributed artifacts and documented user path. | Release evidence bundle, annotated tag, GitHub prerelease, six approved hosted assets, post-promotion status page, hosted ISO/ELF/JSON checks, and live force-push readback. | The hosted bundle matches the accepted hashes, QEMU reproduces all 41 markers, documentation reflects the prerelease, and no in-place release mutation occurs. |
 | `v1.0.0` | Final kernel-foundation release | Publish only the proven, scoped KOZO kernel foundation. | Final release evidence bundle, final changelog and notes, passing local and hosted gates, annotated tag, six verified assets, explicit non-goals. | v1.0.0 claims only evidence-backed behavior, preserves the accepted runtime and RC record, and keeps all compatibility and production-desktop non-goals. |
 | `v1.0.1` | Cross-host Odin object normalization patch | Publish the accepted build-tooling correction without changing runtime behavior. | Canonical object-output normalization, focused regressions, scoped release notes and evidence, exact commit-bound bundle, annotated tag, six verified assets. | Local and hosted gates pass at the tagged commit; hosted assets match the approved bundle; KOZO-TRIAGE-001 is resolved; v1.0.0 and v1.0.0-rc.1 remain immutable. |
+| `v1.0.1 observation` | Post-release observation and issue triage | Revalidate release integrity, review project-visible defects and workflows, observe Odin output behavior, and decide whether another patch is justified. | Observation report, immutable asset and ISO checks, issue and Actions inventory, cross-host Odin evidence, task-state closure. | No qualifying defect is reproduced; v1.0.2 remains unauthorized; v1.1.0 remains unstarted; published release records remain immutable. |
 
 ---
 

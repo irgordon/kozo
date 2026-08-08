@@ -171,6 +171,13 @@ governed verification pass, including the formerly failing release-bundle
 stage. Patch preparation and release gates passed. v1.0.1 is published from
 the exact hosted-accepted commit, and `KOZO-TRIAGE-001` is resolved.
 
+The bounded v1.0.1 post-release observation is complete locally. It reviewed
+all project-visible issues and post-publication Actions, revalidated the six
+hosted assets, booted the downloaded ISO through all 41 markers, and observed
+the accepted cross-host Odin output boundary against tagged source. No
+qualifying defect was reproduced. v1.0.2 is not authorized, v1.1.0 has not
+started, and the current release remains v1.0.1.
+
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity
 and performance without making core supported functionality depend on
