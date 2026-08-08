@@ -2,7 +2,7 @@
 
 ## v1.1.0 Phase 0 - Cross-host portability matrix - 2026-08-08
 
-**Status:** Repository governance and validation work after v1.0.1; not a new product release. Hosted acceptance is pending.
+**Status:** Repository governance and validation work after v1.0.1; not a new product release. Phase 0 is blocked by `KOZO-TRIAGE-002`.
 
 * Added ADR 0017 and a host-portability invariant that treats local macOS as
   one validation environment rather than a reference platform.
@@ -18,6 +18,13 @@
   real Odin object normalization, release inventory, and SHA-256 validation.
 * Kept Linux QEMU runtime verification separate and unchanged; Windows runtime
   remains `NOT_EXECUTED` unless a future governed runtime job proves it.
+* Ran the required hosted matrix in Actions run `31270131685`: Linux and macOS
+  passed, while Windows failed 57 full-suite checks involving canonical path
+  diagnostics and text-evidence byte accounting.
+* Recorded the deterministic Windows result as `KOZO-TRIAGE-002` without
+  skipping tests, narrowing the contract, or rerunning to obtain a green result.
+* Preserved the separate Linux runtime gate in CI run `31270131715` with 67
+  checks, no failures, QEMU pass, blocker none, and all 41 ordered markers.
 * Changed no kernel, userspace runtime, ABI, contract, schema, release tag,
   hosted asset, or product version. The current published release is v1.0.1.
 

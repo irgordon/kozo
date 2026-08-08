@@ -134,10 +134,19 @@ job does not prove Windows QEMU or guest-runtime behavior. Terms such as
 status and evidence.
 
 The Phase 0 required build hosts are Linux `ubuntu-24.04`, Windows
-`windows-2025`, and macOS `macos-15`. Until the required workflow completes,
-their new build-contract status remains `NOT_EXECUTED`. Linux runtime retains
-its separately accepted hosted QEMU evidence; Windows and macOS runtime remain
-`NOT_EXECUTED` unless a governed runtime job actually runs.
+`windows-2025`, and macOS `macos-15`. The first required execution is recorded
+in `docs/portability/HOST_MATRIX.md`:
+
+| Host | Current status | Build evidence | Runtime evidence |
+| --- | --- | --- | --- |
+| Linux | `VALIDATED_RUNTIME` | `PASS` in portability run `31270131685` | `PASS` in CI run `31270131715` |
+| Windows | `UNSUPPORTED` | `FAIL` in portability run `31270131685`; `KOZO-TRIAGE-002` | `NOT_EXECUTED` |
+| macOS | `VALIDATED_BUILD` | `PASS` in portability run `31270131685` | `NOT_EXECUTED` |
+
+Here `UNSUPPORTED` means that Windows has a known blocker in the declared
+Phase 0 build contract. It does not mean Windows is permanently outside the
+intended host set. A separately authorized correction and passing required
+job are needed before the status can become `VALIDATED_BUILD`.
 
 ---
 

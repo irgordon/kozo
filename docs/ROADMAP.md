@@ -181,8 +181,11 @@ release remains v1.0.1.
 v1.1.0 Phase 0 is now the active repository-development gate. It establishes
 host portability as an evidence-backed invariant and requires pinned Linux,
 Windows, and macOS build-contract results while keeping guest runtime evidence
-separate. The hosted matrix is pending. No v1.1.0 product capability work is
-authorized until Phase 0 is accepted.
+separate. Hosted run `31270131685` passed Linux and macOS but exposed the
+reproducible Windows evidence-normalization failure `KOZO-TRIAGE-002`. The
+separate Linux runtime run `31270131715` remains green. Phase 0 is blocked,
+and no v1.1.0 product capability work is authorized until the Windows boundary
+is corrected and the full required matrix passes.
 
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity

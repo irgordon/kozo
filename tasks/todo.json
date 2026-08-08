@@ -3287,6 +3287,8 @@
         "docs/RELEASE_EVIDENCE.md",
         "docs/BOOT_TOOLING.md",
         "docs/REQUIRED_CHECKS.md",
+        "docs/portability/HOST_MATRIX.md",
+        "docs/portability/KOZO-TRIAGE-002.md",
         "docs/ROADMAP.md",
         "docs/PHASEMAP.md",
         "scripts/build_odin_object.sh",
@@ -3307,7 +3309,7 @@
       "verification_refs": [
         "verification.tests_run[160]"
       ],
-      "failure_count": 0
+      "failure_count": 1
     }
   ],
   "expected_outputs": [
@@ -4192,7 +4194,7 @@
       {
         "tool": "v1.1.0 Phase 0 cross-host portability matrix",
         "command": "ADR and governance review; actionlint; 34 focused Odin object regressions; host portability contract; Python, Odin, Rust, task/schema, release inventory, checksum, governed runtime, GitHub Actions matrix, hosted artifacts, and immutable release readback",
-        "status": "local_pass_34_focused_1097_full_tests_67_checks_0_failures_qemu_pass_41_markers_hosted_matrix_pending_capability_work_unauthorized"
+        "status": "blocked_hosted_portability_run_31270131685_linux_build_pass_macos_build_pass_windows_build_fail_57_tests_KOZO-TRIAGE-002_linux_runtime_ci_31270131715_pass_67_checks_0_failures_qemu_pass_41_markers_capability_work_unauthorized"
       }
     ],
     "logs": [
