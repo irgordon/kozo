@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260808T174231Z",
+  "run_id": "verify-20260808T221402Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -493,9 +493,15 @@
   ],
   "failed_checks": [],
   "changed_files": [
-    "artifacts/runtime/qemu_smoke.metadata.json",
-    "artifacts/runtime/qemu_smoke.summary.txt",
-    "docs/generated/governance_index.md"
+    "CHANGELOG.md",
+    "docs/COMPATIBILITY.md",
+    "docs/PHASEMAP.md",
+    "docs/RELEASE_EVIDENCE.md",
+    "docs/ROADMAP.md",
+    "docs/portability/HOST_MATRIX.md",
+    "docs/portability/KOZO-TRIAGE-002.md",
+    "tasks/runtime.json",
+    "tasks/todo.json"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -512,5 +518,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-08-08T17:42:31Z"
+  "generated_at": "2026-08-08T22:14:02Z"
 }
