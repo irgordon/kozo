@@ -106,7 +106,7 @@
   "timed_out": true,
   "timeout_seconds": 20,
   "serial_log_bytes": 2359,
-  "stderr_log_bytes": 80,
+  "stderr_log_bytes": 79,
   "validator": "qemu_smoke_evidence",
   "proves": [
     "QEMU launched the KOZO ISO",
