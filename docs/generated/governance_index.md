@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 67
 * Failed checks: 0
-* Run ID: `verify-20260807T231015Z`
-* Generated at: `2026-08-07T23:10:15Z`
+* Run ID: `verify-20260808T174231Z`
+* Generated at: `2026-08-08T17:42:31Z`
 
 ## Registered validators
 

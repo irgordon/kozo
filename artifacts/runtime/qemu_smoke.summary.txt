@@ -59,7 +59,7 @@ Metadata
 QEMU exit code: 124
 Timed out: True
 Serial log bytes: 2359
-Stderr log bytes: 79
+Stderr log bytes: 80
 
 Evidence References
 artifacts/runtime/qemu_smoke.log
@@ -120,4 +120,4 @@ KOZO_SECOND_CAPABILITY_OK
 KOZO_RUNTIME_RETURN_OK
 
 Last 50 stderr lines
-qemu-system-x86_64: terminating on signal 15 from pid 1456 (<unknown process>)
+qemu-system-x86_64: terminating on signal 15 from pid 11720 (<unknown process>)
