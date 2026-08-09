@@ -7,6 +7,7 @@ from pathlib import Path
 
 from harness.codes import OK, QEMU_SMOKE_EVIDENCE_INVALID
 from harness.runtime_evidence_taxonomy import get_expected_smoke_marker, get_smoke_marker_order
+from harness.text_evidence import canonical_text_bytes, write_canonical_text
 from harness.validators_impl import qemu_smoke_evidence as validator_module
 from harness.validators_impl.qemu_smoke_evidence import QemuSmokeEvidenceValidator
 
@@ -637,14 +638,14 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
                 paths["metadata"].unlink()
             elif mutate_metadata is not None:
                 metadata = json.loads(paths["metadata"].read_text())
-                paths["metadata"].write_text(json.dumps(mutate_metadata(metadata), indent=2) + "\n")
+                write_canonical_text(paths["metadata"], json.dumps(mutate_metadata(metadata), indent=2) + "\n")
             elif mutate_metadata_text is not None:
-                paths["metadata"].write_text(mutate_metadata_text(paths["metadata"].read_text()))
+                write_canonical_text(paths["metadata"], mutate_metadata_text(paths["metadata"].read_text()))
 
             if remove_serial_log:
                 paths["serial_log"].unlink()
             elif mutate_serial_log is not None:
-                paths["serial_log"].write_text(mutate_serial_log(paths["serial_log"].read_text()))
+                write_canonical_text(paths["serial_log"], mutate_serial_log(paths["serial_log"].read_text()))
 
             if remove_stderr_log:
                 paths["stderr_log"].unlink()
@@ -652,10 +653,10 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
             if remove_summary:
                 paths["summary"].unlink()
             elif mutate_summary is not None:
-                paths["summary"].write_text(mutate_summary(paths["summary"].read_text()))
+                write_canonical_text(paths["summary"], mutate_summary(paths["summary"].read_text()))
 
             if mutate_release_doc is not None:
-                paths["release_doc"].write_text(mutate_release_doc(paths["release_doc"].read_text()))
+                write_canonical_text(paths["release_doc"], mutate_release_doc(paths["release_doc"].read_text()))
 
             old_paths = patch_validator_paths(paths)
             try:
@@ -689,15 +690,15 @@ def write_fixture_files(root: Path, metadata_factory, blocker_factory) -> dict[s
     blocker = (blocker_factory or (lambda: valid_blocker("none")))()
     metadata["boot_image"] = str(paths["boot_image"])
 
-    paths["metadata"].write_text(json.dumps(metadata, indent=2) + "\n")
-    paths["serial_log"].write_text(default_serial_log_text())
-    paths["stderr_log"].write_text(default_stderr_log_text())
-    paths["summary"].write_text(valid_summary_text(metadata))
-    paths["blocker"].write_text(json.dumps(blocker, indent=2) + "\n")
+    write_canonical_text(paths["metadata"], json.dumps(metadata, indent=2) + "\n")
+    write_canonical_text(paths["serial_log"], default_serial_log_text())
+    write_canonical_text(paths["stderr_log"], default_stderr_log_text())
+    write_canonical_text(paths["summary"], valid_summary_text(metadata))
+    write_canonical_text(paths["blocker"], json.dumps(blocker, indent=2) + "\n")
     paths["boot_image"].write_bytes(b"iso")
-    paths["boot_doc"].write_text(valid_doc_text())
-    paths["runtime_doc"].write_text(valid_doc_text())
-    paths["release_doc"].write_text(valid_doc_text())
+    write_canonical_text(paths["boot_doc"], valid_doc_text())
+    write_canonical_text(paths["runtime_doc"], valid_doc_text())
+    write_canonical_text(paths["release_doc"], valid_doc_text())
     return paths
 
 
@@ -745,8 +746,8 @@ def valid_metadata(outcome: str, *, serial_text: str | None = None, stderr_text:
         "qemu_exit_code": 0,
         "timed_out": False,
         "timeout_seconds": 20,
-        "serial_log_bytes": len(serial_text.encode()),
-        "stderr_log_bytes": len(stderr_text.encode()),
+        "serial_log_bytes": len(canonical_text_bytes(serial_text)),
+        "stderr_log_bytes": len(canonical_text_bytes(stderr_text)),
         "validator": "qemu_smoke_evidence",
         "proves": [
             "QEMU launched the KOZO ISO",

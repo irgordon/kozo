@@ -184,8 +184,10 @@ Windows, and macOS build-contract results while keeping guest runtime evidence
 separate. Hosted run `31270131685` passed Linux and macOS but exposed the
 reproducible Windows evidence-normalization failure `KOZO-TRIAGE-002`. The
 separate Linux runtime run `31270131715` remains green. Phase 0 is blocked,
-and no v1.1.0 product capability work is authorized until the Windows boundary
-is corrected and the full required matrix passes.
+and no v1.1.0 product capability work is authorized until the full required
+matrix passes. The bounded correction now passes 1,117 local tests and keeps
+raw QEMU byte semantics, native filesystem paths, pinned runners, and runtime
+evidence unchanged; it is pending hosted proof.
 
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity

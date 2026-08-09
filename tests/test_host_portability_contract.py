@@ -4,8 +4,11 @@ import tempfile
 import unittest
 
 from scripts.host_portability_contract import (
+    ContractExecutionState,
     OBJECT_FORM_PATTERN,
     PortabilityContractError,
+    build_failure_evidence,
+    build_pending_evidence,
     expected_staged_files,
     portable_release_entries,
     validate_checksum_manifest,
@@ -16,6 +19,40 @@ from scripts.host_portability_contract import (
 
 
 class HostPortabilityContractTests(unittest.TestCase):
+    def test_pending_evidence_contains_host_tools_and_workflow(self):
+        environment = sample_environment()
+        state = ContractExecutionState(environment)
+
+        evidence = build_pending_evidence(state)
+
+        self.assertEqual(evidence["host"], environment["host"])
+        self.assertEqual(evidence["tool_versions"], environment["tool_versions"])
+        self.assertEqual(evidence["workflow"], environment["workflow"])
+        self.assertEqual(evidence["contract_stage"], "environment_capture")
+        self.assertEqual(evidence["build_contract"], "PENDING")
+
+    def test_failure_evidence_retains_environment_and_stage(self):
+        environment = sample_environment()
+        state = ContractExecutionState(environment)
+        state.enter("python_tests")
+
+        evidence = build_failure_evidence(state, PortabilityContractError("failed"))
+
+        self.assertEqual(evidence["host"], environment["host"])
+        self.assertEqual(evidence["tool_versions"]["odin"], "odin test")
+        self.assertEqual(evidence["workflow"]["run_id"], "123")
+        self.assertEqual(evidence["contract_stage"], "python_tests")
+        self.assertEqual(evidence["build_contract"], "FAIL")
+        self.assertEqual(evidence["failure"], "failed")
+
+    def test_failure_evidence_does_not_coerce_success(self):
+        state = ContractExecutionState(sample_environment())
+
+        evidence = build_failure_evidence(state, PortabilityContractError("failed"))
+
+        self.assertNotEqual(evidence["build_contract"], "PASS")
+        self.assertEqual(evidence["runtime_contract"], "NOT_EXECUTED")
+
     def test_accepts_safe_relative_release_destinations(self):
         validate_destinations(["README.md", "docs/guide.md", "packages/core/Cargo.toml"])
 
@@ -91,6 +128,29 @@ class HostPortabilityContractTests(unittest.TestCase):
             "host": {"runner_os": "Windows", "shell_contract": "Git Bash"},
         }
         self.assertEqual(json.loads(json.dumps(evidence)), evidence)
+
+
+def sample_environment() -> dict:
+    return {
+        "commit": "abc123",
+        "host": {
+            "runner_os": "Windows",
+            "runner_arch": "X64",
+            "shell_contract": "Git Bash",
+        },
+        "tool_versions": {
+            "python": "3.13.14",
+            "odin": "odin test",
+            "rustc": "rustc test",
+            "cargo": "cargo test",
+            "git": "git test",
+        },
+        "workflow": {
+            "name": "portability",
+            "run_id": "123",
+            "run_attempt": "1",
+        },
+    }
 
 
 if __name__ == "__main__":

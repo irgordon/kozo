@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import dataclass
 import hashlib
 import json
 import os
@@ -13,8 +14,13 @@ import sys
 import tempfile
 import unittest
 
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from harness.text_evidence import write_canonical_text
+
+
 EXPECTED_FOCUSED_TESTS = 34
 REQUIRED_LICENSES = {"LICENSE", "LICENSE-MIT", "LICENSE-APACHE"}
 PROHIBITED_NAMES = {".git", ".env", "target", "__pycache__"}
@@ -27,17 +33,31 @@ class PortabilityContractError(RuntimeError):
     pass
 
 
+@dataclass
+class ContractExecutionState:
+    environment: dict
+    stage: str = "environment_capture"
+
+    def enter(self, stage: str) -> None:
+        self.stage = stage
+        print(f"KOZO_PORTABILITY_STAGE={stage} RESULT=START")
+
+    def finish(self) -> None:
+        self.stage = "complete"
+
+
 def main() -> int:
     arguments = parse_arguments()
     output_path = arguments.output.resolve()
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    state = begin_contract_evidence(output_path)
     try:
         with tempfile.TemporaryDirectory(
             prefix="kozo portability ", dir=output_path.parent
         ) as temporary_directory:
-            evidence = execute_build_contract(ROOT, Path(temporary_directory))
+            evidence = execute_build_contract(ROOT, Path(temporary_directory), state)
     except Exception as error:
-        evidence = build_failure_evidence(error)
+        evidence = build_failure_evidence(state, error)
         write_evidence(output_path, evidence)
         raise
     write_evidence(output_path, evidence)
@@ -51,14 +71,46 @@ def parse_arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def execute_build_contract(root: Path, work_directory: Path) -> dict:
+def begin_contract_evidence(output_path: Path) -> ContractExecutionState:
+    state = ContractExecutionState(capture_environment_evidence())
+    write_evidence(output_path, build_pending_evidence(state))
+    return state
+
+
+def execute_build_contract(
+    root: Path,
+    work_directory: Path,
+    state: ContractExecutionState,
+) -> dict:
+    state.enter("required_tools")
+    validate_required_tools()
+    state.enter("task_schema")
     validate_json_and_task_documents(root)
+    state.enter("python_tests")
     focused_count, full_count = run_python_contract(root)
+    state.enter("build_checks")
     run_build_checks(root)
+    state.enter("release_inventory")
     inventory = validate_release_inventory(root, work_directory)
+    state.enter("checksums")
     checksums = validate_checksum_round_trip(root, work_directory)
+    state.enter("odin_object")
     object_result = build_real_odin_object(root, work_directory)
-    return build_evidence(focused_count, full_count, inventory, checksums, object_result)
+    state.finish()
+    return build_evidence(
+        state,
+        focused_count,
+        full_count,
+        inventory,
+        checksums,
+        object_result,
+    )
+
+
+def validate_required_tools() -> None:
+    for command in ("bash", "odin", "rustc", "cargo", "git"):
+        require_command(command)
+    report_step("required_tools")
 
 
 def validate_json_and_task_documents(root: Path) -> None:
@@ -326,36 +378,58 @@ def build_real_odin_object(root: Path, work_directory: Path) -> dict:
 
 
 def build_evidence(
+    state: ContractExecutionState,
     focused_count: int,
     full_count: int,
     inventory: dict,
     checksums: dict,
     object_result: dict,
 ) -> dict:
-    return {
-        "artifact_version": "1",
-        "evidence_class": "host_portability",
-        "commit": os.environ.get("GITHUB_SHA", git_head()),
-        "host": host_details(),
-        "tool_versions": tool_versions(),
+    return build_environment_evidence(
+        state,
+        "PASS",
+    ) | {
         "tests": {"odin_object_build": focused_count, "full_python": full_count},
         "odin_object": object_result,
         "release_inventory": {**inventory, "result": "PASS"},
         "checksums": {"algorithm": "SHA-256", "result": "PASS", "files": checksums},
-        "build_contract": "PASS",
+    }
+
+
+def build_pending_evidence(state: ContractExecutionState) -> dict:
+    return build_environment_evidence(state, "PENDING")
+
+
+def build_failure_evidence(
+    state: ContractExecutionState,
+    error: Exception,
+) -> dict:
+    return build_environment_evidence(state, "FAIL") | {"failure": str(error)}
+
+
+def build_environment_evidence(
+    state: ContractExecutionState,
+    contract_result: str,
+) -> dict:
+    return {
+        "artifact_version": "1",
+        "evidence_class": "host_portability",
+        "commit": state.environment["commit"],
+        "host": state.environment["host"],
+        "tool_versions": state.environment["tool_versions"],
+        "workflow": state.environment["workflow"],
+        "contract_stage": state.stage,
+        "build_contract": contract_result,
         "runtime_contract": "NOT_EXECUTED",
     }
 
 
-def build_failure_evidence(error: Exception) -> dict:
+def capture_environment_evidence() -> dict:
     return {
-        "artifact_version": "1",
-        "evidence_class": "host_portability",
-        "commit": os.environ.get("GITHUB_SHA", git_head()),
+        "commit": capture_commit(),
         "host": host_details(),
-        "build_contract": "FAIL",
-        "runtime_contract": "NOT_EXECUTED",
-        "failure": str(error),
+        "tool_versions": tool_versions(),
+        "workflow": workflow_details(),
     }
 
 
@@ -367,16 +441,53 @@ def host_details() -> dict:
         "runner_image_version": os.environ.get("ImageVersion", "local"),
         "platform": platform.platform(),
         "shell_contract": "Git Bash" if platform.system() == "Windows" else "Bash",
+        "shell_path": os.environ.get("SHELL", os.environ.get("COMSPEC", "unknown")),
     }
 
 
 def tool_versions() -> dict:
     return {
         "python": platform.python_version(),
-        "odin": command_version(["odin", "version"]),
-        "rustc": command_version(["rustc", "--version"]),
-        "cargo": command_version(["cargo", "--version"]),
+        "odin": available_command_version(["odin", "version"]),
+        "rustc": available_command_version(["rustc", "--version"]),
+        "cargo": available_command_version(["cargo", "--version"]),
+        "git": available_command_version(["git", "--version"]),
     }
+
+
+def workflow_details() -> dict:
+    return {
+        "name": os.environ.get("GITHUB_WORKFLOW", "local"),
+        "run_id": os.environ.get("GITHUB_RUN_ID", "local"),
+        "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT", "local"),
+        "job": os.environ.get("GITHUB_JOB", "local"),
+    }
+
+
+def capture_commit() -> str:
+    return os.environ.get("GITHUB_SHA") or available_command_version(
+        ["git", "rev-parse", "HEAD"]
+    )
+
+
+def available_command_version(command: list[str]) -> str:
+    executable = shutil.which(command[0])
+    if executable is None:
+        return "NOT_AVAILABLE"
+    result = subprocess.run(
+        [executable, *command[1:]],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return f"ERROR({result.returncode})"
+    return first_output_line(result)
+
+
+def first_output_line(result: subprocess.CompletedProcess[str]) -> str:
+    lines = (result.stdout or result.stderr).strip().splitlines()
+    return lines[0] if lines else "unknown"
 
 
 def command_version(command: list[str]) -> str:
@@ -435,7 +546,7 @@ def report_step(name: str) -> None:
 
 
 def write_evidence(path: Path, evidence: dict) -> None:
-    path.write_text(json.dumps(evidence, indent=2) + "\n")
+    write_canonical_text(path, json.dumps(evidence, indent=2) + "\n")
 
 
 if __name__ == "__main__":

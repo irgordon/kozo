@@ -4,6 +4,24 @@
 
 **Status:** Repository governance and validation work after v1.0.1; not a new product release. Phase 0 is blocked by `KOZO-TRIAGE-002`.
 
+### KOZO-TRIAGE-002 correction candidate
+
+* Added structured repository-relative path serialization so portable
+  diagnostics use POSIX separators while filesystem access retains native
+  host paths and root escapes remain rejected.
+* Kept QEMU log-size fields as raw artifact byte counts and made governed text
+  producers emit deterministic UTF-8/LF bytes across LF, CRLF, and CR inputs.
+* Captured host, runner, workflow, Python, Odin, Rust, Cargo, Git, shell, and
+  contract-stage evidence before failure-prone build-contract work.
+* Added focused path, text, raw-byte, SHA-256, and failed-evidence regressions;
+  local discovery now passes 1,117 tests without skips or host-specific
+  expectations.
+* Preserved all pinned runners, Linux runtime depth, Windows Git Bash scope,
+  release version 1.0.1, runtime behavior, contracts, schemas, and immutable
+  releases.
+* The correction is pending the same required hosted matrix. Windows remains
+  unvalidated and Phase 0 remains blocked until that evidence passes.
+
 * Added ADR 0017 and a host-portability invariant that treats local macOS as
   one validation environment rather than a reference platform.
 * Defined separate build, guest-runtime, and future resource-scaling evidence

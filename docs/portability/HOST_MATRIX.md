@@ -86,3 +86,15 @@ incompatibility and cannot be promoted to `VALIDATED_BUILD`.
 v1.1.0 Phase 0 is blocked. Product capability work remains unauthorized until
 a separately authorized correction resolves `KOZO-TRIAGE-002` and all three
 required build jobs pass.
+
+## Correction Candidate
+
+The authorized correction is implemented and passes 1,117 local Python tests,
+including structured canonical-path, deterministic text-serialization,
+raw-byte, byte-exact SHA-256, early environment-capture, and unchanged 34-case
+Odin object regressions. It preserves the pinned matrix, Windows Git Bash
+boundary, runtime separation, and all compatibility claim levels.
+
+This section does not replace the hosted table above. The historical failed
+run remains the authoritative current matrix result until a new run proves all
+three required build contracts. Phase 0 therefore remains blocked.

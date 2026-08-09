@@ -3291,12 +3291,18 @@
         "docs/portability/KOZO-TRIAGE-002.md",
         "docs/ROADMAP.md",
         "docs/PHASEMAP.md",
+        "harness/repository_paths.py",
+        "harness/text_evidence.py",
         "scripts/build_odin_object.sh",
         "scripts/host_portability_contract.py",
+        "scripts/qemu_smoke.sh",
         "tests/test_odin_object_build.py",
         "tests/test_host_portability_contract.py",
         "tests/test_host_dependency_portability.py",
+        "tests/test_qemu_smoke_evidence.py",
+        "tests/test_text_evidence_portability.py",
         "harness/validators_impl/host_dependency_portability.py",
+        "harness/validators_impl/qemu_smoke_evidence.py",
         "harness/validators_impl/validator_coverage.py",
         "CHANGELOG.md",
         "tasks/todo.json",
@@ -3307,7 +3313,8 @@
         "artifacts/runtime/qemu_smoke.summary.txt"
       ],
       "verification_refs": [
-        "verification.tests_run[160]"
+        "verification.tests_run[160]",
+        "verification.tests_run[161]"
       ],
       "failure_count": 1
     }
@@ -4195,6 +4202,11 @@
         "tool": "v1.1.0 Phase 0 cross-host portability matrix",
         "command": "ADR and governance review; actionlint; 34 focused Odin object regressions; host portability contract; Python, Odin, Rust, task/schema, release inventory, checksum, governed runtime, GitHub Actions matrix, hosted artifacts, and immutable release readback",
         "status": "blocked_hosted_portability_run_31270131685_linux_build_pass_macos_build_pass_windows_build_fail_57_tests_KOZO-TRIAGE-002_linux_runtime_ci_31270131715_pass_67_checks_0_failures_qemu_pass_41_markers_capability_work_unauthorized"
+      },
+      {
+        "tool": "KOZO-TRIAGE-002 bounded portability correction",
+        "command": "evidence-semantics review; structured canonical repository-path tests; deterministic LF/CRLF/CR text serialization tests; raw-byte and SHA-256 regression; early failed-host evidence tests; 34 focused Odin object regressions; full Python discovery; hosted pinned matrix pending",
+        "status": "local_correction_pass_1117_tests_34_odin_object_tests_raw_qemu_byte_semantics_preserved_contracts_schemas_runtime_release_version_unchanged_hosted_matrix_pending_phase_0_blocked_capability_work_unauthorized"
       }
     ],
     "logs": [

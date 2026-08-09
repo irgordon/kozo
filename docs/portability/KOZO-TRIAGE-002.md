@@ -66,3 +66,28 @@ Until that correction is separately authorized and hosted-proven:
 * Windows runtime is `NOT_EXECUTED`;
 * v1.1.0 Phase 0 is blocked; and
 * v1.1.0 capability work is unauthorized.
+
+## Correction Candidate On Main
+
+The authorized correction preserves the existing evidence definitions. QEMU
+`serial_log_bytes` and `stderr_log_bytes` remain raw file-byte counts because
+the producer and validator both define them through file size. Governed text
+serialization now emits UTF-8 with LF line endings, so equivalent LF, CRLF,
+and CR semantic inputs produce the same deterministic text bytes before raw
+accounting. Binary files and SHA-256 behavior remain unchanged.
+
+Repository diagnostics now derive a validated repository-relative path from
+the native path and serialize only that path with POSIX separators. Root
+escape and unrelated absolute roots are rejected. Non-path backslash content
+is not rewritten.
+
+The host contract now writes a `PENDING` artifact immediately after capturing
+runner, shell, workflow, run, Python, Odin, Rust, Cargo, and Git evidence. If a
+later stage fails, the artifact records `FAIL` and the exact stage while the
+required job remains failed.
+
+Focused path, text, host-evidence, QEMU, and Odin regression tests pass
+locally. Full local discovery passes 1,117 tests. This is correction-candidate
+evidence only: `KOZO-TRIAGE-002` remains `REPRODUCED`, Windows remains
+unvalidated, and Phase 0 remains blocked until the unchanged pinned matrix
+passes on a new commit.

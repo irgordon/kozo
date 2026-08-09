@@ -11,6 +11,7 @@ from harness.runtime_evidence_taxonomy import (
     get_smoke_outcomes,
 )
 from harness.codes import OK, QEMU_SMOKE_EVIDENCE_INVALID
+from harness.text_evidence import raw_artifact_size
 from harness.validator import BaseValidator, ValidationResult
 
 _ROOT = Path(__file__).resolve().parents[2]
@@ -174,9 +175,9 @@ def _diagnostic_field_issue(metadata: dict[str, object]) -> QemuSmokeIssue | Non
         return _issue("field_mismatch", "qemu_smoke.serial_log_bytes", "QEMU smoke serial byte count must be recorded")
     if not isinstance(metadata.get("stderr_log_bytes"), int):
         return _issue("field_mismatch", "qemu_smoke.stderr_log_bytes", "QEMU smoke stderr byte count must be recorded")
-    if _SERIAL_LOG_PATH.is_file() and metadata.get("serial_log_bytes") != _SERIAL_LOG_PATH.stat().st_size:
+    if _SERIAL_LOG_PATH.is_file() and metadata.get("serial_log_bytes") != raw_artifact_size(_SERIAL_LOG_PATH):
         return _issue("byte_count_mismatch", "qemu_smoke.serial_log_bytes", "QEMU smoke serial byte count must match the serial log")
-    if _STDERR_LOG_PATH.is_file() and metadata.get("stderr_log_bytes") != _STDERR_LOG_PATH.stat().st_size:
+    if _STDERR_LOG_PATH.is_file() and metadata.get("stderr_log_bytes") != raw_artifact_size(_STDERR_LOG_PATH):
         return _issue("byte_count_mismatch", "qemu_smoke.stderr_log_bytes", "QEMU smoke stderr byte count must match the stderr log")
     return None
 

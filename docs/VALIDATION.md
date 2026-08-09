@@ -399,6 +399,23 @@ host, runner image, architecture, commit, tool versions, object-output form,
 test counts, build result, and explicit runtime result. The artifact is
 generated evidence, not compatibility authority.
 
+Repository paths in portable diagnostics are derived from structured paths,
+validated against the repository root, and serialized with POSIX separators.
+Native paths remain in use for host filesystem access. Non-path diagnostic
+content is not rewritten.
+
+QEMU `serial_log_bytes` and `stderr_log_bytes` are raw file-byte counts. QEMU
+captures serial and stderr as raw artifacts, while KOZO-generated textual
+metadata, summaries, and deterministic test evidence use UTF-8 with LF line
+endings. Binary artifacts and SHA-256 inputs remain byte-exact and are never
+newline-normalized.
+
+The host artifact is initialized before the full contract runs. It records
+host, shell, workflow, run identity, Python, Odin, Rust, Cargo, Git, and the
+current contract stage. A later failure replaces `PENDING` with `FAIL` while
+retaining that environment evidence; `if: always()` uploads the artifact but
+does not alter the required job result.
+
 ## 22.2 Runtime Contract
 
 A successful build contract does not imply QEMU validation, ISO boot, or guest

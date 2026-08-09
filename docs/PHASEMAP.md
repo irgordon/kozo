@@ -169,17 +169,19 @@ v1.0.2 is not authorized. v1.1.0 Phase 0 adopted ADR 0017 and the portability
 invariant, but required portability run `31270131685` failed on Windows after
 Linux and macOS passed. `KOZO-TRIAGE-002` records the deterministic host
 evidence-normalization boundary. The separate Linux runtime gate passed in run
-`31270131715`. Phase 0 and all v1.1.0 product capability work remain blocked.
+`31270131715`. The bounded correction passes 1,117 local tests and awaits the
+same pinned hosted matrix. Phase 0 and all v1.1.0 product capability work
+remain blocked.
 
 Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr`, `kernel_entry_not_reached`, `serial_not_initialized`, and `marker_not_emitted` are retained only as resolved historical evidence states unless a future CI artifact reintroduces one.
 
 ## Next Phase
 
 The `v1.0.0-rc.1`, `v1.0.0`, post-publication documentation, v1.0.1 patch, and
-v1.0.1 observation phases are complete. The next task is a separately
-authorized correction for `KOZO-TRIAGE-002`, followed by the same pinned
-Linux, Windows, and macOS build matrix. Product capability work remains
-blocked until Phase 0 is accepted. All published tags and hosted assets remain
+v1.0.1 observation phases are complete. The separately authorized correction
+for `KOZO-TRIAGE-002` is implemented locally; the next gate is the same pinned
+Linux, Windows, and macOS matrix. Product capability work remains blocked
+until Phase 0 is accepted. All published tags and hosted assets remain
 immutable.
 
 ---

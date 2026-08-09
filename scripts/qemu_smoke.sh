@@ -383,7 +383,7 @@ write_metadata() {
   local outcome=$1
   local blocker=$2
 
-  python3 - \
+  PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}" python3 - \
     "$QEMU_METADATA" \
     "$outcome" \
     "$blocker" \
@@ -397,6 +397,8 @@ write_metadata() {
 import json
 import sys
 from pathlib import Path
+
+from harness.text_evidence import write_canonical_text
 
 metadata_path = Path(sys.argv[1])
 outcome = sys.argv[2]
@@ -505,13 +507,13 @@ metadata = {
 if outcome == "blocked":
     metadata["blocker_category"] = blocker
 
-metadata_path.write_text(json.dumps(metadata, indent=2) + "\n")
+write_canonical_text(metadata_path, json.dumps(metadata, indent=2) + "\n")
 PY
   write_smoke_summary
 }
 
 write_smoke_summary() {
-  python3 - \
+  PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}" python3 - \
     "$QEMU_SUMMARY" \
     "$QEMU_METADATA" \
     "$QEMU_LOG" \
@@ -520,6 +522,8 @@ write_smoke_summary() {
 import json
 import sys
 from pathlib import Path
+
+from harness.text_evidence import write_canonical_text
 
 summary_path = Path(sys.argv[1])
 metadata_path = Path(sys.argv[2])
@@ -615,7 +619,7 @@ summary_lines.extend(
 )
 _append_tail(summary_lines, "Last 50 serial lines", _read_tail(serial_log_path))
 _append_tail(summary_lines, "Last 50 stderr lines", _read_tail(stderr_log_path))
-summary_path.write_text("\n".join(summary_lines) + "\n")
+write_canonical_text(summary_path, "\n".join(summary_lines) + "\n")
 PY
 }
 

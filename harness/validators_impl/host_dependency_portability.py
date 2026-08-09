@@ -5,6 +5,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from harness.codes import HOST_DEPENDENCY_PORTABILITY_INVALID, OK
+from harness.repository_paths import (
+    canonical_repository_field,
+    canonical_repository_path,
+)
 from harness.validator import BaseValidator, ValidationResult
 
 _ROOT = Path(__file__).resolve().parents[2]
@@ -81,6 +85,7 @@ _PORTABILITY_WORKFLOW_ANCHORS = (
     "macos-15",
     "shell: bash",
     "scripts/host_portability_contract.py",
+    "if: always()",
     "portability-observation:",
     "continue-on-error: true",
     "actions/upload-artifact@v7",
@@ -175,7 +180,12 @@ def _tracked_source_scan_issue() -> HostPortabilityIssue | None:
             if token in text:
                 return _issue(
                     "host_specific_token",
-                    f"host_dependency_portability.{_relative_path(path)}.{token}",
+                    canonical_repository_field(
+                        "host_dependency_portability",
+                        _ROOT.resolve(),
+                        path.resolve(),
+                        token,
+                    ),
                     f"Tracked source contains host-specific token {token}: {_relative_path(path)}",
                 )
     return None
@@ -243,10 +253,7 @@ def _documentation_policy_issue() -> HostPortabilityIssue | None:
 
 
 def _relative_path(path: Path) -> str:
-    try:
-        return str(path.relative_to(_ROOT))
-    except ValueError:
-        return str(path)
+    return canonical_repository_path(_ROOT.resolve(), path.resolve())
 
 
 def _first_issue(*issues: HostPortabilityIssue | None) -> HostPortabilityIssue | None:

@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import tempfile
 import unittest
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 from harness.codes import HOST_DEPENDENCY_PORTABILITY_INVALID, OK
 from harness.validators_impl import host_dependency_portability as validator_module
-from harness.validators_impl.host_dependency_portability import HostDependencyPortabilityValidator
+from harness.validators_impl.host_dependency_portability import (
+    HostDependencyPortabilityValidator,
+    canonical_repository_field,
+    canonical_repository_path,
+)
 
 KOZO_NEGATIVE_COVERAGE = {
     "host_dependency_portability": {
@@ -28,6 +32,75 @@ KOZO_NEGATIVE_COVERAGE = {
 
 
 class HostDependencyPortabilityValidatorTests(unittest.TestCase):
+    def test_canonicalizes_windows_repository_path(self):
+        root = PureWindowsPath(r"D:\a\kozo\kozo")
+        path = PureWindowsPath(r"D:\a\kozo\kozo\artifacts\runtime\qemu_smoke.log")
+
+        self.assertEqual(
+            canonical_repository_path(root, path),
+            "artifacts/runtime/qemu_smoke.log",
+        )
+
+    def test_canonicalizes_posix_nested_path_with_spaces(self):
+        root = PurePosixPath("/workspace/kozo")
+        path = PurePosixPath("/workspace/kozo/docs/path with spaces/report.md")
+
+        self.assertEqual(
+            canonical_repository_path(root, path),
+            "docs/path with spaces/report.md",
+        )
+
+    def test_canonicalizes_mixed_windows_separators(self):
+        root = PureWindowsPath(r"D:\a\kozo\kozo")
+        path = PureWindowsPath(r"D:\a/kozo\kozo/docs\report.md")
+
+        self.assertEqual(canonical_repository_path(root, path), "docs/report.md")
+
+    def test_canonicalizes_repository_root(self):
+        root = PurePosixPath("/workspace/kozo")
+
+        self.assertEqual(canonical_repository_path(root, root), ".")
+
+    def test_rejects_repository_root_escape(self):
+        root = PurePosixPath("/workspace/kozo")
+        escaped = PurePosixPath("/workspace/kozo/../private/file")
+
+        with self.assertRaises(ValueError):
+            canonical_repository_path(root, escaped)
+
+    def test_rejects_unrelated_absolute_root(self):
+        root = PureWindowsPath(r"D:\a\kozo\kozo")
+        unrelated = PureWindowsPath(r"C:\Users\developer\file.txt")
+
+        with self.assertRaises(ValueError):
+            canonical_repository_path(root, unrelated)
+
+    def test_canonical_path_does_not_leak_developer_root(self):
+        root = PureWindowsPath(r"C:\Users\developer\Projects\kozo")
+        path = root / "tests" / "fixture.py"
+
+        canonical = canonical_repository_path(root, path)
+
+        self.assertEqual(canonical, "tests/fixture.py")
+        self.assertNotIn("developer", canonical)
+        self.assertNotIn(":", canonical)
+
+    def test_non_path_backslashes_are_not_rewritten(self):
+        root = PureWindowsPath(r"D:\a\kozo\kozo")
+        path = root / "scripts" / "check.py"
+
+        field = canonical_repository_field(
+            "host_dependency_portability",
+            root,
+            path,
+            r"literal\diagnostic",
+        )
+
+        self.assertEqual(
+            field,
+            r"host_dependency_portability.scripts/check.py.literal\diagnostic",
+        )
+
     def test_passes_when_portability_inputs_are_complete(self):
         result = self.validate_fixture()
 
@@ -131,6 +204,18 @@ class HostDependencyPortabilityValidatorTests(unittest.TestCase):
             result,
             "missing_anchor",
             "host_dependency_portability.portability.workflow.continue-on-error: true",
+        )
+
+    def test_fails_when_failure_evidence_upload_is_not_preserved(self):
+        result = self.validate_fixture(
+            mutate_portability=lambda text: text.replace("if: always()", "if: success()")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_portability_failure(
+            result,
+            "missing_anchor",
+            "host_dependency_portability.portability.workflow.if: always()",
         )
 
     def test_fails_when_runtime_separation_is_missing(self):
@@ -288,6 +373,7 @@ def valid_portability_text() -> str:
             "macos-15",
             "shell: bash",
             "scripts/host_portability_contract.py",
+            "if: always()",
             "portability-observation:",
             "continue-on-error: true",
             "actions/upload-artifact@v7",
