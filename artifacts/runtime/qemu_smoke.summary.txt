@@ -120,4 +120,4 @@ KOZO_SECOND_CAPABILITY_OK
 KOZO_RUNTIME_RETURN_OK
 
 Last 50 stderr lines
-qemu-system-x86_64: terminating on signal 15 from pid 23704 (<unknown process>)
+qemu-system-x86_64: terminating on signal 15 from pid 13142 (<unknown process>)
