@@ -3289,6 +3289,7 @@
         "docs/REQUIRED_CHECKS.md",
         "docs/portability/HOST_MATRIX.md",
         "docs/portability/KOZO-TRIAGE-002.md",
+        "docs/portability/KOZO-TRIAGE-003.md",
         "docs/ROADMAP.md",
         "docs/PHASEMAP.md",
         "harness/repository_paths.py",
@@ -3314,9 +3315,10 @@
       ],
       "verification_refs": [
         "verification.tests_run[160]",
-        "verification.tests_run[161]"
+        "verification.tests_run[161]",
+        "verification.tests_run[162]"
       ],
-      "failure_count": 1
+      "failure_count": 2
     }
   ],
   "expected_outputs": [
@@ -4205,8 +4207,13 @@
       },
       {
         "tool": "KOZO-TRIAGE-002 bounded portability correction",
-        "command": "evidence-semantics review; structured canonical repository-path tests; deterministic LF/CRLF/CR text serialization tests; raw-byte and SHA-256 regression; early failed-host evidence tests; 34 focused Odin object regressions; full Python discovery; hosted pinned matrix pending",
-        "status": "local_correction_pass_1117_tests_34_odin_object_tests_raw_qemu_byte_semantics_preserved_contracts_schemas_runtime_release_version_unchanged_hosted_matrix_pending_phase_0_blocked_capability_work_unauthorized"
+        "command": "evidence-semantics review; structured canonical repository-path tests; deterministic LF/CRLF/CR text serialization tests; raw-byte and SHA-256 regression; early failed-host evidence tests; 34 focused Odin object regressions; 1,117-test discovery; required hosted pinned matrix; CI and lint; downloaded host-artifact comparison",
+        "status": "resolved_on_main_portability_run_31291100568_linux_windows_macos_jobs_pass_1117_tests_34_odin_tests_ci_31291100579_pass_67_checks_0_failures_qemu_pass_41_markers_lint_31291100569_pass_new_independent_KOZO-TRIAGE-003_cross_host_license_byte_mismatch_phase_0_blocked"
+      },
+      {
+        "tool": "KOZO-TRIAGE-003 cross-host license-byte triage",
+        "command": "download portability run 31291100568 artifacts; compare Linux, Windows, and macOS license hashes; reproduce Windows hashes with LF-to-CRLF transformation; preserve byte-exact SHA-256 semantics and record a separate unauthorized correction boundary",
+        "status": "reproduced_windows_LICENSE_LICENSE-APACHE_LICENSE-MIT_CRLF_hashes_differ_from_identical_linux_macos_LF_hashes_required_jobs_green_contract_gap_phase_0_blocked_windows_not_VALIDATED_BUILD_capability_work_unauthorized"
       }
     ],
     "logs": [
@@ -4227,7 +4234,8 @@
       "Hosted CI run 29459278491 captured the complete ordered runtime marker sequence and passed runtime_progression_evidence.",
       "Ring3 response-consumer ELF evidence must be bounded by authoritative start and end symbol addresses so GNU and LLVM label aliases cannot change the governed comparison result.",
       "Published v1.0.0, v1.0.0-rc.1, and v1.0.1 tags, notes, and assets remain immutable; later patch preparation requires a reproduced, in-scope defect that satisfies the complete authorization gate.",
-      "A post-release observation record cannot authorize a version change, patch implementation, feature implementation, tag mutation, release mutation, or asset replacement."
+      "A post-release observation record cannot authorize a version change, patch implementation, feature implementation, tag mutation, release mutation, or asset replacement.",
+      "Per-host checksum round trips do not prove cross-host release-input determinism; supposedly identical tracked release inputs must have identical governed bytes and hashes before a host can satisfy the complete Phase 0 claim."
     ],
     "expected_behavior": [
       "verify.sh succeeds on a clean tree and prints the generated artifact JSON before VERIFY: PASS",
@@ -4461,6 +4469,7 @@
     "Reviewed project-visible post-release issue sources, reproduced the immutable hosted baseline, classified current-Odin object normalization as KOZO-TRIAGE-001 BUILD_TOOLING/U2/R3, and authorized bounded v1.0.1 patch preparation without changing runtime or immutable release state.",
     "Normalized supported Odin object filenames at one portable build boundary, added fail-closed fake-compiler regression coverage, passed the formerly failing hosted release-bundle stage, and preserved runtime and immutable prior releases.",
     "Published immutable v1.0.1 from hosted-accepted commit 02f1b0113458b988562b7e03362ec9ae716cebd0, independently verified all six hosted assets and the downloaded ISO, resolved KOZO-TRIAGE-001, and did not publish core_service.",
-    "Established ADR-backed host portability governance, a pinned required build matrix, a non-blocking observation lane, a portable host contract, and 34 cross-host object-boundary regressions without changing runtime or the published product version."
+    "Established ADR-backed host portability governance, a pinned required build matrix, a non-blocking observation lane, a portable host contract, and 34 cross-host object-boundary regressions without changing runtime or the published product version.",
+    "Resolved KOZO-TRIAGE-002 across all three pinned hosted jobs, then preserved Phase 0 as blocked after downloaded evidence exposed KOZO-TRIAGE-003: Windows staged tracked license inputs with CRLF bytes and different hashes from Linux and macOS."
   ]
 }

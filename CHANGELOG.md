@@ -2,7 +2,26 @@
 
 ## v1.1.0 Phase 0 - Cross-host portability matrix - 2026-08-08
 
-**Status:** Repository governance and validation work after v1.0.1; not a new product release. Phase 0 is blocked by `KOZO-TRIAGE-002`.
+**Status:** Repository governance and validation work after v1.0.1; not a new product release. `KOZO-TRIAGE-002` is resolved on `main`, but Phase 0 is blocked by `KOZO-TRIAGE-003`.
+
+### Hosted correction result and new blocker
+
+* Passed the required Linux, Windows, and macOS jobs in portability run
+  `31291100568`; all hosts passed 34 Odin regressions, 1,117 Python tests, real
+  Odin normalization, release inventory, metadata, and per-host checksums.
+* Resolved `KOZO-TRIAGE-002` on `main` without skips, OS-specific expected
+  values, changed raw QEMU byte semantics, or incomplete failure artifacts.
+* Preserved CI run `31291100579` at 67 checks, no failures, QEMU pass, blocker
+  none, 41 ordered markers, and final marker `KOZO_RUNTIME_RETURN_OK`; lint run
+  `31291100569` also passed.
+* Independent artifact comparison found that Windows staged `LICENSE`,
+  `LICENSE-APACHE`, and `LICENSE-MIT` with CRLF bytes while Linux and macOS
+  staged LF bytes, producing different SHA-256 values.
+* Recorded that independently causal release-input defect as
+  `KOZO-TRIAGE-003`. Phase 0 remains blocked, Windows is not promoted to
+  `VALIDATED_BUILD`, and capability development remains unauthorized.
+* Changed no runtime, ABI, contract, schema, marker, product version, or
+  immutable release record.
 
 ### KOZO-TRIAGE-002 correction candidate
 
@@ -19,8 +38,8 @@
 * Preserved all pinned runners, Linux runtime depth, Windows Git Bash scope,
   release version 1.0.1, runtime behavior, contracts, schemas, and immutable
   releases.
-* The correction is pending the same required hosted matrix. Windows remains
-  unvalidated and Phase 0 remains blocked until that evidence passes.
+* The same required hosted matrix passed and resolved this case. Phase 0 is
+  nevertheless blocked by the separately recorded `KOZO-TRIAGE-003` finding.
 
 * Added ADR 0017 and a host-portability invariant that treats local macOS as
   one validation environment rather than a reference platform.

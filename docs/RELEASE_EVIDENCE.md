@@ -345,14 +345,19 @@ the common portable release-policy boundary while recording final archive,
 ISO, and kernel artifact construction as `NOT_EXECUTED`. Linux full CI remains
 the release/runtime evidence owner for those generated binary artifacts.
 
-The first Phase 0 execution is recorded in
-`docs/portability/HOST_MATRIX.md`. Portability run `31270131685` passed the
-Linux and macOS build contracts and failed the Windows build contract. CI run
-`31270131715` separately passed the Linux runtime contract with 67 checks, no
-failures, QEMU outcome `pass`, blocker `none`, and 41 ordered markers. Windows
-and macOS runtime are `NOT_EXECUTED`. The Windows result is
-`KOZO-TRIAGE-002`; Phase 0 remains blocked rather than promoting an incomplete
-host claim.
+Current Phase 0 execution is recorded in
+`docs/portability/HOST_MATRIX.md`. Portability run `31291100568` passed all
+three required jobs and resolved the path, textual QEMU evidence, and early
+diagnostic-capture failures in `KOZO-TRIAGE-002`. CI run `31291100579`
+separately passed the Linux runtime contract with 67 checks, no failures, QEMU
+outcome `pass`, blocker `none`, and 41 ordered markers. Windows and macOS
+runtime are `NOT_EXECUTED`.
+
+Independent comparison of the downloaded host artifacts found that Windows
+staged the three tracked license texts with CRLF bytes while Linux and macOS
+staged LF bytes. Per-host checksum round trips passed, but the cross-host
+hashes differed. `KOZO-TRIAGE-003` records that separate release-input defect.
+Phase 0 remains blocked and Windows is not promoted to `VALIDATED_BUILD`.
 
 ---
 

@@ -178,16 +178,19 @@ the accepted cross-host Odin output boundary against tagged source. No
 qualifying defect was reproduced. v1.0.2 is not authorized, and the current
 release remains v1.0.1.
 
-v1.1.0 Phase 0 is now the active repository-development gate. It establishes
-host portability as an evidence-backed invariant and requires pinned Linux,
-Windows, and macOS build-contract results while keeping guest runtime evidence
-separate. Hosted run `31270131685` passed Linux and macOS but exposed the
-reproducible Windows evidence-normalization failure `KOZO-TRIAGE-002`. The
-separate Linux runtime run `31270131715` remains green. Phase 0 is blocked,
-and no v1.1.0 product capability work is authorized until the full required
-matrix passes. The bounded correction now passes 1,117 local tests and keeps
-raw QEMU byte semantics, native filesystem paths, pinned runners, and runtime
-evidence unchanged; it is pending hosted proof.
+v1.1.0 Phase 0 is the active repository-development gate. Hosted portability
+run `31291100568` passed all three pinned jobs and resolved
+`KOZO-TRIAGE-002`: canonical paths, deterministic textual QEMU evidence, and
+early host diagnostics now work across Linux, Windows, and macOS. Separate CI
+run `31291100579` preserves the Linux runtime result at 67 checks, no failures,
+QEMU pass, and 41 markers.
+
+Phase 0 is still blocked. Downloaded host artifacts exposed
+`KOZO-TRIAGE-003`: Windows staged the tracked license files with CRLF bytes,
+so supposedly identical release inputs had different SHA-256 values from
+Linux and macOS even though each host's internal checksum round trip passed.
+No v1.1.0 capability work is authorized until that independently causal
+release-input boundary is corrected and hosted-proven.
 
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity
@@ -227,9 +230,9 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
     one canonical object-build boundary with its focused failure coverage.
 21. Preserve the immutable v1.0.1 tag, notes, six assets, checksums, and hosted
     ISO evidence; use a later patch version for any product correction.
-22. Complete v1.1.0 Phase 0 by proving the governed build contract on pinned
-    Linux, Windows, and macOS runners while retaining Linux as the required
-    guest/runtime gate.
+22. Complete v1.1.0 Phase 0 by resolving `KOZO-TRIAGE-003`, proving identical
+    governed release inputs on pinned Linux, Windows, and macOS runners, and
+    retaining Linux as the required guest/runtime gate.
 23. Keep v1.1.0 product capability work blocked until Phase 0 hosted evidence
     is accepted.
 24. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
