@@ -353,19 +353,21 @@ separately passed the Linux runtime contract with 67 checks, no failures, QEMU
 outcome `pass`, blocker `none`, and 41 ordered markers. Windows and macOS
 runtime are `NOT_EXECUTED`.
 
-Independent comparison of the downloaded host artifacts found that Windows
+The historical run `31291100568` showed that Windows
 staged the three tracked license texts with CRLF bytes while Linux and macOS
 staged LF bytes. Per-host checksum round trips passed, but the cross-host
 hashes differed. `KOZO-TRIAGE-003` records that separate release-input defect.
-Phase 0 remains blocked and Windows is not promoted to `VALIDATED_BUILD`.
+That run did not promote Windows to `VALIDATED_BUILD`.
 
 The bounded correction treats committed `HEAD` blob bytes as authoritative,
 requires narrow LF checkout attributes for the three licenses, rejects any
 worktree/blob mismatch before staging, and compares source and staged bytes
-without normalization. A required aggregation job now compares path, size,
-and SHA-256 across all three pinned host artifacts. These changes remain a
-candidate until a new hosted matrix passes; final generated-asset
-reproducibility is outside this gate.
+without normalization. Portability run `31458972010` passed all three pinned
+jobs and its required aggregation job, proving identical path, size, and
+SHA-256 records. CI run `31458972015` separately preserved the Linux runtime
+gate at 67 checks, no failures, QEMU pass, blocker none, and 41 markers. Phase
+0 is accepted; final generated-asset reproducibility remains outside this
+gate.
 
 ---
 

@@ -170,19 +170,20 @@ invariant. Required portability run `31291100568` passed all three pinned jobs
 and resolves `KOZO-TRIAGE-002`; separate CI run `31291100579` preserves the
 Linux runtime gate. Artifact comparison then reproduced
 `KOZO-TRIAGE-003`: Windows staged tracked license text with different bytes
-and hashes from Linux and macOS. Phase 0 and all v1.1.0 product capability work
-remain blocked. A bounded committed-blob/LF checkout correction and required
-cross-host identity gate are implemented locally but not yet hosted-proven.
+and hashes from Linux and macOS. Portability run `31458972010` then proved the
+bounded committed-blob/LF checkout correction and required aggregate identity
+gate across all three pinned hosts. CI run `31458972015` preserved Linux
+runtime evidence. Phase 0 is accepted; product capability work remains
+separately unauthorized.
 
 Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr`, `kernel_entry_not_reached`, `serial_not_initialized`, and `marker_not_emitted` are retained only as resolved historical evidence states unless a future CI artifact reintroduces one.
 
 ## Next Phase
 
 The `v1.0.0-rc.1`, `v1.0.0`, post-publication documentation, v1.0.1 patch, and
-v1.0.1 observation phases are complete. `KOZO-TRIAGE-002` is resolved on
-`main`. The authorized `KOZO-TRIAGE-003` correction now awaits the same pinned
-matrix and required cross-host artifact comparison. Product capability work
-remains blocked until Phase 0 is accepted.
+v1.0.1 observation phases are complete. `KOZO-TRIAGE-002` and
+`KOZO-TRIAGE-003` are resolved on `main`, and v1.1.0 Phase 0 is accepted.
+Product capability work still requires separate authorization.
 All published tags and hosted assets remain immutable.
 
 ---

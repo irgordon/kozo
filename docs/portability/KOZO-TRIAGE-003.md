@@ -1,7 +1,8 @@
 # KOZO-TRIAGE-003: Cross-Host License Bytes
 
-Status: REPRODUCED
+Status: RESOLVED_ON_MAIN
 Report date: 2026-08-09
+Resolution date: 2026-08-11
 Surface: BUILD_TOOLING
 
 ## Case Record
@@ -59,7 +60,7 @@ No published tag, note, or asset changed. The current release remains v1.0.1,
 `release/version.txt` remains `1.0.1`, and no CPU, RAM, or storage assumption
 was introduced.
 
-## Phase Effect
+## Historical Phase Effect
 
 Until a separately authorized correction is hosted-proven:
 
@@ -69,9 +70,10 @@ Until a separately authorized correction is hosted-proven:
 * v1.1.0 Phase 0 remains blocked; and
 * v1.1.0 capability work remains unauthorized.
 
-## Correction Candidate
+## Correction
 
-The correction is implemented locally on `main` and awaits hosted validation.
+The correction is validated on `main` by portability run
+[31458972010](https://github.com/irgordon/kozo/actions/runs/31458972010).
 Repository governance identifies committed `HEAD` blobs as the authoritative
 release inputs: the release packager uses `git archive` before verification
 and staging. The candidate therefore:
@@ -89,5 +91,17 @@ and staging. The candidate therefore:
 The complete 49-entry inventory remains path-governed. ADR 0017 does not make
 all 49 source bytes or the six generated final artifacts reproducible across
 hosts, so this correction compares only the three explicitly governed legal
-inputs. Status remains `REPRODUCED` until the new required matrix and aggregate
-gate pass.
+inputs.
+
+All three pinned host jobs passed 1,136 Python tests, 34 Odin object
+regressions, portable staging, inventory, metadata, prohibited-path, and
+checksum checks. The required aggregate job compared the downloaded host
+artifacts and reported identical path, size, and SHA-256 records for all three
+licenses. CI run
+[31458972015](https://github.com/irgordon/kozo/actions/runs/31458972015)
+separately preserved Linux runtime evidence at 67 checks, no failures, QEMU
+pass, blocker none, and 41 markers ending at `KOZO_RUNTIME_RETURN_OK`.
+
+`KOZO-TRIAGE-003` is `RESOLVED_ON_MAIN`. Windows is `VALIDATED_BUILD`; Windows
+and macOS runtime remain `NOT_EXECUTED`. The correction is not part of the
+immutable v1.0.1 release, so released correction remains none.

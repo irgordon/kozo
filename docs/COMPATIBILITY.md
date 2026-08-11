@@ -139,23 +139,15 @@ The Phase 0 required build hosts are Linux `ubuntu-24.04`, Windows
 
 | Host | Current status | Build evidence | Runtime evidence |
 | --- | --- | --- | --- |
-| Linux | `VALIDATED_RUNTIME` | `PASS` in portability run `31291100568` | `PASS` in CI run `31291100579` |
-| Windows | `UNSUPPORTED` | Required job `PASS` in run `31291100568`, but cross-host release-input hashes fail the complete claim; `KOZO-TRIAGE-003` | `NOT_EXECUTED` |
-| macOS | `VALIDATED_BUILD` | `PASS` in portability run `31291100568` | `NOT_EXECUTED` |
+| Linux | `VALIDATED_RUNTIME` | `PASS` in portability run `31458972010` | `PASS` in CI run `31458972015` |
+| Windows | `VALIDATED_BUILD` | Required job and aggregate release-input identity gate `PASS` in run `31458972010` | `NOT_EXECUTED` |
+| macOS | `VALIDATED_BUILD` | `PASS` in portability run `31458972010` | `NOT_EXECUTED` |
 
-Here `UNSUPPORTED` means that Windows has a known blocker in the declared
-Phase 0 build contract. The required job passed its per-host checks, but
-downloaded evidence proved that Windows staged tracked license text with CRLF
-bytes while Linux and macOS staged LF bytes. A green job cannot promote the
-claim while supposedly identical release inputs have different hashes. This
-does not mean Windows is permanently outside the intended host set. A
-separately authorized correction and cross-host evidence are required before
-the status can become `VALIDATED_BUILD`.
-
-The correction is implemented on `main` using committed blob authority,
-narrow LF checkout policy, byte-exact staging checks, and a required
-cross-host identity job. Windows remains `UNSUPPORTED` until a new pinned
-matrix proves the distributed path/size/SHA-256 property.
+Windows now satisfies `VALIDATED_BUILD` because its per-host contract and the
+required distributed path/size/SHA-256 gate both passed. The correction uses
+committed blob authority, narrow LF checkout policy, and byte-exact staging;
+it does not normalize invalid inputs downstream. Windows runtime remains
+`NOT_EXECUTED`, so this status does not claim Windows QEMU behavior.
 
 ---
 

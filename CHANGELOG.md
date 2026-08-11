@@ -2,9 +2,22 @@
 
 ## v1.1.0 Phase 0 - Cross-host portability matrix - 2026-08-08
 
-**Status:** Repository governance and validation work after v1.0.1; not a new product release. `KOZO-TRIAGE-002` is resolved on `main`; the `KOZO-TRIAGE-003` correction awaits hosted proof.
+**Status:** Repository governance and validation work after v1.0.1; not a new product release. Phase 0 is accepted, and `KOZO-TRIAGE-002` plus `KOZO-TRIAGE-003` are resolved on `main`.
 
-### KOZO-TRIAGE-003 correction candidate
+### Phase 0 hosted acceptance
+
+* Portability run `31458972010` passed the Linux, Windows, and macOS pinned
+  build contracts and the required aggregate release-input identity gate.
+* The three license inputs matched across hosts by path, size, and raw
+  SHA-256; each staged copy matched its authoritative committed blob.
+* CI run `31458972015` preserved 67 checks, no failures, QEMU pass, blocker
+  none, and 41 markers; lint run `31458972013` passed.
+* Linux is `VALIDATED_RUNTIME`; Windows and macOS are `VALIDATED_BUILD` with
+  runtime `NOT_EXECUTED`.
+* No runtime, release version, published tag, or hosted asset changed, and
+  v1.1.0 capability work remains separately unauthorized.
+
+### KOZO-TRIAGE-003 correction implementation
 
 * Declared LF checkout policy only for `LICENSE`, `LICENSE-MIT`, and
   `LICENSE-APACHE` without changing their committed blob content.

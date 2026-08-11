@@ -2,7 +2,7 @@
   "task_title": "KOZO v1.1.0 Phase 0 - GitHub Actions Cross-Host Portability Matrix",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
-  "plan_status": "approved",
+  "plan_status": "complete",
   "replan_number": 0,
   "approval": {
     "status": "approved"
@@ -3273,7 +3273,7 @@
     {
       "id": 95,
       "title": "Establish the v1.1.0 Phase 0 host portability matrix",
-      "status": "pending",
+      "status": "done",
       "kind": "edit",
       "files_expected": [
         ".gitattributes",
@@ -3398,7 +3398,7 @@
     "Post-release triage records no user-filed reports and one hosted-workflow case, reproduces KOZO-TRIAGE-001 against tagged v1.0.0 source, classifies it BUILD_TOOLING/U2/R3, authorizes bounded v1.0.1 patch preparation, and changes no product behavior.",
     "The v1.0.1 patch-preparation boundary normalizes exact, appended .o, and accepted legacy .obj Odin output to one canonical caller path while failing closed on compiler failure, missing output, ambiguity, stale candidates, invalid output types, and unsafe provenance.",
     "v1.0.1 post-release observation revalidates immutable release assets and runtime evidence, reviews project-visible reports and workflows, records cross-host Odin evidence without overclaiming, and authorizes no later release or capability work.",
-    "v1.1.0 Phase 0 governs host portability through pinned Linux, Windows, and macOS build contracts, keeps guest runtime evidence separate, defines no resource minimum, preserves v1.0.1, and leaves product capability work unauthorized pending hosted acceptance."
+    "v1.1.0 Phase 0 governs and now validates host portability through pinned Linux, Windows, and macOS build contracts, keeps guest runtime evidence separate, defines no resource minimum, preserves v1.0.1, and leaves product capability work separately unauthorized."
   ],
   "verification": {
     "tests_run": [
@@ -4219,8 +4219,8 @@
       },
       {
         "tool": "KOZO-TRIAGE-003 bounded release-input correction",
-        "command": "committed-blob authority review; narrow Git LF attributes; worktree/blob and source/staged byte validation; focused release-input and cross-host comparison tests; required aggregate workflow gate; local full validation; hosted validation pending",
-        "status": "implemented_locally_hosted_matrix_pending_phase_0_blocked_windows_not_VALIDATED_BUILD_v1.0.2_unauthorized_v1.1.0_capability_work_unauthorized"
+        "command": "committed-blob authority review; narrow Git LF attributes; worktree/blob and source/staged byte validation; focused release-input and cross-host comparison tests; required aggregate workflow gate; 1,136-test local and hosted validation; portability run 31458972010; CI run 31458972015; lint run 31458972013; downloaded host and runtime proof inspection",
+        "status": "resolved_on_main_phase_0_accepted_linux_VALIDATED_RUNTIME_windows_macos_VALIDATED_BUILD_windows_macos_runtime_NOT_EXECUTED_three_license_path_size_sha256_records_identical_67_checks_0_failures_qemu_pass_41_markers_v1.0.2_unauthorized_v1.1.0_capability_work_unauthorized"
       }
     ],
     "logs": [
@@ -4479,6 +4479,7 @@
     "Published immutable v1.0.1 from hosted-accepted commit 02f1b0113458b988562b7e03362ec9ae716cebd0, independently verified all six hosted assets and the downloaded ISO, resolved KOZO-TRIAGE-001, and did not publish core_service.",
     "Established ADR-backed host portability governance, a pinned required build matrix, a non-blocking observation lane, a portable host contract, and 34 cross-host object-boundary regressions without changing runtime or the published product version.",
     "Resolved KOZO-TRIAGE-002 across all three pinned hosted jobs, then preserved Phase 0 as blocked after downloaded evidence exposed KOZO-TRIAGE-003: Windows staged tracked license inputs with CRLF bytes and different hashes from Linux and macOS.",
-    "Implemented the bounded KOZO-TRIAGE-003 candidate with narrow LF checkout attributes, committed-blob and staged-byte validation, and a required cross-host path/size/SHA-256 gate; hosted acceptance remains pending."
+    "Implemented the bounded KOZO-TRIAGE-003 correction with narrow LF checkout attributes, committed-blob and staged-byte validation, and a required cross-host path/size/SHA-256 gate.",
+    "Accepted v1.1.0 Phase 0 after portability run 31458972010 passed all pinned host contracts and the aggregate release-input gate, CI run 31458972015 preserved 67 checks and the 41-marker QEMU path, and lint run 31458972013 passed; capability work remains separately unauthorized."
   ]
 }

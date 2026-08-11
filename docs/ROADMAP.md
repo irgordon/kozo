@@ -185,17 +185,18 @@ early host diagnostics now work across Linux, Windows, and macOS. Separate CI
 run `31291100579` preserves the Linux runtime result at 67 checks, no failures,
 QEMU pass, and 41 markers.
 
-Phase 0 is still blocked. Downloaded host artifacts exposed
+The historical run left Phase 0 blocked after downloaded host artifacts exposed
 `KOZO-TRIAGE-003`: Windows staged the tracked license files with CRLF bytes,
 so supposedly identical release inputs had different SHA-256 values from
 Linux and macOS even though each host's internal checksum round trip passed.
-No v1.1.0 capability work is authorized until that independently causal
-release-input boundary is corrected and hosted-proven.
+No v1.1.0 capability work was authorized while that independently causal
+release-input boundary remained uncorrected.
 
-The bounded correction is now implemented locally: three narrow Git
-attributes govern license checkout bytes, staging rejects differences from
-committed blobs, and a required aggregate job compares host evidence. Phase 0
-remains blocked until the same pinned matrix and aggregate identity gate pass.
+Portability run `31458972010` validated the bounded correction on all three
+pinned hosts and passed the required aggregate release-input identity gate.
+Linux remains `VALIDATED_RUNTIME`; Windows and macOS are `VALIDATED_BUILD`
+with runtime `NOT_EXECUTED`. Phase 0 is accepted. v1.1.0 capability work still
+requires separate authorization.
 
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity
