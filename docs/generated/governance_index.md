@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 67
 * Failed checks: 0
-* Run ID: `verify-20260811T065103Z`
-* Generated at: `2026-08-11T06:51:03Z`
+* Run ID: `verify-20260811T084805Z`
+* Generated at: `2026-08-11T08:48:05Z`
 
 ## Registered validators
 
@@ -106,6 +106,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | `contracts/controlled_runtime_loop_contract.v0.json` | `0` | controlled runtime loop contract.v0 |
 | `contracts/cpu_extended_state_initialization_contract.v0.json` | `0` | cpu extended state initialization contract.v0 |
 | `contracts/first_governed_runtime_capability.v0.json` | `0` | first governed runtime capability.v0 |
+| `contracts/fixed_user_execution_context_contract.v0.json` | `0` | fixed user execution context contract.v0 |
 | `contracts/fixed_user_mapping_foundation.v0.json` | `0` | fixed user mapping foundation.v0 |
 | `contracts/fixed_user_request_boundary_contract.v0.json` | `0` | fixed user request boundary contract.v0 |
 | `contracts/fixed_user_runtime_status_service_contract.v0.json` | `0` | fixed user runtime status service contract.v0 |
@@ -133,6 +134,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | `schemas/controlled_runtime_loop_contract.schema.json` | KOZO controlled runtime loop contract |
 | `schemas/cpu_extended_state_initialization_contract.schema.json` | KOZO CPU extended-state initialization contract |
 | `schemas/first_governed_runtime_capability.schema.json` | KOZO first governed runtime capability |
+| `schemas/fixed_user_execution_context_contract.schema.json` | KOZO fixed user execution context governance contract |
 | `schemas/fixed_user_mapping_foundation.schema.json` | KOZO fixed user-mapping foundation contract |
 | `schemas/fixed_user_request_boundary_contract.schema.json` | KOZO fixed user request boundary contract |
 | `schemas/fixed_user_runtime_status_service_contract.schema.json` | KOZO fixed user runtime status service contract |
