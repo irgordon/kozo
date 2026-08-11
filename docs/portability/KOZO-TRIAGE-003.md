@@ -68,3 +68,26 @@ Until a separately authorized correction is hosted-proven:
 * Windows remains below `VALIDATED_BUILD`;
 * v1.1.0 Phase 0 remains blocked; and
 * v1.1.0 capability work remains unauthorized.
+
+## Correction Candidate
+
+The correction is implemented locally on `main` and awaits hosted validation.
+Repository governance identifies committed `HEAD` blobs as the authoritative
+release inputs: the release packager uses `git archive` before verification
+and staging. The candidate therefore:
+
+* assigns `text eol=lf` only to `LICENSE`, `LICENSE-MIT`, and
+  `LICENSE-APACHE`;
+* verifies each checked-out file is canonical LF and byte-identical to its
+  `HEAD` blob before staging;
+* copies the validated source unchanged and verifies source/staged byte and
+  SHA-256 identity;
+* emits path, size, blob ID, source hash, and staged hash in each host artifact;
+* adds a required post-matrix comparison of path, size, and SHA-256; and
+* keeps raw hashing exact without release-stage newline repair.
+
+The complete 49-entry inventory remains path-governed. ADR 0017 does not make
+all 49 source bytes or the six generated final artifacts reproducible across
+hosts, so this correction compares only the three explicitly governed legal
+inputs. Status remains `REPRODUCED` until the new required matrix and aggregate
+gate pass.

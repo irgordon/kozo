@@ -146,3 +146,42 @@ jobs:
           name: kozo-portability-${{ matrix.host }}
           path: artifacts/portability/${{ matrix.host }}.json
           if-no-files-found: error
+
+  portability-release-input-identity:
+    name: required cross-host release-input identity
+    if: github.event_name != 'schedule'
+    needs: portability-build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Download required host evidence
+        uses: actions/download-artifact@v7
+        with:
+          pattern: kozo-portability-*
+          path: artifacts/portability-hosts
+          merge-multiple: true
+
+      - name: Compare governed release inputs
+        run: |
+          python scripts/compare_portability_release_inputs.py \
+            --linux artifacts/portability-hosts/linux.json \
+            --macos artifacts/portability-hosts/macos.json \
+            --windows artifacts/portability-hosts/windows.json \
+            --output artifacts/portability-comparison/cross-host-release-inputs.json
+
+      - name: Upload cross-host release-input evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: kozo-portability-release-input-identity
+          path: artifacts/portability-comparison/cross-host-release-inputs.json
+          if-no-files-found: error

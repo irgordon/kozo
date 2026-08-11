@@ -192,6 +192,11 @@ Linux and macOS even though each host's internal checksum round trip passed.
 No v1.1.0 capability work is authorized until that independently causal
 release-input boundary is corrected and hosted-proven.
 
+The bounded correction is now implemented locally: three narrow Git
+attributes govern license checkout bytes, staging rejects differences from
+committed blobs, and a required aggregate job compares host evidence. Phase 0
+remains blocked until the same pinned matrix and aggregate identity gate pass.
+
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity
 and performance without making core supported functionality depend on

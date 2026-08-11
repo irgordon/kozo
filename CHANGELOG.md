@@ -2,7 +2,22 @@
 
 ## v1.1.0 Phase 0 - Cross-host portability matrix - 2026-08-08
 
-**Status:** Repository governance and validation work after v1.0.1; not a new product release. `KOZO-TRIAGE-002` is resolved on `main`, but Phase 0 is blocked by `KOZO-TRIAGE-003`.
+**Status:** Repository governance and validation work after v1.0.1; not a new product release. `KOZO-TRIAGE-002` is resolved on `main`; the `KOZO-TRIAGE-003` correction awaits hosted proof.
+
+### KOZO-TRIAGE-003 correction candidate
+
+* Declared LF checkout policy only for `LICENSE`, `LICENSE-MIT`, and
+  `LICENSE-APACHE` without changing their committed blob content.
+* Established committed `HEAD` blobs as the host-contract source, rejected
+  noncanonical or host-altered worktree bytes, and copied valid inputs without
+  release-stage normalization.
+* Added source/staged byte and SHA-256 validation plus a required cross-host
+  path, size, and SHA-256 comparison job for all three pinned runners.
+* Preserved raw hashing, the 49-entry path inventory, generated-asset
+  reproducibility boundaries, runtime behavior, release version 1.0.1, and
+  every immutable release record.
+* Kept Phase 0 and v1.1.0 capability work blocked pending hosted matrix and
+  aggregate-gate acceptance.
 
 ### Hosted correction result and new blocker
 

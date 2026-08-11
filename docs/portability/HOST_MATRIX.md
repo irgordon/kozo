@@ -1,6 +1,6 @@
 # KOZO Host Portability Matrix
 
-Status: Blocked by KOZO-TRIAGE-003
+Status: KOZO-TRIAGE-003 correction pending hosted validation
 Evidence date: 2026-08-09
 Workflow: `portability`
 Run: [31291100568](https://github.com/irgordon/kozo/actions/runs/31291100568)
@@ -79,6 +79,12 @@ CRLF. The files were therefore not identical release inputs across hosts.
 This independent defect is `KOZO-TRIAGE-003`. SHA-256 semantics are not
 weakened, and raw staged artifacts are not normalized after the fact.
 
+The correction candidate uses committed Git blob bytes as authority, applies
+LF checkout policy only to the three licenses, verifies worktree/blob and
+source/staged identity, and adds a required aggregate path/size/SHA-256 gate.
+The historical hashes and compatibility states above remain authoritative
+until a new pinned run proves the candidate.
+
 ## Phase Status
 
 ADR 0017 and the portability invariant remain adopted. Linux is
@@ -86,5 +92,5 @@ ADR 0017 and the portability invariant remain adopted. Linux is
 blocking incompatibility in the complete release-build contract.
 
 v1.1.0 Phase 0 remains blocked. Product capability work remains unauthorized
-until `KOZO-TRIAGE-003` is separately corrected and hosted evidence proves
+until `KOZO-TRIAGE-003` is hosted-proven and the required aggregate job proves
 cross-host release-input determinism. No runtime or published release changed.

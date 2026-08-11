@@ -1223,6 +1223,8 @@ _VALIDATOR_TEST_CONTRACTS = {
             "missing_fail_fast_false",
             "missing_observation_non_blocking",
             "missing_runtime_separation",
+            "missing_release_input_attribute",
+            "missing_cross_host_identity_gate",
             "missing_qemu_override",
             "missing_rust_toolchain_selection",
             "diagnostic_names_field",

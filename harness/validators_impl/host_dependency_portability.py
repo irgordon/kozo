@@ -15,6 +15,7 @@ _ROOT = Path(__file__).resolve().parents[2]
 _CI_WORKFLOW_PATH = _ROOT / ".github" / "workflows" / "ci.yml"
 _LINT_WORKFLOW_PATH = _ROOT / ".github" / "workflows" / "lint.yml"
 _PORTABILITY_WORKFLOW_PATH = _ROOT / ".github" / "workflows" / "portability.yml"
+_GIT_ATTRIBUTES_PATH = _ROOT / ".gitattributes"
 _PORTABILITY_ADR_PATH = _ROOT / "docs" / "adr" / "0017-host-portability-evidence.md"
 _VERIFY_SCRIPT_PATH = _ROOT / "scripts" / "verify.sh"
 _BUILD_BOOT_IMAGE_PATH = _ROOT / "scripts" / "build_boot_image.sh"
@@ -85,10 +86,19 @@ _PORTABILITY_WORKFLOW_ANCHORS = (
     "macos-15",
     "shell: bash",
     "scripts/host_portability_contract.py",
+    "portability-release-input-identity:",
+    "actions/download-artifact@v7",
+    "scripts/compare_portability_release_inputs.py",
     "if: always()",
     "portability-observation:",
     "continue-on-error: true",
     "actions/upload-artifact@v7",
+)
+
+_GIT_ATTRIBUTE_ANCHORS = (
+    "/LICENSE text eol=lf",
+    "/LICENSE-MIT text eol=lf",
+    "/LICENSE-APACHE text eol=lf",
 )
 
 _PORTABILITY_ADR_ANCHORS = (
@@ -159,6 +169,11 @@ def _host_portability_issue() -> HostPortabilityIssue | None:
             _PORTABILITY_WORKFLOW_PATH,
             _PORTABILITY_WORKFLOW_ANCHORS,
             "portability.workflow",
+        ),
+        _anchor_file_issue(
+            _GIT_ATTRIBUTES_PATH,
+            _GIT_ATTRIBUTE_ANCHORS,
+            "portability.release_inputs.attributes",
         ),
         _anchor_file_issue(
             _PORTABILITY_ADR_PATH,

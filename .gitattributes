@@ -1,3 +1,6 @@
 *.sh text eol=lf
 artifacts/runtime/*.json text eol=lf
 artifacts/runtime/*.txt text eol=lf
+/LICENSE text eol=lf
+/LICENSE-MIT text eol=lf
+/LICENSE-APACHE text eol=lf

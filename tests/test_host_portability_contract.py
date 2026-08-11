@@ -5,20 +5,113 @@ import unittest
 
 from scripts.host_portability_contract import (
     ContractExecutionState,
+    GOVERNED_RELEASE_INPUTS,
     OBJECT_FORM_PATTERN,
     PortabilityContractError,
+    ReleaseInputSource,
+    ROOT,
     build_failure_evidence,
     build_pending_evidence,
     expected_staged_files,
     portable_release_entries,
+    sha256_bytes,
+    stage_release_sources,
+    validate_canonical_lf_bytes,
     validate_checksum_manifest,
     validate_destinations,
     validate_prohibited_entries,
+    validate_release_input_attributes,
+    validate_release_input_bytes,
+    validate_staged_release_inputs,
     write_checksum_manifest,
 )
 
 
 class HostPortabilityContractTests(unittest.TestCase):
+    def test_governed_license_attributes_require_lf(self):
+        validate_release_input_attributes(ROOT)
+
+    def test_governed_release_input_set_is_narrow(self):
+        self.assertEqual(
+            GOVERNED_RELEASE_INPUTS,
+            ("LICENSE", "LICENSE-APACHE", "LICENSE-MIT"),
+        )
+
+    def test_accepts_canonical_lf_release_input(self):
+        validate_canonical_lf_bytes(b"governed\nrelease input\n", "LICENSE")
+
+    def test_rejects_crlf_release_input(self):
+        with self.assertRaises(PortabilityContractError):
+            validate_canonical_lf_bytes(b"governed\r\nrelease input\r\n", "LICENSE")
+
+    def test_rejects_cr_release_input(self):
+        with self.assertRaises(PortabilityContractError):
+            validate_canonical_lf_bytes(b"governed\rrelease input\r", "LICENSE")
+
+    def test_rejects_worktree_bytes_that_differ_from_blob(self):
+        with self.assertRaises(PortabilityContractError):
+            validate_release_input_bytes(
+                b"governed\r\nlicense\r\n",
+                b"governed\nlicense\n",
+                "LICENSE",
+            )
+
+    def test_staged_release_input_remains_byte_exact(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory) / "source"
+            staging = Path(temporary_directory) / "staging"
+            root.mkdir()
+            content = b"governed\nlicense\n"
+            (root / "LICENSE").write_bytes(content)
+            source = ReleaseInputSource(
+                "LICENSE", "blob", len(content), sha256_bytes(content)
+            )
+            stage_release_sources(
+                root,
+                staging,
+                [{"source": "LICENSE", "destination": "LICENSE"}],
+            )
+
+            result = validate_staged_release_inputs(root, staging, (source,))
+
+            self.assertEqual((staging / "LICENSE").read_bytes(), content)
+            self.assertEqual(
+                result["files"][0]["sha256"],
+                result["files"][0]["staged_sha256"],
+            )
+
+    def test_staged_release_input_rejects_changed_bytes(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory) / "source"
+            staging = Path(temporary_directory) / "staging"
+            root.mkdir()
+            staging.mkdir()
+            content = b"governed\nlicense\n"
+            (root / "LICENSE").write_bytes(content)
+            (staging / "LICENSE").write_bytes(b"changed\n")
+            source = ReleaseInputSource(
+                "LICENSE", "blob", len(content), sha256_bytes(content)
+            )
+
+            with self.assertRaises(PortabilityContractError):
+                validate_staged_release_inputs(root, staging, (source,))
+
+    def test_binary_staging_does_not_normalize_bytes(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory) / "source"
+            staging = Path(temporary_directory) / "staging"
+            root.mkdir()
+            content = b"\x00\r\n\xff"
+            (root / "binary.bin").write_bytes(content)
+
+            stage_release_sources(
+                root,
+                staging,
+                [{"source": "binary.bin", "destination": "binary.bin"}],
+            )
+
+            self.assertEqual((staging / "binary.bin").read_bytes(), content)
+
     def test_pending_evidence_contains_host_tools_and_workflow(self):
         environment = sample_environment()
         state = ContractExecutionState(environment)

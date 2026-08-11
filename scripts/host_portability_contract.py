@@ -22,7 +22,8 @@ from harness.text_evidence import write_canonical_text
 
 
 EXPECTED_FOCUSED_TESTS = 34
-REQUIRED_LICENSES = {"LICENSE", "LICENSE-MIT", "LICENSE-APACHE"}
+GOVERNED_RELEASE_INPUTS = ("LICENSE", "LICENSE-APACHE", "LICENSE-MIT")
+REQUIRED_LICENSES = set(GOVERNED_RELEASE_INPUTS)
 PROHIBITED_NAMES = {".git", ".env", "target", "__pycache__"}
 OBJECT_FORM_PATTERN = re.compile(
     r"^KOZO_ODIN_OBJECT_OUTPUT_FORM=(exact|dot_o|dot_obj)$", re.MULTILINE
@@ -44,6 +45,14 @@ class ContractExecutionState:
 
     def finish(self) -> None:
         self.stage = "complete"
+
+
+@dataclass(frozen=True)
+class ReleaseInputSource:
+    path: str
+    blob_id: str
+    size: int
+    sha256: str
 
 
 def main() -> int:
@@ -90,8 +99,14 @@ def execute_build_contract(
     focused_count, full_count = run_python_contract(root)
     state.enter("build_checks")
     run_build_checks(root)
+    state.enter("release_inputs")
+    release_sources = validate_release_input_sources(root)
     state.enter("release_inventory")
-    inventory = validate_release_inventory(root, work_directory)
+    inventory, release_inputs = validate_release_inventory(
+        root,
+        work_directory,
+        release_sources,
+    )
     state.enter("checksums")
     checksums = validate_checksum_round_trip(root, work_directory)
     state.enter("odin_object")
@@ -102,6 +117,7 @@ def execute_build_contract(
         focused_count,
         full_count,
         inventory,
+        release_inputs,
         checksums,
         object_result,
     )
@@ -166,7 +182,11 @@ def run_build_checks(root: Path) -> None:
     report_step("build_checks")
 
 
-def validate_release_inventory(root: Path, work_directory: Path) -> dict:
+def validate_release_inventory(
+    root: Path,
+    work_directory: Path,
+    release_sources: tuple[ReleaseInputSource, ...],
+) -> tuple[dict, dict]:
     manifest = load_json(root / "release/release_files.v1.json")
     entries = manifest_entries(manifest)
     destinations = [entry["destination"] for entry in entries]
@@ -177,12 +197,13 @@ def validate_release_inventory(root: Path, work_directory: Path) -> dict:
     portable_entries = portable_release_entries(entries)
     staging = work_directory / "release staging with spaces"
     stage_release_sources(root, staging, portable_entries)
+    release_inputs = validate_staged_release_inputs(root, staging, release_sources)
     write_host_release_metadata(root, staging)
     staged_file_count = validate_staged_inventory(root, staging, portable_entries)
     validate_staged_paths(staging, manifest)
     validate_host_release_metadata(root, staging)
     report_step("release_inventory")
-    return {
+    inventory = {
         "entry_count": len(entries),
         "portable_entry_count": len(portable_entries),
         "runtime_generated_entry_count": len(entries) - len(portable_entries),
@@ -191,6 +212,128 @@ def validate_release_inventory(root: Path, work_directory: Path) -> dict:
         "required_directory_count": len(manifest["required_directories"]),
         "metadata_result": "PASS",
         "final_archive_contract": "NOT_EXECUTED",
+    }
+    return inventory, release_inputs
+
+
+def validate_release_input_sources(root: Path) -> tuple[ReleaseInputSource, ...]:
+    validate_release_input_attributes(root)
+    sources = tuple(load_release_input_source(root, path) for path in GOVERNED_RELEASE_INPUTS)
+    report_step("release_inputs")
+    return sources
+
+
+def validate_release_input_attributes(root: Path) -> None:
+    attributes = read_release_input_attributes(root)
+    for path in GOVERNED_RELEASE_INPUTS:
+        require(
+            attributes.get((path, "text")) == "set",
+            f"release input text attribute missing: {path}",
+        )
+        require(
+            attributes.get((path, "eol")) == "lf",
+            f"release input LF attribute missing: {path}",
+        )
+
+
+def read_release_input_attributes(root: Path) -> dict[tuple[str, str], str]:
+    result = run_command(
+        ["git", "check-attr", "text", "eol", "--", *GOVERNED_RELEASE_INPUTS],
+        root,
+    )
+    attributes: dict[tuple[str, str], str] = {}
+    for line in result.stdout.splitlines():
+        path, name, value = line.split(": ", 2)
+        attributes[(path, name)] = value
+    return attributes
+
+
+def load_release_input_source(root: Path, relative_path: str) -> ReleaseInputSource:
+    source = root / relative_path
+    require(
+        source.is_file() and not source.is_symlink(),
+        f"invalid release input: {relative_path}",
+    )
+    source_bytes = source.read_bytes()
+    blob_bytes = git_blob_bytes(root, relative_path)
+    validate_release_input_bytes(source_bytes, blob_bytes, relative_path)
+    return ReleaseInputSource(
+        path=relative_path,
+        blob_id=git_blob_id(root, relative_path),
+        size=len(source_bytes),
+        sha256=sha256_bytes(source_bytes),
+    )
+
+
+def validate_release_input_bytes(
+    source_bytes: bytes,
+    blob_bytes: bytes,
+    relative_path: str,
+) -> None:
+    validate_canonical_lf_bytes(blob_bytes, relative_path)
+    require(
+        source_bytes == blob_bytes,
+        f"release input differs from HEAD blob: {relative_path}",
+    )
+
+
+def validate_canonical_lf_bytes(content: bytes, relative_path: str) -> None:
+    require(content, f"empty governed release input: {relative_path}")
+    require(b"\r" not in content, f"non-LF governed release input: {relative_path}")
+    try:
+        content.decode("utf-8")
+    except UnicodeDecodeError as error:
+        raise PortabilityContractError(f"non-UTF-8 governed release input: {relative_path}") from error
+
+
+def validate_staged_release_inputs(
+    root: Path,
+    staging: Path,
+    sources: tuple[ReleaseInputSource, ...],
+) -> dict:
+    files = [validate_staged_release_input(root, staging, source) for source in sources]
+    return {
+        "authority": "git_blob",
+        "checkout_policy": "text eol=lf",
+        "comparison_scope": "governed_license_inputs",
+        "comparison_dimensions": ["path", "size", "sha256"],
+        "result": "PASS",
+        "files": files,
+    }
+
+
+def validate_staged_release_input(
+    root: Path,
+    staging: Path,
+    source: ReleaseInputSource,
+) -> dict:
+    staged = staging / source.path
+    require(
+        staged.is_file() and not staged.is_symlink(),
+        f"missing staged release input: {source.path}",
+    )
+    source_bytes = (root / source.path).read_bytes()
+    staged_bytes = staged.read_bytes()
+    require(
+        len(staged_bytes) == source.size,
+        f"staged release input size mismatch: {source.path}",
+    )
+    require(
+        staged_bytes == source_bytes,
+        f"staged release input bytes mismatch: {source.path}",
+    )
+    staged_sha256 = sha256_bytes(staged_bytes)
+    require(
+        staged_sha256 == source.sha256,
+        f"staged release input hash mismatch: {source.path}",
+    )
+    return {
+        "path": source.path,
+        "blob_id": source.blob_id,
+        "size": source.size,
+        "sha256": source.sha256,
+        "staged_size": len(staged_bytes),
+        "staged_sha256": staged_sha256,
     }
 
 
@@ -382,6 +525,7 @@ def build_evidence(
     focused_count: int,
     full_count: int,
     inventory: dict,
+    release_inputs: dict,
     checksums: dict,
     object_result: dict,
 ) -> dict:
@@ -392,6 +536,7 @@ def build_evidence(
         "tests": {"odin_object_build": focused_count, "full_python": full_count},
         "odin_object": object_result,
         "release_inventory": {**inventory, "result": "PASS"},
+        "release_inputs": release_inputs,
         "checksums": {"algorithm": "SHA-256", "result": "PASS", "files": checksums},
     }
 
@@ -514,6 +659,25 @@ def sha256(path: Path) -> str:
         for block in iter(lambda: file_handle.read(65536), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def sha256_bytes(content: bytes) -> str:
+    return hashlib.sha256(content).hexdigest()
+
+
+def git_blob_bytes(root: Path, relative_path: str) -> bytes:
+    result = subprocess.run(
+        ["git", "cat-file", "blob", f"HEAD:{relative_path}"],
+        cwd=root,
+        capture_output=True,
+    )
+    require(result.returncode == 0, f"missing release input blob: {relative_path}")
+    return result.stdout
+
+
+def git_blob_id(root: Path, relative_path: str) -> str:
+    result = run_command(["git", "rev-parse", f"HEAD:{relative_path}"], root)
+    return result.stdout.strip()
 
 
 def git_head() -> str:

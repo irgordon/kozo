@@ -359,6 +359,14 @@ staged LF bytes. Per-host checksum round trips passed, but the cross-host
 hashes differed. `KOZO-TRIAGE-003` records that separate release-input defect.
 Phase 0 remains blocked and Windows is not promoted to `VALIDATED_BUILD`.
 
+The bounded correction treats committed `HEAD` blob bytes as authoritative,
+requires narrow LF checkout attributes for the three licenses, rejects any
+worktree/blob mismatch before staging, and compares source and staged bytes
+without normalization. A required aggregation job now compares path, size,
+and SHA-256 across all three pinned host artifacts. These changes remain a
+candidate until a new hosted matrix passes; final generated-asset
+reproducibility is outside this gate.
+
 ---
 
 # 8. Required Changelog and Release Notes

@@ -3296,10 +3296,12 @@
         "harness/text_evidence.py",
         "scripts/build_odin_object.sh",
         "scripts/host_portability_contract.py",
+        "scripts/compare_portability_release_inputs.py",
         "scripts/qemu_smoke.sh",
         "tests/test_odin_object_build.py",
         "tests/test_host_portability_contract.py",
         "tests/test_host_dependency_portability.py",
+        "tests/test_release_input_portability.py",
         "tests/test_qemu_smoke_evidence.py",
         "tests/test_text_evidence_portability.py",
         "harness/validators_impl/host_dependency_portability.py",
@@ -4214,6 +4216,11 @@
         "tool": "KOZO-TRIAGE-003 cross-host license-byte triage",
         "command": "download portability run 31291100568 artifacts; compare Linux, Windows, and macOS license hashes; reproduce Windows hashes with LF-to-CRLF transformation; preserve byte-exact SHA-256 semantics and record a separate unauthorized correction boundary",
         "status": "reproduced_windows_LICENSE_LICENSE-APACHE_LICENSE-MIT_CRLF_hashes_differ_from_identical_linux_macos_LF_hashes_required_jobs_green_contract_gap_phase_0_blocked_windows_not_VALIDATED_BUILD_capability_work_unauthorized"
+      },
+      {
+        "tool": "KOZO-TRIAGE-003 bounded release-input correction",
+        "command": "committed-blob authority review; narrow Git LF attributes; worktree/blob and source/staged byte validation; focused release-input and cross-host comparison tests; required aggregate workflow gate; local full validation; hosted validation pending",
+        "status": "implemented_locally_hosted_matrix_pending_phase_0_blocked_windows_not_VALIDATED_BUILD_v1.0.2_unauthorized_v1.1.0_capability_work_unauthorized"
       }
     ],
     "logs": [
@@ -4235,7 +4242,8 @@
       "Ring3 response-consumer ELF evidence must be bounded by authoritative start and end symbol addresses so GNU and LLVM label aliases cannot change the governed comparison result.",
       "Published v1.0.0, v1.0.0-rc.1, and v1.0.1 tags, notes, and assets remain immutable; later patch preparation requires a reproduced, in-scope defect that satisfies the complete authorization gate.",
       "A post-release observation record cannot authorize a version change, patch implementation, feature implementation, tag mutation, release mutation, or asset replacement.",
-      "Per-host checksum round trips do not prove cross-host release-input determinism; supposedly identical tracked release inputs must have identical governed bytes and hashes before a host can satisfy the complete Phase 0 claim."
+      "Per-host checksum round trips do not prove cross-host release-input determinism; supposedly identical tracked release inputs must have identical governed bytes and hashes before a host can satisfy the complete Phase 0 claim.",
+      "Committed HEAD blobs own governed release-input bytes; host checkouts and staged copies must match those blobs exactly, and the required aggregate gate must compare path, size, and SHA-256 across pinned hosts."
     ],
     "expected_behavior": [
       "verify.sh succeeds on a clean tree and prints the generated artifact JSON before VERIFY: PASS",
@@ -4470,6 +4478,7 @@
     "Normalized supported Odin object filenames at one portable build boundary, added fail-closed fake-compiler regression coverage, passed the formerly failing hosted release-bundle stage, and preserved runtime and immutable prior releases.",
     "Published immutable v1.0.1 from hosted-accepted commit 02f1b0113458b988562b7e03362ec9ae716cebd0, independently verified all six hosted assets and the downloaded ISO, resolved KOZO-TRIAGE-001, and did not publish core_service.",
     "Established ADR-backed host portability governance, a pinned required build matrix, a non-blocking observation lane, a portable host contract, and 34 cross-host object-boundary regressions without changing runtime or the published product version.",
-    "Resolved KOZO-TRIAGE-002 across all three pinned hosted jobs, then preserved Phase 0 as blocked after downloaded evidence exposed KOZO-TRIAGE-003: Windows staged tracked license inputs with CRLF bytes and different hashes from Linux and macOS."
+    "Resolved KOZO-TRIAGE-002 across all three pinned hosted jobs, then preserved Phase 0 as blocked after downloaded evidence exposed KOZO-TRIAGE-003: Windows staged tracked license inputs with CRLF bytes and different hashes from Linux and macOS.",
+    "Implemented the bounded KOZO-TRIAGE-003 candidate with narrow LF checkout attributes, committed-blob and staged-byte validation, and a required cross-host path/size/SHA-256 gate; hosted acceptance remains pending."
   ]
 }

@@ -24,6 +24,8 @@ KOZO_NEGATIVE_COVERAGE = {
         "missing_fail_fast_false": "test_fails_when_matrix_fail_fast_is_enabled",
         "missing_observation_non_blocking": "test_fails_when_observation_is_blocking",
         "missing_runtime_separation": "test_fails_when_runtime_separation_is_missing",
+        "missing_release_input_attribute": "test_fails_when_release_input_attribute_is_missing",
+        "missing_cross_host_identity_gate": "test_fails_when_cross_host_identity_gate_is_missing",
         "missing_qemu_override": "test_fails_when_qemu_override_is_missing",
         "missing_rust_toolchain_selection": "test_fails_when_verify_script_does_not_select_rust_toolchain",
         "diagnostic_names_field": "test_failure_diagnostic_names_field",
@@ -218,6 +220,33 @@ class HostDependencyPortabilityValidatorTests(unittest.TestCase):
             "host_dependency_portability.portability.workflow.if: always()",
         )
 
+    def test_fails_when_release_input_attribute_is_missing(self):
+        result = self.validate_fixture(
+            mutate_attributes=lambda text: text.replace("/LICENSE text eol=lf", "")
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_portability_failure(
+            result,
+            "missing_anchor",
+            "host_dependency_portability.portability.release_inputs.attributes./LICENSE text eol=lf",
+        )
+
+    def test_fails_when_cross_host_identity_gate_is_missing(self):
+        result = self.validate_fixture(
+            mutate_portability=lambda text: text.replace(
+                "scripts/compare_portability_release_inputs.py",
+                "scripts/missing-release-input-comparison.py",
+            )
+        )
+
+        self.assertEqual(result.status, "fail")
+        self.assert_portability_failure(
+            result,
+            "missing_anchor",
+            "host_dependency_portability.portability.workflow.scripts/compare_portability_release_inputs.py",
+        )
+
     def test_fails_when_runtime_separation_is_missing(self):
         result = self.validate_fixture(
             mutate_adr=lambda text: text.replace("Guest portability", "Guest execution")
@@ -254,6 +283,7 @@ class HostDependencyPortabilityValidatorTests(unittest.TestCase):
         mutate_build=None,
         mutate_qemu=None,
         mutate_portability=None,
+        mutate_attributes=None,
         mutate_adr=None,
         extra_file: tuple[str, str] | None = None,
     ):
@@ -272,6 +302,10 @@ class HostDependencyPortabilityValidatorTests(unittest.TestCase):
             if mutate_portability is not None:
                 paths["portability"].write_text(
                     mutate_portability(paths["portability"].read_text())
+                )
+            if mutate_attributes is not None:
+                paths["attributes"].write_text(
+                    mutate_attributes(paths["attributes"].read_text())
                 )
             if mutate_adr is not None:
                 paths["adr"].write_text(mutate_adr(paths["adr"].read_text()))
@@ -298,6 +332,7 @@ def write_fixture_files(root: Path) -> dict[str, object]:
         "ci": root / ".github" / "workflows" / "ci.yml",
         "lint": root / ".github" / "workflows" / "lint.yml",
         "portability": root / ".github" / "workflows" / "portability.yml",
+        "attributes": root / ".gitattributes",
         "adr": root / "docs" / "adr" / "0017-host-portability-evidence.md",
         "verify": root / "scripts" / "verify.sh",
         "build": root / "scripts" / "build_boot_image.sh",
@@ -315,6 +350,7 @@ def write_fixture_files(root: Path) -> dict[str, object]:
     paths["ci"].write_text(valid_ci_text())
     paths["lint"].write_text(valid_lint_text())
     paths["portability"].write_text(valid_portability_text())
+    paths["attributes"].write_text(valid_attributes_text())
     paths["adr"].write_text(valid_adr_text())
     paths["verify"].write_text(valid_verify_text())
     paths["build"].write_text(valid_build_text())
@@ -373,10 +409,23 @@ def valid_portability_text() -> str:
             "macos-15",
             "shell: bash",
             "scripts/host_portability_contract.py",
+            "portability-release-input-identity:",
+            "actions/download-artifact@v7",
+            "scripts/compare_portability_release_inputs.py",
             "if: always()",
             "portability-observation:",
             "continue-on-error: true",
             "actions/upload-artifact@v7",
+        )
+    )
+
+
+def valid_attributes_text() -> str:
+    return "\n".join(
+        (
+            "/LICENSE text eol=lf",
+            "/LICENSE-MIT text eol=lf",
+            "/LICENSE-APACHE text eol=lf",
         )
     )
 
@@ -451,6 +500,7 @@ def patch_validator_paths(paths: dict[str, object]):
         validator_module._CI_WORKFLOW_PATH,
         validator_module._LINT_WORKFLOW_PATH,
         validator_module._PORTABILITY_WORKFLOW_PATH,
+        validator_module._GIT_ATTRIBUTES_PATH,
         validator_module._PORTABILITY_ADR_PATH,
         validator_module._VERIFY_SCRIPT_PATH,
         validator_module._BUILD_BOOT_IMAGE_PATH,
@@ -465,6 +515,7 @@ def patch_validator_paths(paths: dict[str, object]):
     validator_module._CI_WORKFLOW_PATH = paths["ci"]
     validator_module._LINT_WORKFLOW_PATH = paths["lint"]
     validator_module._PORTABILITY_WORKFLOW_PATH = paths["portability"]
+    validator_module._GIT_ATTRIBUTES_PATH = paths["attributes"]
     validator_module._PORTABILITY_ADR_PATH = paths["adr"]
     validator_module._VERIFY_SCRIPT_PATH = paths["verify"]
     validator_module._BUILD_BOOT_IMAGE_PATH = paths["build"]
@@ -483,6 +534,7 @@ def restore_validator_paths(old_paths) -> None:
         validator_module._CI_WORKFLOW_PATH,
         validator_module._LINT_WORKFLOW_PATH,
         validator_module._PORTABILITY_WORKFLOW_PATH,
+        validator_module._GIT_ATTRIBUTES_PATH,
         validator_module._PORTABILITY_ADR_PATH,
         validator_module._VERIFY_SCRIPT_PATH,
         validator_module._BUILD_BOOT_IMAGE_PATH,

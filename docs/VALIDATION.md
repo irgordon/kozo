@@ -394,6 +394,19 @@ separate Linux runtime/release gate. The final `.tar.xz`, ISO, and kernel ELF
 are not constructed by Windows or macOS Phase 0 build jobs; their host artifact
 records `final_archive_contract: NOT_EXECUTED` rather than implying success.
 
+The committed `HEAD` blobs are authoritative for governed release inputs. The
+release packager materializes them with `git archive`; the portability contract
+requires the checked-out `LICENSE`, `LICENSE-MIT`, and `LICENSE-APACHE` bytes to
+match those blobs before staging. `.gitattributes` requires LF checkout bytes
+for only those three legal inputs. Staging copies them unchanged, then compares
+source and staged size, bytes, and SHA-256. It does not repair line endings.
+
+After all required host jobs finish, a required aggregation job compares the
+three governed records by repository-relative path, size, and SHA-256. Linux,
+Windows, and macOS must agree before any host result can satisfy the complete
+release-input portability gate. This is not a claim that generated archives,
+ISO images, ELF files, or timestamped evidence are reproducible across hosts.
+
 Required jobs produce a compact host-portability JSON artifact containing the
 host, runner image, architecture, commit, tool versions, object-output form,
 test counts, build result, and explicit runtime result. The artifact is

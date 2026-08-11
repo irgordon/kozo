@@ -152,6 +152,11 @@ does not mean Windows is permanently outside the intended host set. A
 separately authorized correction and cross-host evidence are required before
 the status can become `VALIDATED_BUILD`.
 
+The correction is implemented on `main` using committed blob authority,
+narrow LF checkout policy, byte-exact staging checks, and a required
+cross-host identity job. Windows remains `UNSUPPORTED` until a new pinned
+matrix proves the distributed path/size/SHA-256 property.
+
 ---
 
 # 9. Userspace Claims
