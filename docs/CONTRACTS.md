@@ -359,3 +359,20 @@ The runtime progression contracts own stage order. The accepted request and
 response-consumption contracts own their fixed transport. This contract owns
 only the status service placed inside that transport; documentation and
 generated reports do not redefine it.
+
+# 28. Fixed User Execution Context Governance
+
+`contracts/fixed_user_execution_context_contract.v0.json` owns the internal
+future context and result policy adopted by ADR 0018. It fixes one 128-byte,
+16-byte-aligned supervisor context and one separate 32-byte, 8-byte-aligned
+non-authoritative result. It defines field authority, fixed bindings, exact
+lifecycle and cleanup edges, clear-state readback, named failure codes, result
+lifetime, the transaction-derived budget of two, phase/count coupling, and
+planned progression placement.
+
+The context contract references the accepted mapping, privilege, request,
+response-consumption, status-service, and progression contracts rather than
+replacing their authority. It is an internal kernel contract, not a public
+userspace ABI. Its schema and direct governance validator prove definition
+consistency only. Runtime implementation and runtime evidence remain
+unauthorized until a separate task.

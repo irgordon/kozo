@@ -323,6 +323,7 @@ def required_contract_files() -> tuple[str, ...]:
         "memory_initialization_evidence_contract.v0.json",
         "controlled_runtime_loop_contract.v0.json",
         "first_governed_runtime_capability.v0.json",
+        "fixed_user_execution_context_contract.v0.json",
     )
 
 
@@ -434,7 +435,7 @@ def required_contracts() -> dict[str, str]:
         "RUNTIME_INITIALIZATION_EVIDENCE": "planned:runtime_initialization_contract",
         "CONTROLLED_RUNTIME_LOOP": "contracts/controlled_runtime_loop_contract.v0.json",
         "FIRST_GOVERNED_RUNTIME_CAPABILITY": "contracts/first_governed_runtime_capability.v0.json",
-        "USERSPACE_PLANNING": "planned:userspace_planning_contract",
+        "USERSPACE_PLANNING": "contracts/fixed_user_execution_context_contract.v0.json",
     }
 
 
@@ -447,7 +448,7 @@ def required_validators() -> dict[str, str]:
         "RUNTIME_INITIALIZATION_EVIDENCE": "planned:runtime_initialization_evidence",
         "CONTROLLED_RUNTIME_LOOP": "controlled_runtime_loop_contract",
         "FIRST_GOVERNED_RUNTIME_CAPABILITY": "first_governed_runtime_capability_evidence",
-        "USERSPACE_PLANNING": "planned:userspace_planning",
+        "USERSPACE_PLANNING": "planned:fixed_user_execution_context_evidence",
     }
 
 
@@ -459,7 +460,7 @@ def valid_transitions() -> list[dict[str, str]]:
         "planned:runtime_initialization_contract",
         "contracts/controlled_runtime_loop_contract.v0.json",
         "contracts/first_governed_runtime_capability.v0.json",
-        "planned:userspace_planning_contract",
+        "contracts/fixed_user_execution_context_contract.v0.json",
     )
     names = stage_names()
     return [

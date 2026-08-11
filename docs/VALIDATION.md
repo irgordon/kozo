@@ -448,3 +448,31 @@ non-blocking. Their failures remain visible but do not change required
 compatibility unless governance promotes that environment. A deterministic
 required-cell failure must be preserved and triaged; it must not be skipped or
 repeated until green.
+
+---
+
+# 23. Fixed User Execution Context Governance Validation
+
+`fixed_user_execution_context_contract` is a direct governance validator for
+ADR 0018 and
+`contracts/fixed_user_execution_context_contract.v0.json`. It validates exact
+context and result geometry, exclusive Ring 0 authority, opaque identity
+rules, the legal lifecycle and failure-cleanup graph, clear-state readback,
+fixed-source bindings, named failures, bounded result lifetime, two-transition
+derivation, phase/count coupling, planned progression, marker preservation, and
+ADR 0017 host requirements.
+
+Focused fixtures cover malformed and missing contracts, unknown fields,
+identity and reserved-state violations, illegal transitions, incomplete
+cleanup, retained result authority, stale-result reuse, binding drift, phase
+and count mismatch, a third transition, early continuation, evidence
+overclaim, and weakened host coverage. The validator checks governance only;
+it does not fabricate runtime symbols or evidence.
+
+The future runtime validator name is
+`fixed_user_execution_context_evidence`. It remains planned and must later
+prove source and ELF placement, lifecycle transitions, result commit, cleanup,
+failure exclusions, and Linux QEMU survival without changing the 41-marker
+taxonomy. The governance validator is not registered in `scripts/verify.sh`,
+so this prerequisite phase preserves 67 governed checks. Registering a new
+runtime check or changing marker evidence requires separate authorization.

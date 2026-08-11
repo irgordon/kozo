@@ -202,10 +202,11 @@ The next capability-selection phase defines one **Fixed User Execution
 Context**. It will eventually bind the accepted user mappings, privilege
 transition, fixed transaction, and Ring 0 return to one kernel-owned opaque
 identity and bounded lifecycle. The definition is complete in
-`docs/FIXED_USER_EXECUTION_CONTEXT.md`; implementation, version assignment,
-and release remain unauthorized. A governance-first implementation task must
-adopt the required context-ownership ADR and contract/evidence changes before
-runtime code changes.
+`docs/FIXED_USER_EXECUTION_CONTEXT.md`; ADR 0018 and the exact internal
+context/result contract now define its governance prerequisites, pending
+hosted acceptance. Implementation, version assignment, and release remain
+unauthorized. A separate task must authorize runtime changes after these
+prerequisites are accepted.
 
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity
@@ -342,6 +343,7 @@ Deferred until separately scoped runtime or cleanup phases:
 | `v1.0.0-rc.1` | Published release candidate | Freeze scope and gates, publish the accepted immutable prerelease, and verify the distributed artifacts and user path. | In-place tag, note, or asset changes; new feature scope after RC. |
 | `v1.0.0` | Final kernel-foundation release | Publish the accepted governed kernel foundation with final versioning, evidence, and immutable assets. | Any unimplemented compatibility or runtime subsystem claim; any in-place mutation of the final tag or assets. |
 | `post-Phase-0 definition` | Fixed User Execution Context | Define one supervisor-only identity and lifecycle that binds the accepted fixed user execution path without implementing it. | Runtime implementation, repeated sessions, processes, scheduling, dynamic memory, ABI expansion, version authorization, or release. |
+| `post-Phase-0 prerequisites` | Fixed User Execution Context Governance | Adopt exact ownership, lifecycle, result, cleanup, transition-budget, progression, and evidence authority before runtime implementation. | Runtime implementation, marker/check-count changes, repeated sessions, public ABI, version authorization, or release. |
 
 ---
 

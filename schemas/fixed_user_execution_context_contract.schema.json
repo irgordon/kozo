@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KOZO fixed user execution context governance contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "status",
+    "authoritative_sources",
+    "authority",
+    "context",
+    "lifecycle",
+    "clear_state",
+    "result",
+    "result_lifetime",
+    "fixed_bindings",
+    "transition_budget",
+    "runtime_progression",
+    "evidence_policy",
+    "claim_boundary",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {"const": 0},
+    "architecture": {"const": "x86_64"},
+    "status": {"const": "governance_defined_implementation_unauthorized"},
+    "authoritative_sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "phase_definition", "mapping", "privilege_transition", "request_boundary", "response_consumption", "status_service", "runtime_progression"],
+      "properties": {
+        "decision": {"type": "string", "pattern": ".*\\S.*"},
+        "phase_definition": {"type": "string", "pattern": ".*\\S.*"},
+        "mapping": {"type": "string", "pattern": ".*\\S.*"},
+        "privilege_transition": {"type": "string", "pattern": ".*\\S.*"},
+        "request_boundary": {"type": "string", "pattern": ".*\\S.*"},
+        "response_consumption": {"type": "string", "pattern": ".*\\S.*"},
+        "status_service": {"type": "string", "pattern": ".*\\S.*"},
+        "runtime_progression": {"type": "string", "pattern": ".*\\S.*"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "context_count", "allocation", "user_accessible", "user_selectable_identity", "user_mutable_authority", "public_abi", "implementation_authorized"],
+      "properties": {
+        "owner": {"const": "ring0"},
+        "context_count": {"const": 1},
+        "allocation": {"const": "fixed_static"},
+        "user_accessible": {"const": false},
+        "user_selectable_identity": {"const": false},
+        "user_mutable_authority": {"const": false},
+        "public_abi": {"const": false},
+        "implementation_authorized": {"const": false}
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "format_version", "size_bytes", "alignment_bytes", "storage_policy", "fields"],
+      "properties": {
+        "name": {"const": "Fixed_User_Execution_Context"},
+        "format_version": {"const": 1},
+        "size_bytes": {"const": 128},
+        "alignment_bytes": {"const": 16},
+        "storage_policy": {"const": "supervisor_rw_nx_static"},
+        "fields": {
+          "type": "array",
+          "minItems": 22,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "offset", "size", "type", "authority", "allowed", "invalid", "initial", "mutation", "cleared", "evidence"],
+            "properties": {
+              "name": {"type": "string", "pattern": ".*\\S.*"},
+              "offset": {"type": "integer"},
+              "size": {"type": "integer"},
+              "type": {"enum": ["u32", "u64"]},
+              "authority": {"enum": ["structural", "ring0_execution", "fixed_binding", "reserved"]},
+              "allowed": {"type": "string", "pattern": ".*\\S.*"},
+              "invalid": {"type": "string", "pattern": ".*\\S.*"},
+              "initial": {"type": "integer"},
+              "mutation": {"type": "string", "pattern": ".*\\S.*"},
+              "cleared": {"type": "integer"},
+              "evidence": {"type": "string", "pattern": ".*\\S.*"}
+            }
+          }
+        }
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["encodings", "successful_transitions", "failure_cleanup_transitions", "forbidden_transitions", "pre_ready_failure", "active_scope", "reuse_allowed"],
+      "properties": {
+        "encodings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["UNINITIALIZED", "READY", "ACTIVE", "RETURNED", "CLEARED"],
+          "properties": {
+            "UNINITIALIZED": {"const": 0},
+            "READY": {"const": 1},
+            "ACTIVE": {"const": 2},
+            "RETURNED": {"const": 3},
+            "CLEARED": {"const": 4}
+          }
+        },
+        "successful_transitions": {"type": "array", "minItems": 4, "items": {"type": "object", "additionalProperties": false, "required": ["from", "to"], "properties": {"from": {"type": "string"}, "to": {"type": "string"}}}},
+        "failure_cleanup_transitions": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["from", "to"], "properties": {"from": {"type": "string"}, "to": {"type": "string"}}}},
+        "forbidden_transitions": {"type": "array", "minItems": 7, "items": {"type": "object", "additionalProperties": false, "required": ["from", "to"], "properties": {"from": {"type": "string"}, "to": {"type": "string"}}}},
+        "pre_ready_failure": {"const": "remain_UNINITIALIZED_commit_failure_result_and_do_not_enter_ring3"},
+        "active_scope": {"const": "complete_existing_two_transition_transaction"},
+        "reuse_allowed": {"const": false}
+      }
+    },
+    "clear_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lifecycle", "retained_structural_fields", "zeroized_fields", "zero_readback_required", "lifecycle_readback_required", "identity_loses_authority_at_zero", "bindings_lose_authority_at_zero", "normal_continuation_requires_valid_clear_state"],
+      "properties": {
+        "lifecycle": {"const": "CLEARED"},
+        "retained_structural_fields": {"type": "object", "additionalProperties": false, "required": ["format_version", "structure_size"], "properties": {"format_version": {"const": 1}, "structure_size": {"const": 128}}},
+        "zeroized_fields": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": ".*\\S.*"}},
+        "zero_readback_required": {"const": true},
+        "lifecycle_readback_required": {"const": true},
+        "identity_loses_authority_at_zero": {"const": true},
+        "bindings_lose_authority_at_zero": {"const": true},
+        "normal_continuation_requires_valid_clear_state": {"const": true}
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "format_version", "size_bytes", "alignment_bytes", "storage_policy", "fields", "outcomes", "failure_codes", "initial_state", "authority_fields_forbidden"],
+      "properties": {
+        "name": {"const": "Fixed_User_Execution_Context_Result"},
+        "format_version": {"const": 1},
+        "size_bytes": {"const": 32},
+        "alignment_bytes": {"const": 8},
+        "storage_policy": {"const": "supervisor_rw_nx_static_non_authoritative"},
+        "fields": {"type": "array", "minItems": 7, "items": {"type": "object", "additionalProperties": false, "required": ["name", "offset", "size", "type"], "properties": {"name": {"type": "string"}, "offset": {"type": "integer"}, "size": {"type": "integer"}, "type": {"enum": ["u32", "u64"]}}}},
+        "outcomes": {"type": "object", "additionalProperties": false, "required": ["INITIAL", "SUCCESS", "FAILURE"], "properties": {"INITIAL": {"const": 0}, "SUCCESS": {"const": 1}, "FAILURE": {"const": 2}}},
+        "failure_codes": {"type": "object", "additionalProperties": false, "required": ["NONE", "INVALID_CONTEXT_FORMAT", "INVALID_IDENTITY", "INVALID_LIFECYCLE", "INVALID_BINDING", "INVALID_RESERVED_STATE", "INVALID_TRANSACTION_ASSOCIATION", "INVALID_TRANSITION_COUNT", "TRANSITION_BUDGET_EXCEEDED", "INVALID_RETURN_STATE", "RESULT_COMMIT_FAILED", "CLEANUP_FAILED"], "properties": {"NONE": {"const": 0}, "INVALID_CONTEXT_FORMAT": {"const": 1}, "INVALID_IDENTITY": {"const": 2}, "INVALID_LIFECYCLE": {"const": 3}, "INVALID_BINDING": {"const": 4}, "INVALID_RESERVED_STATE": {"const": 5}, "INVALID_TRANSACTION_ASSOCIATION": {"const": 6}, "INVALID_TRANSITION_COUNT": {"const": 7}, "TRANSITION_BUDGET_EXCEEDED": {"const": 8}, "INVALID_RETURN_STATE": {"const": 9}, "RESULT_COMMIT_FAILED": {"const": 10}, "CLEANUP_FAILED": {"const": 11}}},
+        "initial_state": {"type": "object", "additionalProperties": false, "required": ["format_version", "structure_size", "outcome", "failure_code", "observed_transition_count", "terminal_lifecycle", "reserved_0"], "properties": {"format_version": {"const": 0}, "structure_size": {"const": 0}, "outcome": {"const": "INITIAL"}, "failure_code": {"const": "NONE"}, "observed_transition_count": {"const": 0}, "terminal_lifecycle": {"const": "UNINITIALIZED"}, "reserved_0": {"const": 0}}},
+        "authority_fields_forbidden": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": ".*\\S.*"}}
+      }
+    },
+    "result_lifetime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit_count", "survives_context_clear", "readers", "can_authorize_execution", "identity_retained", "reset_before_future_initialization", "history_supported"],
+      "properties": {
+        "commit_count": {"const": 1},
+        "survives_context_clear": {"const": true},
+        "readers": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": ".*\\S.*"}},
+        "can_authorize_execution": {"const": false},
+        "identity_retained": {"const": false},
+        "reset_before_future_initialization": {"const": true},
+        "history_supported": {"const": false}
+      }
+    },
+    "fixed_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["user_code", "user_data", "user_stack", "entry", "transaction"],
+      "properties": {
+        "user_code": {"type": "object", "additionalProperties": false, "required": ["virtual_start", "size_bytes", "permissions", "source_region"], "properties": {"virtual_start": {"type": "string"}, "size_bytes": {"type": "integer"}, "permissions": {"type": "string"}, "source_region": {"type": "string"}}},
+        "user_data": {"type": "object", "additionalProperties": false, "required": ["virtual_start", "size_bytes", "permissions", "source_region"], "properties": {"virtual_start": {"type": "string"}, "size_bytes": {"type": "integer"}, "permissions": {"type": "string"}, "source_region": {"type": "string"}}},
+        "user_stack": {"type": "object", "additionalProperties": false, "required": ["virtual_start", "size_bytes", "virtual_top", "initial_rsp", "permissions", "source_region"], "properties": {"virtual_start": {"type": "string"}, "size_bytes": {"type": "integer"}, "virtual_top": {"type": "string"}, "initial_rsp": {"type": "string"}, "permissions": {"type": "string"}, "source_region": {"type": "string"}}},
+        "entry": {"type": "object", "additionalProperties": false, "required": ["symbol", "virtual_address", "user_code_selector", "user_data_selector", "return_vector"], "properties": {"symbol": {"type": "string"}, "virtual_address": {"type": "string"}, "user_code_selector": {"type": "string"}, "user_data_selector": {"type": "string"}, "return_vector": {"type": "string"}}},
+        "transaction": {"type": "object", "additionalProperties": false, "required": ["request_identifier", "request_phase", "response_phase", "completed_phase", "phase_storage_symbol", "continuation_symbol"], "properties": {"request_identifier": {"type": "integer"}, "request_phase": {"type": "string"}, "response_phase": {"type": "string"}, "completed_phase": {"type": "string"}, "phase_storage_symbol": {"type": "string"}, "continuation_symbol": {"type": "string"}}}
+      }
+    },
+    "transition_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authorized_count", "initial_observed_count", "instruction", "derivation", "third_transition", "phase_and_count_both_required", "new_transition_type_created"],
+      "properties": {
+        "authorized_count": {"const": 2},
+        "initial_observed_count": {"const": 0},
+        "instruction": {"const": "int 0x81"},
+        "derivation": {"type": "array", "minItems": 2, "items": {"type": "object", "additionalProperties": false, "required": ["ordinal", "source_symbol", "return_symbol", "required_lifecycle", "required_phase_before", "required_count_before", "count_after_entry", "phase_after_handler"], "properties": {"ordinal": {"type": "integer"}, "source_symbol": {"type": "string"}, "return_symbol": {"type": "string"}, "required_lifecycle": {"type": "string"}, "required_phase_before": {"type": "string"}, "required_count_before": {"type": "integer"}, "count_after_entry": {"type": "integer"}, "phase_after_handler": {"type": "string"}}}},
+        "third_transition": {"const": "fail_closed_budget_exceeded"},
+        "phase_and_count_both_required": {"const": true},
+        "new_transition_type_created": {"const": false}
+      }
+    },
+    "runtime_progression": {"type": "object", "additionalProperties": false, "required": ["placement", "existing_odin_continuation_symbol", "implementation_authorized", "repeated_session"], "properties": {"placement": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": ".*\\S.*"}}, "existing_odin_continuation_symbol": {"const": "execute_runtime_status_boundaries"}, "implementation_authorized": {"const": false}, "repeated_session": {"const": false}}},
+    "evidence_policy": {"type": "object", "additionalProperties": false, "required": ["governance_validator", "future_runtime_validator", "registered_governed_check_now", "governed_check_count", "marker_count", "marker_change_required", "runtime_evidence_claimed", "required_build_hosts", "required_runtime_host"], "properties": {"governance_validator": {"const": "fixed_user_execution_context_contract"}, "future_runtime_validator": {"const": "fixed_user_execution_context_evidence"}, "registered_governed_check_now": {"const": false}, "governed_check_count": {"const": 67}, "marker_count": {"const": 41}, "marker_change_required": {"const": false}, "runtime_evidence_claimed": {"const": false}, "required_build_hosts": {"type": "array", "minItems": 1, "items": {"type": "string"}}, "required_runtime_host": {"const": "ubuntu-24.04"}}},
+    "claim_boundary": {"type": "object", "additionalProperties": false, "required": ["defines", "does_not_prove"], "properties": {"defines": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": ".*\\S.*"}}, "does_not_prove": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": ".*\\S.*"}}}},
+    "non_goals": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": ".*\\S.*"}}
+  }
+}

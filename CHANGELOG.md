@@ -1,5 +1,22 @@
 # Changelog
 
+## Fixed user execution context prerequisites - 2026-08-11
+
+**Status:** Governance defined; pending hosted acceptance. Runtime
+implementation, version change, and release remain unauthorized.
+
+* Adopted ADR 0018 with exclusive Ring 0 ownership of one fixed execution
+  context and a non-pointer, non-PID opaque identity.
+* Added an exact internal context/result contract and schema with a 128-byte
+  mutable context, a separate 32-byte bounded result, fixed bindings, explicit
+  lifecycle and cleanup edges, reserved-zero rules, and named failures.
+* Derived the transition budget of two from the accepted request and response
+  consumption returns and required both transaction phase and count to match.
+* Added a direct governance validator and focused tests without registering a
+  new runtime check or claiming runtime implementation.
+* Preserved 67 governed checks, all 41 markers, ADR 0017 host evidence,
+  release version 1.0.1, and immutable published releases.
+
 ## Next capability definition - 2026-08-11
 
 **Status:** Governance and planning after accepted Phase 0; not a product

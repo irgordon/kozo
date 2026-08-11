@@ -1,8 +1,8 @@
 {
-  "task_title": "KOZO Next Capability Selection and Phase Definition",
+  "task_title": "KOZO Fixed User Execution Context Governance Prerequisites",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
-  "plan_status": "complete",
+  "plan_status": "approved",
   "replan_number": 0,
   "approval": {
     "status": "approved"
@@ -69,7 +69,9 @@
     "release/version.txt remains 1.0.1 and no resource minimum is defined by this phase",
     "The selected next capability is one Fixed User Execution Context; its phase definition is complete while implementation, version change, and release remain unauthorized",
     "A context-ownership ADR and fixed execution-context contract/evidence changes must precede any separately authorized runtime implementation",
-    "The 41-marker taxonomy, current ABI, contracts, schemas, runtime behavior, and accepted host evidence remain unchanged by capability selection"
+    "The 41-marker taxonomy, current ABI, contracts, schemas, runtime behavior, and accepted host evidence remain unchanged by capability selection",
+    "ADR 0018 and the fixed execution-context contract define governance prerequisites only; implementation, version change, and release remain unauthorized",
+    "The direct context governance validator is not a registered runtime check, preserving the governed total of 67 until implementation evidence is separately authorized"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -3324,7 +3326,7 @@
         "verification.tests_run[161]",
         "verification.tests_run[162]"
       ],
-      "failure_count": 2
+      "failure_count": 3
     },
     {
       "id": 96,
@@ -3350,6 +3352,47 @@
         "verification.tests_run[163]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 97,
+      "title": "Define fixed user execution context governance prerequisites",
+      "status": "pending",
+      "kind": "edit",
+      "files_expected": [
+        "docs/adr/0018-fixed-user-execution-context-ownership.md",
+        "docs/FIXED_USER_EXECUTION_CONTEXT.md",
+        "docs/INVARIANTS.md",
+        "docs/ARCHITECTURE.md",
+        "docs/SECURITY_MODEL.md",
+        "docs/CONTRACTS.md",
+        "docs/VALIDATION.md",
+        "docs/ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "contracts/fixed_user_execution_context_contract.v0.json",
+        "contracts/runtime_progression_stages.v0.json",
+        "schemas/fixed_user_execution_context_contract.schema.json",
+        "schemas/latest_verify.schema.json",
+        "harness/fixed_user_execution_context_contract.py",
+        "harness/codes.py",
+        "harness/validators_impl/fixed_user_execution_context_contract.py",
+        "harness/validators_impl/schema.py",
+        "tests/test_fixed_user_execution_context_contract.py",
+        "tests/test_runtime_progression_stages.py",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "tasks/runtime.json",
+        "docs/generated/governance_index.md",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/boot_blocker_report.json",
+        "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.summary.txt",
+        "artifacts/runtime/runtime_smoke.metadata.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[164]"
+      ],
+      "failure_count": 3
     }
   ],
   "expected_outputs": [
@@ -3428,7 +3471,8 @@
     "The v1.0.1 patch-preparation boundary normalizes exact, appended .o, and accepted legacy .obj Odin output to one canonical caller path while failing closed on compiler failure, missing output, ambiguity, stale candidates, invalid output types, and unsafe provenance.",
     "v1.0.1 post-release observation revalidates immutable release assets and runtime evidence, reviews project-visible reports and workflows, records cross-host Odin evidence without overclaiming, and authorizes no later release or capability work.",
     "v1.1.0 Phase 0 governs and now validates host portability through pinned Linux, Windows, and macOS build contracts, keeps guest runtime evidence separate, defines no resource minimum, preserves v1.0.1, and leaves product capability work separately unauthorized.",
-    "The Fixed User Execution Context phase definition selects exactly one kernel-owned identity and lifecycle boundary, defines prerequisites and future evidence, and authorizes no implementation, version change, or release."
+    "The Fixed User Execution Context phase definition selects exactly one kernel-owned identity and lifecycle boundary, defines prerequisites and future evidence, and authorizes no implementation, version change, or release.",
+    "ADR 0018, one exact internal context/result contract, its schema, direct governance validator, focused tests, and progression authority define the prerequisites without changing runtime, markers, governed check count, version, or release state."
   ],
   "verification": {
     "tests_run": [
@@ -4251,6 +4295,11 @@
         "tool": "KOZO-TRIAGE-003 bounded release-input correction",
         "command": "committed-blob authority review; narrow Git LF attributes; worktree/blob and source/staged byte validation; focused release-input and cross-host comparison tests; required aggregate workflow gate; 1,136-test local and hosted validation; portability run 31458972010; CI run 31458972015; lint run 31458972013; downloaded host and runtime proof inspection",
         "status": "resolved_on_main_phase_0_accepted_linux_VALIDATED_RUNTIME_windows_macos_VALIDATED_BUILD_windows_macos_runtime_NOT_EXECUTED_three_license_path_size_sha256_records_identical_67_checks_0_failures_qemu_pass_41_markers_v1.0.2_unauthorized_v1.1.0_capability_work_unauthorized"
+      },
+      {
+        "tool": "Fixed User Execution Context governance prerequisites",
+        "command": "ADR and authority review; exact context/result contract and schema; lifecycle, clear-state, binding, transition-budget, progression, portability, and negative governance tests; full local and hosted validation",
+        "status": "local_pass_1183_tests_71_focused_context_and_progression_tests_67_checks_0_failures_qemu_pass_blocker_none_41_markers_hosted_pending_implementation_unauthorized"
       }
     ],
     "logs": [
@@ -4273,7 +4322,9 @@
       "Published v1.0.0, v1.0.0-rc.1, and v1.0.1 tags, notes, and assets remain immutable; later patch preparation requires a reproduced, in-scope defect that satisfies the complete authorization gate.",
       "A post-release observation record cannot authorize a version change, patch implementation, feature implementation, tag mutation, release mutation, or asset replacement.",
       "Per-host checksum round trips do not prove cross-host release-input determinism; supposedly identical tracked release inputs must have identical governed bytes and hashes before a host can satisfy the complete Phase 0 claim.",
-      "Committed HEAD blobs own governed release-input bytes; host checkouts and staged copies must match those blobs exactly, and the required aggregate gate must compare path, size, and SHA-256 across pinned hosts."
+      "Committed HEAD blobs own governed release-input bytes; host checkouts and staged copies must match those blobs exactly, and the required aggregate gate must compare path, size, and SHA-256 across pinned hosts.",
+      "One future fixed user execution context is Ring0-owned, non-public, non-process authority; its result is separately bounded and cannot reactivate cleared authority.",
+      "The accepted marker taxonomy remains 41 and the governed runtime check total remains 67 until a separately authorized implementation task changes runtime evidence policy."
     ],
     "expected_behavior": [
       "verify.sh succeeds on a clean tree and prints the generated artifact JSON before VERIFY: PASS",
@@ -4511,6 +4562,7 @@
     "Resolved KOZO-TRIAGE-002 across all three pinned hosted jobs, then preserved Phase 0 as blocked after downloaded evidence exposed KOZO-TRIAGE-003: Windows staged tracked license inputs with CRLF bytes and different hashes from Linux and macOS.",
     "Implemented the bounded KOZO-TRIAGE-003 correction with narrow LF checkout attributes, committed-blob and staged-byte validation, and a required cross-host path/size/SHA-256 gate.",
     "Accepted v1.1.0 Phase 0 after portability run 31458972010 passed all pinned host contracts and the aggregate release-input gate, CI run 31458972015 preserved 67 checks and the 41-marker QEMU path, and lint run 31458972013 passed; capability work remains separately unauthorized.",
-    "Selected one Fixed User Execution Context as the next capability, defined its ownership, lifecycle, failure, resource, portability, testing, evidence, and governance prerequisites, and left implementation and release unauthorized."
+    "Selected one Fixed User Execution Context as the next capability, defined its ownership, lifecycle, failure, resource, portability, testing, evidence, and governance prerequisites, and left implementation and release unauthorized.",
+    "Adopted ADR 0018 and defined one exact internal context/result contract with lifecycle, cleanup, fixed binding, two-transition budget, progression, portability, and evidence rules while leaving implementation, version change, and release unauthorized."
   ]
 }

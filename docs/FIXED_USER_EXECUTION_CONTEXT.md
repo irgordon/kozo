@@ -3,6 +3,7 @@
 Version: 1
 Status: Defined
 Implementation: Unauthorized
+Governance prerequisites: Defined, pending hosted acceptance
 Scope: Selection and boundary definition for one kernel-owned user execution context
 
 ---
@@ -122,7 +123,10 @@ The context owns only:
 * association with the accepted fixed transaction phase; and
 * reserved fields required to remain zero.
 
-Exact field geometry belongs to a future contract.
+Exact field geometry is governed by
+`contracts/fixed_user_execution_context_contract.v0.json`. A future runtime
+implementation must implement that geometry without exposing it as a public
+ABI.
 
 ## State Not Owned
 
@@ -414,19 +418,19 @@ does not authorize `v1.1.0`, any patch release, or publication.
 
 # 21. Prerequisites
 
-Before implementation changes architecture or security authority:
+The governance prerequisites are now defined:
 
-1. Adopt an ADR for fixed execution-context identity, ownership, lifecycle,
+1. ADR 0018 defines fixed execution-context identity, ownership, lifecycle,
    and its relationship to the existing transaction phase.
-2. Authorize a fixed execution-context contract, schema, validators, focused
-   tests, and ELF evidence.
-3. Update the runtime progression stage authority so the planned
-   `USERSPACE_PLANNING` boundary can name this capability without implying
-   general userspace execution.
+2. The fixed execution-context contract, schema, direct validator, and focused
+   tests define the internal governance boundary. Runtime and ELF evidence
+   remain implementation work.
+3. The runtime progression stage authority names the context contract without
+   implying general userspace execution.
 
 These are governance and evidence prerequisites, not independent product
-capabilities. They may be included at the start of one separately authorized
-implementation task, in governance-first order.
+capabilities. Hosted acceptance of this governance task must precede a
+separately authorized implementation task.
 
 No marker-taxonomy change, new external dependency, resource study, or prior
 runtime capability is required.
@@ -439,17 +443,17 @@ runtime capability is required.
 | --- | --- | --- |
 | `docs/ROADMAP.md` | Consistent | The selection advances the proven fixed user boundary without claiming deferred general userspace. |
 | `docs/PHASEMAP.md` | Consistent with prerequisite | The next planned stage is userspace planning; its contract authority must be updated before implementation. |
-| `docs/GOVERNANCE.md` | Consistent | This task changes planning state only and leaves higher authority unchanged. |
+| `docs/GOVERNANCE.md` | Consistent | This task adopts the required subordinate ADR, contract, and planning authority without changing higher authority. |
 | `docs/INVARIANTS.md` | Consistent | Fail-closed, security, portability, runtime, and release invariants remain intact. |
 | `docs/VALIDATION.md` | Consistent with prerequisite | Future behavior requires contract, source, ELF, negative, and runtime evidence. |
 | `docs/COMPATIBILITY.md` | Consistent | No general userspace, process, or host-runtime claim is added. |
-| `docs/ARCHITECTURE.md` | ADR required before implementation | A new runtime ownership record must be adopted before architecture text changes. |
-| `docs/SECURITY_MODEL.md` | ADR required before implementation | Explicit context identity and lifecycle add authority checks at the existing privilege boundary. |
+| `docs/ARCHITECTURE.md` | Consistent | ADR 0018 defines the future ownership record while the architecture text keeps implementation explicitly unauthorized. |
+| `docs/SECURITY_MODEL.md` | Consistent | ADR 0018 defines future identity and lifecycle checks without claiming a new implemented security boundary. |
 | ADR 0017 | Consistent | All three build hosts remain required and runtime evidence stays separate. |
 
-Governance-conflict classification: `ADR_REQUIRED` before implementation.
-The phase definition itself is not blocked because the ADR is not an
-independent product capability.
+Governance-conflict classification: `NO_CONFLICT`. ADR 0018 satisfies the
+ownership decision prerequisite; runtime implementation still requires
+separate authorization after hosted acceptance.
 
 ---
 
@@ -469,6 +473,38 @@ Release authorized: false.
 
 Current release: `v1.0.1`.
 
-Next action: a separate explicit implementation-authorization task using this
-definition as authority and completing the governance prerequisites before
-runtime mutation.
+Next action after hosted governance acceptance: a separate explicit
+implementation-authorization task using this definition, ADR 0018, and the
+fixed context contract as authority before runtime mutation.
+
+---
+
+# 24. Adopted Governance Prerequisites
+
+ADR 0018 adopts Ring 0 as the exclusive owner of one fixed execution context.
+`contracts/fixed_user_execution_context_contract.v0.json` now defines the
+exact 128-byte context, 32-byte non-authoritative result, lifecycle graph,
+clear representation, fixed bindings, two-transition budget, and planned
+placement around the existing transaction.
+
+The successful lifecycle is:
+
+```text
+UNINITIALIZED -> READY -> ACTIVE -> RETURNED -> CLEARED
+```
+
+Failures from `READY`, `ACTIVE`, or `RETURNED` must clear authority before any
+permitted continuation or terminal handling. Failures before `READY` must not
+create authority. The result is committed once, survives context clearing only
+long enough for validation and the unchanged continuation or terminal path,
+cannot authorize execution, and must be reset before any future lifecycle.
+
+The budget of two is derived from the accepted transaction: the request return
+enters Ring 0 in `REQUEST_PENDING`, and response consumption returns in
+`RESPONSE_READY`. The existing handler advances to `CONSUMED`; any third
+transition is an invariant violation. Both phase and count must match.
+
+The governance validator is intentionally direct and is not registered as a
+new governed runtime check. Runtime implementation evidence remains future
+work, so the accepted totals remain 67 checks and 41 markers. Implementation,
+version change, and release remain unauthorized.

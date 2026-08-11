@@ -282,3 +282,23 @@ The fixed transaction returns to Odin before capabilities 1 and 2 execute.
 The assembly halt loop remains the only terminal runtime state. The path adds
 no general dispatcher, public syscall ABI, arbitrary pointer, persistent
 userspace runtime, process model, or scheduler.
+
+# 17. Defined Fixed User Execution Context Boundary
+
+ADR 0018 defines, but does not implement, one future supervisor-owned context
+around the accepted one-shot Ring 3 transaction. The context binds the current
+fixed code, data, stack, entry, selectors, return vector, request identity, and
+transaction phase to one opaque non-pointer identity.
+
+The planned top-level path is context initialization and validation, `READY`,
+activation immediately before the existing Ring 3 entry, `ACTIVE`, both
+existing `int 0x81` returns, completed-transaction validation, `RETURNED`, one
+result commit, authority clearing, verified `CLEARED`, and the unchanged Odin
+continuation. The transition budget is two because those are the only two
+returns in the accepted transaction.
+
+The context and its result are separate internal kernel records. The context
+owns mutable execution authority; the result records bounded outcome evidence
+without identity or reusable authority. This boundary is not present in the
+runtime yet and does not create a process, scheduler entity, public ABI,
+repeated session, or hostile-code containment boundary.

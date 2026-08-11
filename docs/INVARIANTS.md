@@ -636,3 +636,30 @@ The 88-byte response has fixed identity and geometry, reports no planned stage
 as proven, sets only seven documented feature bits, and keeps every reserved
 field zero. All transaction buffers and the snapshot must be cleared before
 later runtime success. Failure suppresses later markers and converges on halt.
+
+# 21. Fixed User Execution Context Governance Invariants
+
+Future implementation may create exactly one fixed, statically allocated,
+supervisor RW-NX execution context. Ring 0 alone creates its nonzero opaque
+identity, validates fixed bindings, changes lifecycle state, counts the two
+existing `int 0x81` returns, commits one result, and clears authority. The
+identity is neither a pointer nor a PID, and user mode cannot select or mutate
+it.
+
+The only successful lifecycle is `UNINITIALIZED -> READY -> ACTIVE ->
+RETURNED -> CLEARED`. Failures from any live state must converge on `CLEARED`;
+failure before `READY` must establish no authority. The clear representation
+retains only context format version `1`, structure size `128`, and lifecycle
+`CLEARED`; identity, bindings, transition state, and reserved fields must read
+back as zero before normal continuation.
+
+The separate 32-byte lifecycle result is non-authoritative. It may preserve a
+terminal outcome, named failure, observed count, and terminal lifecycle only
+for bounded validation and continuation. It contains no identity, pointer,
+selector, mapping, or reusable handle and must be reset before any future
+initialization.
+
+These are governance prerequisites, not implemented runtime claims. They do
+not authorize markers, a new interrupt or syscall, repeated sessions,
+processes, scheduling, dynamic memory, a public ABI, or hostile-code
+containment. Runtime implementation requires separate authorization.

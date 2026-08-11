@@ -211,23 +211,26 @@
     {
       "stage_id": 7,
       "stage_name": "USERSPACE_PLANNING",
-      "description": "Future planning stage for userspace boundaries after governed runtime capability evidence exists.",
+      "description": "Governance-defined planning boundary for one fixed supervisor-owned user execution context around the accepted one-shot Ring3 transaction; runtime implementation remains unauthorized.",
       "status": "planned",
       "required_prerequisites": [
         "FIRST_GOVERNED_RUNTIME_CAPABILITY"
       ],
       "required_evidence": [
-        "userspace planning evidence"
+        "userspace planning evidence",
+        "fixed user execution context governance prerequisites"
       ],
       "required_contracts": [
-        "planned:userspace_planning_contract"
+        "contracts/fixed_user_execution_context_contract.v0.json"
       ],
       "required_validators": [
-        "planned:userspace_planning"
+        "planned:fixed_user_execution_context_evidence"
       ],
       "allowed_next_stages": [],
       "forbidden_shortcuts": [
-        "USERSPACE_PLANNING to userspace execution without separate implementation evidence"
+        "USERSPACE_PLANNING to userspace execution without separate implementation evidence",
+        "USERSPACE_PLANNING to repeated user sessions",
+        "USERSPACE_PLANNING to process or scheduler behavior"
       ]
     }
   ],
@@ -265,7 +268,7 @@
     {
       "from_stage": "FIRST_GOVERNED_RUNTIME_CAPABILITY",
       "to_stage": "USERSPACE_PLANNING",
-      "owner_contract": "planned:userspace_planning_contract"
+      "owner_contract": "contracts/fixed_user_execution_context_contract.v0.json"
     }
   ],
   "transition_requirements": [

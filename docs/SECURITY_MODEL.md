@@ -250,3 +250,20 @@ The service reports only already proven runtime facts from one kernel-owned
 post-loop snapshot. It is not a public syscall ABI, authorization boundary,
 general status API, persistent user session, process boundary, sandbox, or
 hostile-code safety proof.
+
+# 20. Fixed User Execution Context Governance Boundary
+
+ADR 0018 assigns future context authority exclusively to Ring 0. User mode
+cannot create, select, mutate, or clear the identity, lifecycle, mappings,
+entry address, stack, selectors, return vector, transition budget, transition
+count, transaction phase, service identity, return target, or cleanup state.
+The identity is an opaque value, not a kernel pointer or PID.
+
+Cleanup removes execution authority. The clear check must prove that identity,
+bindings, transition state, and reserved fields are zero while lifecycle is
+`CLEARED`. Failure evidence survives in a separate bounded result that cannot
+reactivate the context or authorize later execution.
+
+This policy is not implemented by this governance phase. It does not create a
+public syscall or API, process isolation, repeated sessions, exception
+recovery, or containment for arbitrary hostile user code.

@@ -1,0 +1,281 @@
+{
+  "version": 0,
+  "architecture": "x86_64",
+  "status": "governance_defined_implementation_unauthorized",
+  "authoritative_sources": {
+    "decision": "docs/adr/0018-fixed-user-execution-context-ownership.md",
+    "phase_definition": "docs/FIXED_USER_EXECUTION_CONTEXT.md",
+    "mapping": "contracts/fixed_user_mapping_foundation.v0.json",
+    "privilege_transition": "contracts/bounded_privilege_transition_probe_contract.v0.json",
+    "request_boundary": "contracts/fixed_user_request_boundary_contract.v0.json",
+    "response_consumption": "contracts/bounded_user_response_consumption_contract.v0.json",
+    "status_service": "contracts/fixed_user_runtime_status_service_contract.v0.json",
+    "runtime_progression": "contracts/runtime_progression_stages.v0.json"
+  },
+  "authority": {
+    "owner": "ring0",
+    "context_count": 1,
+    "allocation": "fixed_static",
+    "user_accessible": false,
+    "user_selectable_identity": false,
+    "user_mutable_authority": false,
+    "public_abi": false,
+    "implementation_authorized": false
+  },
+  "context": {
+    "name": "Fixed_User_Execution_Context",
+    "format_version": 1,
+    "size_bytes": 128,
+    "alignment_bytes": 16,
+    "storage_policy": "supervisor_rw_nx_static",
+    "fields": [
+      {"name": "format_version", "offset": 0, "size": 4, "type": "u32", "authority": "structural", "allowed": "zero only while UNINITIALIZED, otherwise 1", "invalid": "any other value", "initial": 0, "mutation": "set once before READY and retain", "cleared": 1, "evidence": "identifies the governed internal format"},
+      {"name": "structure_size", "offset": 4, "size": 4, "type": "u32", "authority": "structural", "allowed": "zero only while UNINITIALIZED, otherwise 128", "invalid": "any other value", "initial": 0, "mutation": "set once before READY and retain", "cleared": 128, "evidence": "proves exact context geometry"},
+      {"name": "opaque_identity", "offset": 8, "size": 8, "type": "u64", "authority": "ring0_execution", "allowed": "nonzero only in READY, ACTIVE, or RETURNED", "invalid": "zero while authority is live, pointer-derived, PID, or user-selected", "initial": 0, "mutation": "kernel assigns once before READY", "cleared": 0, "evidence": "correlates one bounded lifecycle without exposing an address"},
+      {"name": "lifecycle", "offset": 16, "size": 4, "type": "u32", "authority": "ring0_execution", "allowed": "one declared lifecycle encoding", "invalid": "unknown, skipped, backward, or reused state", "initial": 0, "mutation": "only through the legal transition graph", "cleared": 4, "evidence": "proves lifecycle position"},
+      {"name": "reserved_0", "offset": 20, "size": 4, "type": "u32", "authority": "reserved", "allowed": "zero", "invalid": "nonzero", "initial": 0, "mutation": "never", "cleared": 0, "evidence": "proves reserved-zero policy"},
+      {"name": "user_code_start", "offset": 24, "size": 8, "type": "u64", "authority": "fixed_binding", "allowed": "accepted fixed user-code virtual start while authority is live", "invalid": "any user-selected or different address", "initial": 0, "mutation": "set before READY and immutable while live", "cleared": 0, "evidence": "binds fixed RX code"},
+      {"name": "user_code_size", "offset": 32, "size": 8, "type": "u64", "authority": "fixed_binding", "allowed": "accepted fixed user-code size while authority is live", "invalid": "zero or different size while live", "initial": 0, "mutation": "set before READY and immutable while live", "cleared": 0, "evidence": "bounds fixed RX code"},
+      {"name": "user_data_start", "offset": 40, "size": 8, "type": "u64", "authority": "fixed_binding", "allowed": "accepted fixed user-data virtual start while authority is live", "invalid": "any user-selected or different address", "initial": 0, "mutation": "set before READY and immutable while live", "cleared": 0, "evidence": "binds fixed RW-NX data"},
+      {"name": "user_data_size", "offset": 48, "size": 8, "type": "u64", "authority": "fixed_binding", "allowed": "accepted fixed user-data size while authority is live", "invalid": "zero or different size while live", "initial": 0, "mutation": "set before READY and immutable while live", "cleared": 0, "evidence": "bounds fixed RW-NX data"},
+      {"name": "user_stack_start", "offset": 56, "size": 8, "type": "u64", "authority": "fixed_binding", "allowed": "accepted fixed user-stack virtual start while authority is live", "invalid": "any user-selected or different address", "initial": 0, "mutation": "set before READY and immutable while live", "cleared": 0, "evidence": "binds fixed RW-NX stack"},
+      {"name": "user_stack_size", "offset": 64, "size": 8, "type": "u64", "authority": "fixed_binding", "allowed": "accepted fixed user-stack size while authority is live", "invalid": "zero or different size while live", "initial": 0, "mutation": "set before READY and immutable while live", "cleared": 0, "evidence": "bounds fixed RW-NX stack"},
+      {"name": "user_stack_top", "offset": 72, "size": 8, "type": "u64", "authority": "fixed_binding", "allowed": "accepted fixed user-stack top while authority is live", "invalid": "any user-selected or different address", "initial": 0, "mutation": "set before READY and immutable while live", "cleared": 0, "evidence": "bounds fixed stack geometry"},
+      {"name": "entry_rip", "offset": 80, "size": 8, "type": "u64", "authority": "fixed_binding", "allowed": "accepted fixed Ring3 entry while authority is live", "invalid": "any user-selected or different entry", "initial": 0, "mutation": "set before READY and immutable while live", "cleared": 0, "evidence": "binds fixed entry policy"},
+      {"name": "initial_rsp", "offset": 88, "size": 8, "type": "u64", "authority": "fixed_binding", "allowed": "accepted fixed Ring3 RSP while authority is live", "invalid": "any user-selected or different stack pointer", "initial": 0, "mutation": "set before READY and immutable while live", "cleared": 0, "evidence": "binds fixed stack-entry policy"},
+      {"name": "user_code_selector", "offset": 96, "size": 4, "type": "u32", "authority": "fixed_binding", "allowed": "accepted user-code selector while authority is live", "invalid": "any other selector", "initial": 0, "mutation": "set before READY and immutable while live", "cleared": 0, "evidence": "binds accepted GDT policy"},
+      {"name": "user_data_selector", "offset": 100, "size": 4, "type": "u32", "authority": "fixed_binding", "allowed": "accepted user-data selector while authority is live", "invalid": "any other selector", "initial": 0, "mutation": "set before READY and immutable while live", "cleared": 0, "evidence": "binds accepted GDT policy"},
+      {"name": "return_vector", "offset": 104, "size": 4, "type": "u32", "authority": "fixed_binding", "allowed": "accepted int 0x81 vector while authority is live", "invalid": "any other vector", "initial": 0, "mutation": "set before READY and immutable while live", "cleared": 0, "evidence": "binds accepted return gate"},
+      {"name": "authorized_transition_budget", "offset": 108, "size": 4, "type": "u32", "authority": "ring0_execution", "allowed": "2 while authority is live", "invalid": "any other value while live", "initial": 0, "mutation": "set before READY and never increased", "cleared": 0, "evidence": "bounds existing user-to-kernel returns"},
+      {"name": "observed_transition_count", "offset": 112, "size": 4, "type": "u32", "authority": "ring0_execution", "allowed": "0 through 2 with matching transaction phase", "invalid": "greater than budget or phase mismatch", "initial": 0, "mutation": "Ring0 increments once for each authorized int 0x81 entry", "cleared": 0, "evidence": "records bounded transition use"},
+      {"name": "transaction_phase", "offset": 116, "size": 4, "type": "u32", "authority": "ring0_execution", "allowed": "accepted REQUEST_PENDING, RESPONSE_READY, or CONSUMED with matching count", "invalid": "unknown or count-inconsistent phase", "initial": 0, "mutation": "existing Ring0 transaction handlers only", "cleared": 0, "evidence": "associates count with existing transaction authority"},
+      {"name": "request_identifier", "offset": 120, "size": 4, "type": "u32", "authority": "fixed_binding", "allowed": "accepted fixed runtime-status request identifier while authority is live", "invalid": "any other or user-selected identifier", "initial": 0, "mutation": "set before READY and immutable while live", "cleared": 0, "evidence": "binds the existing fixed service transaction"},
+      {"name": "reserved_1", "offset": 124, "size": 4, "type": "u32", "authority": "reserved", "allowed": "zero", "invalid": "nonzero", "initial": 0, "mutation": "never", "cleared": 0, "evidence": "proves reserved-zero policy"}
+    ]
+  },
+  "lifecycle": {
+    "encodings": {
+      "UNINITIALIZED": 0,
+      "READY": 1,
+      "ACTIVE": 2,
+      "RETURNED": 3,
+      "CLEARED": 4
+    },
+    "successful_transitions": [
+      {"from": "UNINITIALIZED", "to": "READY"},
+      {"from": "READY", "to": "ACTIVE"},
+      {"from": "ACTIVE", "to": "RETURNED"},
+      {"from": "RETURNED", "to": "CLEARED"}
+    ],
+    "failure_cleanup_transitions": [
+      {"from": "READY", "to": "CLEARED"},
+      {"from": "ACTIVE", "to": "CLEARED"},
+      {"from": "RETURNED", "to": "CLEARED"}
+    ],
+    "forbidden_transitions": [
+      {"from": "UNINITIALIZED", "to": "ACTIVE"},
+      {"from": "UNINITIALIZED", "to": "RETURNED"},
+      {"from": "READY", "to": "RETURNED"},
+      {"from": "ACTIVE", "to": "READY"},
+      {"from": "RETURNED", "to": "ACTIVE"},
+      {"from": "CLEARED", "to": "ACTIVE"},
+      {"from": "CLEARED", "to": "READY"}
+    ],
+    "pre_ready_failure": "remain_UNINITIALIZED_commit_failure_result_and_do_not_enter_ring3",
+    "active_scope": "complete_existing_two_transition_transaction",
+    "reuse_allowed": false
+  },
+  "clear_state": {
+    "lifecycle": "CLEARED",
+    "retained_structural_fields": {
+      "format_version": 1,
+      "structure_size": 128
+    },
+    "zeroized_fields": [
+      "opaque_identity",
+      "reserved_0",
+      "user_code_start",
+      "user_code_size",
+      "user_data_start",
+      "user_data_size",
+      "user_stack_start",
+      "user_stack_size",
+      "user_stack_top",
+      "entry_rip",
+      "initial_rsp",
+      "user_code_selector",
+      "user_data_selector",
+      "return_vector",
+      "authorized_transition_budget",
+      "observed_transition_count",
+      "transaction_phase",
+      "request_identifier",
+      "reserved_1"
+    ],
+    "zero_readback_required": true,
+    "lifecycle_readback_required": true,
+    "identity_loses_authority_at_zero": true,
+    "bindings_lose_authority_at_zero": true,
+    "normal_continuation_requires_valid_clear_state": true
+  },
+  "result": {
+    "name": "Fixed_User_Execution_Context_Result",
+    "format_version": 1,
+    "size_bytes": 32,
+    "alignment_bytes": 8,
+    "storage_policy": "supervisor_rw_nx_static_non_authoritative",
+    "fields": [
+      {"name": "format_version", "offset": 0, "size": 4, "type": "u32"},
+      {"name": "structure_size", "offset": 4, "size": 4, "type": "u32"},
+      {"name": "outcome", "offset": 8, "size": 4, "type": "u32"},
+      {"name": "failure_code", "offset": 12, "size": 4, "type": "u32"},
+      {"name": "observed_transition_count", "offset": 16, "size": 4, "type": "u32"},
+      {"name": "terminal_lifecycle", "offset": 20, "size": 4, "type": "u32"},
+      {"name": "reserved_0", "offset": 24, "size": 8, "type": "u64"}
+    ],
+    "outcomes": {
+      "INITIAL": 0,
+      "SUCCESS": 1,
+      "FAILURE": 2
+    },
+    "failure_codes": {
+      "NONE": 0,
+      "INVALID_CONTEXT_FORMAT": 1,
+      "INVALID_IDENTITY": 2,
+      "INVALID_LIFECYCLE": 3,
+      "INVALID_BINDING": 4,
+      "INVALID_RESERVED_STATE": 5,
+      "INVALID_TRANSACTION_ASSOCIATION": 6,
+      "INVALID_TRANSITION_COUNT": 7,
+      "TRANSITION_BUDGET_EXCEEDED": 8,
+      "INVALID_RETURN_STATE": 9,
+      "RESULT_COMMIT_FAILED": 10,
+      "CLEANUP_FAILED": 11
+    },
+    "initial_state": {
+      "format_version": 0,
+      "structure_size": 0,
+      "outcome": "INITIAL",
+      "failure_code": "NONE",
+      "observed_transition_count": 0,
+      "terminal_lifecycle": "UNINITIALIZED",
+      "reserved_0": 0
+    },
+    "authority_fields_forbidden": [
+      "opaque_identity",
+      "kernel_pointer",
+      "user_pointer",
+      "selector",
+      "mapping",
+      "reusable_handle"
+    ]
+  },
+  "result_lifetime": {
+    "commit_count": 1,
+    "survives_context_clear": true,
+    "readers": [
+      "lifecycle_validator",
+      "governed_evidence",
+      "existing_odin_continuation_or_terminal_failure_handler"
+    ],
+    "can_authorize_execution": false,
+    "identity_retained": false,
+    "reset_before_future_initialization": true,
+    "history_supported": false
+  },
+  "fixed_bindings": {
+    "user_code": {"virtual_start": "0x0000400000000000", "size_bytes": 4096, "permissions": "user_rx", "source_region": "user_probe_code"},
+    "user_data": {"virtual_start": "0x0000400000001000", "size_bytes": 4096, "permissions": "user_rw_nx", "source_region": "user_probe_data"},
+    "user_stack": {"virtual_start": "0x0000400000002000", "size_bytes": 4096, "virtual_top": "0x0000400000003000", "initial_rsp": "0x0000400000002ff0", "permissions": "user_rw_nx", "source_region": "user_probe_stack"},
+    "entry": {"symbol": "user_privilege_probe_start", "virtual_address": "0x0000400000000000", "user_code_selector": "0x23", "user_data_selector": "0x1b", "return_vector": "0x81"},
+    "transaction": {"request_identifier": 2, "request_phase": "REQUEST_PENDING", "response_phase": "RESPONSE_READY", "completed_phase": "CONSUMED", "phase_storage_symbol": "fixed_user_transaction_phase", "continuation_symbol": "privilege_ring0_continuation"}
+  },
+  "transition_budget": {
+    "authorized_count": 2,
+    "initial_observed_count": 0,
+    "instruction": "int 0x81",
+    "derivation": [
+      {"ordinal": 1, "source_symbol": "user_privilege_probe_start", "return_symbol": "user_privilege_probe_after_interrupt", "required_lifecycle": "ACTIVE", "required_phase_before": "REQUEST_PENDING", "required_count_before": 0, "count_after_entry": 1, "phase_after_handler": "RESPONSE_READY"},
+      {"ordinal": 2, "source_symbol": "user_response_consumer_start", "return_symbol": "user_response_consumer_interrupt_return", "required_lifecycle": "ACTIVE", "required_phase_before": "RESPONSE_READY", "required_count_before": 1, "count_after_entry": 2, "phase_after_handler": "CONSUMED"}
+    ],
+    "third_transition": "fail_closed_budget_exceeded",
+    "phase_and_count_both_required": true,
+    "new_transition_type_created": false
+  },
+  "runtime_progression": {
+    "placement": [
+      "KOZO_RUNTIME_LOOP_EXIT_OK",
+      "initialize_fixed_user_execution_context",
+      "validate_ready_context",
+      "READY",
+      "activate_before_existing_ring3_entry",
+      "ACTIVE",
+      "existing_request_pending_int_0x81",
+      "existing_request_service_response",
+      "existing_response_ready_ring3_resume",
+      "existing_response_consumption_int_0x81",
+      "validate_consumed_transaction",
+      "RETURNED",
+      "commit_lifecycle_result",
+      "clear_context_authority",
+      "validate_CLEARED",
+      "KOZO_RING0_RETURN_OK",
+      "existing_internal_capability_continuation"
+    ],
+    "existing_odin_continuation_symbol": "execute_runtime_status_boundaries",
+    "implementation_authorized": false,
+    "repeated_session": false
+  },
+  "evidence_policy": {
+    "governance_validator": "fixed_user_execution_context_contract",
+    "future_runtime_validator": "fixed_user_execution_context_evidence",
+    "registered_governed_check_now": false,
+    "governed_check_count": 67,
+    "marker_count": 41,
+    "marker_change_required": false,
+    "runtime_evidence_claimed": false,
+    "required_build_hosts": ["ubuntu-24.04", "windows-2025", "macos-15"],
+    "required_runtime_host": "ubuntu-24.04"
+  },
+  "claim_boundary": {
+    "defines": [
+      "one supervisor-owned fixed context geometry",
+      "one opaque non-pointer non-PID identity",
+      "one legal lifecycle and fail-closed cleanup graph",
+      "one separate bounded non-authoritative result",
+      "two transitions derived from the accepted transaction",
+      "future progression placement around the existing transaction"
+    ],
+    "does_not_prove": [
+      "runtime implementation",
+      "repeated user sessions",
+      "process isolation",
+      "hostile user-code containment",
+      "public userspace ABI",
+      "production readiness"
+    ]
+  },
+  "non_goals": [
+    "runtime implementation",
+    "multiple contexts",
+    "PID allocation",
+    "repeated user sessions",
+    "process model",
+    "scheduler",
+    "timer subsystem",
+    "frame allocator",
+    "executable loader",
+    "dynamic virtual memory",
+    "public syscall ABI",
+    "general userspace",
+    "filesystem",
+    "drivers",
+    "networking",
+    "hostile-code containment",
+    "Windows runtime validation",
+    "macOS runtime validation",
+    "version change",
+    "release preparation",
+    "production readiness"
+  ]
+}

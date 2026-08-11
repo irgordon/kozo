@@ -65,6 +65,7 @@ BOUNDED_USER_RESPONSE_CONSUMPTION_CONTRACT_INVALID = "BOUNDED_USER_RESPONSE_CONS
 BOUNDED_USER_RESPONSE_CONSUMPTION_EVIDENCE_INVALID = "BOUNDED_USER_RESPONSE_CONSUMPTION_EVIDENCE_INVALID"
 FIXED_USER_RUNTIME_STATUS_SERVICE_CONTRACT_INVALID = "FIXED_USER_RUNTIME_STATUS_SERVICE_CONTRACT_INVALID"
 FIXED_USER_RUNTIME_STATUS_SERVICE_EVIDENCE_INVALID = "FIXED_USER_RUNTIME_STATUS_SERVICE_EVIDENCE_INVALID"
+FIXED_USER_EXECUTION_CONTEXT_CONTRACT_INVALID = "FIXED_USER_EXECUTION_CONTEXT_CONTRACT_INVALID"
 RUNTIME_STATE_TRANSITION_CAPABILITY_INVALID = "RUNTIME_STATE_TRANSITION_CAPABILITY_INVALID"
 RUNTIME_STATE_TRANSITION_CAPABILITY_EVIDENCE_INVALID = "RUNTIME_STATE_TRANSITION_CAPABILITY_EVIDENCE_INVALID"
 BOOT_BLOCKER_REPORT_INVALID = "BOOT_BLOCKER_REPORT_INVALID"
@@ -145,6 +146,7 @@ CODES = MappingProxyType(
         BOUNDED_USER_RESPONSE_CONSUMPTION_EVIDENCE_INVALID: "Bounded user response consumption evidence is missing, malformed, or inconsistent with source, ELF, QEMU, response, record, or halt evidence",
         FIXED_USER_RUNTIME_STATUS_SERVICE_CONTRACT_INVALID: "Fixed user runtime status service contract is missing, malformed, or inconsistent with post-loop ordering or shared status ownership",
         FIXED_USER_RUNTIME_STATUS_SERVICE_EVIDENCE_INVALID: "Fixed user runtime status service evidence is missing, malformed, or inconsistent with source, ELF, QEMU, response, cleanup, or halt evidence",
+        FIXED_USER_EXECUTION_CONTEXT_CONTRACT_INVALID: "Fixed user execution context governance contract is missing, malformed, or inconsistent with its ownership, lifecycle, result, transition, or progression authority",
         RUNTIME_STATE_TRANSITION_CAPABILITY_INVALID: "Runtime state transition capability contract is missing, malformed, or inconsistent with its bounded READY/0 to ACTIVE/1 boundary",
         RUNTIME_STATE_TRANSITION_CAPABILITY_EVIDENCE_INVALID: "Runtime state transition capability evidence is missing, malformed, or inconsistent with source, ELF, QEMU, first-capability, or halt state",
         BOOT_BLOCKER_REPORT_INVALID: "Boot blocker report is missing, malformed, or inconsistent with boot baseline policy",
