@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260811T084936Z",
+  "run_id": "verify-20260811T091557Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -495,28 +495,12 @@
   "changed_files": [
     "CHANGELOG.md",
     "artifacts/runtime/qemu_smoke.summary.txt",
-    "contracts/fixed_user_execution_context_contract.v0.json",
-    "contracts/runtime_progression_stages.v0.json",
-    "docs/ARCHITECTURE.md",
-    "docs/CONTRACTS.md",
     "docs/FIXED_USER_EXECUTION_CONTEXT.md",
-    "docs/INVARIANTS.md",
     "docs/PHASEMAP.md",
     "docs/ROADMAP.md",
-    "docs/SECURITY_MODEL.md",
-    "docs/VALIDATION.md",
-    "docs/adr/0018-fixed-user-execution-context-ownership.md",
     "docs/generated/governance_index.md",
-    "harness/codes.py",
-    "harness/fixed_user_execution_context_contract.py",
-    "harness/validators_impl/fixed_user_execution_context_contract.py",
-    "harness/validators_impl/schema.py",
-    "schemas/fixed_user_execution_context_contract.schema.json",
-    "schemas/latest_verify.schema.json",
     "tasks/runtime.json",
-    "tasks/todo.json",
-    "tests/test_fixed_user_execution_context_contract.py",
-    "tests/test_runtime_progression_stages.py"
+    "tasks/todo.json"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -533,5 +517,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-08-11T08:49:36Z"
+  "generated_at": "2026-08-11T09:15:57Z"
 }
