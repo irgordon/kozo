@@ -94,4 +94,3 @@ def _transition_phase_pairs(
     for transition in contract.transition_budget["derivation"]:
         pairs.add((transition["phase_after_handler"], transition["count_after_entry"]))
     return frozenset(pairs)
-

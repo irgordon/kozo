@@ -129,4 +129,3 @@ A future implementation validator requires separate authorization.
 ## Superseded Decisions
 
 None.
-
