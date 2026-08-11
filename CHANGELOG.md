@@ -1,5 +1,22 @@
 # Changelog
 
+## Next capability definition - 2026-08-11
+
+**Status:** Governance and planning after accepted Phase 0; not a product
+release and not implementation authorization.
+
+* Selected one Fixed User Execution Context as KOZO's next capability
+  boundary.
+* Defined one supervisor-only opaque identity and lifecycle around the
+  accepted fixed mappings, Ring 3 transaction, and Ring 0 return.
+* Deferred repeated sessions, processes, scheduling, dynamic memory, timers,
+  loaders, general syscalls, and compatibility expansion.
+* Required a context-ownership ADR and contract/evidence updates before any
+  separately authorized implementation changes runtime state.
+* Preserved release version 1.0.1, all 41 runtime markers, Phase 0 host
+  evidence, and every immutable published release.
+* Authorized no implementation, version change, or release.
+
 ## v1.1.0 Phase 0 - Cross-host portability matrix - 2026-08-08
 
 **Status:** Repository governance and validation work after v1.0.1; not a new product release. Phase 0 is accepted, and `KOZO-TRIAGE-002` plus `KOZO-TRIAGE-003` are resolved on `main`.

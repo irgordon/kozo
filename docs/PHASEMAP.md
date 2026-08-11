@@ -183,7 +183,11 @@ Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr
 The `v1.0.0-rc.1`, `v1.0.0`, post-publication documentation, v1.0.1 patch, and
 v1.0.1 observation phases are complete. `KOZO-TRIAGE-002` and
 `KOZO-TRIAGE-003` are resolved on `main`, and v1.1.0 Phase 0 is accepted.
-Product capability work still requires separate authorization.
+The next selected capability is one Fixed User Execution Context. Its phase
+definition is complete in `docs/FIXED_USER_EXECUTION_CONTEXT.md`, but
+implementation remains unauthorized. The required context-ownership ADR and
+contract/evidence updates must precede runtime mutation under a separate
+explicit task. Product version and release authorization remain unchanged.
 All published tags and hosted assets remain immutable.
 
 ---
@@ -254,6 +258,7 @@ All published tags and hosted assets remain immutable.
 | `v1.0.1` | Cross-host Odin object normalization patch | Publish the accepted build-tooling correction without changing runtime behavior. | Canonical object-output normalization, focused regressions, scoped release notes and evidence, exact commit-bound bundle, annotated tag, six verified assets. | Local and hosted gates pass at the tagged commit; hosted assets match the approved bundle; KOZO-TRIAGE-001 is resolved; v1.0.0 and v1.0.0-rc.1 remain immutable. |
 | `v1.0.1 observation` | Post-release observation and issue triage | Revalidate release integrity, review project-visible defects and workflows, observe Odin output behavior, and decide whether another patch is justified. | Observation report, immutable asset and ISO checks, issue and Actions inventory, cross-host Odin evidence, task-state closure. | No qualifying defect is reproduced; v1.0.2 remains unauthorized; v1.1.0 remains unstarted; published release records remain immutable. |
 | `v1.1.0 Phase 0` | GitHub Actions Cross-Host Portability Matrix | Govern host portability separately from guest runtime and resource scaling before capability work starts. | ADR 0017, portability invariant, pinned Linux/Windows/macOS build matrix, Linux runtime gate, focused object normalization regression, host evidence artifacts, compatibility and release-evidence policy. | Required Linux, Windows, and macOS build contracts pass; Linux runtime remains 67/0 with QEMU pass and 41 markers; unsupported runtime cells remain explicit; no product version or runtime behavior changes. |
+| `post-Phase-0 definition` | Fixed User Execution Context | Select and bound one kernel-owned identity and lifecycle for the accepted fixed Ring 3 transaction. | `docs/FIXED_USER_EXECUTION_CONTEXT.md`, candidate comparison, capability boundary, invariants, failure/resource/portability/testing models, prerequisite and authorization decisions. | One capability is defined; Phase 0 remains accepted; runtime, contracts, schemas, markers, and version remain unchanged; implementation remains unauthorized. |
 
 ---
 

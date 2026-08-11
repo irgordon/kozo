@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO v1.1.0 Phase 0 - GitHub Actions Cross-Host Portability Matrix",
+  "task_title": "KOZO Next Capability Selection and Phase Definition",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -36,7 +36,8 @@
     "Annotated v1.0.1 tag object 7896c767376a666ad7f7d8f294beadb473b0290c targets the accepted release commit and its six hosted assets are independently verified",
     "Post-publication CI run 31226436612 and lint run 31226436655 accepted main commit 71cbd8651747c9088f426de20f111e49b5d2d8ee",
     "v1.1.0 Phase 0 starts from clean synchronized main at f472472fb7a41b14c80df3e17fad48e783d5e749",
-    "The published v1.0.1 tag object 7896c767376a666ad7f7d8f294beadb473b0290c and historical release records remain immutable"
+    "The published v1.0.1 tag object 7896c767376a666ad7f7d8f294beadb473b0290c and historical release records remain immutable",
+    "v1.1.0 Phase 0 host portability is accepted on main at a05900e04301d5b1e7a58c25e2970a87c3583673 with Linux VALIDATED_RUNTIME and Windows/macOS VALIDATED_BUILD"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
@@ -65,7 +66,10 @@
     "Post-release observation may record evidence and classify reports, but it may not implement a fix or advance release/version.txt",
     "Host portability, guest portability, and resource scaling are separate evidence classes",
     "v1.1.0 Phase 0 changes governance and hosted validation only; product capability work remains unauthorized until hosted acceptance",
-    "release/version.txt remains 1.0.1 and no resource minimum is defined by this phase"
+    "release/version.txt remains 1.0.1 and no resource minimum is defined by this phase",
+    "The selected next capability is one Fixed User Execution Context; its phase definition is complete while implementation, version change, and release remain unauthorized",
+    "A context-ownership ADR and fixed execution-context contract/evidence changes must precede any separately authorized runtime implementation",
+    "The 41-marker taxonomy, current ABI, contracts, schemas, runtime behavior, and accepted host evidence remain unchanged by capability selection"
   ],
   "file_scope": [
     ".codex/AGENTS.md",
@@ -3321,6 +3325,31 @@
         "verification.tests_run[162]"
       ],
       "failure_count": 2
+    },
+    {
+      "id": 96,
+      "title": "Define the next fixed user execution context capability",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "docs/FIXED_USER_EXECUTION_CONTEXT.md",
+        "docs/ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "tasks/runtime.json",
+        "docs/generated/governance_index.md",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/boot_blocker_report.json",
+        "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.summary.txt",
+        "artifacts/runtime/runtime_smoke.metadata.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[163]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -3398,7 +3427,8 @@
     "Post-release triage records no user-filed reports and one hosted-workflow case, reproduces KOZO-TRIAGE-001 against tagged v1.0.0 source, classifies it BUILD_TOOLING/U2/R3, authorizes bounded v1.0.1 patch preparation, and changes no product behavior.",
     "The v1.0.1 patch-preparation boundary normalizes exact, appended .o, and accepted legacy .obj Odin output to one canonical caller path while failing closed on compiler failure, missing output, ambiguity, stale candidates, invalid output types, and unsafe provenance.",
     "v1.0.1 post-release observation revalidates immutable release assets and runtime evidence, reviews project-visible reports and workflows, records cross-host Odin evidence without overclaiming, and authorizes no later release or capability work.",
-    "v1.1.0 Phase 0 governs and now validates host portability through pinned Linux, Windows, and macOS build contracts, keeps guest runtime evidence separate, defines no resource minimum, preserves v1.0.1, and leaves product capability work separately unauthorized."
+    "v1.1.0 Phase 0 governs and now validates host portability through pinned Linux, Windows, and macOS build contracts, keeps guest runtime evidence separate, defines no resource minimum, preserves v1.0.1, and leaves product capability work separately unauthorized.",
+    "The Fixed User Execution Context phase definition selects exactly one kernel-owned identity and lifecycle boundary, defines prerequisites and future evidence, and authorizes no implementation, version change, or release."
   ],
   "verification": {
     "tests_run": [
@@ -4480,6 +4510,7 @@
     "Established ADR-backed host portability governance, a pinned required build matrix, a non-blocking observation lane, a portable host contract, and 34 cross-host object-boundary regressions without changing runtime or the published product version.",
     "Resolved KOZO-TRIAGE-002 across all three pinned hosted jobs, then preserved Phase 0 as blocked after downloaded evidence exposed KOZO-TRIAGE-003: Windows staged tracked license inputs with CRLF bytes and different hashes from Linux and macOS.",
     "Implemented the bounded KOZO-TRIAGE-003 correction with narrow LF checkout attributes, committed-blob and staged-byte validation, and a required cross-host path/size/SHA-256 gate.",
-    "Accepted v1.1.0 Phase 0 after portability run 31458972010 passed all pinned host contracts and the aggregate release-input gate, CI run 31458972015 preserved 67 checks and the 41-marker QEMU path, and lint run 31458972013 passed; capability work remains separately unauthorized."
+    "Accepted v1.1.0 Phase 0 after portability run 31458972010 passed all pinned host contracts and the aggregate release-input gate, CI run 31458972015 preserved 67 checks and the 41-marker QEMU path, and lint run 31458972013 passed; capability work remains separately unauthorized.",
+    "Selected one Fixed User Execution Context as the next capability, defined its ownership, lifecycle, failure, resource, portability, testing, evidence, and governance prerequisites, and left implementation and release unauthorized."
   ]
 }

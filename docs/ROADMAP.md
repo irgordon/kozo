@@ -198,6 +198,15 @@ Linux remains `VALIDATED_RUNTIME`; Windows and macOS are `VALIDATED_BUILD`
 with runtime `NOT_EXECUTED`. Phase 0 is accepted. v1.1.0 capability work still
 requires separate authorization.
 
+The next capability-selection phase defines one **Fixed User Execution
+Context**. It will eventually bind the accepted user mappings, privilege
+transition, fixed transaction, and Ring 0 return to one kernel-owned opaque
+identity and bounded lifecycle. The definition is complete in
+`docs/FIXED_USER_EXECUTION_CONTEXT.md`; implementation, version assignment,
+and release remain unauthorized. A governance-first implementation task must
+adopt the required context-ownership ADR and contract/evidence changes before
+runtime code changes.
+
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity
 and performance without making core supported functionality depend on
@@ -332,6 +341,7 @@ Deferred until separately scoped runtime or cleanup phases:
 | `v0.8.9` | Documentation and Adoption Readiness | Add a user-first wiki, maintainer path, engineering overview, terminology guide, documentation audit, and focused comment cleanup. | Runtime features, documentation frameworks, publication, compatibility, complete release readiness. |
 | `v1.0.0-rc.1` | Published release candidate | Freeze scope and gates, publish the accepted immutable prerelease, and verify the distributed artifacts and user path. | In-place tag, note, or asset changes; new feature scope after RC. |
 | `v1.0.0` | Final kernel-foundation release | Publish the accepted governed kernel foundation with final versioning, evidence, and immutable assets. | Any unimplemented compatibility or runtime subsystem claim; any in-place mutation of the final tag or assets. |
+| `post-Phase-0 definition` | Fixed User Execution Context | Define one supervisor-only identity and lifecycle that binds the accepted fixed user execution path without implementing it. | Runtime implementation, repeated sessions, processes, scheduling, dynamic memory, ABI expansion, version authorization, or release. |
 
 ---
 
