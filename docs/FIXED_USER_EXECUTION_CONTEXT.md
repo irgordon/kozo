@@ -3,7 +3,7 @@
 Version: 1
 Status: Defined
 Implementation: Unauthorized
-Governance prerequisites: Defined, pending hosted acceptance
+Governance prerequisites: Accepted
 Scope: Selection and boundary definition for one kernel-owned user execution context
 
 ---
@@ -453,7 +453,7 @@ runtime capability is required.
 
 Governance-conflict classification: `NO_CONFLICT`. ADR 0018 satisfies the
 ownership decision prerequisite; runtime implementation still requires
-separate authorization after hosted acceptance.
+separate authorization.
 
 ---
 
@@ -473,9 +473,9 @@ Release authorized: false.
 
 Current release: `v1.0.1`.
 
-Next action after hosted governance acceptance: a separate explicit
-implementation-authorization task using this definition, ADR 0018, and the
-fixed context contract as authority before runtime mutation.
+Next action: a separate explicit Fixed User Execution Context Implementation
+Authorization task using this definition, ADR 0018, and the fixed context
+contract as authority before runtime mutation.
 
 ---
 
@@ -508,3 +508,7 @@ The governance validator is intentionally direct and is not registered as a
 new governed runtime check. Runtime implementation evidence remains future
 work, so the accepted totals remain 67 checks and 41 markers. Implementation,
 version change, and release remain unauthorized.
+
+Hosted acceptance used CI run `31475116760`, lint run `31475116763`, and
+portability run `31475116739`. Linux retained `VALIDATED_RUNTIME`; Windows and
+macOS retained `VALIDATED_BUILD` with runtime `NOT_EXECUTED`.

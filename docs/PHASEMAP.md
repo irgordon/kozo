@@ -185,11 +185,10 @@ v1.0.1 observation phases are complete. `KOZO-TRIAGE-002` and
 `KOZO-TRIAGE-003` are resolved on `main`, and v1.1.0 Phase 0 is accepted.
 The next selected capability is one Fixed User Execution Context. Its phase
 definition is complete in `docs/FIXED_USER_EXECUTION_CONTEXT.md`. ADR 0018 and
-the exact internal context/result contract now define its governance
-prerequisites, pending hosted acceptance. Implementation remains unauthorized;
-a separate task must authorize runtime mutation after these prerequisites are
-accepted. Product version and release authorization remain unchanged. All
-published tags and hosted assets remain immutable.
+the exact internal context/result contract define its accepted governance
+prerequisites. Implementation remains unauthorized; a separate task must
+authorize runtime mutation. Product version and release authorization remain
+unchanged. All published tags and hosted assets remain immutable.
 
 ---
 

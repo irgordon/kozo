@@ -2,7 +2,7 @@
   "task_title": "KOZO Fixed User Execution Context Governance Prerequisites",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
-  "plan_status": "approved",
+  "plan_status": "complete",
   "replan_number": 0,
   "approval": {
     "status": "approved"
@@ -3356,7 +3356,7 @@
     {
       "id": 97,
       "title": "Define fixed user execution context governance prerequisites",
-      "status": "pending",
+      "status": "done",
       "kind": "edit",
       "files_expected": [
         "docs/adr/0018-fixed-user-execution-context-ownership.md",
@@ -3392,7 +3392,7 @@
       "verification_refs": [
         "verification.tests_run[164]"
       ],
-      "failure_count": 3
+      "failure_count": 4
     }
   ],
   "expected_outputs": [
@@ -4299,7 +4299,7 @@
       {
         "tool": "Fixed User Execution Context governance prerequisites",
         "command": "ADR and authority review; exact context/result contract and schema; lifecycle, clear-state, binding, transition-budget, progression, portability, and negative governance tests; full local and hosted validation",
-        "status": "local_pass_1183_tests_71_focused_context_and_progression_tests_67_checks_0_failures_qemu_pass_blocker_none_41_markers_hosted_pending_implementation_unauthorized"
+        "status": "accepted_ci_31475116760_lint_31475116763_portability_31475116739_1183_tests_71_focused_context_and_progression_tests_67_checks_0_failures_qemu_pass_blocker_none_41_markers_linux_VALIDATED_RUNTIME_windows_macos_VALIDATED_BUILD_runtime_NOT_EXECUTED_implementation_unauthorized"
       }
     ],
     "logs": [
@@ -4563,6 +4563,7 @@
     "Implemented the bounded KOZO-TRIAGE-003 correction with narrow LF checkout attributes, committed-blob and staged-byte validation, and a required cross-host path/size/SHA-256 gate.",
     "Accepted v1.1.0 Phase 0 after portability run 31458972010 passed all pinned host contracts and the aggregate release-input gate, CI run 31458972015 preserved 67 checks and the 41-marker QEMU path, and lint run 31458972013 passed; capability work remains separately unauthorized.",
     "Selected one Fixed User Execution Context as the next capability, defined its ownership, lifecycle, failure, resource, portability, testing, evidence, and governance prerequisites, and left implementation and release unauthorized.",
-    "Adopted ADR 0018 and defined one exact internal context/result contract with lifecycle, cleanup, fixed binding, two-transition budget, progression, portability, and evidence rules while leaving implementation, version change, and release unauthorized."
+    "Adopted ADR 0018 and defined one exact internal context/result contract with lifecycle, cleanup, fixed binding, two-transition budget, progression, portability, and evidence rules while leaving implementation, version change, and release unauthorized.",
+    "Accepted the Fixed User Execution Context governance prerequisites through CI run 31475116760, lint run 31475116763, and portability run 31475116739; the next milestone is a separately authorized Fixed User Execution Context Implementation Authorization task."
   ]
 }

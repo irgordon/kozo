@@ -2,8 +2,8 @@
 
 ## Fixed user execution context prerequisites - 2026-08-11
 
-**Status:** Governance defined; pending hosted acceptance. Runtime
-implementation, version change, and release remain unauthorized.
+**Status:** Governance prerequisites accepted. Runtime implementation, version
+change, and release remain unauthorized.
 
 * Adopted ADR 0018 with exclusive Ring 0 ownership of one fixed execution
   context and a non-pointer, non-PID opaque identity.
@@ -16,6 +16,8 @@ implementation, version change, and release remain unauthorized.
   new runtime check or claiming runtime implementation.
 * Preserved 67 governed checks, all 41 markers, ADR 0017 host evidence,
   release version 1.0.1, and immutable published releases.
+* Hosted CI run `31475116760`, lint run `31475116763`, and portability run
+  `31475116739` accepted the governance boundary on Linux, Windows, and macOS.
 
 ## Next capability definition - 2026-08-11
 

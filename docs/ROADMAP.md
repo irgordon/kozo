@@ -203,10 +203,9 @@ Context**. It will eventually bind the accepted user mappings, privilege
 transition, fixed transaction, and Ring 0 return to one kernel-owned opaque
 identity and bounded lifecycle. The definition is complete in
 `docs/FIXED_USER_EXECUTION_CONTEXT.md`; ADR 0018 and the exact internal
-context/result contract now define its governance prerequisites, pending
-hosted acceptance. Implementation, version assignment, and release remain
-unauthorized. A separate task must authorize runtime changes after these
-prerequisites are accepted.
+context/result contract define its accepted governance prerequisites.
+Implementation, version assignment, and release remain unauthorized. A
+separate task must authorize runtime changes.
 
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity
