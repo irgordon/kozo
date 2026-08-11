@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260809T124112Z",
+  "run_id": "verify-20260811T043453Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -493,8 +493,7 @@
   ],
   "failed_checks": [],
   "changed_files": [
-    "artifacts/runtime/qemu_smoke.summary.txt",
-    "docs/generated/governance_index.md"
+    "artifacts/runtime/qemu_smoke.summary.txt"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -511,5 +510,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-08-09T12:41:12Z"
+  "generated_at": "2026-08-11T04:34:53Z"
 }
