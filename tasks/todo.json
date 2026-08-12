@@ -1,5 +1,5 @@
 {
-  "task_title": "KOZO Fixed User Execution Context Governance Prerequisites",
+  "task_title": "KOZO Fixed User Execution Context Implementation",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
   "plan_status": "complete",
@@ -37,7 +37,8 @@
     "Post-publication CI run 31226436612 and lint run 31226436655 accepted main commit 71cbd8651747c9088f426de20f111e49b5d2d8ee",
     "v1.1.0 Phase 0 starts from clean synchronized main at f472472fb7a41b14c80df3e17fad48e783d5e749",
     "The published v1.0.1 tag object 7896c767376a666ad7f7d8f294beadb473b0290c and historical release records remain immutable",
-    "v1.1.0 Phase 0 host portability is accepted on main at a05900e04301d5b1e7a58c25e2970a87c3583673 with Linux VALIDATED_RUNTIME and Windows/macOS VALIDATED_BUILD"
+    "v1.1.0 Phase 0 host portability is accepted on main at a05900e04301d5b1e7a58c25e2970a87c3583673 with Linux VALIDATED_RUNTIME and Windows/macOS VALIDATED_BUILD",
+    "A separate Fixed User Execution Context Implementation Authorization task permits exactly one static context and one non-authoritative result while preserving release version 1.0.1, public ABI, contracts, schemas, 41 markers, and 67 governed checks"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
@@ -67,10 +68,10 @@
     "Host portability, guest portability, and resource scaling are separate evidence classes",
     "v1.1.0 Phase 0 changes governance and hosted validation only; product capability work remains unauthorized until hosted acceptance",
     "release/version.txt remains 1.0.1 and no resource minimum is defined by this phase",
-    "The selected next capability is one Fixed User Execution Context; its phase definition is complete while implementation, version change, and release remain unauthorized",
-    "A context-ownership ADR and fixed execution-context contract/evidence changes must precede any separately authorized runtime implementation",
-    "The 41-marker taxonomy, current ABI, contracts, schemas, runtime behavior, and accepted host evidence remain unchanged by capability selection",
-    "ADR 0018 and the fixed execution-context contract define governance prerequisites only; implementation, version change, and release remain unauthorized",
+    "The authorized capability remains exactly one Fixed User Execution Context with one bounded static identity and lifecycle; version change and release remain unauthorized",
+    "ADR 0018 and the fixed execution-context contract precede and govern the authorized runtime implementation",
+    "The implementation changes only the internal runtime authority boundary while preserving the 41-marker taxonomy, public ABI, contracts, schemas, and accepted host evidence",
+    "The separate implementation task authorizes the fixed context only; version change, tag mutation, release mutation, and broader userspace capability remain unauthorized",
     "The direct context governance validator is not a registered runtime check, preserving the governed total of 67 until implementation evidence is separately authorized"
   ],
   "file_scope": [
@@ -3393,6 +3394,39 @@
         "verification.tests_run[164]"
       ],
       "failure_count": 4
+    },
+    {
+      "id": 98,
+      "title": "Implement fixed user execution context",
+      "status": "done",
+      "kind": "edit",
+      "files_expected": [
+        "kernel/arch/x86_64/runtime_layout.inc",
+        "kernel/arch/x86_64/privilege_transition.asm",
+        "linker/kernel.ld",
+        "scripts/kernel_elf_report.py",
+        "harness/validators_impl/fixed_user_execution_context_evidence.py",
+        "tests/test_fixed_user_execution_context_evidence.py",
+        "tests/test_kernel_elf_report.py",
+        "docs/FIXED_USER_EXECUTION_CONTEXT.md",
+        "docs/ARCHITECTURE.md",
+        "docs/SECURITY_MODEL.md",
+        "docs/VALIDATION.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "tasks/runtime.json",
+        "docs/generated/governance_index.md",
+        "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.summary.txt",
+        "artifacts/latest_verify.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[165]"
+      ],
+      "failure_count": 3
     }
   ],
   "expected_outputs": [
@@ -3472,7 +3506,9 @@
     "v1.0.1 post-release observation revalidates immutable release assets and runtime evidence, reviews project-visible reports and workflows, records cross-host Odin evidence without overclaiming, and authorizes no later release or capability work.",
     "v1.1.0 Phase 0 governs and now validates host portability through pinned Linux, Windows, and macOS build contracts, keeps guest runtime evidence separate, defines no resource minimum, preserves v1.0.1, and leaves product capability work separately unauthorized.",
     "The Fixed User Execution Context phase definition selects exactly one kernel-owned identity and lifecycle boundary, defines prerequisites and future evidence, and authorizes no implementation, version change, or release.",
-    "ADR 0018, one exact internal context/result contract, its schema, direct governance validator, focused tests, and progression authority define the prerequisites without changing runtime, markers, governed check count, version, or release state."
+    "ADR 0018, one exact internal context/result contract, its schema, direct governance validator, focused tests, and progression authority define the prerequisites without changing runtime, markers, governed check count, version, or release state.",
+    "One 128-byte, 16-byte-aligned supervisor-owned context and one separate 32-byte, 8-byte-aligned non-authoritative result implement the exact lifecycle, two-transition budget, phase coupling, result commit, clear, and fail-closed continuation rules.",
+    "Focused structural and negative evidence remains outside the validator registry so the governed total stays 67 while the accepted QEMU marker taxonomy stays 41."
   ],
   "verification": {
     "tests_run": [
@@ -4300,6 +4336,11 @@
         "tool": "Fixed User Execution Context governance prerequisites",
         "command": "ADR and authority review; exact context/result contract and schema; lifecycle, clear-state, binding, transition-budget, progression, portability, and negative governance tests; full local and hosted validation",
         "status": "accepted_ci_31475116760_lint_31475116763_portability_31475116739_1183_tests_71_focused_context_and_progression_tests_67_checks_0_failures_qemu_pass_blocker_none_41_markers_linux_VALIDATED_RUNTIME_windows_macos_VALIDATED_BUILD_runtime_NOT_EXECUTED_implementation_unauthorized"
+      },
+      {
+        "tool": "Fixed User Execution Context implementation",
+        "command": "31 focused context tests; 117 focused aggregate tests; 1,217-test discovery; Python compile; NASM assembly; Odin check; Rust check; offline cargo-deny and cargo-audit; actionlint; local host portability contract; configured kernel build; 41-marker QEMU smoke; ELF and direct context evidence validation",
+        "status": "local_candidate_pass_1217_tests_67_governed_checks_pending_source_commit_verification_and_hosted_acceptance"
       }
     ],
     "logs": [
@@ -4323,8 +4364,8 @@
       "A post-release observation record cannot authorize a version change, patch implementation, feature implementation, tag mutation, release mutation, or asset replacement.",
       "Per-host checksum round trips do not prove cross-host release-input determinism; supposedly identical tracked release inputs must have identical governed bytes and hashes before a host can satisfy the complete Phase 0 claim.",
       "Committed HEAD blobs own governed release-input bytes; host checkouts and staged copies must match those blobs exactly, and the required aggregate gate must compare path, size, and SHA-256 across pinned hosts.",
-      "One future fixed user execution context is Ring0-owned, non-public, non-process authority; its result is separately bounded and cannot reactivate cleared authority.",
-      "The accepted marker taxonomy remains 41 and the governed runtime check total remains 67 until a separately authorized implementation task changes runtime evidence policy."
+      "The implemented fixed user execution context is Ring0-owned, non-public, non-process authority; its result is separately bounded and cannot reactivate cleared authority.",
+      "The accepted marker taxonomy remains 41 and the governed runtime check total remains 67 because focused implementation evidence is intentionally unregistered."
     ],
     "expected_behavior": [
       "verify.sh succeeds on a clean tree and prints the generated artifact JSON before VERIFY: PASS",
@@ -4472,7 +4513,9 @@
       "The immutable v1.0.0-rc.1 tag and prerelease remain unchanged; all six hosted assets validate, the distributed ISO produces the accepted 41-marker sequence, the clean user path works with ld.lld, and current documentation distinguishes publication from dry-run metadata.",
       "The post-publication wiki provides distinct user, maintainer, and engineer paths, states the v1.0.0 product boundary directly, validates the hosted ISO workflow, and preserves immutable final and RC release records without runtime changes.",
       "Post-release triage found no user-filed reports in project-visible GitHub issues, then reproduced KOZO-TRIAGE-001 against tagged v1.0.0 source and current Odin; recorded one BUILD_TOOLING/U2/R3 case; preserved the accepted runtime baseline; and authorized bounded v1.0.1 patch preparation without authorizing implementation or publication.",
-      "Published v1.0.1 accepts the exact Odin output and supported .o or legacy .obj variation at one helper boundary, rejects uncertain output provenance, and preserves the v1.0.0 runtime; local, hosted, release-asset, and downloaded-ISO acceptance pass."
+      "Published v1.0.1 accepts the exact Odin output and supported .o or legacy .obj variation at one helper boundary, rejects uncertain output provenance, and preserves the v1.0.0 runtime; local, hosted, release-asset, and downloaded-ISO acceptance pass.",
+      "The fixed context uses exact static geometry, direct fixed-page bindings, a deterministic non-pointer identity, reserved-field validation, lifecycle transitions, phase/count coupling, a hard two-transition budget, and cleanup readback before normal continuation.",
+      "Local QEMU executes all 41 accepted markers through KOZO_RUNTIME_RETURN_OK; the ELF report proves context and result placement in disjoint higher-half supervisor RW-NX .bss storage."
     ],
     "baseline_reference": "kozo-trap-path-v1"
   },
@@ -4564,6 +4607,7 @@
     "Accepted v1.1.0 Phase 0 after portability run 31458972010 passed all pinned host contracts and the aggregate release-input gate, CI run 31458972015 preserved 67 checks and the 41-marker QEMU path, and lint run 31458972013 passed; capability work remains separately unauthorized.",
     "Selected one Fixed User Execution Context as the next capability, defined its ownership, lifecycle, failure, resource, portability, testing, evidence, and governance prerequisites, and left implementation and release unauthorized.",
     "Adopted ADR 0018 and defined one exact internal context/result contract with lifecycle, cleanup, fixed binding, two-transition budget, progression, portability, and evidence rules while leaving implementation, version change, and release unauthorized.",
-    "Accepted the Fixed User Execution Context governance prerequisites through CI run 31475116760, lint run 31475116763, and portability run 31475116739; the next milestone is a separately authorized Fixed User Execution Context Implementation Authorization task."
+    "Accepted the Fixed User Execution Context governance prerequisites through CI run 31475116760, lint run 31475116763, and portability run 31475116739; the next milestone is a separately authorized Fixed User Execution Context Implementation Authorization task.",
+    "Implemented the authorized fixed user context as one layered static authority boundary with an exact result record, fail-closed lifecycle enforcement, transition accounting, cleanup readback, ELF storage proof, focused negative tests, and no public ABI, contract, schema, marker, governed-check, version, tag, or release change."
   ]
 }

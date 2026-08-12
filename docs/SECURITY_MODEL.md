@@ -253,7 +253,7 @@ hostile-code safety proof.
 
 # 20. Fixed User Execution Context Governance Boundary
 
-ADR 0018 assigns future context authority exclusively to Ring 0. User mode
+ADR 0018 assigns context authority exclusively to Ring 0. User mode
 cannot create, select, mutate, or clear the identity, lifecycle, mappings,
 entry address, stack, selectors, return vector, transition budget, transition
 count, transaction phase, service identity, return target, or cleanup state.
@@ -264,6 +264,10 @@ bindings, transition state, and reserved fields are zero while lifecycle is
 `CLEARED`. Failure evidence survives in a separate bounded result that cannot
 reactivate the context or authorize later execution.
 
-This policy is not implemented by this governance phase. It does not create a
-public syscall or API, process isolation, repeated sessions, exception
-recovery, or containment for arbitrary hostile user code.
+The bounded implementation applies this policy to the existing one-shot
+transaction. Every existing return revalidates lifecycle, fixed identity,
+bindings, phase, and count before the transaction can progress. A focused
+unregistered validator and Linux QEMU evidence prove the implementation
+without changing the governed marker taxonomy. This does not create a public
+syscall or API, process isolation, repeated sessions, exception recovery, or
+containment for arbitrary hostile user code.

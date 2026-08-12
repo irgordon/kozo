@@ -343,6 +343,8 @@ Deferred until separately scoped runtime or cleanup phases:
 | `v1.0.0` | Final kernel-foundation release | Publish the accepted governed kernel foundation with final versioning, evidence, and immutable assets. | Any unimplemented compatibility or runtime subsystem claim; any in-place mutation of the final tag or assets. |
 | `post-Phase-0 definition` | Fixed User Execution Context | Define one supervisor-only identity and lifecycle that binds the accepted fixed user execution path without implementing it. | Runtime implementation, repeated sessions, processes, scheduling, dynamic memory, ABI expansion, version authorization, or release. |
 | `post-Phase-0 prerequisites` | Fixed User Execution Context Governance | Adopt exact ownership, lifecycle, result, cleanup, transition-budget, progression, and evidence authority before runtime implementation. | Runtime implementation, marker/check-count changes, repeated sessions, public ABI, version authorization, or release. |
+| `post-Phase-0 implementation` | Fixed User Execution Context Implementation | Add one static supervisor-owned lifecycle around the accepted fixed transaction and prove cleanup without changing markers or ABI. | Repeated sessions, processes, scheduling, dynamic allocation, marker/check-count changes, version authorization, or release. |
+| `post-implementation observation` | Fixed User Execution Context Observation | Observe hosted and runtime stability after implementation acceptance. | New capability work, version changes, release preparation, or expansion of user execution semantics. |
 
 ---
 

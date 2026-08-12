@@ -179,6 +179,45 @@ FIXED_USER_RUNTIME_STATUS_SYMBOLS = (
     "runtime_serial_write_user_runtime_status_service_ok_marker",
     "runtime_serial_write_ring0_return_marker",
 )
+FIXED_USER_EXECUTION_CONTEXT_SYMBOLS = (
+    "execute_fixed_user_runtime_status_transaction",
+    "initialize_fixed_user_execution_context",
+    "validate_fixed_user_execution_context_ready",
+    "activate_fixed_user_execution_context",
+    "record_fixed_user_context_transition",
+    "validate_fixed_user_context_return",
+    "commit_fixed_user_context_result",
+    "clear_fixed_user_execution_context",
+    "validate_fixed_user_execution_context_cleared",
+    "fixed_user_context",
+    "fixed_user_context_end",
+    "fixed_user_context_result",
+    "fixed_user_context_result_end",
+)
+FIXED_USER_CONTEXT_OVERLAP_SYMBOLS = (
+    "boot_stack",
+    "boot_stack_top",
+)
+FIXED_USER_CONTEXT_PROTECTED_RANGES = (
+    ("boot_stack", "boot_stack", "boot_stack_top"),
+    ("boot_memory_region", "boot_memory_region", "boot_memory_region_end"),
+    ("runtime_capability_state", "runtime_progression_state", "governed_gdt"),
+    ("governed_page_tables", "governed_page_tables_start", "governed_page_tables_end"),
+    ("governed_gdt", "governed_gdt", "governed_gdt_end"),
+    ("governed_tss", "governed_tss", "governed_tss_end"),
+    ("governed_idt", "governed_idt", "governed_idt_end"),
+    ("privilege_return_stack", "privilege_return_stack", "privilege_return_stack_top"),
+    ("double_fault_stack", "double_fault_stack", "double_fault_stack_top"),
+    ("fixed_user_request_shadow", "fixed_user_request_shadow", "fixed_user_request_shadow_end"),
+    ("fixed_user_response_shadow", "fixed_user_response_shadow", "fixed_user_response_shadow_end"),
+    ("fixed_user_response_verify", "fixed_user_response_verify", "fixed_user_response_verify_end"),
+    ("fixed_user_consumption_shadow", "fixed_user_consumption_shadow", "fixed_user_consumption_shadow_end"),
+    ("fixed_user_transaction_phase", "fixed_user_transaction_phase", "fixed_user_transaction_phase_end"),
+    ("post_context_runtime_state", "fixed_user_request_success_state", "user_probe_data_start"),
+    ("fixed_user_code", "user_probe_code_start", "user_probe_code_end"),
+    ("fixed_user_data", "user_probe_data_start", "user_probe_data_end"),
+    ("fixed_user_stack", "user_probe_stack", "user_probe_stack_top"),
+)
 BOUNDED_USER_RESPONSE_SYMBOLS = (
     "user_response_consumer_start",
     "user_response_consumer_interrupt_return",
@@ -350,6 +389,8 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
             *FIXED_USER_REQUEST_SYMBOLS,
             *BOUNDED_USER_RESPONSE_SYMBOLS,
             *FIXED_USER_RUNTIME_STATUS_SYMBOLS,
+            *FIXED_USER_EXECUTION_CONTEXT_SYMBOLS,
+            *FIXED_USER_CONTEXT_OVERLAP_SYMBOLS,
         ),
     )
     symbol_address = symbols.get("_start")
@@ -384,6 +425,11 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "fixed_user_request_boundary": fixed_user_request_boundary_record(kernel_elf, symbols),
         "bounded_user_response_consumption": bounded_user_response_consumption_record(kernel_elf, symbols),
         "fixed_user_runtime_status_service": fixed_user_runtime_status_service_record(kernel_elf, symbols),
+        "fixed_user_execution_context": fixed_user_execution_context_record(
+            kernel_elf,
+            symbols,
+            load_segments,
+        ),
         "program_header_count": header.program_header_count,
         "section_count": header.section_header_count,
         "load_segments": [segment_record(segment) for segment in load_segments],
@@ -495,6 +541,26 @@ def symbol_sizes(kernel_elf: Path, symbol_names: tuple[str, ...]) -> dict[str, i
     return parse_symbol_sizes(result.stdout, set(symbol_names))
 
 
+def symbol_sections(kernel_elf: Path, symbol_names: tuple[str, ...]) -> dict[str, str]:
+    output = run_text_command(["objdump", "-t", str(kernel_elf)])
+    return parse_symbol_sections(output, set(symbol_names))
+
+
+def parse_symbol_sections(
+    objdump_output: str,
+    symbol_names: set[str],
+) -> dict[str, str]:
+    sections: dict[str, str] = {}
+    for line in objdump_output.splitlines():
+        parts = line.split()
+        if not parts or parts[-1] not in symbol_names:
+            continue
+        section = next((part for part in parts[1:-1] if part.startswith(".")), "")
+        if section:
+            sections[parts[-1]] = section
+    return sections
+
+
 def parse_symbol_sizes(nm_output: str, symbol_names: set[str]) -> dict[str, int]:
     sizes: dict[str, int] = {}
     for line in nm_output.splitlines():
@@ -525,6 +591,138 @@ def parse_symbol_address(nm_output: str, symbol_name: str) -> int | None:
             except ValueError:
                 return None
     return None
+
+
+def _fixed_storage_record(
+    symbols: dict[str, int],
+    sections: dict[str, str],
+    load_segments: list[ProgramHeader],
+    start_symbol: str,
+    end_symbol: str,
+    required_size: int,
+    required_alignment: int,
+) -> dict[str, object]:
+    record = _symbol_range_record(
+        symbols,
+        start_symbol,
+        end_symbol,
+        required_size,
+        required_alignment,
+    )
+    return record | _fixed_storage_policy_record(
+        symbols,
+        sections,
+        load_segments,
+        start_symbol,
+    )
+
+
+def _fixed_storage_policy_record(
+    symbols: dict[str, int],
+    sections: dict[str, str],
+    load_segments: list[ProgramHeader],
+    start_symbol: str,
+) -> dict[str, object]:
+    start = symbols.get(start_symbol)
+    segment = _load_segment_for_address(load_segments, start)
+    flags = segment_flags(segment.flags) if segment is not None else ""
+    return {
+        "section": sections.get(start_symbol, ""),
+        "load_segment_flags": flags,
+        "writable": "w" in flags,
+        "non_executable": "x" not in flags if flags else False,
+        "higher_half_address": start is not None and start >= LOWER_HALF_LIMIT,
+    }
+
+
+def _load_segment_for_address(
+    load_segments: list[ProgramHeader],
+    address: int | None,
+) -> ProgramHeader | None:
+    if address is None:
+        return None
+    return next(
+        (
+            segment
+            for segment in load_segments
+            if segment.virtual_address
+            <= address
+            < segment.virtual_address + segment.memory_size
+        ),
+        None,
+    )
+
+
+def _fixed_user_context_ordering_valid(symbols: dict[str, int]) -> bool:
+    names = (
+        "fixed_user_transaction_phase_end",
+        "fixed_user_context",
+        "fixed_user_context_end",
+        "fixed_user_context_result",
+        "fixed_user_context_result_end",
+        "fixed_user_request_success_state",
+    )
+    values = [symbols.get(name) for name in names]
+    return all(value is not None for value in values) and values == sorted(values)
+
+
+def _fixed_user_context_protected_ranges(
+    symbols: dict[str, int],
+) -> dict[str, tuple[int, int]]:
+    ranges: dict[str, tuple[int, int]] = {}
+    for name, start_symbol, end_symbol in FIXED_USER_CONTEXT_PROTECTED_RANGES:
+        start = symbols.get(start_symbol)
+        end = symbols.get(end_symbol)
+        if start is not None and end is not None:
+            ranges[name] = (start, end)
+    return ranges
+
+
+def _fixed_user_context_overlaps(
+    context: dict[str, object],
+    result: dict[str, object],
+    protected_ranges: dict[str, tuple[int, int]],
+) -> list[str]:
+    owned_ranges = {
+        "context": _record_range(context),
+        "result": _record_range(result),
+    }
+    overlaps: list[str] = []
+    if _ranges_overlap(owned_ranges["context"], owned_ranges["result"]):
+        overlaps.append("context:result")
+    for owned_name, owned_range in owned_ranges.items():
+        for protected_name, protected_range in protected_ranges.items():
+            if _ranges_overlap(owned_range, protected_range):
+                overlaps.append(f"{owned_name}:{protected_name}")
+    return sorted(overlaps)
+
+
+def _protected_range_records(
+    protected_ranges: dict[str, tuple[int, int]],
+) -> dict[str, dict[str, str]]:
+    return {
+        name: {"start_address": _hex(start), "end_address": _hex(end)}
+        for name, (start, end) in sorted(protected_ranges.items())
+    }
+
+
+def _record_range(record: dict[str, object]) -> tuple[int, int] | None:
+    start_text = record.get("start_address")
+    end_text = record.get("end_address")
+    if not isinstance(start_text, str) or not isinstance(end_text, str):
+        return None
+    if not start_text or not end_text:
+        return None
+    return int(start_text, 16), int(end_text, 16)
+
+
+def _ranges_overlap(
+    left: tuple[int, int] | None,
+    right: tuple[int, int] | None,
+) -> bool:
+    if left is None or right is None:
+        return False
+    return left[0] < right[1] and right[0] < left[1]
 
 
 def memory_evidence_region_record(symbols: dict[str, int]) -> dict[str, object]:
@@ -952,6 +1150,51 @@ def fixed_user_runtime_status_service_record(
             "xor",
         ),
     }
+
+
+def fixed_user_execution_context_record(
+    kernel_elf: Path,
+    symbols: dict[str, int],
+    load_segments: list[ProgramHeader],
+) -> dict[str, object]:
+    sections = symbol_sections(kernel_elf, FIXED_USER_EXECUTION_CONTEXT_SYMBOLS)
+    context = _fixed_user_context_storage_record(symbols, sections, load_segments)
+    result = _fixed_user_context_result_storage_record(symbols, sections, load_segments)
+    protected_ranges = _fixed_user_context_protected_ranges(symbols)
+    overlaps = _fixed_user_context_overlaps(context, result, protected_ranges)
+    return {
+        "symbols": symbol_record(symbols, FIXED_USER_EXECUTION_CONTEXT_SYMBOLS),
+        "context": context,
+        "result": result,
+        "ordering_valid": _fixed_user_context_ordering_valid(symbols),
+        "protected_ranges": _protected_range_records(protected_ranges),
+        "overlaps": overlaps,
+        "no_overlap": not overlaps,
+    }
+
+
+def _fixed_user_context_storage_record(symbols, sections, load_segments):
+    return _fixed_storage_record(
+        symbols,
+        sections,
+        load_segments,
+        "fixed_user_context",
+        "fixed_user_context_end",
+        128,
+        16,
+    )
+
+
+def _fixed_user_context_result_storage_record(symbols, sections, load_segments):
+    return _fixed_storage_record(
+        symbols,
+        sections,
+        load_segments,
+        "fixed_user_context_result",
+        "fixed_user_context_result_end",
+        32,
+        8,
+    )
 
 
 def bounded_user_response_consumption_record(

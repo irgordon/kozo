@@ -1,5 +1,22 @@
 # Changelog
 
+## Fixed user execution context implementation - 2026-08-12
+
+**Status:** Implemented candidate with local verification; hosted acceptance
+pending. Version and release authorization remain unchanged.
+
+* Implemented the Fixed User Execution Context around the existing fixed
+  Ring 3 transaction.
+* Added one 128-byte context and one separate 32-byte non-authoritative result
+  in supervisor RW-NX static storage.
+* Enforced `UNINITIALIZED -> READY -> ACTIVE -> RETURNED -> CLEARED`, exact
+  phase/count coupling for both existing `int 0x81` entries, one result commit,
+  fail-closed cleanup, and clear-state readback.
+* Added focused source and ELF evidence without registering a new governed
+  check or changing the 41-marker taxonomy.
+* No process, scheduler, repeated session, public ABI, marker, or release
+  behavior changed.
+
 ## Fixed user execution context prerequisites - 2026-08-11
 
 **Status:** Governance prerequisites accepted. Runtime implementation, version

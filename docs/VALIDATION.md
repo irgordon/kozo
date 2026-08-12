@@ -469,10 +469,10 @@ and count mismatch, a third transition, early continuation, evidence
 overclaim, and weakened host coverage. The validator checks governance only;
 it does not fabricate runtime symbols or evidence.
 
-The future runtime validator name is
-`fixed_user_execution_context_evidence`. It remains planned and must later
-prove source and ELF placement, lifecycle transitions, result commit, cleanup,
-failure exclusions, and Linux QEMU survival without changing the 41-marker
-taxonomy. The governance validator is not registered in `scripts/verify.sh`,
-so this prerequisite phase preserves 67 governed checks. Registering a new
-runtime check or changing marker evidence requires separate authorization.
+The focused runtime validator is `fixed_user_execution_context_evidence`. It
+proves source and ELF placement, exact storage geometry and RW-NX policy,
+lifecycle transitions, count/phase coupling, one result commit, cleanup
+readback, failure exclusions, and Linux QEMU survival without changing the
+41-marker taxonomy. It is exercised directly and remains unregistered in
+`scripts/verify.sh`, preserving 67 governed checks. Registering a new runtime
+check or changing marker evidence requires separate authorization.

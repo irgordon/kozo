@@ -1,8 +1,8 @@
 # KOZO Fixed User Execution Context Phase Definition
 
 Version: 1
-Status: Defined
-Implementation: Unauthorized
+Status: Implemented candidate
+Implementation: Authorized and locally validated
 Governance prerequisites: Accepted
 Scope: Selection and boundary definition for one kernel-owned user execution context
 
@@ -10,11 +10,12 @@ Scope: Selection and boundary definition for one kernel-owned user execution con
 
 # 1. Purpose
 
-Define one fixed, kernel-owned user execution context as KOZO's next product
-capability after the accepted host-portability phase.
+Define and record one fixed, kernel-owned user execution context as KOZO's
+next product capability after the accepted host-portability phase.
 
-This document selects and bounds future work. It does not implement the
-context, change runtime behavior, or authorize a version or release.
+The original sections below preserve the accepted definition that preceded
+implementation. A separate implementation task later authorized the bounded
+runtime change. No version change or release is authorized.
 
 ---
 
@@ -329,7 +330,7 @@ be reported as guest-runtime success.
 
 # 16. Testing Requirements
 
-Future implementation requires focused evidence for:
+Implementation acceptance requires focused evidence for:
 
 * contract and schema validity;
 * context initialization and exact field validation;
@@ -355,7 +356,7 @@ Every new logic branch requires focused positive or negative evidence.
 Implementation must retain every currently passing check. The accepted
 baseline is:
 
-* Python: 1,136 tests;
+* Python: at least 1,183 tests;
 * governed verification: 67 checks, 0 failures;
 * QEMU: pass;
 * blocker: none;
@@ -385,7 +386,7 @@ changes marker meaning requires separate authorization.
 
 # 19. Hosted Acceptance Evidence
 
-Future implementation acceptance requires:
+Implementation acceptance requires:
 
 * CI success and lint success;
 * the pinned Linux, Windows, and macOS build contracts passing;
@@ -465,7 +466,9 @@ Selected capability: Fixed User Execution Context.
 
 Phase definition: complete.
 
-Implementation authorized: false.
+Implementation authorized by separate explicit task: true.
+
+Implementation status: locally validated candidate; hosted acceptance pending.
 
 Version change authorized: false.
 
@@ -473,9 +476,8 @@ Release authorized: false.
 
 Current release: `v1.0.1`.
 
-Next action: a separate explicit Fixed User Execution Context Implementation
-Authorization task using this definition, ADR 0018, and the fixed context
-contract as authority before runtime mutation.
+Next action: complete hosted acceptance for the implemented candidate, then
+begin Post-Implementation Observation only if every gate remains green.
 
 ---
 
@@ -504,11 +506,32 @@ enters Ring 0 in `REQUEST_PENDING`, and response consumption returns in
 `RESPONSE_READY`. The existing handler advances to `CONSUMED`; any third
 transition is an invariant violation. Both phase and count must match.
 
-The governance validator is intentionally direct and is not registered as a
-new governed runtime check. Runtime implementation evidence remains future
-work, so the accepted totals remain 67 checks and 41 markers. Implementation,
-version change, and release remain unauthorized.
+The governance validator remains direct and unregistered. The separately
+authorized implementation adds a focused unregistered runtime evidence
+validator, preserving 67 governed checks and 41 markers. Version change and
+release remain unauthorized.
 
 Hosted acceptance used CI run `31475116760`, lint run `31475116763`, and
 portability run `31475116739`. Linux retained `VALIDATED_RUNTIME`; Windows and
 macOS retained `VALIDATED_BUILD` with runtime `NOT_EXECUTED`.
+
+---
+
+# 25. Implemented Candidate
+
+The runtime now owns one 128-byte, 16-byte-aligned context and one separate
+32-byte, 8-byte-aligned result in supervisor RW-NX static storage. The context
+wraps the existing fixed transaction without adding a marker, interrupt,
+syscall, ABI surface, allocation, or repeatable session.
+
+The implemented path initializes and validates `READY`, activates `ACTIVE`,
+accounts the existing request and response `int 0x81` entries against phase
+and count, validates `RETURNED`, commits one bounded result, clears authority,
+and validates `CLEARED` before `KOZO_RING0_RETURN_OK`.
+
+Focused source and ELF validation covers identity, lifecycle, bindings,
+reserved fields, phase/count mismatches, budget exhaustion, result authority,
+cleanup readback, storage policy, ordering, and overlap. Local QEMU retains the
+exact 41-marker sequence through `KOZO_RUNTIME_RETURN_OK`. Hosted acceptance
+must confirm the existing Linux, Windows, and macOS evidence levels before the
+candidate is accepted.

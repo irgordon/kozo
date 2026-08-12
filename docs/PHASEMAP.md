@@ -183,12 +183,12 @@ Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr
 The `v1.0.0-rc.1`, `v1.0.0`, post-publication documentation, v1.0.1 patch, and
 v1.0.1 observation phases are complete. `KOZO-TRIAGE-002` and
 `KOZO-TRIAGE-003` are resolved on `main`, and v1.1.0 Phase 0 is accepted.
-The next selected capability is one Fixed User Execution Context. Its phase
-definition is complete in `docs/FIXED_USER_EXECUTION_CONTEXT.md`. ADR 0018 and
-the exact internal context/result contract define its accepted governance
-prerequisites. Implementation remains unauthorized; a separate task must
-authorize runtime mutation. Product version and release authorization remain
-unchanged. All published tags and hosted assets remain immutable.
+The Fixed User Execution Context definition and governance prerequisites are
+complete. A separate task authorized and locally validated the bounded runtime
+implementation around the existing one-shot transaction. Hosted acceptance is
+pending. Product version and release authorization remain unchanged. All
+published tags and hosted assets remain immutable. The next milestone after
+acceptance is Post-Implementation Observation for Fixed User Execution Context.
 
 ---
 
@@ -260,6 +260,8 @@ unchanged. All published tags and hosted assets remain immutable.
 | `v1.1.0 Phase 0` | GitHub Actions Cross-Host Portability Matrix | Govern host portability separately from guest runtime and resource scaling before capability work starts. | ADR 0017, portability invariant, pinned Linux/Windows/macOS build matrix, Linux runtime gate, focused object normalization regression, host evidence artifacts, compatibility and release-evidence policy. | Required Linux, Windows, and macOS build contracts pass; Linux runtime remains 67/0 with QEMU pass and 41 markers; unsupported runtime cells remain explicit; no product version or runtime behavior changes. |
 | `post-Phase-0 definition` | Fixed User Execution Context | Select and bound one kernel-owned identity and lifecycle for the accepted fixed Ring 3 transaction. | `docs/FIXED_USER_EXECUTION_CONTEXT.md`, candidate comparison, capability boundary, invariants, failure/resource/portability/testing models, prerequisite and authorization decisions. | One capability is defined; Phase 0 remains accepted; runtime, contracts, schemas, markers, and version remain unchanged; implementation remains unauthorized. |
 | `post-Phase-0 prerequisites` | Fixed User Execution Context Governance | Define exact ownership, lifecycle, result, cleanup, transition-budget, progression, and evidence authority. | ADR 0018, internal context/result contract and schema, direct governance validator, focused tests, aligned authority documents and task state. | Hosted gates accept the governance prerequisites with 67 checks and 41 markers unchanged; implementation, version, and release remain unauthorized. |
+| `post-Phase-0 implementation` | Fixed User Execution Context Implementation | Wrap the accepted fixed Ring 3 transaction with one supervisor-owned lifecycle and bounded result. | Static context/result storage, direct lifecycle and transition accounting, ELF report evidence, focused unregistered validator/tests, local and hosted gates. | Exactly one context reaches verified `CLEARED`; 67 governed checks, 41 markers, ABI, release version, and Phase 0 evidence levels remain unchanged. |
+| `post-implementation observation` | Fixed User Execution Context Observation | Observe the accepted implementation without starting another capability or release. | Runtime, hosted, portability, release-integrity, and project-visible issue review. | Evidence remains stable or one exact separately authorized blocker is recorded. |
 
 ---
 

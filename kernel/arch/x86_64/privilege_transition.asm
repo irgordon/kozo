@@ -30,6 +30,10 @@ global fixed_user_consumption_shadow
 global fixed_user_consumption_shadow_end
 global fixed_user_transaction_phase
 global fixed_user_transaction_phase_end
+global fixed_user_context
+global fixed_user_context_end
+global fixed_user_context_result
+global fixed_user_context_result_end
 global fixed_user_request_success_state
 global saved_odin_return_stack
 global user_probe_code_start
@@ -52,6 +56,14 @@ global fixed_user_response_matches_shadow
 global copy_fixed_user_consumption_record
 global validate_fixed_user_consumption_record
 global clear_fixed_user_response_transaction
+global initialize_fixed_user_execution_context
+global validate_fixed_user_execution_context_ready
+global activate_fixed_user_execution_context
+global record_fixed_user_context_transition
+global validate_fixed_user_context_return
+global commit_fixed_user_context_result
+global clear_fixed_user_execution_context
+global validate_fixed_user_execution_context_cleared
 global observed_governed_gdtr
 global observed_governed_idtr
 global observed_task_register
@@ -346,6 +358,14 @@ fixed_user_transaction_phase:
     resd 1
     resd 1
 fixed_user_transaction_phase_end:
+alignb FIXED_USER_CONTEXT_ALIGNMENT
+fixed_user_context:
+    resb FIXED_USER_CONTEXT_SIZE
+fixed_user_context_end:
+alignb FIXED_USER_CONTEXT_RESULT_ALIGNMENT
+fixed_user_context_result:
+    resb FIXED_USER_CONTEXT_RESULT_SIZE
+fixed_user_context_result_end:
 alignb 8
 fixed_user_request_success_state:
     resq 1
@@ -676,6 +696,14 @@ validate_user_probe_entry:
     call require_supervisor_rw_nx
     test eax, eax
     jnz .entry_invalid
+    lea rdi, [rel fixed_user_context]
+    call require_supervisor_rw_nx
+    test eax, eax
+    jnz .entry_invalid
+    lea rdi, [rel fixed_user_context_result]
+    call require_supervisor_rw_nx
+    test eax, eax
+    jnz .entry_invalid
 
     lea rdi, [rel user_probe_code_start]
     call walk_page_mapping
@@ -726,9 +754,71 @@ require_mapping_flags:
 ; Preserve SysV stack alignment and return the architecture status in eax.
 execute_fixed_user_runtime_status_transaction:
     sub rsp, 8
+    call initialize_fixed_user_execution_context
+    test eax, eax
+    jnz .pre_ready_failure
+    call validate_fixed_user_execution_context_ready
+    test eax, eax
+    jnz .live_context_failure
+    call activate_fixed_user_execution_context
+    test eax, eax
+    jnz .live_context_failure
     call enter_bounded_ring3_probe
+    test eax, eax
+    jz .done
+    call finish_fixed_user_context_transaction_failure
+.done:
     add rsp, 8
     ret
+.pre_ready_failure:
+    call finish_fixed_user_context_pre_ready_failure
+    jmp .done
+.live_context_failure:
+    call finish_fixed_user_context_live_failure
+    jmp .done
+
+finish_fixed_user_context_pre_ready_failure:
+    push rax
+    mov edi, eax
+    call commit_fixed_user_context_failure_result
+    test eax, eax
+    jnz .use_commit_failure
+    pop rax
+    jmp fixed_user_context_status_from_failure
+.use_commit_failure:
+    add rsp, 8
+    jmp fixed_user_context_status_from_failure
+
+finish_fixed_user_context_live_failure:
+    push rax
+    mov edi, eax
+    call fail_and_clear_fixed_user_execution_context
+    test eax, eax
+    jnz .use_cleanup_failure
+    pop rax
+    jmp fixed_user_context_status_from_failure
+.use_cleanup_failure:
+    add rsp, 8
+    jmp fixed_user_context_status_from_failure
+
+finish_fixed_user_context_transaction_failure:
+    push rax
+    cmp eax, FIXED_USER_CONTEXT_STATUS_BASE
+    jbe .use_invalid_return_failure
+    sub eax, FIXED_USER_CONTEXT_STATUS_BASE
+    mov edi, eax
+    jmp .clear_transaction_failure
+.use_invalid_return_failure:
+    mov edi, FIXED_USER_CONTEXT_FAILURE_INVALID_RETURN_STATE
+.clear_transaction_failure:
+    call fail_and_clear_fixed_user_execution_context
+    test eax, eax
+    jnz .use_cleanup_failure
+    pop rax
+    ret
+.use_cleanup_failure:
+    add rsp, 8
+    jmp fixed_user_context_status_from_failure
 
 ; Save the Odin stack so the fixed Ring3 transaction has one return target.
 enter_bounded_ring3_probe:
@@ -778,6 +868,12 @@ privilege_return_handler:
     mov fs, ax
     mov gs, ax
     mov r15, rsp
+    call record_fixed_user_context_transition
+    test eax, eax
+    jz .dispatch_phase
+    call fixed_user_context_status_from_failure
+    jmp privilege_return_failure
+.dispatch_phase:
     cmp dword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
     je handle_fixed_user_request
     cmp dword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_RESPONSE_READY
@@ -848,6 +944,9 @@ handle_fixed_user_response_consumption:
     jne privilege_response_phase_failure
     cmp dword [rel fixed_user_transaction_phase + 4], 0
     jne privilege_response_phase_failure
+    call set_fixed_user_context_consumed_phase
+    test eax, eax
+    jnz privilege_context_phase_failure
     call runtime_serial_write_fixed_user_response_marker
     mov rax, FIXED_USER_REQUEST_SUCCESS_STATE
     mov [rel fixed_user_request_success_state], rax
@@ -857,6 +956,10 @@ handle_fixed_user_response_consumption:
     call runtime_serial_write_ring3_probe_marker
     mov rsp, [rel saved_odin_return_stack]
     jmp privilege_ring0_continuation
+
+privilege_context_phase_failure:
+    call fixed_user_context_status_from_failure
+    jmp privilege_return_failure
 
 privilege_response_phase_failure:
     mov eax, USER_RESPONSE_PHASE_INVALID
@@ -1285,6 +1388,12 @@ prepare_user_response_resume:
     mov dword [rel fixed_user_transaction_phase + 4], 0
     cmp dword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_RESPONSE_READY
     jne .failed
+    call set_fixed_user_context_response_phase
+    test eax, eax
+    jz .context_phase_ready
+    call fixed_user_context_status_from_failure
+    ret
+.context_phase_ready:
     xor eax, eax
     ret
 .failed:
@@ -1582,6 +1691,9 @@ privilege_ring0_continuation:
     call fixed_user_buffers_are_zero
     test eax, eax
     jnz .boundary_failed
+    call complete_fixed_user_execution_context
+    test eax, eax
+    jnz .boundary_failed
     mov qword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
     cmp qword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
     jne .boundary_failed
@@ -1601,6 +1713,577 @@ privilege_ring0_continuation:
     mov qword [rel privilege_probe_state], 0
     mov qword [rel fixed_user_request_success_state], 0
     mov eax, PRIVILEGE_RING0_CONTINUATION_FAILED
+    ret
+
+; Initializes one fixed authority record after resetting its bounded result.
+initialize_fixed_user_execution_context:
+    call reset_fixed_user_context_result
+    test eax, eax
+    jnz .result_reset_failed
+    call fixed_user_context_is_uninitialized
+    test eax, eax
+    jnz .lifecycle_invalid
+    call populate_fixed_user_execution_context
+    xor eax, eax
+    ret
+.result_reset_failed:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_RESULT_COMMIT_FAILED
+    ret
+.lifecycle_invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_LIFECYCLE
+    ret
+
+; Validates the complete READY representation before any Ring3 entry.
+validate_fixed_user_execution_context_ready:
+    call validate_fixed_user_context_format_and_identity
+    test eax, eax
+    jnz .done
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_LIFECYCLE_OFFSET], FIXED_USER_CONTEXT_READY
+    jne .lifecycle_invalid
+    call validate_fixed_user_context_bindings
+    test eax, eax
+    jnz .done
+    call validate_fixed_user_context_reserved_state
+    test eax, eax
+    jnz .done
+    call validate_fixed_user_context_phase_and_count
+.done:
+    ret
+.lifecycle_invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_LIFECYCLE
+    ret
+
+activate_fixed_user_execution_context:
+    call validate_fixed_user_execution_context_ready
+    test eax, eax
+    jnz .done
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_LIFECYCLE_OFFSET], FIXED_USER_CONTEXT_ACTIVE
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_LIFECYCLE_OFFSET], FIXED_USER_CONTEXT_ACTIVE
+    jne .lifecycle_invalid
+    xor eax, eax
+.done:
+    ret
+.lifecycle_invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_LIFECYCLE
+    ret
+
+; Accounts one existing int 0x81 entry only when phase and count agree.
+record_fixed_user_context_transition:
+    call validate_fixed_user_execution_context_active
+    test eax, eax
+    jnz .done
+    call fixed_user_context_transition_count_is_authorized
+    test eax, eax
+    jnz .done
+    call fixed_user_context_transition_phase_is_authorized
+    test eax, eax
+    jnz .done
+    call increment_fixed_user_context_transition_count
+.done:
+    ret
+
+fixed_user_context_transition_count_is_authorized:
+    mov eax, [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSITION_COUNT_OFFSET]
+    cmp eax, [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSITION_BUDGET_OFFSET]
+    jae .budget_exceeded
+    cmp eax, 1
+    ja .count_invalid
+    xor eax, eax
+    ret
+.budget_exceeded:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_TRANSITION_BUDGET_EXCEEDED
+    ret
+.count_invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_TRANSITION_COUNT
+    ret
+
+fixed_user_context_transition_phase_is_authorized:
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSITION_COUNT_OFFSET], 0
+    je .require_request_phase
+    cmp dword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_RESPONSE_READY
+    jne .association_invalid
+    xor eax, eax
+    ret
+.require_request_phase:
+    cmp dword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
+    jne .association_invalid
+    xor eax, eax
+    ret
+.association_invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_TRANSACTION_ASSOCIATION
+    ret
+
+increment_fixed_user_context_transition_count:
+    mov eax, [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSITION_COUNT_OFFSET]
+    inc dword [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSITION_COUNT_OFFSET]
+    mov edx, [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSITION_COUNT_OFFSET]
+    lea ecx, [eax + 1]
+    cmp edx, ecx
+    jne .count_invalid
+    xor eax, eax
+    ret
+.count_invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_TRANSITION_COUNT
+    ret
+
+; Moves ACTIVE to RETURNED only after both returns and CONSUMED agree.
+validate_fixed_user_context_return:
+    call validate_fixed_user_execution_context_active
+    test eax, eax
+    jnz .invalid_return
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSITION_COUNT_OFFSET], FIXED_USER_CONTEXT_TRANSITION_BUDGET
+    jne .invalid_return
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSACTION_PHASE_OFFSET], FIXED_USER_PHASE_CONSUMED
+    jne .invalid_return
+    cmp dword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_CONSUMED
+    jne .invalid_return
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_LIFECYCLE_OFFSET], FIXED_USER_CONTEXT_RETURNED
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_LIFECYCLE_OFFSET], FIXED_USER_CONTEXT_RETURNED
+    jne .invalid_return
+    xor eax, eax
+    ret
+.invalid_return:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_RETURN_STATE
+    ret
+
+; Commits the one non-authoritative success result while authority is RETURNED.
+commit_fixed_user_context_result:
+    call fixed_user_context_result_is_initial
+    test eax, eax
+    jnz .commit_failed
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_LIFECYCLE_OFFSET], FIXED_USER_CONTEXT_RETURNED
+    jne .commit_failed
+    mov dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_FORMAT_VERSION_OFFSET], FIXED_USER_CONTEXT_RESULT_FORMAT_VERSION
+    mov dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_STRUCTURE_SIZE_OFFSET], FIXED_USER_CONTEXT_RESULT_SIZE
+    mov dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_OUTCOME_OFFSET], FIXED_USER_CONTEXT_RESULT_SUCCESS
+    mov dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_FAILURE_CODE_OFFSET], FIXED_USER_CONTEXT_FAILURE_NONE
+    mov eax, [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSITION_COUNT_OFFSET]
+    mov [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_TRANSITION_COUNT_OFFSET], eax
+    mov dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_TERMINAL_LIFECYCLE_OFFSET], FIXED_USER_CONTEXT_RETURNED
+    mov qword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_RESERVED_0_OFFSET], 0
+    call validate_fixed_user_context_success_result
+    ret
+.commit_failed:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_RESULT_COMMIT_FAILED
+    ret
+
+; Removes every authority field while retaining only structural clear evidence.
+clear_fixed_user_execution_context:
+    cld
+    lea rdi, [rel fixed_user_context]
+    xor eax, eax
+    mov ecx, FIXED_USER_CONTEXT_SIZE / 8
+    rep stosq
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_FORMAT_VERSION_OFFSET], FIXED_USER_CONTEXT_FORMAT_VERSION
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_STRUCTURE_SIZE_OFFSET], FIXED_USER_CONTEXT_SIZE
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_LIFECYCLE_OFFSET], FIXED_USER_CONTEXT_CLEARED
+    ret
+
+validate_fixed_user_execution_context_cleared:
+    mov eax, (FIXED_USER_CONTEXT_SIZE << 16)
+    shl rax, 16
+    or rax, FIXED_USER_CONTEXT_FORMAT_VERSION
+    cmp qword [rel fixed_user_context], rax
+    jne .cleanup_failed
+    cmp qword [rel fixed_user_context + FIXED_USER_CONTEXT_OPAQUE_IDENTITY_OFFSET], 0
+    jne .cleanup_failed
+    cmp qword [rel fixed_user_context + FIXED_USER_CONTEXT_LIFECYCLE_OFFSET], FIXED_USER_CONTEXT_CLEARED
+    jne .cleanup_failed
+    lea rdi, [rel fixed_user_context + FIXED_USER_CONTEXT_USER_CODE_START_OFFSET]
+    mov ecx, (FIXED_USER_CONTEXT_SIZE - FIXED_USER_CONTEXT_USER_CODE_START_OFFSET) / 8
+    call fixed_qword_span_is_zero
+    test eax, eax
+    jnz .cleanup_failed
+    xor eax, eax
+    ret
+.cleanup_failed:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_CLEANUP_FAILED
+    ret
+
+complete_fixed_user_execution_context:
+    call validate_fixed_user_context_return
+    test eax, eax
+    jnz complete_fixed_user_context_live_failure
+    call commit_fixed_user_context_result
+    test eax, eax
+    jnz complete_fixed_user_context_uncommitted_failure
+    call clear_fixed_user_execution_context
+    call validate_fixed_user_execution_context_cleared
+    test eax, eax
+    jnz complete_fixed_user_context_done
+    call validate_fixed_user_context_success_result
+complete_fixed_user_context_done:
+    ret
+
+complete_fixed_user_context_live_failure:
+    push rax
+    mov edi, eax
+    call fail_and_clear_fixed_user_execution_context
+    test eax, eax
+    jnz complete_fixed_user_context_discard_failure
+    pop rax
+    ret
+
+complete_fixed_user_context_uncommitted_failure:
+    push rax
+    call clear_fixed_user_execution_context
+    call validate_fixed_user_execution_context_cleared
+    test eax, eax
+    jnz complete_fixed_user_context_discard_failure
+    pop rax
+    ret
+
+complete_fixed_user_context_discard_failure:
+    add rsp, 8
+    ret
+
+fail_and_clear_fixed_user_execution_context:
+    push rdi
+    call commit_fixed_user_context_failure_result
+    push rax
+    call clear_fixed_user_execution_context
+    call validate_fixed_user_execution_context_cleared
+    test eax, eax
+    jnz .cleanup_failed
+    pop rax
+    test eax, eax
+    jnz .done
+    mov edi, [rsp]
+    call validate_fixed_user_context_failure_result_survives
+    test eax, eax
+    jnz .done
+    add rsp, 8
+    xor eax, eax
+    ret
+.done:
+    add rsp, 8
+    ret
+.cleanup_failed:
+    add rsp, 16
+    mov eax, FIXED_USER_CONTEXT_FAILURE_CLEANUP_FAILED
+    ret
+
+commit_fixed_user_context_failure_result:
+    push rdi
+    call fixed_user_context_result_is_initial
+    test eax, eax
+    jnz .commit_failed
+    pop rdi
+    mov dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_FORMAT_VERSION_OFFSET], FIXED_USER_CONTEXT_RESULT_FORMAT_VERSION
+    mov dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_STRUCTURE_SIZE_OFFSET], FIXED_USER_CONTEXT_RESULT_SIZE
+    mov dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_OUTCOME_OFFSET], FIXED_USER_CONTEXT_RESULT_FAILURE
+    mov [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_FAILURE_CODE_OFFSET], edi
+    mov eax, [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSITION_COUNT_OFFSET]
+    mov [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_TRANSITION_COUNT_OFFSET], eax
+    mov eax, [rel fixed_user_context + FIXED_USER_CONTEXT_LIFECYCLE_OFFSET]
+    mov [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_TERMINAL_LIFECYCLE_OFFSET], eax
+    mov qword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_RESERVED_0_OFFSET], 0
+    call validate_fixed_user_context_failure_result
+    ret
+.commit_failed:
+    add rsp, 8
+    mov eax, FIXED_USER_CONTEXT_FAILURE_RESULT_COMMIT_FAILED
+    ret
+
+validate_fixed_user_context_failure_result:
+    call validate_fixed_user_context_failure_result_survives
+    test eax, eax
+    jnz .done
+    mov eax, [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSITION_COUNT_OFFSET]
+    cmp [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_TRANSITION_COUNT_OFFSET], eax
+    jne .invalid
+    mov eax, [rel fixed_user_context + FIXED_USER_CONTEXT_LIFECYCLE_OFFSET]
+    cmp [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_TERMINAL_LIFECYCLE_OFFSET], eax
+    jne .invalid
+    xor eax, eax
+.done:
+    ret
+.invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_RESULT_COMMIT_FAILED
+    ret
+
+validate_fixed_user_context_failure_result_survives:
+    cmp edi, FIXED_USER_CONTEXT_FAILURE_INVALID_CONTEXT_FORMAT
+    jb .invalid
+    cmp edi, FIXED_USER_CONTEXT_FAILURE_CLEANUP_FAILED
+    ja .invalid
+    cmp dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_FORMAT_VERSION_OFFSET], FIXED_USER_CONTEXT_RESULT_FORMAT_VERSION
+    jne .invalid
+    cmp dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_STRUCTURE_SIZE_OFFSET], FIXED_USER_CONTEXT_RESULT_SIZE
+    jne .invalid
+    cmp dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_OUTCOME_OFFSET], FIXED_USER_CONTEXT_RESULT_FAILURE
+    jne .invalid
+    cmp [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_FAILURE_CODE_OFFSET], edi
+    jne .invalid
+    cmp qword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_RESERVED_0_OFFSET], 0
+    jne .invalid
+    xor eax, eax
+    ret
+.invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_RESULT_COMMIT_FAILED
+    ret
+
+set_fixed_user_context_response_phase:
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSACTION_PHASE_OFFSET], FIXED_USER_PHASE_RESPONSE_READY
+    jmp validate_fixed_user_context_phase_and_count
+
+set_fixed_user_context_consumed_phase:
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSACTION_PHASE_OFFSET], FIXED_USER_PHASE_CONSUMED
+    jmp validate_fixed_user_context_phase_and_count
+
+validate_fixed_user_execution_context_active:
+    call validate_fixed_user_context_format_and_identity
+    test eax, eax
+    jnz .done
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_LIFECYCLE_OFFSET], FIXED_USER_CONTEXT_ACTIVE
+    jne .lifecycle_invalid
+    call validate_fixed_user_context_bindings
+    test eax, eax
+    jnz .done
+    call validate_fixed_user_context_reserved_state
+    test eax, eax
+    jnz .done
+    call validate_fixed_user_context_phase_and_count
+.done:
+    ret
+.lifecycle_invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_LIFECYCLE
+    ret
+
+validate_fixed_user_context_format_and_identity:
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_FORMAT_VERSION_OFFSET], FIXED_USER_CONTEXT_FORMAT_VERSION
+    jne .format_invalid
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_STRUCTURE_SIZE_OFFSET], FIXED_USER_CONTEXT_SIZE
+    jne .format_invalid
+    mov rax, FIXED_USER_CONTEXT_OPAQUE_IDENTITY
+    cmp [rel fixed_user_context + FIXED_USER_CONTEXT_OPAQUE_IDENTITY_OFFSET], rax
+    jne .identity_invalid
+    xor eax, eax
+    ret
+.format_invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_CONTEXT_FORMAT
+    ret
+.identity_invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_IDENTITY
+    ret
+
+validate_fixed_user_context_bindings:
+    call validate_fixed_user_context_code_and_data_bindings
+    test eax, eax
+    jnz .done
+    call validate_fixed_user_context_stack_bindings
+    test eax, eax
+    jnz .done
+    call validate_fixed_user_context_entry_bindings
+    test eax, eax
+    jnz .done
+    call validate_fixed_user_context_transaction_bindings
+.done:
+    ret
+
+validate_fixed_user_context_code_and_data_bindings:
+    mov rax, USER_PROBE_CODE_VA
+    cmp [rel fixed_user_context + FIXED_USER_CONTEXT_USER_CODE_START_OFFSET], rax
+    jne .invalid
+    cmp qword [rel fixed_user_context + FIXED_USER_CONTEXT_USER_CODE_SIZE_OFFSET], KOZO_PAGE_SIZE
+    jne .invalid
+    mov rax, USER_PROBE_DATA_VA
+    cmp [rel fixed_user_context + FIXED_USER_CONTEXT_USER_DATA_START_OFFSET], rax
+    jne .invalid
+    cmp qword [rel fixed_user_context + FIXED_USER_CONTEXT_USER_DATA_SIZE_OFFSET], KOZO_PAGE_SIZE
+    jne .invalid
+    xor eax, eax
+    ret
+.invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_BINDING
+    ret
+
+validate_fixed_user_context_stack_bindings:
+    mov rax, USER_PROBE_STACK_VA
+    cmp [rel fixed_user_context + FIXED_USER_CONTEXT_USER_STACK_START_OFFSET], rax
+    jne .invalid
+    cmp qword [rel fixed_user_context + FIXED_USER_CONTEXT_USER_STACK_SIZE_OFFSET], KOZO_PAGE_SIZE
+    jne .invalid
+    mov rax, USER_PROBE_STACK_TOP_VA
+    cmp [rel fixed_user_context + FIXED_USER_CONTEXT_USER_STACK_TOP_OFFSET], rax
+    jne .invalid
+    xor eax, eax
+    ret
+.invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_BINDING
+    ret
+
+validate_fixed_user_context_entry_bindings:
+    mov rax, USER_PROBE_CODE_VA
+    cmp [rel fixed_user_context + FIXED_USER_CONTEXT_ENTRY_RIP_OFFSET], rax
+    jne .invalid
+    mov rax, USER_INITIAL_RSP
+    cmp [rel fixed_user_context + FIXED_USER_CONTEXT_INITIAL_RSP_OFFSET], rax
+    jne .invalid
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_USER_CODE_SELECTOR_OFFSET], USER_CODE_SELECTOR
+    jne .invalid
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_USER_DATA_SELECTOR_OFFSET], USER_DATA_SELECTOR
+    jne .invalid
+    xor eax, eax
+    ret
+.invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_BINDING
+    ret
+
+validate_fixed_user_context_transaction_bindings:
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_RETURN_VECTOR_OFFSET], KOZO_PRIVILEGE_RETURN_VECTOR
+    jne .invalid
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSITION_BUDGET_OFFSET], FIXED_USER_CONTEXT_TRANSITION_BUDGET
+    jne .invalid
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_REQUEST_IDENTIFIER_OFFSET], FIXED_USER_REQUEST_ID
+    jne .invalid
+    xor eax, eax
+    ret
+.invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_BINDING
+    ret
+
+validate_fixed_user_context_reserved_state:
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_RESERVED_0_OFFSET], 0
+    jne .invalid
+    cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_RESERVED_1_OFFSET], 0
+    jne .invalid
+    xor eax, eax
+    ret
+.invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_RESERVED_STATE
+    ret
+
+validate_fixed_user_context_phase_and_count:
+    mov eax, [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSACTION_PHASE_OFFSET]
+    cmp eax, [rel fixed_user_transaction_phase]
+    jne fixed_user_context_association_invalid
+    cmp dword [rel fixed_user_transaction_phase + 4], 0
+    jne fixed_user_context_association_invalid
+    mov edx, [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSITION_COUNT_OFFSET]
+    test edx, edx
+    jz validate_fixed_user_context_request_phase
+    cmp edx, 1
+    je validate_fixed_user_context_response_phase
+    cmp edx, FIXED_USER_CONTEXT_TRANSITION_BUDGET
+    jne fixed_user_context_count_invalid
+    jmp validate_fixed_user_context_consumed_phase
+
+validate_fixed_user_context_request_phase:
+    cmp eax, FIXED_USER_PHASE_REQUEST_PENDING
+    jne fixed_user_context_association_invalid
+    xor eax, eax
+    ret
+
+validate_fixed_user_context_response_phase:
+    cmp eax, FIXED_USER_PHASE_RESPONSE_READY
+    jne fixed_user_context_association_invalid
+    xor eax, eax
+    ret
+
+validate_fixed_user_context_consumed_phase:
+    cmp eax, FIXED_USER_PHASE_CONSUMED
+    jne fixed_user_context_association_invalid
+    xor eax, eax
+    ret
+
+fixed_user_context_count_invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_TRANSITION_COUNT
+    ret
+
+fixed_user_context_association_invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_TRANSACTION_ASSOCIATION
+    ret
+
+populate_fixed_user_execution_context:
+    call populate_fixed_user_context_header
+    call populate_fixed_user_context_code_and_data
+    call populate_fixed_user_context_stack
+    call populate_fixed_user_context_entry_and_transaction
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_LIFECYCLE_OFFSET], FIXED_USER_CONTEXT_READY
+    ret
+
+populate_fixed_user_context_header:
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_FORMAT_VERSION_OFFSET], FIXED_USER_CONTEXT_FORMAT_VERSION
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_STRUCTURE_SIZE_OFFSET], FIXED_USER_CONTEXT_SIZE
+    mov rax, FIXED_USER_CONTEXT_OPAQUE_IDENTITY
+    mov [rel fixed_user_context + FIXED_USER_CONTEXT_OPAQUE_IDENTITY_OFFSET], rax
+    mov qword [rel fixed_user_context + FIXED_USER_CONTEXT_LIFECYCLE_OFFSET], FIXED_USER_CONTEXT_UNINITIALIZED
+    ret
+
+populate_fixed_user_context_code_and_data:
+    mov rax, USER_PROBE_CODE_VA
+    mov [rel fixed_user_context + FIXED_USER_CONTEXT_USER_CODE_START_OFFSET], rax
+    mov qword [rel fixed_user_context + FIXED_USER_CONTEXT_USER_CODE_SIZE_OFFSET], KOZO_PAGE_SIZE
+    mov rax, USER_PROBE_DATA_VA
+    mov [rel fixed_user_context + FIXED_USER_CONTEXT_USER_DATA_START_OFFSET], rax
+    mov qword [rel fixed_user_context + FIXED_USER_CONTEXT_USER_DATA_SIZE_OFFSET], KOZO_PAGE_SIZE
+    ret
+
+populate_fixed_user_context_stack:
+    mov rax, USER_PROBE_STACK_VA
+    mov [rel fixed_user_context + FIXED_USER_CONTEXT_USER_STACK_START_OFFSET], rax
+    mov qword [rel fixed_user_context + FIXED_USER_CONTEXT_USER_STACK_SIZE_OFFSET], KOZO_PAGE_SIZE
+    mov rax, USER_PROBE_STACK_TOP_VA
+    mov [rel fixed_user_context + FIXED_USER_CONTEXT_USER_STACK_TOP_OFFSET], rax
+    ret
+
+populate_fixed_user_context_entry_and_transaction:
+    mov rax, USER_PROBE_CODE_VA
+    mov [rel fixed_user_context + FIXED_USER_CONTEXT_ENTRY_RIP_OFFSET], rax
+    mov rax, USER_INITIAL_RSP
+    mov [rel fixed_user_context + FIXED_USER_CONTEXT_INITIAL_RSP_OFFSET], rax
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_USER_CODE_SELECTOR_OFFSET], USER_CODE_SELECTOR
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_USER_DATA_SELECTOR_OFFSET], USER_DATA_SELECTOR
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_RETURN_VECTOR_OFFSET], KOZO_PRIVILEGE_RETURN_VECTOR
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSITION_BUDGET_OFFSET], FIXED_USER_CONTEXT_TRANSITION_BUDGET
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSITION_COUNT_OFFSET], 0
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_TRANSACTION_PHASE_OFFSET], FIXED_USER_PHASE_REQUEST_PENDING
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_REQUEST_IDENTIFIER_OFFSET], FIXED_USER_REQUEST_ID
+    mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_RESERVED_1_OFFSET], 0
+    ret
+
+reset_fixed_user_context_result:
+    cld
+    lea rdi, [rel fixed_user_context_result]
+    xor eax, eax
+    mov ecx, FIXED_USER_CONTEXT_RESULT_SIZE / 8
+    rep stosq
+    jmp fixed_user_context_result_is_initial
+
+fixed_user_context_is_uninitialized:
+    lea rdi, [rel fixed_user_context]
+    mov ecx, FIXED_USER_CONTEXT_SIZE / 8
+    jmp fixed_qword_span_is_zero
+
+fixed_user_context_result_is_initial:
+    lea rdi, [rel fixed_user_context_result]
+    mov ecx, FIXED_USER_CONTEXT_RESULT_SIZE / 8
+    jmp fixed_qword_span_is_zero
+
+validate_fixed_user_context_success_result:
+    cmp dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_FORMAT_VERSION_OFFSET], FIXED_USER_CONTEXT_RESULT_FORMAT_VERSION
+    jne .invalid
+    cmp dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_STRUCTURE_SIZE_OFFSET], FIXED_USER_CONTEXT_RESULT_SIZE
+    jne .invalid
+    cmp dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_OUTCOME_OFFSET], FIXED_USER_CONTEXT_RESULT_SUCCESS
+    jne .invalid
+    cmp dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_FAILURE_CODE_OFFSET], FIXED_USER_CONTEXT_FAILURE_NONE
+    jne .invalid
+    cmp dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_TRANSITION_COUNT_OFFSET], FIXED_USER_CONTEXT_TRANSITION_BUDGET
+    jne .invalid
+    cmp dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_TERMINAL_LIFECYCLE_OFFSET], FIXED_USER_CONTEXT_RETURNED
+    jne .invalid
+    cmp qword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_RESERVED_0_OFFSET], 0
+    jne .invalid
+    xor eax, eax
+    ret
+.invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_RESULT_COMMIT_FAILED
+    ret
+
+fixed_user_context_status_from_failure:
+    add eax, FIXED_USER_CONTEXT_STATUS_BASE
     ret
 
 privilege_fault_sink:

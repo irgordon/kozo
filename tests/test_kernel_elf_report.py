@@ -19,6 +19,62 @@ CONSUMER_SYMBOLS = {
 
 
 class KernelElfReportTests(unittest.TestCase):
+    def test_symbol_sections_parse_bss_from_gnu_and_llvm_shapes(self):
+        output = (
+            "ffffffff80216120 g       .bss 0000000000000000 fixed_user_context\n"
+            "ffffffff802161a0 g     O .bss 0000000000000020 fixed_user_context_result\n"
+        )
+        sections = kernel_elf_report.parse_symbol_sections(
+            output,
+            {"fixed_user_context", "fixed_user_context_result"},
+        )
+        self.assertEqual(
+            sections,
+            {
+                "fixed_user_context": ".bss",
+                "fixed_user_context_result": ".bss",
+            },
+        )
+
+    def test_fixed_storage_record_requires_rw_nx_higher_half_segment(self):
+        start = 0xFFFFFFFF80216120
+        segment = kernel_elf_report.ProgramHeader(
+            header_type=kernel_elf_report.PT_LOAD,
+            flags=6,
+            offset=0,
+            virtual_address=0xFFFFFFFF80216000,
+            physical_address=0,
+            file_size=0,
+            memory_size=0x1000,
+            alignment=0x1000,
+        )
+        record = kernel_elf_report._fixed_storage_record(
+            {"context": start, "context_end": start + 128},
+            {"context": ".bss"},
+            [segment],
+            "context",
+            "context_end",
+            128,
+            16,
+        )
+        self.assertEqual(record["load_segment_flags"], "rw-")
+        self.assertTrue(record["writable"])
+        self.assertTrue(record["non_executable"])
+        self.assertTrue(record["higher_half_address"])
+
+    def test_fixed_context_overlap_detection_names_conflict(self):
+        context = {"start_address": "0x1000", "end_address": "0x1080"}
+        result = {"start_address": "0x1070", "end_address": "0x1090"}
+        overlaps = kernel_elf_report._fixed_user_context_overlaps(
+            context,
+            result,
+            {"governed_state": (0x1080, 0x10A0)},
+        )
+        self.assertEqual(
+            overlaps,
+            ["context:result", "result:governed_state"],
+        )
+
     def test_llvm_fixture_proves_complete_consumer(self):
         evidence = self.fixture_evidence(LLVM_FIXTURE)
         self.assert_complete_consumer(evidence)

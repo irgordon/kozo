@@ -102,6 +102,20 @@ SECTIONS
          "fixed user consumption shadow must be exactly 48 bytes")
   ASSERT((fixed_user_transaction_phase_end - fixed_user_transaction_phase) == 8,
          "fixed user transaction phase must be exactly 8 bytes")
+  ASSERT((fixed_user_context_end - fixed_user_context) == 128,
+         "fixed user execution context must be exactly 128 bytes")
+  ASSERT((fixed_user_context % 16) == 0,
+         "fixed user execution context must be 16-byte aligned")
+  ASSERT((fixed_user_context_result_end - fixed_user_context_result) == 32,
+         "fixed user execution context result must be exactly 32 bytes")
+  ASSERT((fixed_user_context_result % 8) == 0,
+         "fixed user execution context result must be 8-byte aligned")
+  ASSERT(fixed_user_transaction_phase_end <= fixed_user_context,
+         "fixed user execution context must not overlap transaction phase")
+  ASSERT(fixed_user_context_end <= fixed_user_context_result,
+         "fixed user execution context and result must not overlap")
+  ASSERT(fixed_user_context_result_end <= fixed_user_request_success_state,
+         "fixed user execution context result must not overlap runtime state")
   ASSERT((fixed_user_request_shadow % 8) == 0,
          "fixed user request shadow must be 8-byte aligned")
   ASSERT((fixed_user_response_shadow % 8) == 0,
