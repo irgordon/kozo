@@ -1,19 +1,19 @@
 {
   "artifact_version": "1",
-  "task_id": "kozo-fixed-user-execution-context-implementation",
-  "task_title": "KOZO Fixed User Execution Context Implementation",
+  "task_id": "kozo-fixed-user-execution-context-hosted-acceptance-alignment",
+  "task_title": "KOZO Fixed User Execution Context Hosted Acceptance Alignment",
   "plan_status": "complete",
-  "current_step_id": 98,
+  "current_step_id": 99,
   "replan_required": false,
   "halted": false,
   "failure_state": {
-    "last_failed_step": 98,
-    "failure_count": 3
+    "last_failed_step": 0,
+    "failure_count": 0
   },
   "execution": {
     "step_attempt": 1,
-    "last_step_started_at": "2026-08-12T03:20:00Z",
-    "last_step_completed_at": "2026-08-12T04:20:00Z"
+    "last_step_started_at": "2026-08-14T16:30:00Z",
+    "last_step_completed_at": "2026-08-14T16:47:00Z"
   },
-  "updated_at": "2026-08-12T04:20:00Z"
+  "updated_at": "2026-08-14T16:47:00Z"
 }

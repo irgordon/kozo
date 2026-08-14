@@ -1,8 +1,8 @@
 # KOZO Fixed User Execution Context Phase Definition
 
 Version: 1
-Status: Implemented candidate
-Implementation: Authorized and locally validated
+Status: Implemented and hosted accepted
+Implementation: Authorized, implemented, and hosted accepted
 Governance prerequisites: Accepted
 Scope: Selection and boundary definition for one kernel-owned user execution context
 
@@ -407,10 +407,10 @@ Implementation acceptance requires:
 
 Current published release: `v1.0.1`.
 
-Likely eventual release class: minor.
+Release containing this implementation: none.
 
-Reason: the capability would add a new runtime ownership and lifecycle
-boundary without repairing a released defect.
+The implementation exists on `main` after the immutable `v1.0.1` tag. A future
+release class and version remain unassigned.
 
 Version assignment is deferred to separate authorization. This definition
 does not authorize `v1.1.0`, any patch release, or publication.
@@ -424,14 +424,15 @@ The governance prerequisites are now defined:
 1. ADR 0018 defines fixed execution-context identity, ownership, lifecycle,
    and its relationship to the existing transaction phase.
 2. The fixed execution-context contract, schema, direct validator, and focused
-   tests define the internal governance boundary. Runtime and ELF evidence
-   remain implementation work.
+   tests define the internal governance boundary. At prerequisite adoption,
+   runtime and ELF evidence remained implementation work; that evidence is now
+   implemented and hosted accepted.
 3. The runtime progression stage authority names the context contract without
    implying general userspace execution.
 
 These are governance and evidence prerequisites, not independent product
-capabilities. Hosted acceptance of this governance task must precede a
-separately authorized implementation task.
+capabilities. Their hosted acceptance preceded the separately authorized and
+now hosted-accepted implementation.
 
 No marker-taxonomy change, new external dependency, resource study, or prior
 runtime capability is required.
@@ -446,15 +447,14 @@ runtime capability is required.
 | `docs/PHASEMAP.md` | Consistent with prerequisite | The next planned stage is userspace planning; its contract authority must be updated before implementation. |
 | `docs/GOVERNANCE.md` | Consistent | This task adopts the required subordinate ADR, contract, and planning authority without changing higher authority. |
 | `docs/INVARIANTS.md` | Consistent | Fail-closed, security, portability, runtime, and release invariants remain intact. |
-| `docs/VALIDATION.md` | Consistent with prerequisite | Future behavior requires contract, source, ELF, negative, and runtime evidence. |
+| `docs/VALIDATION.md` | Consistent | Contract, source, ELF, negative, and runtime evidence passed without changing the governed check count. |
 | `docs/COMPATIBILITY.md` | Consistent | No general userspace, process, or host-runtime claim is added. |
-| `docs/ARCHITECTURE.md` | Consistent | ADR 0018 defines the future ownership record while the architecture text keeps implementation explicitly unauthorized. |
-| `docs/SECURITY_MODEL.md` | Consistent | ADR 0018 defines future identity and lifecycle checks without claiming a new implemented security boundary. |
+| `docs/ARCHITECTURE.md` | Consistent | ADR 0018 owns the implemented fixed context boundary without adding process semantics. |
+| `docs/SECURITY_MODEL.md` | Consistent | The implemented identity and lifecycle checks remain internal and do not claim hostile-code containment. |
 | ADR 0017 | Consistent | All three build hosts remain required and runtime evidence stays separate. |
 
-Governance-conflict classification: `NO_CONFLICT`. ADR 0018 satisfies the
-ownership decision prerequisite; runtime implementation still requires
-separate authorization.
+Governance-conflict classification: `NO_CONFLICT`. ADR 0018 governed the
+separately authorized implementation, which is now hosted accepted.
 
 ---
 
@@ -468,16 +468,20 @@ Phase definition: complete.
 
 Implementation authorized by separate explicit task: true.
 
-Implementation status: locally validated candidate; hosted acceptance pending.
+Implementation status: implemented and hosted accepted.
+
+Hosted acceptance: CI run `31563696881`, lint run `31563696973`, and
+portability run `31563697127` passed.
 
 Version change authorized: false.
 
 Release authorized: false.
 
-Current release: `v1.0.1`.
+Current published release: `v1.0.1`.
 
-Next action: complete hosted acceptance for the implemented candidate, then
-begin Post-Implementation Observation only if every gate remains green.
+Published release containing this implementation: none.
+
+Next capability: not selected. No follow-on task is inferred automatically.
 
 ---
 
@@ -517,7 +521,7 @@ macOS retained `VALIDATED_BUILD` with runtime `NOT_EXECUTED`.
 
 ---
 
-# 25. Implemented Candidate
+# 25. Hosted-Accepted Implementation
 
 The runtime now owns one 128-byte, 16-byte-aligned context and one separate
 32-byte, 8-byte-aligned result in supervisor RW-NX static storage. The context
@@ -531,7 +535,13 @@ and validates `CLEARED` before `KOZO_RING0_RETURN_OK`.
 
 Focused source and ELF validation covers identity, lifecycle, bindings,
 reserved fields, phase/count mismatches, budget exhaustion, result authority,
-cleanup readback, storage policy, ordering, and overlap. Local QEMU retains the
-exact 41-marker sequence through `KOZO_RUNTIME_RETURN_OK`. Hosted acceptance
-must confirm the existing Linux, Windows, and macOS evidence levels before the
-candidate is accepted.
+cleanup readback, storage policy, ordering, and overlap. Hosted CI run
+`31563696881` passed 1,217 Python tests, 102 focused context tests, 67 governed
+checks with no failures, and QEMU with blocker `none`, all 41 markers, and
+`KOZO_RUNTIME_RETURN_OK` final. Lint run `31563696973` and portability run
+`31563697127` also passed. Linux remains `VALIDATED_RUNTIME`; Windows and macOS
+remain `VALIDATED_BUILD` with runtime `NOT_EXECUTED`.
+
+The implementation changed no marker, governed check count, public ABI,
+release version, tag, or hosted release asset. It exists on current `main`, not
+in the immutable published `v1.0.1` release.

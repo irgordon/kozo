@@ -195,17 +195,18 @@ release-input boundary remained uncorrected.
 Portability run `31458972010` validated the bounded correction on all three
 pinned hosts and passed the required aggregate release-input identity gate.
 Linux remains `VALIDATED_RUNTIME`; Windows and macOS are `VALIDATED_BUILD`
-with runtime `NOT_EXECUTED`. Phase 0 is accepted. v1.1.0 capability work still
-requires separate authorization.
+with runtime `NOT_EXECUTED`. Phase 0 is accepted. Phase 0 itself authorized no
+product capability; a later separate task authorized only the Fixed User
+Execution Context implementation.
 
-The next capability-selection phase defines one **Fixed User Execution
-Context**. It will eventually bind the accepted user mappings, privilege
-transition, fixed transaction, and Ring 0 return to one kernel-owned opaque
-identity and bounded lifecycle. The definition is complete in
-`docs/FIXED_USER_EXECUTION_CONTEXT.md`; ADR 0018 and the exact internal
-context/result contract define its accepted governance prerequisites.
-Implementation, version assignment, and release remain unauthorized. A
-separate task must authorize runtime changes.
+The **Fixed User Execution Context** definition, governance prerequisites, and
+implementation are complete and hosted accepted on `main`. CI run
+`31563696881`, lint run `31563696973`, and portability run `31563697127`
+preserved 67 governed checks, all 41 markers, the existing ABI, and the
+accepted host evidence levels. The current published release remains
+`v1.0.1`, which predates this implementation; no published release contains
+the context. v1.0.2 and v1.1.0 remain unauthorized, and no next capability is
+selected.
 
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity
@@ -344,7 +345,6 @@ Deferred until separately scoped runtime or cleanup phases:
 | `post-Phase-0 definition` | Fixed User Execution Context | Define one supervisor-only identity and lifecycle that binds the accepted fixed user execution path without implementing it. | Runtime implementation, repeated sessions, processes, scheduling, dynamic memory, ABI expansion, version authorization, or release. |
 | `post-Phase-0 prerequisites` | Fixed User Execution Context Governance | Adopt exact ownership, lifecycle, result, cleanup, transition-budget, progression, and evidence authority before runtime implementation. | Runtime implementation, marker/check-count changes, repeated sessions, public ABI, version authorization, or release. |
 | `post-Phase-0 implementation` | Fixed User Execution Context Implementation | Add one static supervisor-owned lifecycle around the accepted fixed transaction and prove cleanup without changing markers or ABI. | Repeated sessions, processes, scheduling, dynamic allocation, marker/check-count changes, version authorization, or release. |
-| `post-implementation observation` | Fixed User Execution Context Observation | Observe hosted and runtime stability after implementation acceptance. | New capability work, version changes, release preparation, or expansion of user execution semantics. |
 
 ---
 

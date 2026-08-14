@@ -2,8 +2,8 @@
 
 ## Fixed user execution context implementation - 2026-08-12
 
-**Status:** Implemented candidate with local verification; hosted acceptance
-pending. Version and release authorization remain unchanged.
+**Status:** Implemented and hosted accepted on `main`; not published in
+`v1.0.1`. Version and release authorization remain unchanged.
 
 * Implemented the Fixed User Execution Context around the existing fixed
   Ring 3 transaction.
@@ -14,8 +14,14 @@ pending. Version and release authorization remain unchanged.
   fail-closed cleanup, and clear-state readback.
 * Added focused source and ELF evidence without registering a new governed
   check or changing the 41-marker taxonomy.
+* Hosted CI run `31563696881`, lint run `31563696973`, and portability run
+  `31563697127` accepted the implementation with 1,217 Python tests, 102
+  focused tests, 67 governed checks, no failures, QEMU pass, blocker none, and
+  all 41 markers through `KOZO_RUNTIME_RETURN_OK`.
 * No process, scheduler, repeated session, public ABI, marker, or release
   behavior changed.
+* The current published release remains immutable `v1.0.1`; no published
+  release contains this implementation.
 
 ## Fixed user execution context prerequisites - 2026-08-11
 
