@@ -206,9 +206,10 @@ preserved 67 governed checks, all 41 markers, the existing ABI, and the
 accepted host evidence levels. The current published release remains
 `v1.0.1`, which predates this implementation; no published release contains
 the context. The separately authorized **Bounded Repeated User Session** is
-implemented locally on `main` with two explicit lifecycles and 52 marker
-occurrences; hosted acceptance is pending. v1.0.2 and v1.1.0 remain
-unauthorized.
+implemented and hosted accepted on `main` through CI run `31899981058`, lint
+run `31899981084`, and portability run `31899981072`. It completes two
+explicit lifecycles and 52 marker occurrences while retaining 67 governed
+checks. v1.0.2 and v1.1.0 remain unauthorized.
 
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity

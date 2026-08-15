@@ -1,7 +1,7 @@
 # KOZO Bounded Repeated User Session
 
 Version: 1
-Status: Implemented locally; hosted acceptance pending
+Status: Implemented and hosted accepted on main
 Current published release: v1.0.1, which does not contain this capability
 
 ## Problem Solved
@@ -70,6 +70,13 @@ context, public syscall ABI, new interrupt vector, user-selected identity,
 mapping, or persistent session. Windows and macOS remain build-validated only;
 Linux remains the governed runtime host.
 
-Hosted acceptance and artifact run identifiers will be recorded only after
-the required CI, lint, and portability workflows pass. No published release
-currently contains this implementation.
+Hosted CI run `31899981058` passed 1,284 Python tests, 67 governed checks,
+QEMU with no blocker, and all 52 ordered marker occurrences. Lint run
+`31899981084` passed. Portability run `31899981072` passed the pinned Linux,
+Windows, and macOS build contracts plus cross-host release-input identity;
+only Linux executed the runtime contract.
+
+Downloaded hosted evidence independently confirmed two completed sessions,
+active ordinal zero, matching packaged and runtime-tested ISO hashes, valid
+package checksums, and the supervisor RW-NX coordinator ELF record. No
+published release currently contains this implementation.

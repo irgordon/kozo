@@ -188,10 +188,11 @@ implementation, and hosted acceptance are complete. CI run `31563696881`, lint
 run `31563696973`, and portability run `31563697127` accepted the bounded
 runtime implementation while preserving 67 governed checks and all 41 markers.
 Current `main` contains the context implementation; immutable `v1.0.1` does
-not. The Bounded Repeated User Session is implemented locally with two fixed
-sessions and 52 marker occurrences; hosted acceptance remains pending. Product
-version and release authorization remain unchanged, and all published tags and
-hosted assets remain immutable.
+not. The Bounded Repeated User Session is implemented and hosted accepted with
+two fixed sessions and 52 marker occurrences. CI run `31899981058`, lint run
+`31899981084`, and portability run `31899981072` passed, including independent
+downloaded-artifact validation. Product version and release authorization
+remain unchanged, and all published tags and hosted assets remain immutable.
 
 ---
 

@@ -2,7 +2,7 @@
   "task_title": "KOZO Bounded Repeated User Session",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
-  "plan_status": "approved",
+  "plan_status": "complete",
   "replan_number": 0,
   "approval": {
     "status": "approved"
@@ -3457,7 +3457,7 @@
     {
       "id": 100,
       "title": "Implement bounded repeated user session",
-      "status": "pending",
+      "status": "done",
       "kind": "edit",
       "files_expected": [
         "contracts/bounded_repeated_user_session_contract.v0.json",
@@ -4442,7 +4442,7 @@
       {
         "tool": "bounded repeated user session validation",
         "command": "focused, full, governed, and hosted validation",
-        "status": "local_pass_1284_tests_67_checks_0_failures_qemu_pass_52_markers_hosted_acceptance_pending"
+        "status": "hosted_accepted_commits_7939be7_f9082db_ci_31899981058_lint_31899981084_portability_31899981072_1284_tests_67_checks_0_failures_qemu_pass_blocker_none_52_markers_2_sessions_4_transitions_linux_VALIDATED_RUNTIME_windows_macos_VALIDATED_BUILD_runtime_NOT_EXECUTED_hosted_artifacts_validated"
       }
     ],
     "logs": [
@@ -4712,6 +4712,7 @@
     "At prerequisite adoption, ADR 0018 and one exact internal context/result contract defined lifecycle, cleanup, fixed binding, two-transition budget, progression, portability, and evidence rules; implementation was authorized later, while version change and release remained unauthorized.",
     "Accepted the Fixed User Execution Context governance prerequisites through CI run 31475116760, lint run 31475116763, and portability run 31475116739; the next milestone is a separately authorized Fixed User Execution Context Implementation Authorization task.",
     "Implemented the authorized fixed user context as one layered static authority boundary with an exact result record, fail-closed lifecycle enforcement, transition accounting, cleanup readback, ELF storage proof, focused negative tests, and no public ABI, contract, schema, marker, governed-check, version, tag, or release change.",
-    "Aligned current documentation and task state with the accepted implementation runs, kept v1.0.1 as the immutable published release that predates the context, and selected no automatic next task."
+    "Aligned current documentation and task state with the accepted implementation runs, kept v1.0.1 as the immutable published release that predates the context, and selected no automatic next task.",
+    "Accepted the Bounded Repeated User Session through CI run 31899981058, lint run 31899981084, and portability run 31899981072; downloaded hosted evidence proves two sessions, four transitions, 52 markers, valid package checksums, matching packaged/runtime ISO hashes, and preserved host evidence levels while v1.0.1 remains unchanged."
   ]
 }

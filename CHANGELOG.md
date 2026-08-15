@@ -2,8 +2,8 @@
 
 ## Bounded repeated user session - 2026-08-15
 
-**Status:** Implemented locally on `main`; hosted acceptance pending. Not
-published in v1.0.1.
+**Status:** Implemented and hosted accepted on `main`; not published in
+v1.0.1.
 
 * Reused the accepted static Fixed User Execution Context for exactly two
   sequential fixed transactions with distinct kernel-owned opaque identities.
@@ -18,6 +18,12 @@ published in v1.0.1.
 * Added a contract, schema, duplicate-aware QEMU evidence, ELF reporting,
   focused unregistered validators, and regression tests while retaining 67
   governed checks.
+* Hosted CI run `31899981058`, lint run `31899981084`, and portability run
+  `31899981072` passed with 1,284 Python tests, 67 checks, QEMU pass, no
+  blocker, 52 ordered markers, and all required host build contracts.
+* Downloaded hosted evidence validated package checksums, JSON, the kernel ELF
+  report, exact QEMU occurrence metadata, matching packaged/runtime ISO hashes,
+  and cross-host release-input identity.
 * Added no process, scheduler, allocator, public ABI, mapping, interrupt vector,
   release version, tag, or release behavior.
 
