@@ -203,7 +203,7 @@ def _runtime_entry_flow_issue(lines: tuple[str, ...]) -> RuntimeProgressionEvide
         "return status_boundary_result",
         "return execute_second_governed_capability()",
         "collection_status := collect_runtime_status()",
-        "transaction_status := execute_fixed_user_runtime_status_transaction()",
+        "transaction_status := execute_bounded_repeated_user_sessions()",
         "capability_status := execute_first_governed_capability()",
         "if !clear_runtime_status_snapshot() {",
         "return RUNTIME_CAPABILITY_EXECUTION_FAILURE",

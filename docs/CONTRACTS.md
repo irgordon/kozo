@@ -374,5 +374,19 @@ The context contract references the accepted mapping, privilege, request,
 response-consumption, status-service, and progression contracts rather than
 replacing their authority. It is an internal kernel contract, not a public
 userspace ABI. Its schema and direct governance validator prove definition
-consistency only. Runtime implementation and runtime evidence remain
-unauthorized until a separate task.
+consistency. The separately authorized runtime implementation is accepted on
+`main`; immutable v1.0.1 predates it.
+
+# 29. Bounded Repeated User Session
+
+`contracts/bounded_repeated_user_session_contract.v0.json` composes exactly two
+complete fixed-context lifecycles without changing the base context contract.
+It owns the two contract-fixed identities, required session count, four total
+returns, between-session reset order, optional 32-byte coordinator geometry,
+duplicate marker occurrence rules, named failures, later-continuation gate,
+and explicit non-goals.
+
+The contract accepts no user input and creates no public ABI. Its direct
+contract and evidence validators are focused and unregistered, preserving the
+67-check aggregate while the runtime taxonomy retains one unique marker
+catalog and a 52-entry occurrence sequence.

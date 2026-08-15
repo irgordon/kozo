@@ -53,6 +53,8 @@ _REQUIRED_MARKERS = (
     "KOZO_SECOND_CAPABILITY_OK",
     "KOZO_RUNTIME_RETURN_OK",
 )
+_FIXED_TRANSACTION_MARKERS = _REQUIRED_MARKERS[23:34]
+_REQUIRED_MARKER_ORDER = _REQUIRED_MARKERS[:34] + _FIXED_TRANSACTION_MARKERS + _REQUIRED_MARKERS[34:]
 _REQUIRED_OUTCOMES = ("pass", "blocked")
 _REQUIRED_BLOCKERS = (
     "none",
@@ -88,6 +90,13 @@ _REQUIRED_BLOCKERS = (
     "fixed_user_request_boundary_not_completed",
     "ring3_probe_not_completed",
     "ring0_return_not_completed",
+    "first_session_not_entered",
+    "first_session_not_completed",
+    "between_session_reset_failed",
+    "second_session_not_entered",
+    "second_session_not_completed",
+    "unexpected_third_session",
+    "later_runtime_continuation_not_reached",
     "capability_dispatch_not_reached",
     "runtime_status_query_not_completed",
     "first_governed_capability_not_proven",
@@ -195,7 +204,7 @@ def _load_taxonomy(
 def _marker_order_issue(
     taxonomy: runtime_evidence_taxonomy.RuntimeEvidenceTaxonomy,
 ) -> RuntimeEvidenceTaxonomyIssue | None:
-    if taxonomy.smoke_marker_order == _REQUIRED_MARKERS:
+    if taxonomy.smoke_marker_order == _REQUIRED_MARKER_ORDER:
         return None
     return _issue("wrong_marker_order", "smoke_marker_order", "Runtime evidence taxonomy marker order must match the governed smoke sequence")
 

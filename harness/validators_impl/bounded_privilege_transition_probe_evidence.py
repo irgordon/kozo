@@ -7,6 +7,7 @@ from pathlib import Path
 from harness.abi_manifest import ROOT
 from harness.codes import BOUNDED_PRIVILEGE_TRANSITION_PROBE_EVIDENCE_INVALID, OK
 from harness.runtime_evidence_taxonomy import get_smoke_marker_order
+from harness.runtime_marker_occurrences import marker_occurs_as_governed
 from harness.validator import BaseValidator, ValidationResult
 from harness.validators_impl.bounded_privilege_transition_probe_contract import _contract_issue
 
@@ -331,8 +332,8 @@ def _runtime_issue(context):
         position = context.serial.find(marker, position + 1)
         if position < 0:
             return _issue("runtime_marker_missing", f"qemu_smoke.{marker}", f"QEMU serial log is missing {marker}")
-        if marker in _MARKERS and context.serial.count(marker) != 1:
-            return _issue("runtime_marker_duplicate", f"qemu_smoke.{marker}", f"QEMU serial log must contain exactly one {marker}")
+        if marker in _MARKERS and not marker_occurs_as_governed(context.serial, marker, expected):
+            return _issue("runtime_marker_duplicate", f"qemu_smoke.{marker}", f"QEMU serial marker count must match the governed occurrence count for {marker}")
     return None
 
 

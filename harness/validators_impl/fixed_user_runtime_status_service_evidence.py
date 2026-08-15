@@ -7,6 +7,7 @@ from pathlib import Path
 from harness.abi_manifest import ROOT
 from harness.codes import FIXED_USER_RUNTIME_STATUS_SERVICE_EVIDENCE_INVALID, OK
 from harness.runtime_evidence_taxonomy import get_smoke_marker_order
+from harness.runtime_marker_occurrences import exact_marker_line_count
 from harness.validator import BaseValidator, ValidationResult
 from harness.validators_impl.fixed_user_runtime_status_service_contract import _contract_issue
 
@@ -180,7 +181,7 @@ def _runtime_order_issue(context):
         boundaries,
         (
             "collect_runtime_status()",
-            "execute_fixed_user_runtime_status_transaction()",
+            "execute_bounded_repeated_user_sessions()",
             "execute_first_governed_capability()",
             "clear_runtime_status_snapshot()",
         ),
@@ -427,11 +428,13 @@ def _runtime_evidence_issue(context):
     expected = get_smoke_marker_order()
     if observed != expected:
         return _issue("metadata_log_mismatch", "qemu_smoke.observed_markers", "QEMU metadata must contain the complete taxonomy sequence")
-    serial_markers = tuple(marker for marker in expected if marker in context.serial)
-    if serial_markers != expected:
-        return _issue("runtime_marker_missing", "qemu_smoke.serial_log", "Serial evidence is missing a required runtime status marker")
-    if any(context.serial.count(marker) != 1 for marker in _RUNTIME_MARKERS):
-        return _issue("runtime_marker_duplicate", "qemu_smoke.serial_log", "Each runtime status boundary marker must appear exactly once")
+    for marker in _RUNTIME_MARKERS:
+        actual = exact_marker_line_count(context.serial, marker)
+        required = expected.count(marker)
+        if actual < required:
+            return _issue("runtime_marker_missing", "qemu_smoke.serial_log", "Serial evidence is missing a required runtime status marker occurrence")
+        if actual > required:
+            return _issue("runtime_marker_duplicate", "qemu_smoke.serial_log", "Runtime status marker counts must match the governed occurrence sequence")
     return None
 
 

@@ -64,6 +64,15 @@ global validate_fixed_user_context_return
 global commit_fixed_user_context_result
 global clear_fixed_user_execution_context
 global validate_fixed_user_execution_context_cleared
+global validate_fixed_user_context_success_result
+global validate_fixed_user_session_cleanup
+global reset_fixed_user_context_result
+global reset_fixed_user_execution_context_for_reuse
+global validate_fixed_user_session_reset_state
+global validate_fixed_user_session_identity_sequence
+global invalidate_fixed_user_session_state
+global fixed_user_context_is_uninitialized
+global fixed_user_context_result_is_initial
 global observed_governed_gdtr
 global observed_governed_idtr
 global observed_task_register
@@ -71,6 +80,8 @@ global observed_task_register
 extern walk_page_mapping
 extern physical_for_kernel_virtual
 extern user_probe_data_start
+extern user_probe_stack
+extern repeated_user_session_coordinator
 extern runtime_serial_write_ring3_enter_marker
 extern runtime_serial_write_user_request_copy_in_marker
 extern runtime_serial_write_user_runtime_status_service_enter_marker
@@ -822,6 +833,8 @@ finish_fixed_user_context_transaction_failure:
 
 ; Save the Odin stack so the fixed Ring3 transaction has one return target.
 enter_bounded_ring3_probe:
+    cmp qword [rel saved_odin_return_stack], 0
+    jne .stale_return_stack
     mov [rel saved_odin_return_stack], rsp
     mov qword [rel privilege_probe_state], 0
     mov qword [rel fixed_user_request_success_state], 0
@@ -857,6 +870,9 @@ enter_bounded_ring3_probe:
     ud2
 .phase_invalid:
     mov eax, USER_RESPONSE_PHASE_INVALID
+    jmp .done
+.stale_return_stack:
+    mov eax, PRIVILEGE_RING0_CONTINUATION_FAILED
 .done:
     ret
 
@@ -1566,7 +1582,10 @@ clear_fixed_user_response_transaction:
     lea rdi, [rel fixed_user_response_verify]
     mov ecx, FIXED_USER_RESPONSE_QWORDS
     rep stosq
-    call fixed_user_buffers_are_zero
+    call clear_fixed_user_reused_storage
+    test eax, eax
+    jnz .failed
+    call fixed_user_session_storage_is_zero
     test eax, eax
     jnz .failed
     xor eax, eax
@@ -1602,13 +1621,45 @@ clear_fixed_user_request_buffers:
     rep stosq
     mov qword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
     mov qword [rel fixed_user_request_success_state], 0
-    call fixed_user_buffers_are_zero
+    call clear_fixed_user_reused_storage
+    test eax, eax
+    jnz .failed
+    call fixed_user_session_storage_is_zero
     test eax, eax
     jnz .failed
     xor eax, eax
     ret
 .failed:
     mov eax, FIXED_USER_BUFFER_CLEAR_FAILED
+    ret
+
+clear_fixed_user_reused_storage:
+    cld
+    mov rdi, FIXED_USER_DATA_SCRATCH_VA
+    xor eax, eax
+    mov ecx, FIXED_USER_DATA_SCRATCH_SIZE / 8
+    rep stosq
+    mov rdi, USER_PROBE_STACK_VA
+    mov ecx, PAGE_QWORDS
+    rep stosq
+    xor eax, eax
+    ret
+
+fixed_user_session_storage_is_zero:
+    call fixed_user_buffers_are_zero
+    test eax, eax
+    jnz .not_zero
+    mov rdi, FIXED_USER_DATA_SCRATCH_VA
+    mov ecx, FIXED_USER_DATA_SCRATCH_SIZE / 8
+    call fixed_qword_span_is_zero
+    test eax, eax
+    jnz .not_zero
+    mov rdi, USER_PROBE_STACK_VA
+    mov ecx, PAGE_QWORDS
+    call fixed_qword_span_is_zero
+    ret
+.not_zero:
+    mov eax, 1
     ret
 
 fixed_user_buffers_are_zero:
@@ -1666,6 +1717,7 @@ privilege_return_failure:
     mov rsp, [rel saved_odin_return_stack]
     test rsp, rsp
     jz boot_terminal_halt
+    mov qword [rel saved_odin_return_stack], 0
     ret
 
 ; Fixed continuation validates restored CPL0 state and returns through the Odin bridge.
@@ -1699,6 +1751,7 @@ privilege_ring0_continuation:
     jne .boundary_failed
     mov qword [rel privilege_probe_state], 0
     mov qword [rel fixed_user_request_success_state], 0
+    mov qword [rel saved_odin_return_stack], 0
     call runtime_serial_write_ring0_return_marker
     xor eax, eax
     ret
@@ -1706,12 +1759,14 @@ privilege_ring0_continuation:
     mov qword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
     mov qword [rel privilege_probe_state], 0
     mov qword [rel fixed_user_request_success_state], 0
+    mov qword [rel saved_odin_return_stack], 0
     mov eax, FIXED_USER_CONTINUATION_INVALID
     ret
 .failed:
     mov qword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
     mov qword [rel privilege_probe_state], 0
     mov qword [rel fixed_user_request_success_state], 0
+    mov qword [rel saved_odin_return_stack], 0
     mov eax, PRIVILEGE_RING0_CONTINUATION_FAILED
     ret
 
@@ -1724,6 +1779,8 @@ initialize_fixed_user_execution_context:
     test eax, eax
     jnz .lifecycle_invalid
     call populate_fixed_user_execution_context
+    test eax, eax
+    jnz .done
     xor eax, eax
     ret
 .result_reset_failed:
@@ -1731,6 +1788,7 @@ initialize_fixed_user_execution_context:
     ret
 .lifecycle_invalid:
     mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_LIFECYCLE
+.done:
     ret
 
 ; Validates the complete READY representation before any Ring3 entry.
@@ -2055,7 +2113,9 @@ validate_fixed_user_context_format_and_identity:
     jne .format_invalid
     cmp dword [rel fixed_user_context + FIXED_USER_CONTEXT_STRUCTURE_SIZE_OFFSET], FIXED_USER_CONTEXT_SIZE
     jne .format_invalid
-    mov rax, FIXED_USER_CONTEXT_OPAQUE_IDENTITY
+    call expected_fixed_user_context_identity
+    test rax, rax
+    jz .identity_invalid
     cmp [rel fixed_user_context + FIXED_USER_CONTEXT_OPAQUE_IDENTITY_OFFSET], rax
     jne .identity_invalid
     xor eax, eax
@@ -2197,18 +2257,73 @@ fixed_user_context_association_invalid:
 
 populate_fixed_user_execution_context:
     call populate_fixed_user_context_header
+    test eax, eax
+    jnz .done
     call populate_fixed_user_context_code_and_data
     call populate_fixed_user_context_stack
     call populate_fixed_user_context_entry_and_transaction
     mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_LIFECYCLE_OFFSET], FIXED_USER_CONTEXT_READY
+    xor eax, eax
+.done:
     ret
 
 populate_fixed_user_context_header:
     mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_FORMAT_VERSION_OFFSET], FIXED_USER_CONTEXT_FORMAT_VERSION
     mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_STRUCTURE_SIZE_OFFSET], FIXED_USER_CONTEXT_SIZE
-    mov rax, FIXED_USER_CONTEXT_OPAQUE_IDENTITY
+    call expected_fixed_user_context_identity
+    test rax, rax
+    jz .identity_invalid
     mov [rel fixed_user_context + FIXED_USER_CONTEXT_OPAQUE_IDENTITY_OFFSET], rax
     mov qword [rel fixed_user_context + FIXED_USER_CONTEXT_LIFECYCLE_OFFSET], FIXED_USER_CONTEXT_UNINITIALIZED
+    xor eax, eax
+    ret
+.identity_invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_IDENTITY
+    ret
+
+expected_fixed_user_context_identity:
+    cmp dword [rel repeated_user_session_coordinator + REPEATED_USER_SESSION_ACTIVE_ORDINAL_OFFSET], REPEATED_USER_SESSION_FIRST_ORDINAL
+    je .first
+    cmp dword [rel repeated_user_session_coordinator + REPEATED_USER_SESSION_ACTIVE_ORDINAL_OFFSET], REPEATED_USER_SESSION_SECOND_ORDINAL
+    je .second
+    xor eax, eax
+    ret
+.first:
+    mov rax, FIXED_USER_CONTEXT_OPAQUE_IDENTITY
+    ret
+.second:
+    mov rax, FIXED_USER_CONTEXT_SECOND_OPAQUE_IDENTITY
+    ret
+
+validate_fixed_user_session_identity_sequence:
+    mov rax, FIXED_USER_CONTEXT_OPAQUE_IDENTITY
+    test rax, rax
+    jz .invalid
+    mov rdx, FIXED_USER_CONTEXT_SECOND_OPAQUE_IDENTITY
+    test rdx, rdx
+    jz .invalid
+    cmp rax, rdx
+    je .invalid
+    call fixed_user_identity_is_non_pointer
+    test eax, eax
+    jnz .invalid
+    mov rax, FIXED_USER_CONTEXT_SECOND_OPAQUE_IDENTITY
+    call fixed_user_identity_is_non_pointer
+    ret
+.invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_IDENTITY
+    ret
+
+fixed_user_identity_is_non_pointer:
+    mov rdx, rax
+    shl rdx, 16
+    sar rdx, 16
+    cmp rdx, rax
+    je .invalid
+    xor eax, eax
+    ret
+.invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_INVALID_IDENTITY
     ret
 
 populate_fixed_user_context_code_and_data:
@@ -2250,6 +2365,77 @@ reset_fixed_user_context_result:
     mov ecx, FIXED_USER_CONTEXT_RESULT_SIZE / 8
     rep stosq
     jmp fixed_user_context_result_is_initial
+
+validate_fixed_user_session_cleanup:
+    call validate_fixed_user_execution_context_cleared
+    test eax, eax
+    jnz .done
+    call validate_fixed_user_context_success_result
+    test eax, eax
+    jnz .done
+    call fixed_user_session_storage_is_zero
+    test eax, eax
+    jnz .storage_invalid
+    cmp qword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
+    jne .storage_invalid
+    cmp qword [rel privilege_probe_state], 0
+    jne .storage_invalid
+    cmp qword [rel fixed_user_request_success_state], 0
+    jne .storage_invalid
+    cmp qword [rel saved_odin_return_stack], 0
+    jne .storage_invalid
+    xor eax, eax
+.done:
+    ret
+.storage_invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_CLEANUP_FAILED
+    ret
+
+reset_fixed_user_execution_context_for_reuse:
+    call validate_fixed_user_execution_context_cleared
+    test eax, eax
+    jnz .done
+    cld
+    lea rdi, [rel fixed_user_context]
+    xor eax, eax
+    mov ecx, FIXED_USER_CONTEXT_SIZE / 8
+    rep stosq
+    call fixed_user_context_is_uninitialized
+.done:
+    ret
+
+validate_fixed_user_session_reset_state:
+    call fixed_user_context_is_uninitialized
+    test eax, eax
+    jnz .invalid
+    call fixed_user_context_result_is_initial
+    test eax, eax
+    jnz .invalid
+    call fixed_user_session_storage_is_zero
+    test eax, eax
+    jnz .invalid
+    cmp qword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
+    jne .invalid
+    cmp qword [rel saved_odin_return_stack], 0
+    jne .invalid
+    xor eax, eax
+    ret
+.invalid:
+    mov eax, FIXED_USER_CONTEXT_FAILURE_CLEANUP_FAILED
+    ret
+
+invalidate_fixed_user_session_state:
+    call clear_fixed_user_request_buffers
+    cld
+    lea rdi, [rel fixed_user_context]
+    xor eax, eax
+    mov ecx, FIXED_USER_CONTEXT_SIZE / 8
+    rep stosq
+    call reset_fixed_user_context_result
+    mov qword [rel privilege_probe_state], 0
+    mov qword [rel fixed_user_request_success_state], 0
+    mov qword [rel saved_odin_return_stack], 0
+    jmp validate_fixed_user_session_reset_state
 
 fixed_user_context_is_uninitialized:
     lea rdi, [rel fixed_user_context]

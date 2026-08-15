@@ -80,7 +80,7 @@ class FixedUserRuntimeStatusServiceEvidenceTests(unittest.TestCase):
     def test_fails_when_transaction_is_not_post_loop(self):
         result = self.validate_fixture(
             runtime=lambda text: text.replace(
-                "transaction_status := execute_fixed_user_runtime_status_transaction()",
+                "transaction_status := execute_bounded_repeated_user_sessions()",
                 "transaction_status := RUNTIME_PROGRESSION_OK",
                 1,
             )
@@ -457,6 +457,10 @@ class FixedUserRuntimeStatusServiceEvidenceTests(unittest.TestCase):
 
     def write_json_fixture(self, target, source, mutate):
         value = json.loads(source.read_text())
+        if source == validator_module._METADATA_PATH:
+            value["observed_markers"] = list(get_smoke_marker_order())
+            value["outcome"] = "pass"
+            value["blocker_category"] = "none"
         target.write_text(json.dumps(mutate(value) if mutate else value))
 
     def patch_paths(self, paths):

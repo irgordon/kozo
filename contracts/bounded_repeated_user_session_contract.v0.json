@@ -1,0 +1,217 @@
+{
+  "version": 1,
+  "architecture": "x86_64",
+  "status": "implemented_on_main",
+  "existing_context_contract": "contracts/fixed_user_execution_context_contract.v0.json",
+  "authority": {
+    "owner": "ring0",
+    "context_count": 1,
+    "allocation": "fixed_static",
+    "required_session_count": 2,
+    "user_selectable_session_count": false,
+    "public_abi": false
+  },
+  "session": {
+    "ordinals": [
+      1,
+      2
+    ],
+    "lifecycle": [
+      "UNINITIALIZED",
+      "READY",
+      "ACTIVE",
+      "RETURNED",
+      "CLEARED"
+    ],
+    "transition_budget": 2,
+    "total_transition_count": 4,
+    "third_session": "fail_closed",
+    "fifth_transition": "fail_closed"
+  },
+  "identity": {
+    "assignment": "kernel_owned_two_value_sequence",
+    "session_1": "0x4b4f5a4f43545831",
+    "session_2": "0x4b4f5a4f43545832",
+    "nonzero": true,
+    "distinct": true,
+    "pointer_derived": false,
+    "pid": false,
+    "user_visible": false,
+    "user_writable": false,
+    "invalid_after_clear": true
+  },
+  "coordinator": {
+    "required": true,
+    "symbol": "repeated_user_session_coordinator",
+    "format_version": 1,
+    "size_bytes": 32,
+    "alignment_bytes": 8,
+    "memory_policy": "supervisor_rw_nx",
+    "fields": [
+      {
+        "name": "format_version",
+        "offset": 0,
+        "size": 4,
+        "type": "u32"
+      },
+      {
+        "name": "structure_size",
+        "offset": 4,
+        "size": 4,
+        "type": "u32"
+      },
+      {
+        "name": "required_session_count",
+        "offset": 8,
+        "size": 4,
+        "type": "u32"
+      },
+      {
+        "name": "active_session_ordinal",
+        "offset": 12,
+        "size": 4,
+        "type": "u32"
+      },
+      {
+        "name": "completed_session_count",
+        "offset": 16,
+        "size": 4,
+        "type": "u32"
+      },
+      {
+        "name": "observed_total_transition_count",
+        "offset": 20,
+        "size": 4,
+        "type": "u32"
+      },
+      {
+        "name": "failure_code",
+        "offset": 24,
+        "size": 4,
+        "type": "u32"
+      },
+      {
+        "name": "reserved",
+        "offset": 28,
+        "size": 4,
+        "type": "u32"
+      }
+    ],
+    "active_session_ordinal_values": [
+      0,
+      1,
+      2
+    ],
+    "completed_session_count_maximum": 2,
+    "observed_total_transition_count_maximum": 4,
+    "reserved_value": 0,
+    "authority_fields_forbidden": [
+      "context_identity",
+      "pointer",
+      "selector",
+      "physical_address",
+      "mapping_authority",
+      "executable_address",
+      "capability_handle",
+      "user_controlled_value"
+    ],
+    "terminal_state": {
+      "active_session_ordinal": 0,
+      "completed_session_count": 2,
+      "observed_total_transition_count": 4,
+      "failure_code": 0,
+      "reserved": 0
+    }
+  },
+  "reset_boundary": {
+    "ordered_steps": [
+      "validate_context_cleared",
+      "validate_session_result",
+      "record_bounded_outcome",
+      "reset_context_result",
+      "validate_context_result_reset",
+      "validate_transaction_storage_reset",
+      "reset_context_to_uninitialized",
+      "validate_context_uninitialized",
+      "assign_fresh_identity"
+    ],
+    "transaction_storage": [
+      "request_buffer",
+      "response_buffer",
+      "consumption_record",
+      "user_data_scratch",
+      "user_stack",
+      "transaction_phase",
+      "request_shadow",
+      "response_shadow",
+      "verification_shadow",
+      "consumption_shadow",
+      "context_result"
+    ],
+    "silent_repair": false,
+    "readback_required": true
+  },
+  "marker_policy": {
+    "catalog_names_changed": false,
+    "starting_occurrence_count": 41,
+    "transaction_block_length": 11,
+    "transaction_block_occurrences": 2,
+    "final_occurrence_count": 52,
+    "final_marker": "KOZO_RUNTIME_RETURN_OK",
+    "duplicate_occurrences_preserved": true
+  },
+  "failure_codes": {
+    "INVALID_COORDINATOR_FORMAT": 1,
+    "INVALID_COORDINATOR_SIZE": 2,
+    "INVALID_SESSION_ORDINAL": 3,
+    "INVALID_REQUIRED_SESSION_COUNT": 4,
+    "STALE_CONTEXT_BEFORE_SESSION": 5,
+    "STALE_CONTEXT_RESULT_BEFORE_SESSION": 6,
+    "IDENTITY_REUSE": 7,
+    "FIRST_SESSION_FAILURE": 8,
+    "FIRST_SESSION_CLEANUP_FAILURE": 9,
+    "FIRST_RESULT_RESET_FAILURE": 10,
+    "SECOND_SESSION_FAILURE": 11,
+    "SECOND_SESSION_CLEANUP_FAILURE": 12,
+    "SECOND_RESULT_RESET_FAILURE": 13,
+    "COMPLETED_SESSION_COUNT_MISMATCH": 14,
+    "TOTAL_TRANSITION_COUNT_MISMATCH": 15,
+    "UNEXPECTED_THIRD_SESSION_ATTEMPT": 16,
+    "COORDINATOR_FINAL_VALIDATION_FAILURE": 17
+  },
+  "runtime_continuation": {
+    "later_capabilities_after_completed_sessions": 2,
+    "later_capabilities_after_total_transitions": 4,
+    "terminal_halt_unchanged": true,
+    "failure_converges_on_terminal_halt": true
+  },
+  "claim_boundary": {
+    "proves": [
+      "two sequential fixed user sessions",
+      "fresh bounded identity per session",
+      "verified cleanup before context reuse",
+      "four total int 0x81 returns",
+      "duplicate-aware ordered runtime evidence"
+    ],
+    "does_not_prove": [
+      "processes",
+      "scheduling",
+      "persistent userspace",
+      "multiple simultaneous contexts",
+      "dynamic allocation",
+      "public syscall ABI",
+      "hostile user-code containment"
+    ]
+  },
+  "non_goals": [
+    "third session",
+    "arbitrary session count",
+    "process model",
+    "scheduler",
+    "dynamic memory",
+    "new user mappings",
+    "new interrupt vector",
+    "public ABI",
+    "release publication"
+  ]
+}

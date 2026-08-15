@@ -301,5 +301,22 @@ The context and its result are separate static internal kernel records. The
 context owns mutable execution authority; the result records bounded outcome
 evidence without identity or reusable authority. Both reside in supervisor
 RW-NX storage, and normal continuation requires verified `CLEARED`. This does
-not create a process, scheduler entity, public ABI, repeated session, or
-hostile-code containment boundary.
+not create a process, scheduler entity, public ABI, or hostile-code containment
+boundary.
+
+# 18. Bounded Repeated User Session
+
+The repeated-session coordinator invokes the fixed context lifecycle twice
+with two explicit calls. Each lifecycle retains the accepted budget of two
+`int 0x81` returns. Between calls, Ring 0 validates `CLEARED`, records only the
+bounded completion count, resets and validates the result, clears every reused
+transaction span and user stack page, and returns the context to the all-zero
+`UNINITIALIZED` form.
+
+Session identities are two fixed contract-owned nonzero opaque values. They
+are distinct and non-pointer-like, and neither is exposed to Ring 3. A 32-byte
+supervisor RW-NX coordinator records only ordinals, counts, failure, and
+reserved state. Later internal capabilities are reachable only after two
+completed sessions, four total returns, zero active ordinal, and zero failure.
+There is no loop, third-session path, process, scheduler, allocator, or ABI
+change.

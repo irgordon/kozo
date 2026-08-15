@@ -82,7 +82,7 @@ class ReleaseBundleTests(unittest.TestCase):
             "run_governed_verification",
             "ensure_verification_passed",
             '[[ "$verificationCheckCount" == "67" ]]',
-            '[[ "$markerCount" == "41" ]]',
+            '[[ "$markerCount" == "52" ]]',
         )
         for value in required:
             self.assertIn(value, self.script)

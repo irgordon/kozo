@@ -37,6 +37,7 @@ _SCHEMA_PATHS = {
     "bounded_user_response_consumption_contract": _SCHEMA_DIR / "bounded_user_response_consumption_contract.schema.json",
     "fixed_user_runtime_status_service_contract": _SCHEMA_DIR / "fixed_user_runtime_status_service_contract.schema.json",
     "fixed_user_execution_context_contract": _SCHEMA_DIR / "fixed_user_execution_context_contract.schema.json",
+    "bounded_repeated_user_session_contract": _SCHEMA_DIR / "bounded_repeated_user_session_contract.schema.json",
 }
 
 

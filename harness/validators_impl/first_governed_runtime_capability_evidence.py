@@ -156,7 +156,7 @@ def _progression_issue(context: FirstCapabilityContext) -> FirstCapabilityEviden
         "collection_status := collect_runtime_status()",
         "if collection_status != RUNTIME_PROGRESSION_OK {",
         "return collection_status",
-        "transaction_status := execute_fixed_user_runtime_status_transaction()",
+        "transaction_status := execute_bounded_repeated_user_sessions()",
         "if transaction_status != RUNTIME_PROGRESSION_OK {",
         "clear_runtime_status_snapshot()",
         "return transaction_status",

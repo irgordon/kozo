@@ -7,6 +7,7 @@ from pathlib import Path
 from harness.abi_manifest import ROOT
 from harness.codes import BOUNDED_USER_RESPONSE_CONSUMPTION_EVIDENCE_INVALID, OK
 from harness.runtime_evidence_taxonomy import get_smoke_marker_order
+from harness.runtime_marker_occurrences import marker_occurs_as_governed
 from harness.validator import BaseValidator, ValidationResult
 from harness.validators_impl.bounded_user_response_consumption_contract import _contract_issue
 
@@ -291,7 +292,8 @@ def _cleanup_continuation_issue(context):
         "fixed_user_response_shadow",
         "fixed_user_consumption_shadow",
         "fixed_user_response_verify",
-        "call fixed_user_buffers_are_zero",
+        "call clear_fixed_user_reused_storage",
+        "call fixed_user_session_storage_is_zero",
     )
     issue = _tokens_issue(clearing, required, "final_clearing_invalid", "clearing")
     if issue is not None:
@@ -391,8 +393,8 @@ def _runtime_issue(context):
         position = context.serial.find(marker, position + 1)
         if position < 0:
             return _issue("runtime_marker_missing", f"qemu_smoke.{marker}", f"QEMU serial log is missing {marker}")
-        if marker in _NEW_MARKERS and context.serial.count(marker) != 1:
-            return _issue("runtime_marker_duplicate", f"qemu_smoke.{marker}", f"QEMU serial log must contain exactly one {marker}")
+        if marker in _NEW_MARKERS and not marker_occurs_as_governed(context.serial, marker, expected):
+            return _issue("runtime_marker_duplicate", f"qemu_smoke.{marker}", f"QEMU serial marker count must match the governed occurrence count for {marker}")
     return None
 
 

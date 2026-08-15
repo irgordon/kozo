@@ -110,6 +110,10 @@ SECTIONS
          "fixed user execution context result must be exactly 32 bytes")
   ASSERT((fixed_user_context_result % 8) == 0,
          "fixed user execution context result must be 8-byte aligned")
+  ASSERT(DEFINED(repeated_user_session_coordinator),
+         "repeated user session coordinator must remain linked")
+  ASSERT((repeated_user_session_coordinator % 8) == 0,
+         "repeated user session coordinator must remain 8-byte aligned")
   ASSERT(fixed_user_transaction_phase_end <= fixed_user_context,
          "fixed user execution context must not overlap transaction phase")
   ASSERT(fixed_user_context_end <= fixed_user_context_result,

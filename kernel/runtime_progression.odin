@@ -28,6 +28,34 @@ RUNTIME_LOOP_STATUS_IDLE :: u32(0)
 RUNTIME_LOOP_STATUS_RUNNING :: u32(1)
 RUNTIME_LOOP_STATUS_COMPLETED :: u32(2)
 
+REPEATED_SESSION_COORDINATOR_FORMAT_VERSION :: u32(1)
+REPEATED_SESSION_COORDINATOR_SIZE :: u32(32)
+REQUIRED_SESSION_COUNT :: u32(2)
+FIRST_SESSION_ORDINAL :: u32(1)
+SECOND_SESSION_ORDINAL :: u32(2)
+PER_SESSION_TRANSITION_COUNT :: u32(2)
+REQUIRED_TOTAL_TRANSITION_COUNT :: u32(4)
+RUNTIME_REPEATED_SESSION_FAILURE :: u32(20)
+
+REPEATED_SESSION_FAILURE_NONE :: u32(0)
+REPEATED_SESSION_FAILURE_INVALID_COORDINATOR_FORMAT :: u32(1)
+REPEATED_SESSION_FAILURE_INVALID_COORDINATOR_SIZE :: u32(2)
+REPEATED_SESSION_FAILURE_INVALID_SESSION_ORDINAL :: u32(3)
+REPEATED_SESSION_FAILURE_INVALID_REQUIRED_SESSION_COUNT :: u32(4)
+REPEATED_SESSION_FAILURE_STALE_CONTEXT_BEFORE_SESSION :: u32(5)
+REPEATED_SESSION_FAILURE_STALE_CONTEXT_RESULT_BEFORE_SESSION :: u32(6)
+REPEATED_SESSION_FAILURE_IDENTITY_REUSE :: u32(7)
+REPEATED_SESSION_FAILURE_FIRST_SESSION :: u32(8)
+REPEATED_SESSION_FAILURE_FIRST_SESSION_CLEANUP :: u32(9)
+REPEATED_SESSION_FAILURE_FIRST_RESULT_RESET :: u32(10)
+REPEATED_SESSION_FAILURE_SECOND_SESSION :: u32(11)
+REPEATED_SESSION_FAILURE_SECOND_SESSION_CLEANUP :: u32(12)
+REPEATED_SESSION_FAILURE_SECOND_RESULT_RESET :: u32(13)
+REPEATED_SESSION_FAILURE_COMPLETED_COUNT :: u32(14)
+REPEATED_SESSION_FAILURE_TOTAL_TRANSITION_COUNT :: u32(15)
+REPEATED_SESSION_FAILURE_UNEXPECTED_THIRD_SESSION :: u32(16)
+REPEATED_SESSION_FAILURE_FINAL_VALIDATION :: u32(17)
+
 @require foreign import runtime_boot_bridge "arch/x86_64/boot.asm"
 @require foreign import runtime_privilege_bridge "arch/x86_64/privilege_transition.asm"
 
@@ -48,6 +76,15 @@ foreign runtime_boot_bridge {
 
 foreign runtime_privilege_bridge {
 	execute_fixed_user_runtime_status_transaction :: proc "c" () -> u32 ---
+	validate_fixed_user_context_success_result :: proc "c" () -> u32 ---
+	validate_fixed_user_session_cleanup :: proc "c" () -> u32 ---
+	reset_fixed_user_context_result :: proc "c" () -> u32 ---
+	reset_fixed_user_execution_context_for_reuse :: proc "c" () -> u32 ---
+	validate_fixed_user_session_reset_state :: proc "c" () -> u32 ---
+	validate_fixed_user_session_identity_sequence :: proc "c" () -> u32 ---
+	invalidate_fixed_user_session_state :: proc "c" () -> u32 ---
+	fixed_user_context_is_uninitialized :: proc "c" () -> u32 ---
+	fixed_user_context_result_is_initial :: proc "c" () -> u32 ---
 }
 
 Runtime_Bootstrap_Context :: struct {
@@ -69,11 +106,28 @@ Runtime_Loop_State :: struct {
 	reserved:        u32,
 }
 
+Repeated_User_Session_Coordinator :: struct #align(8) {
+	format_version:                  u32,
+	structure_size:                 u32,
+	required_session_count:         u32,
+	active_session_ordinal:         u32,
+	completed_session_count:        u32,
+	observed_total_transition_count: u32,
+	failure_code:                   u32,
+	reserved:                       u32,
+}
+
+#assert(size_of(Repeated_User_Session_Coordinator) == REPEATED_SESSION_COORDINATOR_SIZE)
+#assert(align_of(Repeated_User_Session_Coordinator) == 8)
+
 @(export)
 runtime_progression_state: u64
 
 @(export)
 runtime_loop_state: Runtime_Loop_State
+
+@(export)
+repeated_user_session_coordinator: Repeated_User_Session_Coordinator
 
 @(export)
 runtime_progression_entry :: proc "c" (bootstrap: ^Runtime_Bootstrap_Context) -> u32 {
@@ -104,7 +158,7 @@ execute_runtime_status_boundaries :: proc "contextless" () -> u32 {
 	if collection_status != RUNTIME_PROGRESSION_OK {
 		return collection_status
 	}
-	transaction_status := execute_fixed_user_runtime_status_transaction()
+	transaction_status := execute_bounded_repeated_user_sessions()
 	if transaction_status != RUNTIME_PROGRESSION_OK {
 		clear_runtime_status_snapshot()
 		return transaction_status
@@ -114,6 +168,313 @@ execute_runtime_status_boundaries :: proc "contextless" () -> u32 {
 		return RUNTIME_CAPABILITY_EXECUTION_FAILURE
 	}
 	return capability_status
+}
+
+@(export)
+execute_bounded_repeated_user_sessions :: proc "contextless" () -> u32 {
+	initialize_repeated_session_coordinator()
+	initial_failure_code := repeated_session_initial_failure_code()
+	if initial_failure_code != REPEATED_SESSION_FAILURE_NONE {
+		return fail_repeated_user_sessions(initial_failure_code)
+	}
+	if execute_first_bounded_user_session() != RUNTIME_PROGRESSION_OK {
+		return RUNTIME_REPEATED_SESSION_FAILURE
+	}
+	return execute_second_bounded_user_session()
+}
+
+@(export)
+execute_first_bounded_user_session :: proc "contextless" () -> u32 {
+	if execute_fixed_user_session(FIRST_SESSION_ORDINAL) != RUNTIME_PROGRESSION_OK {
+		return RUNTIME_REPEATED_SESSION_FAILURE
+	}
+	return prepare_next_fixed_user_session()
+}
+
+@(export)
+execute_second_bounded_user_session :: proc "contextless" () -> u32 {
+	if execute_fixed_user_session(SECOND_SESSION_ORDINAL) != RUNTIME_PROGRESSION_OK {
+		return RUNTIME_REPEATED_SESSION_FAILURE
+	}
+	return finalize_repeated_session_coordinator()
+}
+
+@(export)
+execute_fixed_user_session :: proc "contextless" (session_ordinal: u32) -> u32 {
+	begin_failure_code := begin_fixed_user_session(session_ordinal)
+	if begin_failure_code != REPEATED_SESSION_FAILURE_NONE {
+		return fail_repeated_user_sessions(begin_failure_code)
+	}
+	if !fixed_user_session_succeeds() {
+		return fail_repeated_user_sessions(session_failure_code(session_ordinal))
+	}
+	return complete_fixed_user_session(session_ordinal)
+}
+
+@(export)
+begin_fixed_user_session :: proc "contextless" (session_ordinal: u32) -> u32 {
+	failure_code := next_fixed_user_session_failure_code(session_ordinal)
+	if failure_code != REPEATED_SESSION_FAILURE_NONE {
+		return failure_code
+	}
+	set_active_repeated_session_ordinal(session_ordinal)
+	return REPEATED_SESSION_FAILURE_NONE
+}
+
+@(export)
+fixed_user_session_succeeds :: proc "contextless" () -> bool {
+	if execute_fixed_user_runtime_status_transaction() != RUNTIME_PROGRESSION_OK {
+		return false
+	}
+	return validate_fixed_user_context_success_result() == RUNTIME_PROGRESSION_OK
+}
+
+@(export)
+complete_fixed_user_session :: proc "contextless" (session_ordinal: u32) -> u32 {
+	record_completed_fixed_user_session()
+	failure_code := completed_session_failure_code(session_ordinal)
+	if failure_code != REPEATED_SESSION_FAILURE_NONE {
+		return fail_repeated_user_sessions(failure_code)
+	}
+	return RUNTIME_PROGRESSION_OK
+}
+
+@(export)
+prepare_next_fixed_user_session :: proc "contextless" () -> u32 {
+	return reset_completed_fixed_user_session(
+		REPEATED_SESSION_FAILURE_FIRST_SESSION_CLEANUP,
+		REPEATED_SESSION_FAILURE_FIRST_RESULT_RESET,
+	)
+}
+
+@(export)
+finalize_repeated_session_coordinator :: proc "contextless" () -> u32 {
+	if reset_completed_fixed_user_session(
+		REPEATED_SESSION_FAILURE_SECOND_SESSION_CLEANUP,
+		REPEATED_SESSION_FAILURE_SECOND_RESULT_RESET,
+	) != RUNTIME_PROGRESSION_OK {
+		return RUNTIME_REPEATED_SESSION_FAILURE
+	}
+	terminal_failure_code := repeated_session_terminal_failure_code()
+	if terminal_failure_code != REPEATED_SESSION_FAILURE_NONE {
+		return fail_repeated_user_sessions(terminal_failure_code)
+	}
+	return RUNTIME_PROGRESSION_OK
+}
+
+@(export)
+reset_completed_fixed_user_session :: proc "contextless" (
+	cleanup_failure_code: u32,
+	result_failure_code: u32,
+) -> u32 {
+	if validate_fixed_user_session_cleanup() != RUNTIME_PROGRESSION_OK {
+		return fail_repeated_user_sessions(cleanup_failure_code)
+	}
+	if reset_fixed_user_context_result() != RUNTIME_PROGRESSION_OK {
+		return fail_repeated_user_sessions(result_failure_code)
+	}
+	return reset_fixed_user_context_for_reuse(cleanup_failure_code)
+}
+
+@(export)
+reset_fixed_user_context_for_reuse :: proc "contextless" (failure_code: u32) -> u32 {
+	if reset_fixed_user_execution_context_for_reuse() != RUNTIME_PROGRESSION_OK {
+		return fail_repeated_user_sessions(failure_code)
+	}
+	if validate_fixed_user_session_reset_state() != RUNTIME_PROGRESSION_OK {
+		return fail_repeated_user_sessions(failure_code)
+	}
+	return RUNTIME_PROGRESSION_OK
+}
+
+@(export)
+initialize_repeated_session_coordinator :: proc "contextless" () {
+	intrinsics.volatile_store(&repeated_user_session_coordinator.format_version, REPEATED_SESSION_COORDINATOR_FORMAT_VERSION)
+	intrinsics.volatile_store(&repeated_user_session_coordinator.structure_size, REPEATED_SESSION_COORDINATOR_SIZE)
+	intrinsics.volatile_store(&repeated_user_session_coordinator.required_session_count, REQUIRED_SESSION_COUNT)
+	intrinsics.volatile_store(&repeated_user_session_coordinator.active_session_ordinal, 0)
+	intrinsics.volatile_store(&repeated_user_session_coordinator.completed_session_count, 0)
+	intrinsics.volatile_store(&repeated_user_session_coordinator.observed_total_transition_count, 0)
+	intrinsics.volatile_store(&repeated_user_session_coordinator.failure_code, REPEATED_SESSION_FAILURE_NONE)
+	intrinsics.volatile_store(&repeated_user_session_coordinator.reserved, 0)
+}
+
+repeated_session_initial_failure_code :: proc "contextless" () -> u32 {
+	if repeated_session_format_version() != REPEATED_SESSION_COORDINATOR_FORMAT_VERSION {
+		return REPEATED_SESSION_FAILURE_INVALID_COORDINATOR_FORMAT
+	}
+	if repeated_session_structure_size() != REPEATED_SESSION_COORDINATOR_SIZE {
+		return REPEATED_SESSION_FAILURE_INVALID_COORDINATOR_SIZE
+	}
+	return repeated_session_required_count_failure_code()
+}
+
+repeated_session_required_count_failure_code :: proc "contextless" () -> u32 {
+	if repeated_session_required_count() != REQUIRED_SESSION_COUNT {
+		return REPEATED_SESSION_FAILURE_INVALID_REQUIRED_SESSION_COUNT
+	}
+	return repeated_session_initial_authority_failure_code()
+}
+
+repeated_session_initial_authority_failure_code :: proc "contextless" () -> u32 {
+	failure_code := reusable_fixed_user_authority_failure_code()
+	if failure_code != REPEATED_SESSION_FAILURE_NONE {
+		return failure_code
+	}
+	return repeated_session_initial_value_failure_code()
+}
+
+reusable_fixed_user_authority_failure_code :: proc "contextless" () -> u32 {
+	if fixed_user_context_is_uninitialized() != RUNTIME_PROGRESSION_OK {
+		return REPEATED_SESSION_FAILURE_STALE_CONTEXT_BEFORE_SESSION
+	}
+	if fixed_user_context_result_is_initial() != RUNTIME_PROGRESSION_OK {
+		return REPEATED_SESSION_FAILURE_STALE_CONTEXT_RESULT_BEFORE_SESSION
+	}
+	return repeated_session_identity_failure_code()
+}
+
+repeated_session_identity_failure_code :: proc "contextless" () -> u32 {
+	if validate_fixed_user_session_identity_sequence() != RUNTIME_PROGRESSION_OK {
+		return REPEATED_SESSION_FAILURE_IDENTITY_REUSE
+	}
+	return REPEATED_SESSION_FAILURE_NONE
+}
+
+repeated_session_initial_value_failure_code :: proc "contextless" () -> u32 {
+	if repeated_session_active_ordinal() != 0 || repeated_session_completed_count() != 0 {
+		return REPEATED_SESSION_FAILURE_INVALID_COORDINATOR_FORMAT
+	}
+	if repeated_session_total_transition_count() != 0 {
+		return REPEATED_SESSION_FAILURE_TOTAL_TRANSITION_COUNT
+	}
+	return repeated_session_initial_metadata_failure_code()
+}
+
+repeated_session_initial_metadata_failure_code :: proc "contextless" () -> u32 {
+	if repeated_session_failure() != REPEATED_SESSION_FAILURE_NONE || repeated_session_reserved() != 0 {
+		return REPEATED_SESSION_FAILURE_INVALID_COORDINATOR_FORMAT
+	}
+	return REPEATED_SESSION_FAILURE_NONE
+}
+
+next_fixed_user_session_failure_code :: proc "contextless" (session_ordinal: u32) -> u32 {
+	if session_ordinal > SECOND_SESSION_ORDINAL {
+		return REPEATED_SESSION_FAILURE_UNEXPECTED_THIRD_SESSION
+	}
+	if session_ordinal < FIRST_SESSION_ORDINAL || repeated_session_active_ordinal() != 0 {
+		return REPEATED_SESSION_FAILURE_INVALID_SESSION_ORDINAL
+	}
+	return next_fixed_user_session_state_failure_code(session_ordinal)
+}
+
+next_fixed_user_session_state_failure_code :: proc "contextless" (session_ordinal: u32) -> u32 {
+	if repeated_session_completed_count() + 1 != session_ordinal {
+		return REPEATED_SESSION_FAILURE_COMPLETED_COUNT
+	}
+	if repeated_session_total_transition_count() != (session_ordinal - 1) * PER_SESSION_TRANSITION_COUNT {
+		return REPEATED_SESSION_FAILURE_TOTAL_TRANSITION_COUNT
+	}
+	return reusable_fixed_user_authority_failure_code()
+}
+
+record_completed_fixed_user_session :: proc "contextless" () {
+	intrinsics.volatile_store(&repeated_user_session_coordinator.active_session_ordinal, 0)
+	intrinsics.volatile_store(&repeated_user_session_coordinator.completed_session_count, repeated_session_completed_count() + 1)
+	intrinsics.volatile_store(&repeated_user_session_coordinator.observed_total_transition_count, repeated_session_total_transition_count() + PER_SESSION_TRANSITION_COUNT)
+}
+
+completed_session_failure_code :: proc "contextless" (session_ordinal: u32) -> u32 {
+	if repeated_session_completed_count() != session_ordinal {
+		return REPEATED_SESSION_FAILURE_COMPLETED_COUNT
+	}
+	if repeated_session_total_transition_count() != session_ordinal * PER_SESSION_TRANSITION_COUNT {
+		return REPEATED_SESSION_FAILURE_TOTAL_TRANSITION_COUNT
+	}
+	return completed_session_metadata_failure_code()
+}
+
+completed_session_metadata_failure_code :: proc "contextless" () -> u32 {
+	if repeated_session_active_ordinal() != 0 || repeated_session_failure() != REPEATED_SESSION_FAILURE_NONE {
+		return REPEATED_SESSION_FAILURE_COMPLETED_COUNT
+	}
+	return REPEATED_SESSION_FAILURE_NONE
+}
+
+repeated_session_terminal_failure_code :: proc "contextless" () -> u32 {
+	if repeated_session_completed_count() != REQUIRED_SESSION_COUNT {
+		return REPEATED_SESSION_FAILURE_COMPLETED_COUNT
+	}
+	if repeated_session_total_transition_count() != REQUIRED_TOTAL_TRANSITION_COUNT {
+		return REPEATED_SESSION_FAILURE_TOTAL_TRANSITION_COUNT
+	}
+	return repeated_session_terminal_metadata_failure_code()
+}
+
+repeated_session_terminal_metadata_failure_code :: proc "contextless" () -> u32 {
+	if !repeated_session_header_is_valid() || repeated_session_active_ordinal() != 0 {
+		return REPEATED_SESSION_FAILURE_FINAL_VALIDATION
+	}
+	if repeated_session_failure() != REPEATED_SESSION_FAILURE_NONE || repeated_session_reserved() != 0 {
+		return REPEATED_SESSION_FAILURE_FINAL_VALIDATION
+	}
+	return REPEATED_SESSION_FAILURE_NONE
+}
+
+repeated_session_header_is_valid :: proc "contextless" () -> bool {
+	return repeated_session_format_version() == REPEATED_SESSION_COORDINATOR_FORMAT_VERSION &&
+	       repeated_session_structure_size() == REPEATED_SESSION_COORDINATOR_SIZE &&
+	       repeated_session_required_count() == REQUIRED_SESSION_COUNT
+}
+
+session_failure_code :: proc "contextless" (session_ordinal: u32) -> u32 {
+	if session_ordinal == FIRST_SESSION_ORDINAL {
+		return REPEATED_SESSION_FAILURE_FIRST_SESSION
+	}
+	return REPEATED_SESSION_FAILURE_SECOND_SESSION
+}
+
+fail_repeated_user_sessions :: proc "contextless" (failure_code: u32) -> u32 {
+	intrinsics.volatile_store(&repeated_user_session_coordinator.active_session_ordinal, 0)
+	intrinsics.volatile_store(&repeated_user_session_coordinator.failure_code, failure_code)
+	invalidate_fixed_user_session_state()
+	return RUNTIME_REPEATED_SESSION_FAILURE
+}
+
+set_active_repeated_session_ordinal :: proc "contextless" (session_ordinal: u32) {
+	intrinsics.volatile_store(&repeated_user_session_coordinator.active_session_ordinal, session_ordinal)
+}
+
+repeated_session_format_version :: proc "contextless" () -> u32 {
+	return intrinsics.volatile_load(&repeated_user_session_coordinator.format_version)
+}
+
+repeated_session_structure_size :: proc "contextless" () -> u32 {
+	return intrinsics.volatile_load(&repeated_user_session_coordinator.structure_size)
+}
+
+repeated_session_required_count :: proc "contextless" () -> u32 {
+	return intrinsics.volatile_load(&repeated_user_session_coordinator.required_session_count)
+}
+
+repeated_session_active_ordinal :: proc "contextless" () -> u32 {
+	return intrinsics.volatile_load(&repeated_user_session_coordinator.active_session_ordinal)
+}
+
+repeated_session_completed_count :: proc "contextless" () -> u32 {
+	return intrinsics.volatile_load(&repeated_user_session_coordinator.completed_session_count)
+}
+
+repeated_session_total_transition_count :: proc "contextless" () -> u32 {
+	return intrinsics.volatile_load(&repeated_user_session_coordinator.observed_total_transition_count)
+}
+
+repeated_session_failure :: proc "contextless" () -> u32 {
+	return intrinsics.volatile_load(&repeated_user_session_coordinator.failure_code)
+}
+
+repeated_session_reserved :: proc "contextless" () -> u32 {
+	return intrinsics.volatile_load(&repeated_user_session_coordinator.reserved)
 }
 
 @(export)

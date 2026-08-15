@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KOZO bounded repeated user session contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "status",
+    "existing_context_contract",
+    "authority",
+    "session",
+    "identity",
+    "coordinator",
+    "reset_boundary",
+    "marker_policy",
+    "failure_codes",
+    "runtime_continuation",
+    "claim_boundary",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "architecture": {"const": "x86_64"},
+    "status": {"const": "implemented_on_main"},
+    "existing_context_contract": {"const": "contracts/fixed_user_execution_context_contract.v0.json"},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "context_count", "allocation", "required_session_count", "user_selectable_session_count", "public_abi"],
+      "properties": {
+        "owner": {"const": "ring0"},
+        "context_count": {"const": 1},
+        "allocation": {"const": "fixed_static"},
+        "required_session_count": {"const": 2},
+        "user_selectable_session_count": {"const": false},
+        "public_abi": {"const": false}
+      }
+    },
+    "session": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ordinals", "lifecycle", "transition_budget", "total_transition_count", "third_session", "fifth_transition"],
+      "properties": {
+        "ordinals": {"type": "array", "minItems": 2, "items": {"type": "integer"}},
+        "lifecycle": {"type": "array", "minItems": 5, "items": {"type": "string"}},
+        "transition_budget": {"const": 2},
+        "total_transition_count": {"const": 4},
+        "third_session": {"const": "fail_closed"},
+        "fifth_transition": {"const": "fail_closed"}
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assignment", "session_1", "session_2", "nonzero", "distinct", "pointer_derived", "pid", "user_visible", "user_writable", "invalid_after_clear"],
+      "properties": {
+        "assignment": {"const": "kernel_owned_two_value_sequence"},
+        "session_1": {"const": "0x4b4f5a4f43545831"},
+        "session_2": {"const": "0x4b4f5a4f43545832"},
+        "nonzero": {"const": true},
+        "distinct": {"const": true},
+        "pointer_derived": {"const": false},
+        "pid": {"const": false},
+        "user_visible": {"const": false},
+        "user_writable": {"const": false},
+        "invalid_after_clear": {"const": true}
+      }
+    },
+    "coordinator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "symbol", "format_version", "size_bytes", "alignment_bytes", "memory_policy", "fields", "active_session_ordinal_values", "completed_session_count_maximum", "observed_total_transition_count_maximum", "reserved_value", "authority_fields_forbidden", "terminal_state"],
+      "properties": {
+        "required": {"const": true},
+        "symbol": {"const": "repeated_user_session_coordinator"},
+        "format_version": {"const": 1},
+        "size_bytes": {"const": 32},
+        "alignment_bytes": {"const": 8},
+        "memory_policy": {"const": "supervisor_rw_nx"},
+        "fields": {
+          "type": "array",
+          "minItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "offset", "size", "type"],
+            "properties": {
+              "name": {"type": "string"},
+              "offset": {"type": "integer"},
+              "size": {"const": 4},
+              "type": {"const": "u32"}
+            }
+          }
+        },
+        "active_session_ordinal_values": {"type": "array", "minItems": 3, "items": {"type": "integer"}},
+        "completed_session_count_maximum": {"const": 2},
+        "observed_total_transition_count_maximum": {"const": 4},
+        "reserved_value": {"const": 0},
+        "authority_fields_forbidden": {"type": "array", "minItems": 8, "items": {"type": "string"}},
+        "terminal_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["active_session_ordinal", "completed_session_count", "observed_total_transition_count", "failure_code", "reserved"],
+          "properties": {
+            "active_session_ordinal": {"const": 0},
+            "completed_session_count": {"const": 2},
+            "observed_total_transition_count": {"const": 4},
+            "failure_code": {"const": 0},
+            "reserved": {"const": 0}
+          }
+        }
+      }
+    },
+    "reset_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ordered_steps", "transaction_storage", "silent_repair", "readback_required"],
+      "properties": {
+        "ordered_steps": {"type": "array", "minItems": 9, "items": {"type": "string"}},
+        "transaction_storage": {"type": "array", "minItems": 11, "items": {"type": "string"}},
+        "silent_repair": {"const": false},
+        "readback_required": {"const": true}
+      }
+    },
+    "marker_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["catalog_names_changed", "starting_occurrence_count", "transaction_block_length", "transaction_block_occurrences", "final_occurrence_count", "final_marker", "duplicate_occurrences_preserved"],
+      "properties": {
+        "catalog_names_changed": {"const": false},
+        "starting_occurrence_count": {"const": 41},
+        "transaction_block_length": {"const": 11},
+        "transaction_block_occurrences": {"const": 2},
+        "final_occurrence_count": {"const": 52},
+        "final_marker": {"const": "KOZO_RUNTIME_RETURN_OK"},
+        "duplicate_occurrences_preserved": {"const": true}
+      }
+    },
+    "failure_codes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["INVALID_COORDINATOR_FORMAT", "INVALID_COORDINATOR_SIZE", "INVALID_SESSION_ORDINAL", "INVALID_REQUIRED_SESSION_COUNT", "STALE_CONTEXT_BEFORE_SESSION", "STALE_CONTEXT_RESULT_BEFORE_SESSION", "IDENTITY_REUSE", "FIRST_SESSION_FAILURE", "FIRST_SESSION_CLEANUP_FAILURE", "FIRST_RESULT_RESET_FAILURE", "SECOND_SESSION_FAILURE", "SECOND_SESSION_CLEANUP_FAILURE", "SECOND_RESULT_RESET_FAILURE", "COMPLETED_SESSION_COUNT_MISMATCH", "TOTAL_TRANSITION_COUNT_MISMATCH", "UNEXPECTED_THIRD_SESSION_ATTEMPT", "COORDINATOR_FINAL_VALIDATION_FAILURE"],
+      "properties": {
+        "INVALID_COORDINATOR_FORMAT": {"const": 1},
+        "INVALID_COORDINATOR_SIZE": {"const": 2},
+        "INVALID_SESSION_ORDINAL": {"const": 3},
+        "INVALID_REQUIRED_SESSION_COUNT": {"const": 4},
+        "STALE_CONTEXT_BEFORE_SESSION": {"const": 5},
+        "STALE_CONTEXT_RESULT_BEFORE_SESSION": {"const": 6},
+        "IDENTITY_REUSE": {"const": 7},
+        "FIRST_SESSION_FAILURE": {"const": 8},
+        "FIRST_SESSION_CLEANUP_FAILURE": {"const": 9},
+        "FIRST_RESULT_RESET_FAILURE": {"const": 10},
+        "SECOND_SESSION_FAILURE": {"const": 11},
+        "SECOND_SESSION_CLEANUP_FAILURE": {"const": 12},
+        "SECOND_RESULT_RESET_FAILURE": {"const": 13},
+        "COMPLETED_SESSION_COUNT_MISMATCH": {"const": 14},
+        "TOTAL_TRANSITION_COUNT_MISMATCH": {"const": 15},
+        "UNEXPECTED_THIRD_SESSION_ATTEMPT": {"const": 16},
+        "COORDINATOR_FINAL_VALIDATION_FAILURE": {"const": 17}
+      }
+    },
+    "runtime_continuation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["later_capabilities_after_completed_sessions", "later_capabilities_after_total_transitions", "terminal_halt_unchanged", "failure_converges_on_terminal_halt"],
+      "properties": {
+        "later_capabilities_after_completed_sessions": {"const": 2},
+        "later_capabilities_after_total_transitions": {"const": 4},
+        "terminal_halt_unchanged": {"const": true},
+        "failure_converges_on_terminal_halt": {"const": true}
+      }
+    },
+    "claim_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proves", "does_not_prove"],
+      "properties": {
+        "proves": {"type": "array", "minItems": 5, "items": {"type": "string"}},
+        "does_not_prove": {"type": "array", "minItems": 7, "items": {"type": "string"}}
+      }
+    },
+    "non_goals": {"type": "array", "minItems": 9, "items": {"type": "string"}}
+  }
+}

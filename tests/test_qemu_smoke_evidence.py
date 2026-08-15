@@ -7,6 +7,12 @@ from pathlib import Path
 
 from harness.codes import OK, QEMU_SMOKE_EVIDENCE_INVALID
 from harness.runtime_evidence_taxonomy import get_expected_smoke_marker, get_smoke_marker_order
+from harness.runtime_marker_occurrences import (
+    active_or_failed_session_ordinal,
+    completed_session_count,
+    extract_marker_occurrences,
+    marker_occurrence_counts,
+)
 from harness.text_evidence import canonical_text_bytes, write_canonical_text
 from harness.validators_impl import qemu_smoke_evidence as validator_module
 from harness.validators_impl.qemu_smoke_evidence import QemuSmokeEvidenceValidator
@@ -149,15 +155,15 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_runtime_return_not_reached_blocker(self):
         result = self.validate_blocked_fixture(
             "runtime_return_not_reached",
-            "\n".join(early_markers()[:40]) + "\n",
+            "\n".join(early_markers()[:51]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
 
-    def test_accepts_capability_dispatch_not_reached_blocker(self):
+    def test_accepts_later_runtime_continuation_not_reached_blocker(self):
         result = self.validate_blocked_fixture(
-            "capability_dispatch_not_reached",
-            "\n".join(early_markers()[:34]) + "\n",
+            "later_runtime_continuation_not_reached",
+            "\n".join(early_markers()[:45]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -165,7 +171,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_runtime_status_query_not_completed_blocker(self):
         result = self.validate_blocked_fixture(
             "runtime_status_query_not_completed",
-            "\n".join(early_markers()[:35]) + "\n",
+            "\n".join(early_markers()[:46]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -173,7 +179,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_first_governed_capability_not_proven_blocker(self):
         result = self.validate_blocked_fixture(
             "first_governed_capability_not_proven",
-            "\n".join(early_markers()[:36]) + "\n",
+            "\n".join(early_markers()[:47]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -181,7 +187,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_runtime_state_update_not_reached_blocker(self):
         result = self.validate_blocked_fixture(
             "runtime_state_update_not_reached",
-            "\n".join(early_markers()[:37]) + "\n",
+            "\n".join(early_markers()[:48]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -189,7 +195,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_runtime_state_update_not_completed_blocker(self):
         result = self.validate_blocked_fixture(
             "runtime_state_update_not_completed",
-            "\n".join(early_markers()[:38]) + "\n",
+            "\n".join(early_markers()[:49]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -197,7 +203,7 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
     def test_accepts_second_governed_capability_not_proven_blocker(self):
         result = self.validate_blocked_fixture(
             "second_governed_capability_not_proven",
-            "\n".join(early_markers()[:39]) + "\n",
+            "\n".join(early_markers()[:50]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
@@ -226,45 +232,45 @@ class QemuSmokeEvidenceValidatorTests(unittest.TestCase):
 
         self.assertEqual(result.status, "pass")
 
-    def test_accepts_runtime_status_transaction_not_reached_blocker(self):
+    def test_accepts_first_session_not_entered_blocker(self):
         result = self.validate_blocked_fixture(
-            "runtime_status_transaction_not_reached",
+            "first_session_not_entered",
             "\n".join(early_markers()[:23]) + "\n",
         )
 
         self.assertEqual(result.status, "pass")
 
-    def test_accepts_fixed_request_copy_in_not_completed_blocker(self):
+    def test_accepts_first_session_not_completed_after_entry(self):
         result = self.validate_blocked_fixture(
-            "fixed_user_request_copy_in_not_completed",
+            "first_session_not_completed",
             "\n".join(early_markers()[:24]) + "\n",
         )
         self.assertEqual(result.status, "pass")
 
-    def test_accepts_user_runtime_status_service_not_reached_blocker(self):
+    def test_accepts_first_session_not_completed_after_copy_in(self):
         result = self.validate_blocked_fixture(
-            "user_runtime_status_service_not_reached",
+            "first_session_not_completed",
             "\n".join(early_markers()[:25]) + "\n",
         )
         self.assertEqual(result.status, "pass")
 
-    def test_accepts_user_runtime_status_service_not_completed_blocker(self):
+    def test_accepts_first_session_not_completed_during_service(self):
         result = self.validate_blocked_fixture(
-            "user_runtime_status_service_not_completed",
+            "first_session_not_completed",
             "\n".join(early_markers()[:26]) + "\n",
         )
         self.assertEqual(result.status, "pass")
 
-    def test_accepts_fixed_response_copy_out_not_completed_blocker(self):
+    def test_accepts_first_session_not_completed_before_copy_out(self):
         result = self.validate_blocked_fixture(
-            "fixed_user_response_copy_out_not_completed",
+            "first_session_not_completed",
             "\n".join(early_markers()[:27]) + "\n",
         )
         self.assertEqual(result.status, "pass")
 
-    def test_accepts_fixed_request_boundary_not_completed_blocker(self):
+    def test_accepts_first_session_not_completed_before_boundary_return(self):
         result = self.validate_blocked_fixture(
-            "fixed_user_request_boundary_not_completed",
+            "first_session_not_completed",
             "\n".join(early_markers()[:31]) + "\n",
         )
         self.assertEqual(result.status, "pass")
@@ -737,6 +743,11 @@ def valid_metadata(outcome: str, *, serial_text: str | None = None, stderr_text:
         "expected_marker": get_expected_smoke_marker(),
         "early_markers": list(early_markers()),
         "observed_markers": observed,
+        "expected_marker_count": len(early_markers()),
+        "observed_marker_count": len(observed),
+        "marker_occurrence_counts": marker_occurrence_counts(observed),
+        "completed_session_count": completed_session_count(observed),
+        "active_or_failed_session_ordinal": active_or_failed_session_ordinal(observed),
         "earliest_observed_marker": observed[0] if observed else "",
         "limine_entry_point_observed": "elf entry point:" in combined.lower(),
         "expected_entry_symbol": "_start",
@@ -875,7 +886,7 @@ def early_markers() -> tuple[str, ...]:
 
 def observed_markers(serial_text: str, stderr_text: str) -> list[str]:
     combined = f"{serial_text}\n{stderr_text}"
-    return [marker for marker in early_markers() if marker in combined]
+    return extract_marker_occurrences(combined, early_markers())
 
 
 def patch_validator_paths(paths: dict[str, Path]):

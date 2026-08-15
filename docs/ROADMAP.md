@@ -205,8 +205,10 @@ implementation are complete and hosted accepted on `main`. CI run
 preserved 67 governed checks, all 41 markers, the existing ABI, and the
 accepted host evidence levels. The current published release remains
 `v1.0.1`, which predates this implementation; no published release contains
-the context. v1.0.2 and v1.1.0 remain unauthorized, and no next capability is
-selected.
+the context. The separately authorized **Bounded Repeated User Session** is
+implemented locally on `main` with two explicit lifecycles and 52 marker
+occurrences; hosted acceptance is pending. v1.0.2 and v1.1.0 remain
+unauthorized.
 
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity
@@ -345,6 +347,7 @@ Deferred until separately scoped runtime or cleanup phases:
 | `post-Phase-0 definition` | Fixed User Execution Context | Define one supervisor-only identity and lifecycle that binds the accepted fixed user execution path without implementing it. | Runtime implementation, repeated sessions, processes, scheduling, dynamic memory, ABI expansion, version authorization, or release. |
 | `post-Phase-0 prerequisites` | Fixed User Execution Context Governance | Adopt exact ownership, lifecycle, result, cleanup, transition-budget, progression, and evidence authority before runtime implementation. | Runtime implementation, marker/check-count changes, repeated sessions, public ABI, version authorization, or release. |
 | `post-Phase-0 implementation` | Fixed User Execution Context Implementation | Add one static supervisor-owned lifecycle around the accepted fixed transaction and prove cleanup without changing markers or ABI. | Repeated sessions, processes, scheduling, dynamic allocation, marker/check-count changes, version authorization, or release. |
+| `post-context implementation` | Bounded Repeated User Session | Reuse the one static context for exactly two independent fixed sessions after verified reset. | Third or arbitrary sessions, processes, scheduling, dynamic allocation, ABI expansion, version authorization, or release. |
 
 ---
 

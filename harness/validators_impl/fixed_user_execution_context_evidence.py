@@ -7,6 +7,7 @@ from pathlib import Path
 from harness.abi_manifest import ROOT
 from harness.codes import FIXED_USER_EXECUTION_CONTEXT_CONTRACT_INVALID, OK
 from harness.runtime_evidence_taxonomy import get_smoke_marker_order
+from harness.runtime_marker_occurrences import marker_occurs_as_governed
 from harness.validator import BaseValidator, ValidationResult
 from harness.validators_impl.fixed_user_execution_context_contract import _contract_issue
 
@@ -426,10 +427,10 @@ def _runtime_issue(evidence) -> FixedUserContextEvidenceIssue | None:
     observed = tuple(evidence.metadata.get("observed_markers", ()))
     if evidence.metadata.get("outcome") != "pass" or evidence.metadata.get("blocker_category") not in (None, "", "none"):
         return _issue("runtime_outcome_invalid", "qemu_smoke.outcome", "QEMU context evidence must pass without a blocker")
-    if len(expected) != 41 or observed != expected:
-        return _issue("marker_sequence_changed", "qemu_smoke.observed_markers", "The exact 41-marker sequence must remain unchanged")
-    if any(evidence.serial.count(marker) != 1 for marker in expected):
-        return _issue("runtime_marker_invalid", "qemu_smoke.serial", "Every governed marker must appear exactly once")
+    if len(expected) != 52 or observed != expected:
+        return _issue("marker_sequence_changed", "qemu_smoke.observed_markers", "The exact 52-occurrence marker sequence must be present")
+    if any(not marker_occurs_as_governed(evidence.serial, marker, expected) for marker in set(expected)):
+        return _issue("runtime_marker_invalid", "qemu_smoke.serial", "Every governed marker must have its required occurrence count")
     return None
 
 

@@ -356,6 +356,10 @@ class FixedUserExecutionContextEvidenceTests(unittest.TestCase):
 
     def write_json(self, target, source, mutation):
         value = json.loads(source.read_text())
+        if source == validator_module._METADATA_PATH:
+            value["observed_markers"] = list(get_smoke_marker_order())
+            value["outcome"] = "pass"
+            value["blocker_category"] = "none"
         target.write_text(json.dumps(mutation(copy.deepcopy(value)) if mutation else value))
         return target
 

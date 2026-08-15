@@ -472,7 +472,21 @@ it does not fabricate runtime symbols or evidence.
 The focused runtime validator is `fixed_user_execution_context_evidence`. It
 proves source and ELF placement, exact storage geometry and RW-NX policy,
 lifecycle transitions, count/phase coupling, one result commit, cleanup
-readback, failure exclusions, and Linux QEMU survival without changing the
-41-marker taxonomy. It is exercised directly and remains unregistered in
-`scripts/verify.sh`, preserving 67 governed checks. Registering a new runtime
-check or changing marker evidence requires separate authorization.
+readback, failure exclusions, and Linux QEMU survival. It is exercised directly
+and remains unregistered in `scripts/verify.sh`, preserving 67 governed checks.
+
+# 24. Bounded Repeated User Session Validation
+
+`bounded_repeated_user_session_contract` directly validates the exact two-call
+composition, distinct identities, per-session budget, total count, coordinator
+geometry, reset order, failure policy, occurrence-aware marker contract, and
+non-goals. `bounded_repeated_user_session_evidence` correlates the Odin and
+assembly source path with ELF placement and duplicate-preserving QEMU evidence.
+Both remain unregistered.
+
+QEMU evidence retains the ordered 52-entry occurrence list and per-name counts.
+It rejects missing, interleaved, deduplicated, or third transaction blocks and
+classifies whether failure occurred before, during, or between the two
+sessions. Linux runtime acceptance still requires 67 checks, zero failures,
+QEMU pass, blocker none, two completed sessions, and
+`KOZO_RUNTIME_RETURN_OK` last.

@@ -284,6 +284,10 @@ class BoundedUserResponseConsumptionEvidenceTests(unittest.TestCase):
                     target = root / f"fixture-{index}"
                     if is_json:
                         value = json.loads(source_path.read_text())
+                        if attribute == "_METADATA_PATH":
+                            value["observed_markers"] = list(get_smoke_marker_order())
+                            value["outcome"] = "pass"
+                            value["blocker_category"] = "none"
                         target.write_text(json.dumps(mutation(copy.deepcopy(value)) if mutation else value))
                     else:
                         value = source_path.read_text()

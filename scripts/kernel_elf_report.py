@@ -145,6 +145,7 @@ FIXED_USER_REQUEST_SYMBOLS = (
     "copy_fixed_user_response_out",
     "validate_fixed_user_response_readback",
     "clear_fixed_user_request_buffers",
+    "fixed_user_session_storage_is_zero",
     "fixed_user_buffers_are_zero",
     "privilege_ring0_continuation",
     "runtime_serial_write_user_request_copy_in_marker",
@@ -194,6 +195,31 @@ FIXED_USER_EXECUTION_CONTEXT_SYMBOLS = (
     "fixed_user_context_result",
     "fixed_user_context_result_end",
 )
+BOUNDED_REPEATED_USER_SESSION_SYMBOLS = (
+    "execute_runtime_status_boundaries",
+    "execute_bounded_repeated_user_sessions",
+    "execute_first_bounded_user_session",
+    "execute_second_bounded_user_session",
+    "initialize_repeated_session_coordinator",
+    "execute_fixed_user_session",
+    "begin_fixed_user_session",
+    "fixed_user_session_succeeds",
+    "complete_fixed_user_session",
+    "prepare_next_fixed_user_session",
+    "finalize_repeated_session_coordinator",
+    "reset_completed_fixed_user_session",
+    "reset_fixed_user_context_for_reuse",
+    "execute_fixed_user_runtime_status_transaction",
+    "validate_fixed_user_context_success_result",
+    "validate_fixed_user_session_cleanup",
+    "reset_fixed_user_context_result",
+    "reset_fixed_user_execution_context_for_reuse",
+    "validate_fixed_user_session_reset_state",
+    "validate_fixed_user_session_identity_sequence",
+    "invalidate_fixed_user_session_state",
+    "execute_first_governed_capability",
+    "repeated_user_session_coordinator",
+)
 FIXED_USER_CONTEXT_OVERLAP_SYMBOLS = (
     "boot_stack",
     "boot_stack_top",
@@ -232,6 +258,7 @@ BOUNDED_USER_RESPONSE_SYMBOLS = (
     "copy_fixed_user_consumption_record",
     "validate_fixed_user_consumption_record",
     "clear_fixed_user_response_transaction",
+    "fixed_user_session_storage_is_zero",
     "fixed_user_response_matches_shadow",
     "fixed_user_transaction_phase",
     "fixed_user_transaction_phase_end",
@@ -390,6 +417,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
             *BOUNDED_USER_RESPONSE_SYMBOLS,
             *FIXED_USER_RUNTIME_STATUS_SYMBOLS,
             *FIXED_USER_EXECUTION_CONTEXT_SYMBOLS,
+            *BOUNDED_REPEATED_USER_SESSION_SYMBOLS,
             *FIXED_USER_CONTEXT_OVERLAP_SYMBOLS,
         ),
     )
@@ -426,6 +454,11 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "bounded_user_response_consumption": bounded_user_response_consumption_record(kernel_elf, symbols),
         "fixed_user_runtime_status_service": fixed_user_runtime_status_service_record(kernel_elf, symbols),
         "fixed_user_execution_context": fixed_user_execution_context_record(
+            kernel_elf,
+            symbols,
+            load_segments,
+        ),
+        "bounded_repeated_user_session": bounded_repeated_user_session_record(
             kernel_elf,
             symbols,
             load_segments,
@@ -633,6 +666,28 @@ def _fixed_storage_policy_record(
         "non_executable": "x" not in flags if flags else False,
         "higher_half_address": start is not None and start >= LOWER_HALF_LIMIT,
     }
+
+
+def _sized_storage_record(
+    kernel_elf: Path,
+    symbols: dict[str, int],
+    sections: dict[str, str],
+    load_segments: list[ProgramHeader],
+    symbol_name: str,
+    required_size: int,
+    required_alignment: int,
+) -> dict[str, object]:
+    start = symbols.get(symbol_name)
+    size = symbol_sizes(kernel_elf, (symbol_name,)).get(symbol_name, -1)
+    return {
+        "symbol": symbol_name,
+        "start_address": _hex(start) if start is not None else "",
+        "end_address": _hex(start + size) if start is not None and size >= 0 else "",
+        "size_bytes": size,
+        "required_size_bytes": required_size,
+        "required_alignment_bytes": required_alignment,
+        "start_aligned": start is not None and start % required_alignment == 0,
+    } | _fixed_storage_policy_record(symbols, sections, load_segments, symbol_name)
 
 
 def _load_segment_for_address(
@@ -1050,7 +1105,7 @@ def fixed_user_request_boundary_record(
         ),
         "post_clear_zero_validation_present": _calls_address(
             instruction_sets.get("clear_fixed_user_request_buffers", []),
-            symbols.get("fixed_user_buffers_are_zero"),
+            symbols.get("fixed_user_session_storage_is_zero"),
         ),
         "fixed_continuation_jump_present": _jumps_address(
             response_handler,
@@ -1107,7 +1162,7 @@ def fixed_user_runtime_status_service_record(
                 symbols.get(name)
                 for name in (
                     "collect_runtime_status",
-                    "execute_fixed_user_runtime_status_transaction",
+                    "execute_bounded_repeated_user_sessions",
                     "execute_first_governed_capability",
                     "clear_runtime_status_snapshot",
                 )
@@ -1171,6 +1226,134 @@ def fixed_user_execution_context_record(
         "overlaps": overlaps,
         "no_overlap": not overlaps,
     }
+
+
+def bounded_repeated_user_session_record(
+    kernel_elf: Path,
+    symbols: dict[str, int],
+    load_segments: list[ProgramHeader],
+) -> dict[str, object]:
+    sections = symbol_sections(kernel_elf, BOUNDED_REPEATED_USER_SESSION_SYMBOLS)
+    coordinator = _sized_storage_record(
+        kernel_elf,
+        symbols,
+        sections,
+        load_segments,
+        "repeated_user_session_coordinator",
+        32,
+        8,
+    )
+    all_instructions = parse_disassembly_instructions(
+        run_text_command(["objdump", "-d", str(kernel_elf)])
+    )
+    instructions = _repeated_session_instruction_sets(all_instructions, symbols)
+    return {
+        "symbols": symbol_record(symbols, BOUNDED_REPEATED_USER_SESSION_SYMBOLS),
+        "coordinator": coordinator,
+        "coordinator_overlap_count": _repeated_session_overlap_count(coordinator, symbols),
+        "session_call_count": sum(
+            _call_target_count(
+                instructions.get(name, []),
+                symbols.get("execute_fixed_user_session"),
+            )
+            for name in (
+                "execute_first_bounded_user_session",
+                "execute_second_bounded_user_session",
+            )
+        ),
+        "total_session_call_count": _call_target_count(
+            all_instructions,
+            symbols.get("execute_fixed_user_session"),
+        ),
+        "session_helper_call_order_valid": _ordered_call_targets_present(
+            instructions.get("execute_fixed_user_session", []),
+            tuple(
+                symbols.get(name)
+                for name in (
+                    "begin_fixed_user_session",
+                    "fixed_user_session_succeeds",
+                    "complete_fixed_user_session",
+                )
+            ),
+        ) and _ordered_call_targets_present(
+            instructions.get("fixed_user_session_succeeds", []),
+            tuple(
+                symbols.get(name)
+                for name in (
+                    "execute_fixed_user_runtime_status_transaction",
+                    "validate_fixed_user_context_success_result",
+                )
+            ),
+        ),
+        "between_session_reset_order_valid": _repeated_session_reset_order_valid(
+            "prepare_next_fixed_user_session",
+            instructions,
+            symbols,
+        ),
+        "terminal_reset_order_valid": _repeated_session_reset_order_valid(
+            "finalize_repeated_session_coordinator",
+            instructions,
+            symbols,
+        ),
+        "later_capability_gate_valid": _ordered_call_targets_present(
+            instructions.get("execute_runtime_status_boundaries", []),
+            (
+                symbols.get("execute_bounded_repeated_user_sessions"),
+                symbols.get("execute_first_governed_capability"),
+            ),
+        ),
+        "coordinator_backward_branches": backward_branch_records(
+            instructions.get("execute_bounded_repeated_user_sessions", [])
+        ),
+    }
+
+
+def _repeated_session_instruction_sets(all_instructions, symbols):
+    return {
+        name: _instructions_for_symbol(all_instructions, name, symbols)
+        for name in BOUNDED_REPEATED_USER_SESSION_SYMBOLS
+        if name in symbols
+    }
+
+
+def _repeated_session_reset_order_valid(entry_name, instructions, symbols) -> bool:
+    entry_calls_reset = _calls_address(
+        instructions.get(entry_name, []),
+        symbols.get("reset_completed_fixed_user_session"),
+    )
+    reset_order_valid = _ordered_call_targets_present(
+        instructions.get("reset_completed_fixed_user_session", []),
+        tuple(
+            symbols.get(name)
+            for name in (
+                "validate_fixed_user_session_cleanup",
+                "reset_fixed_user_context_result",
+                "reset_fixed_user_context_for_reuse",
+            )
+        ),
+    )
+    context_reset_order_valid = _ordered_call_targets_present(
+        instructions.get("reset_fixed_user_context_for_reuse", []),
+        tuple(
+            symbols.get(name)
+            for name in (
+                "reset_fixed_user_execution_context_for_reuse",
+                "validate_fixed_user_session_reset_state",
+            )
+        ),
+    )
+    return entry_calls_reset and reset_order_valid and context_reset_order_valid
+
+
+def _repeated_session_overlap_count(coordinator, symbols) -> int:
+    coordinator_range = _record_range(coordinator)
+    protected_ranges = (
+        (symbols.get("fixed_user_context"), symbols.get("fixed_user_context_end")),
+        (symbols.get("fixed_user_context_result"), symbols.get("fixed_user_context_result_end")),
+        (symbols.get("user_probe_data_start"), symbols.get("user_probe_data_end")),
+        (symbols.get("user_probe_stack"), symbols.get("user_probe_stack_top")),
+    )
+    return sum(_ranges_overlap(coordinator_range, candidate) for candidate in protected_ranges)
 
 
 def _fixed_user_context_storage_record(symbols, sections, load_segments):
@@ -1281,7 +1464,7 @@ def bounded_user_response_consumption_record(
         "response_clear_stosq_count": _rep_stosq_count(clearing),
         "response_clear_zero_validation_present": _calls_address(
             clearing,
-            symbols.get("fixed_user_buffers_are_zero"),
+            symbols.get("fixed_user_session_storage_is_zero"),
         ),
         "fixed_continuation_jump_present": _jumps_address(
             second_handler,
@@ -1602,6 +1785,18 @@ def _calls_address(
     if target_address is None:
         return False
     return any(
+        mnemonic.startswith("call") and instruction_target(operands) == target_address
+        for _, mnemonic, operands in instructions
+    )
+
+
+def _call_target_count(
+    instructions: list[tuple[int, str, str]],
+    target_address: int | None,
+) -> int:
+    if target_address is None:
+        return 0
+    return sum(
         mnemonic.startswith("call") and instruction_target(operands) == target_address
         for _, mnemonic, operands in instructions
     )

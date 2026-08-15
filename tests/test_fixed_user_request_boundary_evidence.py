@@ -126,11 +126,12 @@ class FixedUserRequestBoundaryEvidenceTests(unittest.TestCase):
         self.assert_reason(result, "service_invalid")
 
     def test_fails_when_clear_readback_is_missing(self):
-        mutation = lambda text: text.replace(
-            "    mov qword [rel fixed_user_request_success_state], 0\n"
-            "    call fixed_user_buffers_are_zero\n",
-            "    mov qword [rel fixed_user_request_success_state], 0\n",
-            1,
+        mutation = lambda text: replace_in_range(
+            text,
+            "clear_fixed_user_request_buffers:",
+            "clear_fixed_user_reused_storage:",
+            "    call fixed_user_session_storage_is_zero\n",
+            "",
         )
         result = self.validate_fixture(mutate_privilege=mutation)
         self.assertEqual(result.status, "fail")
@@ -336,6 +337,13 @@ def valid_range(size):
 def remove_symbol(report, name):
     report["fixed_user_request_boundary"]["symbols"][name]["present"] = False
     return report
+
+
+def replace_in_range(text, start, end, old, new):
+    start_index = text.index(start)
+    end_index = text.index(end, start_index)
+    section = text[start_index:end_index].replace(old, new, 1)
+    return text[:start_index] + section + text[end_index:]
 
 
 def write_mutated(path, text, mutation):

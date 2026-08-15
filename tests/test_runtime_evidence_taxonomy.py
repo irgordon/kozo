@@ -39,7 +39,8 @@ class RuntimeEvidenceTaxonomyValidatorTests(unittest.TestCase):
             paths = write_fixture_files(root)
             old_paths = patch_validator_paths(root, paths["contract"])
             try:
-                self.assertTrue(contract_module.is_complete_ordered_marker_sequence(valid_contract()["smoke_marker_order"]))
+                marker_order = json.loads(paths["contract"].read_text())["smoke_marker_order"]
+                self.assertTrue(contract_module.is_complete_ordered_marker_sequence(marker_order))
                 self.assertFalse(contract_module.is_complete_ordered_marker_sequence(["KOZO_BOOT_SMOKE_OK"]))
             finally:
                 restore_validator_paths(old_paths)
@@ -193,7 +194,7 @@ class RuntimeEvidenceTaxonomyValidatorTests(unittest.TestCase):
 def write_fixture_files(root: Path) -> dict[str, Path]:
     contract_path = root / "contracts" / "runtime_evidence_taxonomy.v0.json"
     contract_path.parent.mkdir(parents=True)
-    contract_path.write_text(json.dumps(valid_contract(), indent=2) + "\n")
+    contract_path.write_text(contract_module.CONTRACT_PATH.read_text())
     return {"contract": contract_path}
 
 

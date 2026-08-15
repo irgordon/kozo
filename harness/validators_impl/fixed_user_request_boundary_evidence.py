@@ -7,6 +7,7 @@ from pathlib import Path
 from harness.abi_manifest import ROOT
 from harness.codes import FIXED_USER_REQUEST_BOUNDARY_EVIDENCE_INVALID, OK
 from harness.runtime_evidence_taxonomy import get_smoke_marker_order
+from harness.runtime_marker_occurrences import marker_occurs_as_governed
 from harness.validator import BaseValidator, ValidationResult
 from harness.validators_impl.fixed_user_request_boundary_contract import _contract_issue
 
@@ -259,18 +260,31 @@ def _service_issue(context):
 
 
 def _clearing_issue(context):
-    source = _source_range(
+    clearing = _source_range(
         context.privilege,
         "clear_fixed_user_request_buffers:",
-        "privilege_return_failure:",
+        "clear_fixed_user_reused_storage:",
     )
     required = (
         "mov ecx, FIXED_USER_REQUEST_QWORDS",
         "mov ecx, FIXED_USER_RESPONSE_QWORDS",
         "rep stosq",
-        "call fixed_user_buffers_are_zero",
+        "call clear_fixed_user_reused_storage",
+        "call fixed_user_session_storage_is_zero",
+        "call clear_fixed_user_reused_storage",
+        "call fixed_user_session_storage_is_zero",
     )
-    return _source_tokens_issue(source, required, "buffer_clear_invalid", "buffer_clearing")
+    issue = _source_tokens_issue(clearing, required, "buffer_clear_invalid", "buffer_clearing")
+    if issue is not None:
+        return issue
+    reused = _source_range(context.privilege, "clear_fixed_user_reused_storage:", "fixed_user_session_storage_is_zero:")
+    readback = _source_range(context.privilege, "fixed_user_session_storage_is_zero:", "fixed_user_buffers_are_zero:")
+    return _source_tokens_issue(
+        reused + readback,
+        ("FIXED_USER_DATA_SCRATCH_VA", "USER_PROBE_STACK_VA", "call fixed_user_buffers_are_zero"),
+        "buffer_clear_invalid",
+        "buffer_clearing",
+    )
 
 
 def _failure_issue(context):
@@ -364,8 +378,8 @@ def _serial_marker_issue(serial: str, expected: list[str]):
         position = serial.find(marker, position + 1)
         if position < 0:
             return _issue("runtime_marker_missing", f"qemu_smoke.{marker}", f"QEMU serial log is missing {marker}")
-        if marker in _BOUNDARY_MARKERS and serial.count(marker) != 1:
-            return _issue("runtime_marker_duplicate", f"qemu_smoke.{marker}", f"QEMU serial log must contain exactly one {marker}")
+        if marker in _BOUNDARY_MARKERS and not marker_occurs_as_governed(serial, marker, expected):
+            return _issue("runtime_marker_duplicate", f"qemu_smoke.{marker}", f"QEMU serial marker count must match the governed occurrence count for {marker}")
     return None
 
 

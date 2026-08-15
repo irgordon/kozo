@@ -48,6 +48,17 @@ EARLY_MARKERS=(
   "KOZO_FIXED_USER_REQUEST_OK"
   "KOZO_RING3_PROBE_OK"
   "KOZO_RING0_RETURN_OK"
+  "KOZO_RING3_ENTER"
+  "KOZO_USER_REQUEST_COPY_IN_OK"
+  "KOZO_USER_RUNTIME_STATUS_SERVICE_ENTER"
+  "KOZO_USER_RUNTIME_STATUS_SERVICE_OK"
+  "KOZO_USER_RESPONSE_COPY_OUT_OK"
+  "KOZO_RING3_RESPONSE_RESUME"
+  "KOZO_USER_RESPONSE_CONSUMED_OK"
+  "KOZO_FIXED_USER_RESPONSE_OK"
+  "KOZO_FIXED_USER_REQUEST_OK"
+  "KOZO_RING3_PROBE_OK"
+  "KOZO_RING0_RETURN_OK"
   "KOZO_CAPABILITY_DISPATCH_ENTER"
   "KOZO_RUNTIME_STATUS_QUERY_OK"
   "KOZO_FIRST_CAPABILITY_OK"
@@ -206,16 +217,16 @@ PY
 }
 
 serial_marker_was_observed() {
-  python3 - "$QEMU_LOG" "${EARLY_MARKERS[@]}" <<'PY'
+  PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}" python3 - "$QEMU_LOG" "${EARLY_MARKERS[@]}" <<'PY'
 import sys
 from pathlib import Path
 
+from harness.runtime_marker_occurrences import extract_marker_occurrences, marker_sequence_is_complete
+
 text = Path(sys.argv[1]).read_text(errors="replace")
-position = -1
-for marker in sys.argv[2:]:
-    position = text.find(marker, position + 1)
-    if position < 0:
-        raise SystemExit(1)
+expected = sys.argv[2:]
+observed = extract_marker_occurrences(text, expected)
+raise SystemExit(0 if marker_sequence_is_complete(observed, expected) else 1)
 PY
 }
 
@@ -249,9 +260,11 @@ classify_boot_blocker() {
   local serial_log=$1
   local stderr_log=$2
 
-  python3 - "$serial_log" "$stderr_log" "${EARLY_MARKERS[@]}" <<'PY'
+  PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}" python3 - "$serial_log" "$stderr_log" "${EARLY_MARKERS[@]}" <<'PY'
 import sys
 from pathlib import Path
+
+from harness.runtime_marker_occurrences import extract_marker_occurrences, repeated_session_blocker
 
 serial_log = Path(sys.argv[1])
 stderr_log = Path(sys.argv[2])
@@ -260,7 +273,7 @@ serial_text = serial_log.read_text(errors="replace") if serial_log.is_file() els
 stderr_text = stderr_log.read_text(errors="replace") if stderr_log.is_file() else ""
 combined = f"{serial_text}\n{stderr_text}"
 combined_lower = combined.lower()
-observed = [marker for marker in markers if marker in combined]
+observed = extract_marker_occurrences(combined, markers)
 
 
 def _has_kernel_load_evidence(text: str, observed_markers: list[str]) -> bool:
@@ -327,44 +340,8 @@ elif markers[18] in observed and markers[21] not in observed:
     print("runtime_loop_iteration_incomplete")
 elif markers[21] in observed and markers[22] not in observed:
     print("runtime_loop_exit_not_reached")
-elif markers[22] in observed and markers[23] not in observed:
-    print("runtime_status_transaction_not_reached")
-elif markers[23] in observed and markers[24] not in observed:
-    print("fixed_user_request_copy_in_not_completed")
-elif markers[24] in observed and markers[25] not in observed:
-    print("user_runtime_status_service_not_reached")
-elif markers[25] in observed and markers[26] not in observed:
-    print("user_runtime_status_service_not_completed")
-elif markers[26] in observed and markers[27] not in observed:
-    print("fixed_user_response_copy_out_not_completed")
-elif markers[27] in observed and markers[28] not in observed:
-    print("ring3_response_resume_not_reached")
-elif markers[28] in observed and markers[29] not in observed:
-    print("user_response_consumption_not_completed")
-elif markers[29] in observed and markers[30] not in observed:
-    print("fixed_user_response_boundary_not_completed")
-elif markers[30] in observed and markers[31] not in observed:
-    print("fixed_user_request_boundary_not_completed")
-elif markers[31] in observed and markers[32] not in observed:
-    print("ring3_probe_not_completed")
-elif markers[32] in observed and markers[33] not in observed:
-    print("ring0_return_not_completed")
-elif markers[33] in observed and markers[34] not in observed:
-    print("capability_dispatch_not_reached")
-elif markers[34] in observed and markers[35] not in observed:
-    print("runtime_status_query_not_completed")
-elif markers[35] in observed and markers[36] not in observed:
-    print("first_governed_capability_not_proven")
-elif markers[36] in observed and markers[37] not in observed:
-    print("runtime_state_update_not_reached")
-elif markers[37] in observed and markers[38] not in observed:
-    print("runtime_state_update_not_completed")
-elif markers[38] in observed and markers[39] not in observed:
-    print("second_governed_capability_not_proven")
-elif markers[39] in observed and markers[40] not in observed:
-    print("runtime_return_not_reached")
-elif observed and observed[0] != markers[0]:
-    print("qemu_timeout")
+elif markers[22] in observed:
+    print(repeated_session_blocker(observed, markers))
 else:
     print("qemu_timeout")
 PY
@@ -398,6 +375,12 @@ import json
 import sys
 from pathlib import Path
 
+from harness.runtime_marker_occurrences import (
+    active_or_failed_session_ordinal,
+    completed_session_count,
+    extract_marker_occurrences,
+    marker_occurrence_counts,
+)
 from harness.text_evidence import write_canonical_text
 
 metadata_path = Path(sys.argv[1])
@@ -415,7 +398,7 @@ stderr_log_path = Path("artifacts/runtime/qemu_smoke.stderr.log")
 serial_text = serial_log_file.read_text(errors="replace") if serial_log_file.is_file() else ""
 stderr_text = stderr_log_file.read_text(errors="replace") if stderr_log_file.is_file() else ""
 combined_text = f"{serial_text}\n{stderr_text}"
-observed_markers = [marker for marker in early_markers if marker in combined_text]
+observed_markers = extract_marker_occurrences(combined_text, early_markers)
 
 
 def _limine_entry_point_observed(text: str) -> bool:
@@ -462,6 +445,11 @@ metadata = {
     "expected_marker": expected_marker,
     "early_markers": early_markers,
     "observed_markers": observed_markers,
+    "expected_marker_count": len(early_markers),
+    "observed_marker_count": len(observed_markers),
+    "marker_occurrence_counts": marker_occurrence_counts(observed_markers),
+    "completed_session_count": completed_session_count(observed_markers),
+    "active_or_failed_session_ordinal": active_or_failed_session_ordinal(observed_markers),
     "earliest_observed_marker": observed_markers[0] if observed_markers else "",
     "limine_entry_point_observed": _limine_entry_point_observed(combined_text),
     "expected_entry_symbol": "_start",

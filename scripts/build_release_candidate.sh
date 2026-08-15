@@ -112,7 +112,7 @@ ensure_verification_passed() {
   [[ "$verificationCheckCount" == "67" ]] || fail "Expected 67 verification checks"
   [[ "$qemuOutcome" == "pass" ]] || fail "QEMU smoke did not pass"
   [[ "$qemuBlocker" == "none" ]] || fail "QEMU smoke reported a blocker"
-  [[ "$markerCount" == "41" ]] || fail "Expected 41 runtime markers"
+  [[ "$markerCount" == "52" ]] || fail "Expected 52 runtime marker occurrences"
 }
 
 copy_release_files() {
@@ -274,7 +274,7 @@ expected = {
     "verification_check_count": 67,
     "qemu_outcome": "pass",
     "qemu_blocker": "none",
-    "marker_count": 41,
+    "marker_count": 52,
     "published": False,
 }
 for field, value in expected.items():

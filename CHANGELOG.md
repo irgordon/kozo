@@ -1,5 +1,26 @@
 # Changelog
 
+## Bounded repeated user session - 2026-08-15
+
+**Status:** Implemented locally on `main`; hosted acceptance pending. Not
+published in v1.0.1.
+
+* Reused the accepted static Fixed User Execution Context for exactly two
+  sequential fixed transactions with distinct kernel-owned opaque identities.
+* Preserved the two-return per-session budget and added a bounded coordinator
+  that requires two completed sessions and four total `int 0x81` returns.
+* Added verified result, transaction-buffer, scratch, and user-stack reset
+  between sessions and after session 2; stale state, a third session, or a
+  fifth return fails closed.
+* Preserved the unique marker catalog while repeating the 11-marker transaction
+  block, increasing ordered occurrences from 41 to 52 with
+  `KOZO_RUNTIME_RETURN_OK` still last.
+* Added a contract, schema, duplicate-aware QEMU evidence, ELF reporting,
+  focused unregistered validators, and regression tests while retaining 67
+  governed checks.
+* Added no process, scheduler, allocator, public ABI, mapping, interrupt vector,
+  release version, tag, or release behavior.
+
 ## Fixed user execution context implementation - 2026-08-12
 
 **Status:** Implemented and hosted accepted on `main`; not published in

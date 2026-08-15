@@ -11,6 +11,13 @@ from harness.runtime_evidence_taxonomy import (
     get_smoke_outcomes,
 )
 from harness.codes import OK, QEMU_SMOKE_EVIDENCE_INVALID
+from harness.runtime_marker_occurrences import (
+    active_or_failed_session_ordinal,
+    completed_session_count,
+    extract_marker_occurrences,
+    marker_occurrence_counts,
+    repeated_session_blocker,
+)
 from harness.text_evidence import raw_artifact_size
 from harness.validator import BaseValidator, ValidationResult
 
@@ -117,9 +124,9 @@ def _qemu_smoke_issue() -> QemuSmokeIssue | None:
         _outcome_issue(metadata),
         _blocked_marker_issue(metadata),
         _pass_evidence_issue(metadata),
-        _diagnostic_field_issue(metadata),
         _entry_handoff_field_issue(metadata),
         _observed_marker_issue(metadata),
+        _diagnostic_field_issue(metadata),
         _marker_sequence_issue(metadata),
         _summary_issue(metadata),
         _blocker_taxonomy_issue(metadata),
@@ -165,6 +172,17 @@ def _diagnostic_field_issue(metadata: dict[str, object]) -> QemuSmokeIssue | Non
         return _issue("field_mismatch", "qemu_smoke.early_markers", "QEMU smoke early marker list must match the boot marker contract")
     if not isinstance(metadata.get("observed_markers"), list):
         return _issue("field_mismatch", "qemu_smoke.observed_markers", "QEMU smoke observed markers must be recorded")
+    if metadata.get("expected_marker_count") != len(_EARLY_MARKERS):
+        return _issue("field_mismatch", "qemu_smoke.expected_marker_count", "QEMU smoke expected occurrence count must match the runtime taxonomy")
+    observed = metadata.get("observed_markers", [])
+    if metadata.get("observed_marker_count") != len(observed):
+        return _issue("field_mismatch", "qemu_smoke.observed_marker_count", "QEMU smoke observed occurrence count must match observed markers")
+    if metadata.get("marker_occurrence_counts") != marker_occurrence_counts(observed):
+        return _issue("field_mismatch", "qemu_smoke.marker_occurrence_counts", "QEMU smoke occurrence counts must preserve duplicate markers")
+    if metadata.get("completed_session_count") != completed_session_count(observed):
+        return _issue("field_mismatch", "qemu_smoke.completed_session_count", "QEMU smoke completed session count must match Ring0 return occurrences")
+    if metadata.get("active_or_failed_session_ordinal") != active_or_failed_session_ordinal(observed):
+        return _issue("field_mismatch", "qemu_smoke.active_or_failed_session_ordinal", "QEMU smoke active or failed session ordinal must match marker occurrences")
     if not isinstance(metadata.get("earliest_observed_marker"), str):
         return _issue("field_mismatch", "qemu_smoke.earliest_observed_marker", "QEMU smoke earliest observed marker must be recorded")
     if not isinstance(metadata.get("timed_out"), bool):
@@ -202,7 +220,7 @@ def _observed_markers_from_logs() -> list[str]:
     serial_text = _SERIAL_LOG_PATH.read_text(errors="replace") if _SERIAL_LOG_PATH.is_file() else ""
     stderr_text = _STDERR_LOG_PATH.read_text(errors="replace") if _STDERR_LOG_PATH.is_file() else ""
     combined = f"{serial_text}\n{stderr_text}"
-    return [marker for marker in _EARLY_MARKERS if marker in combined]
+    return extract_marker_occurrences(combined, _EARLY_MARKERS)
 
 
 def _summary_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
@@ -279,18 +297,26 @@ def _log_text() -> str:
 
 
 def _marker_sequence_issue(metadata: dict[str, object]) -> QemuSmokeIssue | None:
-    log_text = _log_text()
-    if metadata.get("outcome") == _PASS_OUTCOME:
-        for marker in _EARLY_MARKERS:
-            if marker not in log_text:
-                return _issue("marker_sequence_incomplete", f"qemu_smoke.marker_sequence.{marker}", "QEMU smoke pass requires the full boot marker sequence")
-    return _marker_order_issue(log_text)
+    observed = _observed_markers_from_logs()
+    order_issue = _marker_order_issue(observed)
+    if order_issue is not None:
+        return order_issue
+    if metadata.get("outcome") == _PASS_OUTCOME and tuple(observed) != _EARLY_MARKERS:
+        missing_index = next((index for index, marker in enumerate(_EARLY_MARKERS) if index >= len(observed) or observed[index] != marker), 0)
+        missing_marker = _EARLY_MARKERS[missing_index]
+        return _issue("marker_sequence_incomplete", f"qemu_smoke.marker_sequence.{missing_marker}", "QEMU smoke pass requires the full ordered occurrence sequence")
+    return None
 
 
-def _marker_order_issue(log_text: str) -> QemuSmokeIssue | None:
-    positions = [(marker, log_text.find(marker)) for marker in _EARLY_MARKERS if marker in log_text]
-    ordered_positions = [position for _, position in positions]
-    if ordered_positions != sorted(ordered_positions):
+def _marker_order_issue(observed: list[str]) -> QemuSmokeIssue | None:
+    expected_index = 0
+    for marker in observed:
+        while expected_index < len(_EARLY_MARKERS) and _EARLY_MARKERS[expected_index] != marker:
+            expected_index += 1
+        if expected_index == len(_EARLY_MARKERS):
+            return _issue("marker_order_invalid", "qemu_smoke.marker_sequence", "QEMU smoke markers must appear in boot order")
+        expected_index += 1
+    if observed.count("KOZO_RING3_ENTER") > 2:
         return _issue("marker_order_invalid", "qemu_smoke.marker_sequence", "QEMU smoke markers must appear in boot order")
     return None
 
@@ -399,42 +425,8 @@ def _expected_blocker_from_logs(metadata: dict[str, object]) -> str | None:
         return "runtime_loop_iteration_incomplete"
     if _EARLY_MARKERS[21] in observed and _EARLY_MARKERS[22] not in observed:
         return "runtime_loop_exit_not_reached"
-    if _EARLY_MARKERS[22] in observed and _EARLY_MARKERS[23] not in observed:
-        return "runtime_status_transaction_not_reached"
-    if _EARLY_MARKERS[23] in observed and _EARLY_MARKERS[24] not in observed:
-        return "fixed_user_request_copy_in_not_completed"
-    if _EARLY_MARKERS[24] in observed and _EARLY_MARKERS[25] not in observed:
-        return "user_runtime_status_service_not_reached"
-    if _EARLY_MARKERS[25] in observed and _EARLY_MARKERS[26] not in observed:
-        return "user_runtime_status_service_not_completed"
-    if _EARLY_MARKERS[26] in observed and _EARLY_MARKERS[27] not in observed:
-        return "fixed_user_response_copy_out_not_completed"
-    if _EARLY_MARKERS[27] in observed and _EARLY_MARKERS[28] not in observed:
-        return "ring3_response_resume_not_reached"
-    if _EARLY_MARKERS[28] in observed and _EARLY_MARKERS[29] not in observed:
-        return "user_response_consumption_not_completed"
-    if _EARLY_MARKERS[29] in observed and _EARLY_MARKERS[30] not in observed:
-        return "fixed_user_response_boundary_not_completed"
-    if _EARLY_MARKERS[30] in observed and _EARLY_MARKERS[31] not in observed:
-        return "fixed_user_request_boundary_not_completed"
-    if _EARLY_MARKERS[31] in observed and _EARLY_MARKERS[32] not in observed:
-        return "ring3_probe_not_completed"
-    if _EARLY_MARKERS[32] in observed and _EARLY_MARKERS[33] not in observed:
-        return "ring0_return_not_completed"
-    if _EARLY_MARKERS[33] in observed and _EARLY_MARKERS[34] not in observed:
-        return "capability_dispatch_not_reached"
-    if _EARLY_MARKERS[34] in observed and _EARLY_MARKERS[35] not in observed:
-        return "runtime_status_query_not_completed"
-    if _EARLY_MARKERS[35] in observed and _EARLY_MARKERS[36] not in observed:
-        return "first_governed_capability_not_proven"
-    if _EARLY_MARKERS[36] in observed and _EARLY_MARKERS[37] not in observed:
-        return "runtime_state_update_not_reached"
-    if _EARLY_MARKERS[37] in observed and _EARLY_MARKERS[38] not in observed:
-        return "runtime_state_update_not_completed"
-    if _EARLY_MARKERS[38] in observed and _EARLY_MARKERS[39] not in observed:
-        return "second_governed_capability_not_proven"
-    if _EARLY_MARKERS[39] in observed and _EARLY_MARKERS[40] not in observed:
-        return "runtime_return_not_reached"
+    if _EARLY_MARKERS[22] in observed:
+        return repeated_session_blocker(observed, _EARLY_MARKERS)
     if observed and observed[0] != _EARLY_MARKERS[0]:
         return "qemu_timeout"
     return "qemu_timeout"

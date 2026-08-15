@@ -264,10 +264,22 @@ bindings, transition state, and reserved fields are zero while lifecycle is
 `CLEARED`. Failure evidence survives in a separate bounded result that cannot
 reactivate the context or authorize later execution.
 
-The bounded implementation applies this policy to the existing one-shot
-transaction. Every existing return revalidates lifecycle, fixed identity,
-bindings, phase, and count before the transaction can progress. A focused
-unregistered validator and Linux QEMU evidence prove the implementation
-without changing the governed marker taxonomy. This does not create a public
-syscall or API, process isolation, repeated sessions, exception recovery, or
+The bounded implementation applies this policy to one session at a time.
+Every existing return revalidates lifecycle, fixed identity, bindings, phase,
+and count before the transaction can progress. A focused unregistered
+validator and Linux QEMU evidence prove the base implementation. This does not
+create a public syscall or API, process isolation, exception recovery, or
 containment for arbitrary hostile user code.
+
+# 21. Repeated Session Reset Boundary
+
+Exactly two sessions may reuse the static context. Reuse is authorized only
+after Ring 0 validates the first `CLEARED` state, records bounded non-authority
+evidence, resets and reads back the result, verifies every transaction buffer
+and user stack byte is clear, and restores the context to non-authoritative
+`UNINITIALIZED`. Session 2 must use the second contract-owned identity; the
+first identity is invalid after clear.
+
+The coordinator has no identity or address authority. Any stale byte, identity
+reuse, count mismatch, cleanup failure, third session, or fifth transition
+prevents later capabilities and converges on the existing terminal halt path.

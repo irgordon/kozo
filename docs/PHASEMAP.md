@@ -187,9 +187,11 @@ The Fixed User Execution Context definition, governance prerequisites,
 implementation, and hosted acceptance are complete. CI run `31563696881`, lint
 run `31563696973`, and portability run `31563697127` accepted the bounded
 runtime implementation while preserving 67 governed checks and all 41 markers.
-Current `main` contains the implementation; immutable `v1.0.1` does not.
-Product version and release authorization remain unchanged, all published tags
-and hosted assets remain immutable, and no next capability is selected.
+Current `main` contains the context implementation; immutable `v1.0.1` does
+not. The Bounded Repeated User Session is implemented locally with two fixed
+sessions and 52 marker occurrences; hosted acceptance remains pending. Product
+version and release authorization remain unchanged, and all published tags and
+hosted assets remain immutable.
 
 ---
 
@@ -262,6 +264,7 @@ and hosted assets remain immutable, and no next capability is selected.
 | `post-Phase-0 definition` | Fixed User Execution Context | Select and bound one kernel-owned identity and lifecycle for the accepted fixed Ring 3 transaction. | `docs/FIXED_USER_EXECUTION_CONTEXT.md`, candidate comparison, capability boundary, invariants, failure/resource/portability/testing models, prerequisite and authorization decisions. | At definition completion, one capability was defined; Phase 0 remained accepted; runtime, contracts, schemas, markers, and version remained unchanged; implementation was not yet authorized. |
 | `post-Phase-0 prerequisites` | Fixed User Execution Context Governance | Define exact ownership, lifecycle, result, cleanup, transition-budget, progression, and evidence authority. | ADR 0018, internal context/result contract and schema, direct governance validator, focused tests, aligned authority documents and task state. | At prerequisite acceptance, hosted gates preserved 67 checks and 41 markers; implementation was authorized later, while version and release remain unauthorized. |
 | `post-Phase-0 implementation` | Fixed User Execution Context Implementation | Wrap the accepted fixed Ring 3 transaction with one supervisor-owned lifecycle and bounded result. | Static context/result storage, direct lifecycle and transition accounting, ELF report evidence, focused unregistered validator/tests, local and hosted gates. | Exactly one context reaches verified `CLEARED`; 67 governed checks, 41 markers, ABI, release version, and Phase 0 evidence levels remain unchanged. |
+| `post-context implementation` | Bounded Repeated User Session | Execute exactly two independent fixed sessions through the accepted static context. | Two explicit calls, fresh identities, result and storage reset, 32-byte coordinator, duplicate-aware marker evidence, focused contract/evidence tests. | Two sessions and four returns complete; 52 ordered occurrences end at `KOZO_RUNTIME_RETURN_OK`; later capabilities run only after final cleanup; hosted gates pass. |
 
 ---
 

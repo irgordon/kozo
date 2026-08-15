@@ -6,6 +6,10 @@ Implementation: Authorized, implemented, and hosted accepted
 Governance prerequisites: Accepted
 Scope: Selection and boundary definition for one kernel-owned user execution context
 
+Current extension: `docs/BOUNDED_REPEATED_USER_SESSION.md` composes exactly
+two independent context lifecycles on current `main`. The base lifecycle,
+geometry, and two-transition budget remain unchanged for each session.
+
 ---
 
 # 1. Purpose
@@ -50,8 +54,9 @@ The capability is one statically allocated, supervisor-only record that binds
 the accepted user mapping, privilege transition, fixed transaction, and Ring 0
 return to one opaque kernel-owned identity and one bounded lifecycle.
 
-Exactly one context is in scope. It executes the existing one-shot user status
-transaction once and is cleared before the existing Odin continuation.
+Exactly one context is in scope. One lifecycle executes the existing one-shot
+user status transaction once. Current `main` reuses that context only after
+verified clearing and reset to execute a second independent lifecycle.
 
 ---
 
@@ -162,7 +167,7 @@ trusted dependencies only after their existing validators pass.
 
 This capability does not provide:
 
-* repeated or persistent Ring 3 sessions;
+* more than two or persistent Ring 3 sessions;
 * multiple contexts, processes, or address spaces;
 * scheduling, preemption, timers, or context switching;
 * dynamic mappings, frame allocation, heap allocation, or page-fault recovery;
