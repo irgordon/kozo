@@ -27,7 +27,7 @@
   "runtime_progression_symbols": {
     "runtime_progression_entry": {
       "present": true,
-      "address": "0xffffffff80202040"
+      "address": "0xffffffff80202640"
     },
     "runtime_bootstrap_context": {
       "present": true,
@@ -46,7 +46,7 @@
     "symbols": {
       "controlled_runtime_loop": {
         "present": true,
-        "address": "0xffffffff80202340"
+        "address": "0xffffffff802039b0"
       },
       "runtime_loop_state": {
         "present": true,
@@ -77,20 +77,20 @@
     "backward_branch_present": true,
     "backward_branches": [
       {
-        "instruction_address": "0xffffffff8020237c",
-        "target_address": "0xffffffff80202360"
+        "instruction_address": "0xffffffff802039ec",
+        "target_address": "0xffffffff802039d0"
       },
       {
-        "instruction_address": "0xffffffff802023b5",
-        "target_address": "0xffffffff80202360"
+        "instruction_address": "0xffffffff80203a25",
+        "target_address": "0xffffffff802039d0"
       },
       {
-        "instruction_address": "0xffffffff802023b7",
-        "target_address": "0xffffffff8020238d"
+        "instruction_address": "0xffffffff80203a27",
+        "target_address": "0xffffffff802039fd"
       },
       {
-        "instruction_address": "0xffffffff802023c2",
-        "target_address": "0xffffffff80202360"
+        "instruction_address": "0xffffffff80203a32",
+        "target_address": "0xffffffff802039d0"
       }
     ],
     "terminal_comparison_present": true
@@ -99,15 +99,15 @@
     "symbols": {
       "execute_first_governed_capability": {
         "present": true,
-        "address": "0xffffffff80202920"
+        "address": "0xffffffff802026f0"
       },
       "dispatch_runtime_capability": {
         "present": true,
-        "address": "0xffffffff80202c50"
+        "address": "0xffffffff80202930"
       },
       "query_runtime_status": {
         "present": true,
-        "address": "0xffffffff80203170"
+        "address": "0xffffffff80202e80"
       },
       "runtime_serial_write_capability_dispatch_marker": {
         "present": true,
@@ -196,43 +196,43 @@
     "symbols": {
       "runtime_state_transition_cell": {
         "present": true,
-        "address": "0xffffffff80210048"
+        "address": "0xffffffff80210068"
       },
       "initialize_runtime_state_transition_cell": {
         "present": true,
-        "address": "0xffffffff80202850"
+        "address": "0xffffffff802026c0"
       },
       "execute_second_governed_capability": {
         "present": true,
-        "address": "0xffffffff80202a00"
+        "address": "0xffffffff802027c0"
       },
       "dispatch_runtime_capability": {
         "present": true,
-        "address": "0xffffffff80202c50"
+        "address": "0xffffffff80202930"
       },
       "dispatch_runtime_state_transition": {
         "present": true,
-        "address": "0xffffffff80203600"
+        "address": "0xffffffff802036b0"
       },
       "transition_runtime_state": {
         "present": true,
-        "address": "0xffffffff802037f0"
+        "address": "0xffffffff80203a40"
       },
       "runtime_state_cell_store": {
         "present": true,
-        "address": "0xffffffff80203ae0"
+        "address": "0xffffffff80204050"
       },
       "runtime_state_cell_state": {
         "present": true,
-        "address": "0xffffffff80203b00"
+        "address": "0xffffffff80204090"
       },
       "runtime_state_cell_reserved": {
         "present": true,
-        "address": "0xffffffff80203bb0"
+        "address": "0xffffffff80204150"
       },
       "runtime_state_cell_generation": {
         "present": true,
-        "address": "0xffffffff80203bc0"
+        "address": "0xffffffff80204180"
       },
       "runtime_serial_write_state_update_enter_marker": {
         "present": true,
@@ -251,7 +251,7 @@
     "dispatcher_route_present": true,
     "handler_comparison_count": 3,
     "volatile_memory_access_count": 5,
-    "state_cell_address": "0xffffffff80210048",
+    "state_cell_address": "0xffffffff80210068",
     "state_cell_size_bytes": 16,
     "state_cell_required_size_bytes": 16,
     "state_cell_required_alignment_bytes": 8,
@@ -261,23 +261,23 @@
     "symbols": {
       "initialize_fixed_user_mapping_tables": {
         "present": true,
-        "address": "0xffffffff80204090"
+        "address": "0xffffffff80204850"
       },
       "validate_fixed_user_mapping_policy": {
         "present": true,
-        "address": "0xffffffff80204499"
+        "address": "0xffffffff80204c59"
       },
       "activate_fixed_user_mapping_root": {
         "present": true,
-        "address": "0xffffffff802046c4"
+        "address": "0xffffffff80204e84"
       },
       "run_fixed_user_mapping_survival_probe": {
         "present": true,
-        "address": "0xffffffff802046fe"
+        "address": "0xffffffff80204ebe"
       },
       "walk_page_mapping": {
         "present": true,
-        "address": "0xffffffff802045b1"
+        "address": "0xffffffff80204d71"
       },
       "governed_pml4": {
         "present": true,
@@ -400,51 +400,51 @@
     "symbols": {
       "initialize_privilege_transition": {
         "present": true,
-        "address": "0xffffffff80204790"
+        "address": "0xffffffff80204f50"
       },
       "clear_privilege_transition_storage": {
         "present": true,
-        "address": "0xffffffff802047c4"
+        "address": "0xffffffff80204f84"
       },
       "initialize_governed_tss": {
         "present": true,
-        "address": "0xffffffff80204832"
+        "address": "0xffffffff80204ff2"
       },
       "initialize_governed_gdt": {
         "present": true,
-        "address": "0xffffffff80204858"
+        "address": "0xffffffff80205018"
       },
       "populate_tss_descriptor": {
         "present": true,
-        "address": "0xffffffff802048de"
+        "address": "0xffffffff8020509e"
       },
       "load_governed_tss": {
         "present": true,
-        "address": "0xffffffff8020493b"
+        "address": "0xffffffff802050fb"
       },
       "initialize_governed_idt": {
         "present": true,
-        "address": "0xffffffff8020495c"
+        "address": "0xffffffff8020511c"
       },
       "set_idt_gate": {
         "present": true,
-        "address": "0xffffffff80204a40"
+        "address": "0xffffffff80205200"
       },
       "validate_privilege_transition_tables": {
         "present": true,
-        "address": "0xffffffff80204a7e"
+        "address": "0xffffffff8020523e"
       },
       "validate_privilege_return_gate": {
         "present": true,
-        "address": "0xffffffff80204bad"
+        "address": "0xffffffff8020536d"
       },
       "validate_user_probe_entry": {
         "present": true,
-        "address": "0xffffffff80204bfa"
+        "address": "0xffffffff802053ba"
       },
       "enter_bounded_ring3_probe": {
         "present": true,
-        "address": "0xffffffff80204e12"
+        "address": "0xffffffff802055d2"
       },
       "governed_gdt": {
         "present": true,
@@ -496,35 +496,35 @@
       },
       "privilege_return_handler": {
         "present": true,
-        "address": "0xffffffff80204e99"
+        "address": "0xffffffff8020566e"
       },
       "handle_fixed_user_request": {
         "present": true,
-        "address": "0xffffffff80204edd"
+        "address": "0xffffffff802056b2"
       },
       "handle_fixed_user_response_consumption": {
         "present": true,
-        "address": "0xffffffff80204f70"
+        "address": "0xffffffff80205745"
       },
       "validate_ring3_request_frame": {
         "present": true,
-        "address": "0xffffffff80205039"
+        "address": "0xffffffff8020580e"
       },
       "validate_ring3_response_frame": {
         "present": true,
-        "address": "0xffffffff8020504f"
+        "address": "0xffffffff80205824"
       },
       "privilege_ring0_continuation": {
         "present": true,
-        "address": "0xffffffff80205a10"
+        "address": "0xffffffff80206268"
       },
       "privilege_fault_sink": {
         "present": true,
-        "address": "0xffffffff80206230"
+        "address": "0xffffffff80206c28"
       },
       "privilege_double_fault_sink": {
         "present": true,
-        "address": "0xffffffff80206236"
+        "address": "0xffffffff80206c2e"
       },
       "observed_governed_gdtr": {
         "present": true,
@@ -624,59 +624,63 @@
       },
       "privilege_return_handler": {
         "present": true,
-        "address": "0xffffffff80204e99"
+        "address": "0xffffffff8020566e"
       },
       "handle_fixed_user_request": {
         "present": true,
-        "address": "0xffffffff80204edd"
+        "address": "0xffffffff802056b2"
       },
       "handle_fixed_user_response_consumption": {
         "present": true,
-        "address": "0xffffffff80204f70"
+        "address": "0xffffffff80205745"
       },
       "validate_ring3_request_frame": {
         "present": true,
-        "address": "0xffffffff80205039"
+        "address": "0xffffffff8020580e"
       },
       "validate_fixed_user_buffer_ranges": {
         "present": true,
-        "address": "0xffffffff802050de"
+        "address": "0xffffffff802058b3"
       },
       "copy_fixed_user_request_in": {
         "present": true,
-        "address": "0xffffffff80205244"
+        "address": "0xffffffff80205a19"
       },
       "validate_fixed_user_request": {
         "present": true,
-        "address": "0xffffffff8020529b"
+        "address": "0xffffffff80205a70"
       },
       "build_fixed_user_runtime_status_response": {
         "present": true,
-        "address": "0xffffffff80205352"
+        "address": "0xffffffff80205b27"
       },
       "validate_fixed_user_response": {
         "present": true,
-        "address": "0xffffffff80205420"
+        "address": "0xffffffff80205bf5"
       },
       "copy_fixed_user_response_out": {
         "present": true,
-        "address": "0xffffffff802054a0"
+        "address": "0xffffffff80205c75"
       },
       "validate_fixed_user_response_readback": {
         "present": true,
-        "address": "0xffffffff80205527"
+        "address": "0xffffffff80205cfc"
       },
       "clear_fixed_user_request_buffers": {
         "present": true,
-        "address": "0xffffffff802058aa"
+        "address": "0xffffffff80206088"
+      },
+      "fixed_user_session_storage_is_zero": {
+        "present": true,
+        "address": "0xffffffff80206158"
       },
       "fixed_user_buffers_are_zero": {
         "present": true,
-        "address": "0xffffffff80205947"
+        "address": "0xffffffff80206194"
       },
       "privilege_ring0_continuation": {
         "present": true,
-        "address": "0xffffffff80205a10"
+        "address": "0xffffffff80206268"
       },
       "runtime_serial_write_user_request_copy_in_marker": {
         "present": true,
@@ -789,47 +793,51 @@
       },
       "privilege_return_handler": {
         "present": true,
-        "address": "0xffffffff80204e99"
+        "address": "0xffffffff8020566e"
       },
       "handle_fixed_user_request": {
         "present": true,
-        "address": "0xffffffff80204edd"
+        "address": "0xffffffff802056b2"
       },
       "handle_fixed_user_response_consumption": {
         "present": true,
-        "address": "0xffffffff80204f70"
+        "address": "0xffffffff80205745"
       },
       "validate_ring3_response_frame": {
         "present": true,
-        "address": "0xffffffff8020504f"
+        "address": "0xffffffff80205824"
       },
       "prepare_user_response_resume": {
         "present": true,
-        "address": "0xffffffff802055c5"
+        "address": "0xffffffff80205d9a"
       },
       "resume_fixed_user_response_consumer": {
         "present": true,
-        "address": "0xffffffff8020570c"
+        "address": "0xffffffff80205ee1"
       },
       "validate_user_visible_response": {
         "present": true,
-        "address": "0xffffffff8020573b"
+        "address": "0xffffffff80205f10"
       },
       "copy_fixed_user_consumption_record": {
         "present": true,
-        "address": "0xffffffff8020574d"
+        "address": "0xffffffff80205f22"
       },
       "validate_fixed_user_consumption_record": {
         "present": true,
-        "address": "0xffffffff802057ac"
+        "address": "0xffffffff80205f81"
       },
       "clear_fixed_user_response_transaction": {
         "present": true,
-        "address": "0xffffffff80205844"
+        "address": "0xffffffff80206019"
+      },
+      "fixed_user_session_storage_is_zero": {
+        "present": true,
+        "address": "0xffffffff80206158"
       },
       "fixed_user_response_matches_shadow": {
         "present": true,
-        "address": "0xffffffff802056ce"
+        "address": "0xffffffff80205ea3"
       },
       "fixed_user_transaction_phase": {
         "present": true,
@@ -861,7 +869,7 @@
       },
       "privilege_ring0_continuation": {
         "present": true,
-        "address": "0xffffffff80205a10"
+        "address": "0xffffffff80206268"
       }
     },
     "transaction_phase": {
@@ -904,55 +912,55 @@
     "symbols": {
       "runtime_progression_entry": {
         "present": true,
-        "address": "0xffffffff80202040"
+        "address": "0xffffffff80202640"
       },
       "execute_runtime_status_boundaries": {
         "present": true,
-        "address": "0xffffffff802022e0"
+        "address": "0xffffffff80202760"
       },
       "collect_runtime_status": {
         "present": true,
-        "address": "0xffffffff80203240"
+        "address": "0xffffffff80202f90"
       },
       "validate_runtime_status_snapshot": {
         "present": true,
-        "address": "0xffffffff80203310"
+        "address": "0xffffffff802030f0"
       },
       "clear_runtime_status_snapshot": {
         "present": true,
-        "address": "0xffffffff802033b0"
+        "address": "0xffffffff80203250"
       },
       "build_internal_runtime_status_response": {
         "present": true,
-        "address": "0xffffffff802034a0"
+        "address": "0xffffffff80203420"
       },
       "execute_fixed_user_runtime_status_transaction": {
         "present": true,
-        "address": "0xffffffff80204d76"
+        "address": "0xffffffff80205536"
       },
       "enter_bounded_ring3_probe": {
         "present": true,
-        "address": "0xffffffff80204e12"
+        "address": "0xffffffff802055d2"
       },
       "runtime_status_snapshot": {
         "present": true,
-        "address": "0xffffffff80210058"
+        "address": "0xffffffff80210078"
       },
       "runtime_status_snapshot_fields_are_valid": {
         "present": true,
-        "address": "0xffffffff802052ee"
+        "address": "0xffffffff80205ac3"
       },
       "build_fixed_user_runtime_status_response": {
         "present": true,
-        "address": "0xffffffff80205352"
+        "address": "0xffffffff80205b27"
       },
       "fixed_user_response_fields_are_valid": {
         "present": true,
-        "address": "0xffffffff80205439"
+        "address": "0xffffffff80205c0e"
       },
       "fixed_user_response_digest": {
         "present": true,
-        "address": "0xffffffff80205818"
+        "address": "0xffffffff80205fed"
       },
       "runtime_serial_write_user_runtime_status_service_enter_marker": {
         "present": true,
@@ -969,7 +977,7 @@
     },
     "snapshot": {
       "present": true,
-      "address": "0xffffffff80210058",
+      "address": "0xffffffff80210078",
       "size_bytes": 64,
       "required_size_bytes": 64,
       "required_alignment_bytes": 8,
@@ -1029,39 +1037,39 @@
     "symbols": {
       "execute_fixed_user_runtime_status_transaction": {
         "present": true,
-        "address": "0xffffffff80204d76"
+        "address": "0xffffffff80205536"
       },
       "initialize_fixed_user_execution_context": {
         "present": true,
-        "address": "0xffffffff80205b06"
+        "address": "0xffffffff8020637f"
       },
       "validate_fixed_user_execution_context_ready": {
         "present": true,
-        "address": "0xffffffff80205b2c"
+        "address": "0xffffffff802063a9"
       },
       "activate_fixed_user_execution_context": {
         "present": true,
-        "address": "0xffffffff80205b5c"
+        "address": "0xffffffff802063d9"
       },
       "record_fixed_user_context_transition": {
         "present": true,
-        "address": "0xffffffff80205b81"
+        "address": "0xffffffff802063fe"
       },
       "validate_fixed_user_context_return": {
         "present": true,
-        "address": "0xffffffff80205c0e"
+        "address": "0xffffffff8020648b"
       },
       "commit_fixed_user_context_result": {
         "present": true,
-        "address": "0xffffffff80205c4e"
+        "address": "0xffffffff802064cb"
       },
       "clear_fixed_user_execution_context": {
         "present": true,
-        "address": "0xffffffff80205cb5"
+        "address": "0xffffffff80206532"
       },
       "validate_fixed_user_execution_context_cleared": {
         "present": true,
-        "address": "0xffffffff80205ce6"
+        "address": "0xffffffff80206563"
       },
       "fixed_user_context": {
         "present": true,
@@ -1188,6 +1196,137 @@
     "overlaps": [],
     "no_overlap": true
   },
+  "bounded_repeated_user_session": {
+    "symbols": {
+      "execute_runtime_status_boundaries": {
+        "present": true,
+        "address": "0xffffffff80202760"
+      },
+      "execute_bounded_repeated_user_sessions": {
+        "present": true,
+        "address": "0xffffffff80202870"
+      },
+      "execute_first_bounded_user_session": {
+        "present": true,
+        "address": "0xffffffff80202900"
+      },
+      "execute_second_bounded_user_session": {
+        "present": true,
+        "address": "0xffffffff802029b0"
+      },
+      "initialize_repeated_session_coordinator": {
+        "present": true,
+        "address": "0xffffffff80202e40"
+      },
+      "execute_fixed_user_session": {
+        "present": true,
+        "address": "0xffffffff802029e0"
+      },
+      "begin_fixed_user_session": {
+        "present": true,
+        "address": "0xffffffff80202a40"
+      },
+      "fixed_user_session_succeeds": {
+        "present": true,
+        "address": "0xffffffff80202ae0"
+      },
+      "complete_fixed_user_session": {
+        "present": true,
+        "address": "0xffffffff80202b10"
+      },
+      "prepare_next_fixed_user_session": {
+        "present": true,
+        "address": "0xffffffff80202c00"
+      },
+      "finalize_repeated_session_coordinator": {
+        "present": true,
+        "address": "0xffffffff80202c20"
+      },
+      "reset_completed_fixed_user_session": {
+        "present": true,
+        "address": "0xffffffff80202cd0"
+      },
+      "reset_fixed_user_context_for_reuse": {
+        "present": true,
+        "address": "0xffffffff80202da0"
+      },
+      "execute_fixed_user_runtime_status_transaction": {
+        "present": true,
+        "address": "0xffffffff80205536"
+      },
+      "validate_fixed_user_context_success_result": {
+        "present": true,
+        "address": "0xffffffff80206bdb"
+      },
+      "validate_fixed_user_session_cleanup": {
+        "present": true,
+        "address": "0xffffffff80206ad5"
+      },
+      "reset_fixed_user_context_result": {
+        "present": true,
+        "address": "0xffffffff80206abe"
+      },
+      "reset_fixed_user_execution_context_for_reuse": {
+        "present": true,
+        "address": "0xffffffff80206b21"
+      },
+      "validate_fixed_user_session_reset_state": {
+        "present": true,
+        "address": "0xffffffff80206b42"
+      },
+      "validate_fixed_user_session_identity_sequence": {
+        "present": true,
+        "address": "0xffffffff80206989"
+      },
+      "invalidate_fixed_user_session_state": {
+        "present": true,
+        "address": "0xffffffff80206b7a"
+      },
+      "execute_first_governed_capability": {
+        "present": true,
+        "address": "0xffffffff802026f0"
+      },
+      "repeated_user_session_coordinator": {
+        "present": true,
+        "address": "0xffffffff80210048"
+      }
+    },
+    "coordinator": {
+      "symbol": "repeated_user_session_coordinator",
+      "start_address": "0xffffffff80210048",
+      "end_address": "0xffffffff80210068",
+      "size_bytes": 32,
+      "required_size_bytes": 32,
+      "required_alignment_bytes": 8,
+      "start_aligned": true,
+      "section": ".bss",
+      "load_segment_flags": "rw-",
+      "writable": true,
+      "non_executable": true,
+      "higher_half_address": true
+    },
+    "coordinator_overlap_count": 0,
+    "session_call_count": 2,
+    "total_session_call_count": 2,
+    "session_helper_call_order_valid": true,
+    "between_session_reset_order_valid": true,
+    "terminal_reset_order_valid": true,
+    "later_capability_gate_valid": true,
+    "coordinator_backward_branches": [
+      {
+        "instruction_address": "0xffffffff80202897",
+        "target_address": "0xffffffff80202886"
+      },
+      {
+        "instruction_address": "0xffffffff802028ab",
+        "target_address": "0xffffffff80202886"
+      },
+      {
+        "instruction_address": "0xffffffff802028b5",
+        "target_address": "0xffffffff80202886"
+      }
+    ]
+  },
   "program_header_count": 11,
   "section_count": 14,
   "load_segments": [
@@ -1197,8 +1336,8 @@
       "offset": "0x1000",
       "virtual_address": "0xffffffff80200000",
       "physical_address": "0x200000",
-      "file_size": "0x6262",
-      "memory_size": "0x6262",
+      "file_size": "0x6c62",
+      "memory_size": "0x6c62",
       "alignment": "0x1000"
     },
     {
@@ -1217,8 +1356,8 @@
       "offset": "0x9000",
       "virtual_address": "0xffffffff80208000",
       "physical_address": "0x208000",
-      "file_size": "0x15f4",
-      "memory_size": "0x15f4",
+      "file_size": "0x19a4",
+      "memory_size": "0x19a4",
       "alignment": "0x1000"
     },
     {

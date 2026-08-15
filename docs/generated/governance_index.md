@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 67
 * Failed checks: 0
-* Run ID: `verify-20260814T183317Z`
-* Generated at: `2026-08-14T18:33:17Z`
+* Run ID: `verify-20260815T175217Z`
+* Generated at: `2026-08-15T17:52:17Z`
 
 ## Registered validators
 
@@ -102,6 +102,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | Path | Version | Role |
 | --- | --- | --- |
 | `contracts/bounded_privilege_transition_probe_contract.v0.json` | `0` | bounded privilege transition probe contract.v0 |
+| `contracts/bounded_repeated_user_session_contract.v0.json` | `1` | bounded repeated user session contract.v0 |
 | `contracts/bounded_user_response_consumption_contract.v0.json` | `0` | bounded user response consumption contract.v0 |
 | `contracts/controlled_runtime_loop_contract.v0.json` | `0` | controlled runtime loop contract.v0 |
 | `contracts/cpu_extended_state_initialization_contract.v0.json` | `0` | cpu extended state initialization contract.v0 |
@@ -130,6 +131,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | --- | --- |
 | `schemas/agent_context.schema.json` | agent_context.schema.json |
 | `schemas/bounded_privilege_transition_probe_contract.schema.json` | KOZO bounded privilege-transition probe contract |
+| `schemas/bounded_repeated_user_session_contract.schema.json` | KOZO bounded repeated user session contract |
 | `schemas/bounded_user_response_consumption_contract.schema.json` | KOZO bounded user response consumption contract |
 | `schemas/controlled_runtime_loop_contract.schema.json` | KOZO controlled runtime loop contract |
 | `schemas/cpu_extended_state_initialization_contract.schema.json` | KOZO CPU extended-state initialization contract |
