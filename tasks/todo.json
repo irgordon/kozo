@@ -2,7 +2,7 @@
   "task_title": "KOZO v1.1.0 Release Qualification and Promotion",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
-  "plan_status": "approved",
+  "plan_status": "complete",
   "replan_number": 0,
   "approval": {
     "status": "approved"
@@ -64,7 +64,7 @@
     "This phase changes documentation and task state only; runtime, ABI, contracts, schemas, marker order, release tags, hosted notes, hosted assets, and published metadata remain unchanged",
     "docs/DOCUMENTATION_STANDARD.md remains the authority for audience-aware documentation; no duplicate documentation authority is introduced",
     "Post-release triage may record evidence and decide patch preparation, but it may not implement v1.0.1 or modify the immutable v1.0.0 and v1.0.0-rc.1 release records",
-    "release/version.txt records the current published patch version 1.0.1; later version changes require a separately authorized release boundary",
+    "release/version.txt records current published feature version 1.1.0; later version changes require a separately authorized release boundary",
     "The published patch changes only the Odin object-build boundary, focused tests, current status documentation, task state, and generated proof",
     "The authorized v1.0.1 release boundary advanced release/version.txt and published one commit-bound six-asset release only after the exact tag target passed local and hosted gates",
     "The immutable v1.0.1 tag targets hosted-accepted descendant 02f1b0113458b988562b7e03362ec9ae716cebd0 of b2bc296dbfd7fdeda5c6ab48c861ff569850f350 and must never be moved",
@@ -72,13 +72,13 @@
     "Host portability, guest portability, and resource scaling are separate evidence classes",
     "v1.1.0 Phase 0 alone authorized no product capability work; the Fixed User Execution Context was authorized later by a separate explicit task",
     "release/version.txt remains 1.0.1 and no resource minimum is defined by this phase",
-    "The authorized capability remains exactly one Fixed User Execution Context with one bounded static identity and lifecycle; version change and release remain unauthorized",
+    "The Fixed User Execution Context remains exactly one bounded static authority lifecycle and is now included in immutable final v1.1.0",
     "ADR 0018 and the fixed execution-context contract precede and govern the authorized runtime implementation",
     "The implementation changes only the internal runtime authority boundary while preserving the 41-marker taxonomy, public ABI, contracts, schemas, and accepted host evidence",
     "The separate implementation task authorizes the fixed context only; version change, tag mutation, release mutation, and broader userspace capability remain unauthorized",
     "The direct context governance and implementation-evidence validators remain unregistered, preserving the governed total of 67 after hosted implementation acceptance",
-    "Current main contains the hosted-accepted Fixed User Execution Context, while immutable v1.0.1 predates it and no published release contains the implementation",
-    "No next capability is selected; v1.0.2 is skipped and v1.1.0 publication is authorized only after every release gate passes",
+    "Immutable final v1.1.0 contains the hosted-accepted Fixed User Execution Context, while immutable v1.0.1 predates it",
+    "No next capability is selected; v1.0.2 is skipped and v1.1.0 is the current immutable published release",
     "Exactly two sequential fixed sessions are authorized; each retains the accepted two-transition lifecycle and uses one distinct kernel-owned non-pointer identity"
   ],
   "file_scope": [
@@ -3524,7 +3524,7 @@
     {
       "id": 101,
       "title": "Qualify, publish, and verify KOZO v1.1.0",
-      "status": "pending",
+      "status": "done",
       "kind": "edit",
       "files_expected": [
         ".github/workflows/ci.yml",
@@ -3644,7 +3644,7 @@
     "At prerequisite adoption, ADR 0018, one exact internal context/result contract, its schema, direct governance validator, focused tests, and progression authority defined the boundary without changing runtime, markers, governed check count, version, or release state.",
     "One 128-byte, 16-byte-aligned supervisor-owned context and one separate 32-byte, 8-byte-aligned non-authoritative result implement the exact lifecycle, two-transition budget, phase coupling, result commit, clear, and fail-closed continuation rules.",
     "Focused structural and negative evidence remains outside the validator registry so the governed total stays 67 while the accepted QEMU marker taxonomy stays 41.",
-    "Current status records identify the Fixed User Execution Context as implemented and hosted accepted on main, preserve immutable v1.0.1 as the current published release without the implementation, and select no successor capability."
+    "Current status records identify the Fixed User Execution Context and Bounded Repeated User Session as included in immutable final v1.1.0, preserve prior releases, and select no successor capability."
   ],
   "verification": {
     "tests_run": [
@@ -4490,8 +4490,8 @@
       },
       {
         "tool": "v1.1.0 release qualification and promotion",
-        "command": "release integrity review; 337 focused tests; 1,284-test discovery; Odin, Rust, cargo-deny, cargo-audit, portability actionlint, and governed 67-check QEMU verification; exact-commit hosted gates, packaging, tag, final publication, hosted download, and post-publication alignment pending",
-        "status": "pre_version_local_qualification_pass_1284_tests_67_checks_0_failures_qemu_pass_blocker_none_52_markers_2_sessions_4_transitions_v1.0.2_skipped_v1.1.0_publication_pending"
+        "command": "release integrity review; 337 focused tests; 1,284-test discovery; Odin, Rust, cargo-deny, cargo-audit, portability actionlint, governed 67-check QEMU verification; hosted CI 31922319739; lint 31922319746; portability 31922319738; annotated tag; final six-asset publication; fresh hosted download, checksum, JSON, byte-identity, and ISO QEMU validation",
+        "status": "complete_v1.0.2_skipped_v1.1.0_published_final_tag_object_db81ce98280cc795ceb2cbd42ac561cfba556f39_target_a5226635be46c687299028b5244f808da67c0984_six_assets_download_verified_1284_tests_67_checks_0_failures_qemu_pass_blocker_none_52_markers_2_sessions_4_transitions"
       }
     ],
     "logs": [
@@ -4763,6 +4763,7 @@
     "Implemented the authorized fixed user context as one layered static authority boundary with an exact result record, fail-closed lifecycle enforcement, transition accounting, cleanup readback, ELF storage proof, focused negative tests, and no public ABI, contract, schema, marker, governed-check, version, tag, or release change.",
     "Aligned current documentation and task state with the accepted implementation runs, kept v1.0.1 as the immutable published release that predates the context, and selected no automatic next task.",
     "Accepted the Bounded Repeated User Session through CI run 31899981058, lint run 31899981084, and portability run 31899981072; downloaded hosted evidence proves two sessions, four transitions, 52 markers, valid package checksums, matching packaged/runtime ISO hashes, and preserved host evidence levels while v1.0.1 remains unchanged.",
-    "Authorized v1.1.0 as the next final feature release, skipped v1.0.2, and advanced the versioned six-asset release boundary only after the complete pre-version local qualification passed."
+    "Authorized v1.1.0 as the next final feature release, skipped v1.0.2, and advanced the versioned six-asset release boundary only after the complete pre-version local qualification passed.",
+    "Published immutable final v1.1.0 from exact hosted-accepted target a5226635be46c687299028b5244f808da67c0984, independently matched all six downloaded assets, booted the downloaded ISO through two sessions and 52 markers, and selected no automatic next task."
   ]
 }

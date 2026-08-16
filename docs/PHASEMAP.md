@@ -160,9 +160,9 @@ deletion, ruleset, or other repository policy is required by this phase.
 The immutable `v1.0.0-rc.1` annotated tag and GitHub prerelease are published.
 Post-promotion checks reproduced the accepted hosted hashes, QEMU result, 41
 markers, and user path. No reproducible final-release blocker was found.
-Final `v1.0.1` remains the current non-draft, non-prerelease GitHub release
-until authorized v1.1.0 promotion completes. Its tag, notes, and assets are
-immutable. The v1.0.0 and RC records remain unchanged.
+Final `v1.1.0` is the current non-draft, non-prerelease GitHub release. Its
+tag, notes, and six assets are immutable. The v1.0.1, v1.0.0, and RC records
+remain unchanged.
 
 The v1.0.1 post-release observation is complete with zero reproduced defects.
 v1.0.2 is not authorized. v1.1.0 Phase 0 adopted ADR 0017 and the portability
@@ -187,14 +187,14 @@ The Fixed User Execution Context definition, governance prerequisites,
 implementation, and hosted acceptance are complete. CI run `31563696881`, lint
 run `31563696973`, and portability run `31563697127` accepted the bounded
 runtime implementation while preserving 67 governed checks and all 41 markers.
-Current `main` contains the context implementation; immutable `v1.0.1` does
-not. The Bounded Repeated User Session is implemented and hosted accepted with
+Immutable `v1.1.0` contains the context implementation; immutable `v1.0.1`
+does not. The Bounded Repeated User Session is implemented and hosted accepted with
 two fixed sessions and 52 marker occurrences. CI run `31899981058`, lint run
 `31899981084`, and portability run `31899981072` passed, including independent
 downloaded-artifact validation. These feature additions authorize the v1.1.0
-release boundary and intentionally skip v1.0.2. The versioned target still
-requires fresh hosted qualification, packaging, publication, and downloaded
-artifact verification; all existing tags and hosted assets remain immutable.
+release boundary and intentionally skip v1.0.2. Fresh hosted qualification,
+packaging, final publication, and downloaded-artifact verification passed;
+all tags and hosted assets are immutable.
 
 ---
 

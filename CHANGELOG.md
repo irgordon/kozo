@@ -1,9 +1,8 @@
 # Changelog
 
-## v1.1.0 - 2026-08-15
+## v1.1.0 - 2026-08-16
 
-**Status:** Final feature release prepared; publication pending exact-commit
-hosted qualification.
+**Status:** Final feature release published and independently verified.
 
 * Selected v1.1.0 instead of v1.0.2 because the accepted changes add runtime
   capability rather than a patch-only correction.
@@ -15,8 +14,12 @@ hosted qualification.
   marker names; `KOZO_RUNTIME_RETURN_OK` remains final.
 * Preserved 67 governed checks, Linux runtime validation, Windows and macOS
   build validation, and cross-host release-input identity.
-* Prepared the established six-asset final release shape. No tag or GitHub
-  release exists until the exact versioned target passes fresh hosted gates.
+* Published annotated tag `v1.1.0` at exact hosted-accepted commit
+  `a5226635be46c687299028b5244f808da67c0984` as a final, non-draft,
+  non-prerelease GitHub release with six assets.
+* Verified every downloaded asset against its pre-upload SHA-256, passed the
+  downloaded checksum manifest and JSON records, and booted the downloaded ISO
+  through 52 ordered markers ending at `KOZO_RUNTIME_RETURN_OK`.
 
 ## Bounded repeated user session - 2026-08-15
 

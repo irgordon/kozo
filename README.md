@@ -13,20 +13,16 @@ that problem by keeping each runtime feature bounded, recording progress over
 the serial port, and checking source, kernel-binary, and QEMU evidence against
 machine-readable rules.
 
-**Current release:** [v1.0.1](https://github.com/irgordon/kozo/releases/tag/v1.0.1)
+**Current release:** [v1.1.0](https://github.com/irgordon/kozo/releases/tag/v1.1.0)
 
-**Release target:** [v1.1.0](docs/releases/v1.1.0.md) is qualified locally
-and authorized for exact-commit hosted validation. Publication is pending.
-
-v1.0.2 is intentionally skipped. The new fixed execution context and bounded
-repeated session are feature additions, so v1.1.0 is the next release target.
+v1.0.2 was intentionally skipped. The new fixed execution context and bounded
+repeated session are feature additions, so they are published in v1.1.0.
 
 Start with the [wiki](docs/wiki/README.md), which routes users, maintainers,
 and engineers to the right level of detail. The
 [v1.1.0 release notes](docs/releases/v1.1.0.md) and
-[qualification evidence](docs/releases/v1.1.0-evidence.md) describe the
-authorized release target. v1.0.1 remains the current downloadable release
-until promotion completes.
+[release evidence](docs/releases/v1.1.0-evidence.md) describe the published
+feature release. v1.0.1 remains an immutable historical patch release.
 
 ## What Works Today
 
@@ -79,15 +75,15 @@ under `docs`.
 
 ## Release Status
 
-`v1.0.1` is published as the current final patch release. Its
-[release evidence](docs/releases/v1.0.1-evidence.md) records the immutable tag,
-hosted asset hashes, and accepted runtime result.
+`v1.1.0` is published as the current final feature release. Its
+[release evidence](docs/releases/v1.1.0-evidence.md) records the immutable tag,
+hosted asset hashes, and downloaded-ISO runtime result.
 
 The earlier `v1.0.0-rc.1` prerelease remains immutable. KOZO v1.0.0 is not a
 production desktop operating system.
 
-The [v1.1.0 release evidence](docs/releases/v1.1.0-evidence.md) records the
-two-session runtime boundary and the gates required before publication.
+The earlier `v1.0.1` final release remains immutable. Its
+[release evidence](docs/releases/v1.0.1-evidence.md) records the patch boundary.
 
 ## Maintaining KOZO
 

@@ -1,7 +1,7 @@
 # Engineering Overview
 
-This page gives engineers a top-down map of the v1.1.0 release target. It explains why each
-mechanism exists, where it is implemented, and how it is verified. Exact
+This page gives engineers a top-down map of the v1.1.0 release. It explains
+why each mechanism exists, where it is implemented, and how it is verified. Exact
 addresses, structure layouts, and bit fields remain in the linked authoritative
 documents.
 

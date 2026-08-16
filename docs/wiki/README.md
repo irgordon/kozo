@@ -4,7 +4,7 @@
 
 KOZO is a small x86-64 kernel for people who want to study or extend low-level
 software whose claims are tied to explicit tests and runtime evidence. The
-v1.1.0 release target boots in QEMU, runs two sequential fixed user sessions,
+v1.1.0 release boots in QEMU, runs two sequential fixed user sessions,
 and stops in a known halt state.
 
 KOZO is useful as an auditable kernel foundation and as a learning environment
@@ -14,18 +14,17 @@ general-purpose operating system.
 ## Current Release
 
 Current final release:
-[v1.0.1](https://github.com/irgordon/kozo/releases/tag/v1.0.1)
+[v1.1.0](https://github.com/irgordon/kozo/releases/tag/v1.1.0)
 
-Authorized release target:
-[v1.1.0](../releases/v1.1.0.md), pending exact-commit hosted promotion
+Previous final release:
+[v1.0.1](https://github.com/irgordon/kozo/releases/tag/v1.0.1)
 
 Previous prerelease:
 [v1.0.0-rc.1](https://github.com/irgordon/kozo/releases/tag/v1.0.0-rc.1)
 
-The current release provides six immutable hosted assets. The v1.1.0 target
-will use the same six-asset publication shape. Read the
+The current release provides six immutable hosted assets. Read the
 [v1.1.0 release notes](../releases/v1.1.0.md), the
-[qualification evidence](../releases/v1.1.0-evidence.md), or the
+[release evidence](../releases/v1.1.0-evidence.md), or the
 [documentation audit](../releases/v1.0.0-documentation-audit.md).
 
 ## Choose Your Path

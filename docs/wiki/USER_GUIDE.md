@@ -7,9 +7,9 @@ provide a shell or graphical interface.
 
 ## Current Release
 
-KOZO `v1.1.0` is the authorized release target. Until publication completes,
-`v1.0.1` remains the current downloadable release. Download and checksum
-instructions are in [Getting Started](GETTING_STARTED.md).
+KOZO `v1.1.0` is the current downloadable final release. Download and checksum
+instructions are in [Getting Started](GETTING_STARTED.md). `v1.0.1` remains an
+immutable historical patch release.
 
 ## What Happens When KOZO Starts
 

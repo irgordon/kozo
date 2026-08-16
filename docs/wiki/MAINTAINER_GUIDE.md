@@ -146,15 +146,15 @@ The repository states are distinct:
 
 | State | Meaning |
 | --- | --- |
-| `v1.1.0` target | Authorized feature release; immutable after publication |
-| `v1.0.1` tag | Immutable current published source and artifact record |
-| `main` | Contains the v1.1.0 release target and may later advance |
+| `v1.1.0` tag | Immutable current published source and artifact record |
+| `v1.0.1` tag | Immutable historical patch-release record |
+| `main` | Contains a later publication-record commit and may advance |
 | `v1.0.0-rc.1` tag | Immutable accepted prerelease record |
 
-The current published patch tag targets
-`02f1b0113458b988562b7e03362ec9ae716cebd0`. The post-publication
-documentation commit is later on `main` and is not part of the tagged release.
-The prior final tag remains fixed at
+The current final tag targets
+`a5226635be46c687299028b5244f808da67c0984`. This publication-record commit is
+later on `main` and is not part of the tagged release. The v1.0.1 and v1.0.0
+targets remain fixed at `02f1b0113458b988562b7e03362ec9ae716cebd0` and
 `1586089415a98a11d2024d606ce6301f568b7d6e`.
 
 Do not move a published tag. Do not replace published assets. Do not rewrite

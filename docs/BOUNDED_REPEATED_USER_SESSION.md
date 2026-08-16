@@ -2,7 +2,7 @@
 
 Version: 1
 Status: Implemented and hosted accepted on main
-Release target: v1.1.0; current published v1.0.1 does not contain this capability
+Published release: v1.1.0
 
 ## Problem Solved
 
@@ -79,5 +79,5 @@ only Linux executed the runtime contract.
 Downloaded hosted development evidence independently confirmed two completed sessions,
 active ordinal zero, matching packaged and runtime-tested ISO hashes, valid
 package checksums, and the supervisor RW-NX coordinator ELF record. The
-implementation is included in the authorized v1.1.0 release target; publication
-remains pending exact-commit hosted qualification.
+implementation is included in immutable final release `v1.1.0`, whose
+downloaded ISO reproduced the accepted 52-marker runtime sequence.

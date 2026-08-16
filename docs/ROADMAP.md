@@ -147,8 +147,8 @@ KOZO still does not prove:
 
 # 9. Current Active Blocker
 
-No active runtime blocker is recorded for the authorized v1.1.0 feature
-release scope. v1.0.1 remains the published release until promotion completes.
+No active runtime blocker is recorded for final v1.1.0. The release is
+published and independently download verified.
 Force pushes to `main` are blocked. No broader repository policy is required
 by the final-release scope. The immutable `v1.0.0-rc.1` prerelease and
 `v1.0.0` final release are published. The final hosted assets passed checksum,
@@ -175,10 +175,10 @@ The bounded v1.0.1 post-release observation is complete. It reviewed
 all project-visible issues and post-publication Actions, revalidated the six
 hosted assets, booted the downloaded ISO through all 41 markers, and observed
 the accepted cross-host Odin output boundary against tagged source. No
-qualifying defect was reproduced. v1.0.2 is not authorized, and the current
-release remains v1.0.1.
+qualifying defect was reproduced. v1.0.2 was skipped in favor of the feature
+release v1.1.0.
 
-v1.1.0 Phase 0 is the active repository-development gate. Hosted portability
+v1.1.0 Phase 0 established the repository-development gate. Hosted portability
 run `31291100568` passed all three pinned jobs and resolved
 `KOZO-TRIAGE-002`: canonical paths, deterministic textual QEMU evidence, and
 early host diagnostics now work across Linux, Windows, and macOS. Separate CI
@@ -208,9 +208,9 @@ implementation. The separately authorized **Bounded Repeated User Session** is
 implemented and hosted accepted on `main` through CI run `31899981058`, lint
 run `31899981084`, and portability run `31899981072`. It completes two
 explicit lifecycles and 52 marker occurrences while retaining 67 governed
-checks. These accepted feature additions authorize v1.1.0 release
-qualification; v1.0.2 is intentionally skipped. Publication remains pending
-the exact-commit hosted and artifact gates.
+checks. These accepted feature additions are published in v1.1.0; v1.0.2 was
+intentionally skipped. Exact-commit hosted, package, publication, and
+downloaded-artifact gates passed.
 
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity

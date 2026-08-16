@@ -830,8 +830,15 @@ release_metadata.json
 SHA256SUMS
 ```
 
-The exact versioned proof commit must pass fresh hosted CI, lint, and
-portability before tagging. The annotated tag must target that commit. Final
-publication requires independent checksum, metadata, and QEMU validation of a
-fresh GitHub download. Until those gates complete, v1.0.1 remains the current
-published release and all earlier release records remain immutable.
+The exact versioned proof commit `a5226635be46c687299028b5244f808da67c0984`
+passed CI run `31922319739`, lint run `31922319746`, and portability run
+`31922319738`. Annotated tag object
+`db81ce98280cc795ceb2cbd42ac561cfba556f39` targets that commit.
+
+Final v1.1.0 is published at
+<https://github.com/irgordon/kozo/releases/tag/v1.1.0> with six assets. A fresh
+download matched all pre-upload hashes, passed `SHA256SUMS`, validated both
+JSON files, and booted the downloaded ISO through both sessions and all 52
+markers ending at `KOZO_RUNTIME_RETURN_OK`. Generated metadata retains
+`published: false` as pre-publication bundle state. All earlier release records
+remain immutable.

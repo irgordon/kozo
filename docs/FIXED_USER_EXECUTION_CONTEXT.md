@@ -410,17 +410,15 @@ Implementation acceptance requires:
 
 # 20. Release Impact Classification
 
-Current published release: `v1.0.1`.
+Current published release: `v1.1.0`.
 
-Release target containing this implementation: `v1.1.0`.
+Published release containing this implementation: `v1.1.0`.
 
-The implementation exists on `main` after the immutable `v1.0.1` tag. The
-accepted bounded repeated-session feature makes `v1.1.0` the authorized
-feature-release boundary.
+The implementation exists in immutable final release `v1.1.0`. The earlier
+`v1.0.1` tag predates it.
 
-The release task separately authorizes version advancement and publication
-only after local, hosted, package, tag, and downloaded-artifact gates pass.
-It explicitly skips `v1.0.2`.
+The release task passed local, hosted, package, tag, and downloaded-artifact
+gates and published `v1.1.0`. It explicitly skipped `v1.0.2`.
 
 ---
 
@@ -480,13 +478,13 @@ Implementation status: implemented and hosted accepted.
 Hosted acceptance: CI run `31563696881`, lint run `31563696973`, and
 portability run `31563697127` passed.
 
-Version change authorized: true for v1.1.0 release qualification.
+Version change authorized and completed: true for v1.1.0.
 
-Release authorized: true for v1.1.0 after all required gates pass.
+Release published: true for v1.1.0 after all required gates passed.
 
-Current published release: `v1.0.1`.
+Current published release: `v1.1.0`.
 
-Release target containing this implementation: `v1.1.0`.
+Published release containing this implementation: `v1.1.0`.
 
 Next capability: not selected. No follow-on task is inferred automatically.
 
@@ -551,4 +549,4 @@ remain `VALIDATED_BUILD` with runtime `NOT_EXECUTED`.
 
 The implementation changed no marker, governed check count, public ABI,
 public ABI, tag, or hosted release asset. It exists on current `main`, is not in
-immutable `v1.0.1`, and is included in the authorized `v1.1.0` release target.
+immutable `v1.0.1`, and is included in immutable final release `v1.1.0`.
