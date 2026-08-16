@@ -13,8 +13,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 ## Current version
 
 * Version: `v1.1.0`
-* Date: `2026-08-15`
-* Status: Final feature release prepared; publication pending exact-commit
+* Date: `2026-08-16`
+* Status: Final feature release published and independently verified.
 
 ## Verification status
 
@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 67
 * Failed checks: 0
-* Run ID: `verify-20260816T023546Z`
-* Generated at: `2026-08-16T02:35:46Z`
+* Run ID: `verify-20260816T160900Z`
+* Generated at: `2026-08-16T16:09:00Z`
 
 ## Registered validators
 
