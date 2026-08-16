@@ -1,9 +1,9 @@
 {
   "artifact_version": "1",
-  "task_id": "kozo-bounded-repeated-user-session",
-  "task_title": "KOZO Bounded Repeated User Session",
-  "plan_status": "complete",
-  "current_step_id": 100,
+  "task_id": "kozo-v1.1.0-release",
+  "task_title": "KOZO v1.1.0 Release Qualification and Promotion",
+  "plan_status": "approved",
+  "current_step_id": 101,
   "replan_required": false,
   "halted": false,
   "failure_state": {
@@ -12,8 +12,8 @@
   },
   "execution": {
     "step_attempt": 1,
-    "last_step_started_at": "2026-08-15T17:00:00Z",
+    "last_step_started_at": "2026-08-15T20:00:00Z",
     "last_step_completed_at": "2026-08-15T18:11:55Z"
   },
-  "updated_at": "2026-08-15T18:11:55Z"
+  "updated_at": "2026-08-15T20:00:00Z"
 }

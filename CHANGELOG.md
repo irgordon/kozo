@@ -1,5 +1,23 @@
 # Changelog
 
+## v1.1.0 - 2026-08-15
+
+**Status:** Final feature release prepared; publication pending exact-commit
+hosted qualification.
+
+* Selected v1.1.0 instead of v1.0.2 because the accepted changes add runtime
+  capability rather than a patch-only correction.
+* Added the hosted-accepted Fixed User Execution Context with explicit
+  lifecycle, opaque kernel identity, result evidence, and verified cleanup.
+* Added exactly two sequential fixed user sessions, distinct identities,
+  complete inter-session reset, and four total `int 0x81` returns.
+* Increased ordered runtime marker occurrences from 41 to 52 without adding
+  marker names; `KOZO_RUNTIME_RETURN_OK` remains final.
+* Preserved 67 governed checks, Linux runtime validation, Windows and macOS
+  build validation, and cross-host release-input identity.
+* Prepared the established six-asset final release shape. No tag or GitHub
+  release exists until the exact versioned target passes fresh hosted gates.
+
 ## Bounded repeated user session - 2026-08-15
 
 **Status:** Implemented and hosted accepted on `main`; not published in

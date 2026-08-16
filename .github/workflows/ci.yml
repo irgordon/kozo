@@ -233,6 +233,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: kozo-v1.0.1-dry-run
+          name: kozo-v1.1.0-dry-run
           path: artifacts/release-candidate/
           if-no-files-found: error

@@ -1,8 +1,8 @@
 {
-  "task_title": "KOZO Bounded Repeated User Session",
+  "task_title": "KOZO v1.1.0 Release Qualification and Promotion",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
-  "plan_status": "complete",
+  "plan_status": "approved",
   "replan_number": 0,
   "approval": {
     "status": "approved"
@@ -40,7 +40,9 @@
     "v1.1.0 Phase 0 host portability is accepted on main at a05900e04301d5b1e7a58c25e2970a87c3583673 with Linux VALIDATED_RUNTIME and Windows/macOS VALIDATED_BUILD",
     "A separate Fixed User Execution Context Implementation Authorization task permits exactly one static context and one non-authoritative result while preserving release version 1.0.1, public ABI, contracts, schemas, 41 markers, and 67 governed checks",
     "Fixed User Execution Context implementation commit 8544ad3 and proof commit 1c1308f are accepted by CI run 31563696881, lint run 31563696973, and portability run 31563697127",
-    "The Fixed User Execution Context is hosted accepted on main at a8a4e870a3c7acfebbe3e7f1dc16434a4191c47d, while immutable v1.0.1 predates it"
+    "The Fixed User Execution Context is hosted accepted on main at a8a4e870a3c7acfebbe3e7f1dc16434a4191c47d, while immutable v1.0.1 predates it",
+    "The Bounded Repeated User Session is hosted accepted on main at e0ed293e0cec02cae0f920505b4af629a31c65fa with 1,284 tests, 67 checks, 52 markers, and all required host gates",
+    "This task explicitly authorizes v1.1.0 qualification and final publication while skipping v1.0.2"
   ],
   "assumptions": [
     "contracts/runtime_progression_stages.v0.json is the sole authority for canonical stage order and allowed transitions",
@@ -76,7 +78,7 @@
     "The separate implementation task authorizes the fixed context only; version change, tag mutation, release mutation, and broader userspace capability remain unauthorized",
     "The direct context governance and implementation-evidence validators remain unregistered, preserving the governed total of 67 after hosted implementation acceptance",
     "Current main contains the hosted-accepted Fixed User Execution Context, while immutable v1.0.1 predates it and no published release contains the implementation",
-    "No next capability, v1.0.2 release, or v1.1.0 release is authorized or selected by hosted acceptance alignment",
+    "No next capability is selected; v1.0.2 is skipped and v1.1.0 publication is authorized only after every release gate passes",
     "Exactly two sequential fixed sessions are authorized; each retains the accepted two-transition lifecycle and uses one distinct kernel-owned non-pointer identity"
   ],
   "file_scope": [
@@ -3518,6 +3520,48 @@
         "verification.tests_run[167]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 101,
+      "title": "Qualify, publish, and verify KOZO v1.1.0",
+      "status": "pending",
+      "kind": "edit",
+      "files_expected": [
+        ".github/workflows/ci.yml",
+        "release/version.txt",
+        "release/release_files.v1.json",
+        "docs/releases/v1.1.0.md",
+        "docs/releases/v1.1.0-evidence.md",
+        "README.md",
+        "docs/wiki/README.md",
+        "docs/wiki/GETTING_STARTED.md",
+        "docs/wiki/USER_GUIDE.md",
+        "docs/wiki/MAINTAINER_GUIDE.md",
+        "docs/wiki/TROUBLESHOOTING.md",
+        "docs/wiki/TERMS.md",
+        "docs/wiki/ENGINEERING_OVERVIEW.md",
+        "docs/FIXED_USER_EXECUTION_CONTEXT.md",
+        "docs/BOUNDED_REPEATED_USER_SESSION.md",
+        "docs/RELEASE_CHECKLIST.md",
+        "docs/RELEASE_EVIDENCE.md",
+        "docs/ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "CHANGELOG.md",
+        "tests/test_release_candidate_hardening.py",
+        "tasks/todo.json",
+        "tasks/runtime.json",
+        "docs/generated/governance_index.md",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/boot_blocker_report.json",
+        "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/qemu_smoke.summary.txt",
+        "artifacts/runtime/runtime_smoke.metadata.json"
+      ],
+      "verification_refs": [
+        "verification.tests_run[168]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -4443,6 +4487,11 @@
         "tool": "bounded repeated user session validation",
         "command": "focused, full, governed, and hosted validation",
         "status": "hosted_accepted_commits_7939be7_f9082db_ci_31899981058_lint_31899981084_portability_31899981072_1284_tests_67_checks_0_failures_qemu_pass_blocker_none_52_markers_2_sessions_4_transitions_linux_VALIDATED_RUNTIME_windows_macos_VALIDATED_BUILD_runtime_NOT_EXECUTED_hosted_artifacts_validated"
+      },
+      {
+        "tool": "v1.1.0 release qualification and promotion",
+        "command": "release integrity review; 337 focused tests; 1,284-test discovery; Odin, Rust, cargo-deny, cargo-audit, portability actionlint, and governed 67-check QEMU verification; exact-commit hosted gates, packaging, tag, final publication, hosted download, and post-publication alignment pending",
+        "status": "pre_version_local_qualification_pass_1284_tests_67_checks_0_failures_qemu_pass_blocker_none_52_markers_2_sessions_4_transitions_v1.0.2_skipped_v1.1.0_publication_pending"
       }
     ],
     "logs": [
@@ -4713,6 +4762,7 @@
     "Accepted the Fixed User Execution Context governance prerequisites through CI run 31475116760, lint run 31475116763, and portability run 31475116739; the next milestone is a separately authorized Fixed User Execution Context Implementation Authorization task.",
     "Implemented the authorized fixed user context as one layered static authority boundary with an exact result record, fail-closed lifecycle enforcement, transition accounting, cleanup readback, ELF storage proof, focused negative tests, and no public ABI, contract, schema, marker, governed-check, version, tag, or release change.",
     "Aligned current documentation and task state with the accepted implementation runs, kept v1.0.1 as the immutable published release that predates the context, and selected no automatic next task.",
-    "Accepted the Bounded Repeated User Session through CI run 31899981058, lint run 31899981084, and portability run 31899981072; downloaded hosted evidence proves two sessions, four transitions, 52 markers, valid package checksums, matching packaged/runtime ISO hashes, and preserved host evidence levels while v1.0.1 remains unchanged."
+    "Accepted the Bounded Repeated User Session through CI run 31899981058, lint run 31899981084, and portability run 31899981072; downloaded hosted evidence proves two sessions, four transitions, 52 markers, valid package checksums, matching packaged/runtime ISO hashes, and preserved host evidence levels while v1.0.1 remains unchanged.",
+    "Authorized v1.1.0 as the next final feature release, skipped v1.0.2, and advanced the versioned six-asset release boundary only after the complete pre-version local qualification passed."
   ]
 }

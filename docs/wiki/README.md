@@ -3,8 +3,8 @@
 ## What KOZO Is
 
 KOZO is a small x86-64 kernel for people who want to study or extend low-level
-software whose claims are tied to explicit tests and runtime evidence. It boots
-in QEMU, crosses one fixed kernel-to-user boundary, completes a bounded request,
+software whose claims are tied to explicit tests and runtime evidence. The
+v1.1.0 release target boots in QEMU, runs two sequential fixed user sessions,
 and stops in a known halt state.
 
 KOZO is useful as an auditable kernel foundation and as a learning environment
@@ -16,15 +16,16 @@ general-purpose operating system.
 Current final release:
 [v1.0.1](https://github.com/irgordon/kozo/releases/tag/v1.0.1)
 
-Previous final release:
-[v1.0.0](https://github.com/irgordon/kozo/releases/tag/v1.0.0)
+Authorized release target:
+[v1.1.0](../releases/v1.1.0.md), pending exact-commit hosted promotion
 
 Previous prerelease:
 [v1.0.0-rc.1](https://github.com/irgordon/kozo/releases/tag/v1.0.0-rc.1)
 
-The current release provides six immutable hosted assets. Read the
-[release notes](../releases/v1.0.1.md), the
-[release evidence](../releases/v1.0.1-evidence.md), or the
+The current release provides six immutable hosted assets. The v1.1.0 target
+will use the same six-asset publication shape. Read the
+[v1.1.0 release notes](../releases/v1.1.0.md), the
+[qualification evidence](../releases/v1.1.0-evidence.md), or the
 [documentation audit](../releases/v1.0.0-documentation-audit.md).
 
 ## Choose Your Path
@@ -42,7 +43,7 @@ The current release provides six immutable hosted assets. Read the
 ## For Users
 
 Start with the downloaded `kozo.iso`. KOZO reports progress over the QEMU
-serial console. A successful accepted run reaches 41 ordered markers ending in
+serial console. The v1.1.0 accepted runtime reaches 52 ordered markers ending in
 `KOZO_RUNTIME_RETURN_OK`; it does not open a prompt or graphical interface.
 
 ## For Maintainers
@@ -59,7 +60,7 @@ halt behavior to their source files and authoritative documents.
 
 ## Current Limits
 
-KOZO v1.0.1 does not provide a desktop, window manager, settings application,
+KOZO v1.1.0 does not provide a desktop, window manager, settings application,
 interactive terminal, shell, scheduler, persistent processes, general-purpose
 userspace, general system-call interface, filesystem, drivers, networking,
 dynamic virtual memory, executable loader, Linux or POSIX compatibility,

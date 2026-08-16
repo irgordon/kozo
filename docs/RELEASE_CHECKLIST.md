@@ -547,3 +547,23 @@ published release.
 | Hosted asset verification | Complete | fresh download, `SHA256SUMS`, byte comparison, JSON validation, hosted ISO QEMU | 41 markers; final marker `KOZO_RUNTIME_RETURN_OK`. |
 | Prior release preservation | Complete | v1.0.0 and v1.0.0-rc.1 tag objects, classifications, and asset digests | Records remain unchanged. |
 | Package publication | Not authorized | `core_service` remains unpublished | Do not run `cargo publish`. |
+
+# 25. v1.1.0 Feature Release Gate
+
+v1.1.0 is authorized because the accepted Fixed User Execution Context and
+Bounded Repeated User Session add runtime capability. v1.0.2 is skipped.
+
+| Item | Status | Evidence | Follow-up |
+| --- | --- | --- | --- |
+| Version authority | Prepared | `release/version.txt` contains `1.1.0` | Hosted metadata must match. |
+| Notes and evidence | Prepared | `docs/releases/v1.1.0.md`, `docs/releases/v1.1.0-evidence.md` | Complete immutable hosted fields after publication. |
+| Runtime capability | Accepted on `main` | fixed context, two sessions, four returns, verified reset | Preserve exact two-session scope. |
+| Full local gate | Complete | 337 focused and 1,284 full Python tests; Odin, Rust, cargo policy; 67/0 verification | Reproduce at exact target in hosted CI. |
+| Runtime evidence | Complete locally | QEMU pass, blocker none, 52 ordered markers | Test the exact packaged and downloaded ISO. |
+| Host portability | Pending fresh target run | pinned Linux, Windows, and macOS build contracts | Linux runtime and aggregate input identity remain required. |
+| Final bundle | Pending exact commit | established six-asset output | Validate checksums, metadata, inventory, and licenses. |
+| Annotated tag | Not created | `v1.1.0` absent before hosted acceptance | Target only the exact accepted proof commit. |
+| Final GitHub release | Not created | authorized after tag verification | Final, non-draft, non-prerelease. |
+| Hosted download | Pending publication | fresh six-asset download and QEMU run required | Do not substitute local bytes. |
+| Prior releases | Preserved | v1.0.1, v1.0.0, and v1.0.0-rc.1 readback | Never replace their tags, notes, or assets. |
+| Package publication | Not authorized | `core_service` remains unpublished | Do not run `cargo publish`. |

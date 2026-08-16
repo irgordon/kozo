@@ -1,6 +1,6 @@
 # Engineering Overview
 
-This page gives engineers a top-down map of v1.0.1. It explains why each
+This page gives engineers a top-down map of the v1.1.0 release target. It explains why each
 mechanism exists, where it is implemented, and how it is verified. Exact
 addresses, structure layouts, and bit fields remain in the linked authoritative
 documents.
@@ -16,10 +16,9 @@ boot image
 -> descriptor and interrupt tables
 -> Odin runtime initialization
 -> controlled three-iteration loop
--> fixed Ring 3 entry
--> fixed request and runtime-status service
--> fixed response and Ring 3 consumption
--> governed Ring 0 return
+-> fixed user session 1 and governed Ring 0 return
+-> verified context, result, and transaction reset
+-> fixed user session 2 and governed Ring 0 return
 -> two internal capabilities
 -> terminal halt
 ```
@@ -49,11 +48,12 @@ ELF geometry, and QEMU survival markers. See [Paging](../PAGING.md).
 
 ## Privilege Boundary
 
-Fixed GDT, TSS, and IDT state supports one `iretq` transition to Ring 3 and one
-`int 0x81` return gate. The kernel validates the saved frame, fixed reason,
-request geometry, response geometry, and continuation before proceeding.
+Fixed GDT, TSS, and IDT state supports the bounded `iretq` transitions to Ring
+3 and the existing `int 0x81` return gate. The kernel validates the saved
+frame, fixed reason, request geometry, response geometry, context identity,
+session count, and continuation before proceeding.
 
-This proves one bounded privilege round trip. It does not provide arbitrary
+This proves two sequential bounded user sessions. It does not provide arbitrary
 user code, a general syscall table, exception recovery, or hostile-code
 containment.
 
@@ -64,10 +64,11 @@ See [Privilege Transition](../PRIVILEGE_TRANSITION.md).
 
 ## Capability Model
 
-The fixed user request asks for one runtime-status response. The kernel copies
+Each fixed user request asks for one runtime-status response. The kernel copies
 and validates the request, formats a response from a shared Odin status
-snapshot, copies it out, and validates its consumption after returning from
-Ring 3.
+snapshot, copies it out, validates its consumption after returning from Ring
+3, clears all authority, and repeats the transaction once with a fresh opaque
+identity.
 
 After the user transaction, Odin runs two internal capabilities: a read-only
 status query and one fixed READY-to-ACTIVE state transition. These operations
@@ -99,7 +100,7 @@ Generated proof is review evidence, not authority. See
 
 Every stage checks exact preconditions and status values. A failed check stops
 before later success markers and converges on a fixed halt path. The terminal
-halt also remains the normal end of the successful v1.0.1 demonstration.
+halt also remains the normal end of the successful v1.1.0 demonstration.
 
 This prevents partial work from being reported as success. It does not provide
 general exception recovery or safe execution of arbitrary hostile code. See

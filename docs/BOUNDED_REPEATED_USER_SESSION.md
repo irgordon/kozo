@@ -2,7 +2,7 @@
 
 Version: 1
 Status: Implemented and hosted accepted on main
-Current published release: v1.0.1, which does not contain this capability
+Release target: v1.1.0; current published v1.0.1 does not contain this capability
 
 ## Problem Solved
 
@@ -76,7 +76,8 @@ QEMU with no blocker, and all 52 ordered marker occurrences. Lint run
 Windows, and macOS build contracts plus cross-host release-input identity;
 only Linux executed the runtime contract.
 
-Downloaded hosted evidence independently confirmed two completed sessions,
+Downloaded hosted development evidence independently confirmed two completed sessions,
 active ordinal zero, matching packaged and runtime-tested ISO hashes, valid
-package checksums, and the supervisor RW-NX coordinator ELF record. No
-published release currently contains this implementation.
+package checksums, and the supervisor RW-NX coordinator ELF record. The
+implementation is included in the authorized v1.1.0 release target; publication
+remains pending exact-commit hosted qualification.

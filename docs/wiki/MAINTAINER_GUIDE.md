@@ -146,12 +146,12 @@ The repository states are distinct:
 
 | State | Meaning |
 | --- | --- |
-| `v1.0.1` tag | Immutable current patch source and artifact record |
-| `v1.0.0` tag | Immutable previous final source and artifact record |
-| `main` | May contain later documentation or development commits |
+| `v1.1.0` target | Authorized feature release; immutable after publication |
+| `v1.0.1` tag | Immutable current published source and artifact record |
+| `main` | Contains the v1.1.0 release target and may later advance |
 | `v1.0.0-rc.1` tag | Immutable accepted prerelease record |
 
-The current patch tag targets
+The current published patch tag targets
 `02f1b0113458b988562b7e03362ec9ae716cebd0`. The post-publication
 documentation commit is later on `main` and is not part of the tagged release.
 The prior final tag remains fixed at
@@ -162,9 +162,12 @@ hosted notes to hide a defect.
 
 ## Patch-Release Process
 
-A reproduced product defect requires a new patch version such as `v1.0.2`.
+A reproduced defect after v1.1.0 publication requires a new patch version such
+as `v1.1.1`.
 Record the defect, fix it in a scoped task, rebuild and verify new artifacts,
-and obtain explicit release authorization. Never repair `v1.0.1` in place.
+and obtain explicit release authorization. Never repair a published release
+in place. v1.0.2 is intentionally skipped because the v1.1.0 changes add
+runtime capability rather than a patch-only correction.
 
 ## Current Warning Policy
 

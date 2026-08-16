@@ -412,13 +412,15 @@ Implementation acceptance requires:
 
 Current published release: `v1.0.1`.
 
-Release containing this implementation: none.
+Release target containing this implementation: `v1.1.0`.
 
-The implementation exists on `main` after the immutable `v1.0.1` tag. A future
-release class and version remain unassigned.
+The implementation exists on `main` after the immutable `v1.0.1` tag. The
+accepted bounded repeated-session feature makes `v1.1.0` the authorized
+feature-release boundary.
 
-Version assignment is deferred to separate authorization. This definition
-does not authorize `v1.1.0`, any patch release, or publication.
+The release task separately authorizes version advancement and publication
+only after local, hosted, package, tag, and downloaded-artifact gates pass.
+It explicitly skips `v1.0.2`.
 
 ---
 
@@ -478,13 +480,13 @@ Implementation status: implemented and hosted accepted.
 Hosted acceptance: CI run `31563696881`, lint run `31563696973`, and
 portability run `31563697127` passed.
 
-Version change authorized: false.
+Version change authorized: true for v1.1.0 release qualification.
 
-Release authorized: false.
+Release authorized: true for v1.1.0 after all required gates pass.
 
 Current published release: `v1.0.1`.
 
-Published release containing this implementation: none.
+Release target containing this implementation: `v1.1.0`.
 
 Next capability: not selected. No follow-on task is inferred automatically.
 
@@ -517,8 +519,8 @@ transition is an invariant violation. Both phase and count must match.
 
 The governance validator remains direct and unregistered. The separately
 authorized implementation adds a focused unregistered runtime evidence
-validator, preserving 67 governed checks and 41 markers. Version change and
-release remain unauthorized.
+validator, preserving 67 governed checks. The repeated-session capability
+later increases runtime occurrences from 41 to 52 without adding marker names.
 
 Hosted acceptance used CI run `31475116760`, lint run `31475116763`, and
 portability run `31475116739`. Linux retained `VALIDATED_RUNTIME`; Windows and
@@ -548,5 +550,5 @@ checks with no failures, and QEMU with blocker `none`, all 41 markers, and
 remain `VALIDATED_BUILD` with runtime `NOT_EXECUTED`.
 
 The implementation changed no marker, governed check count, public ABI,
-release version, tag, or hosted release asset. It exists on current `main`, not
-in the immutable published `v1.0.1` release.
+public ABI, tag, or hosted release asset. It exists on current `main`, is not in
+immutable `v1.0.1`, and is included in the authorized `v1.1.0` release target.

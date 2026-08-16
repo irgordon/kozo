@@ -160,9 +160,9 @@ deletion, ruleset, or other repository policy is required by this phase.
 The immutable `v1.0.0-rc.1` annotated tag and GitHub prerelease are published.
 Post-promotion checks reproduced the accepted hosted hashes, QEMU result, 41
 markers, and user path. No reproducible final-release blocker was found.
-Final `v1.0.1` is published as the current non-draft, non-prerelease GitHub
-release. Its tag, notes, and assets are immutable. The v1.0.0 and RC records
-remain unchanged.
+Final `v1.0.1` remains the current non-draft, non-prerelease GitHub release
+until authorized v1.1.0 promotion completes. Its tag, notes, and assets are
+immutable. The v1.0.0 and RC records remain unchanged.
 
 The v1.0.1 post-release observation is complete with zero reproduced defects.
 v1.0.2 is not authorized. v1.1.0 Phase 0 adopted ADR 0017 and the portability
@@ -191,8 +191,10 @@ Current `main` contains the context implementation; immutable `v1.0.1` does
 not. The Bounded Repeated User Session is implemented and hosted accepted with
 two fixed sessions and 52 marker occurrences. CI run `31899981058`, lint run
 `31899981084`, and portability run `31899981072` passed, including independent
-downloaded-artifact validation. Product version and release authorization
-remain unchanged, and all published tags and hosted assets remain immutable.
+downloaded-artifact validation. These feature additions authorize the v1.1.0
+release boundary and intentionally skip v1.0.2. The versioned target still
+requires fresh hosted qualification, packaging, publication, and downloaded
+artifact verification; all existing tags and hosted assets remain immutable.
 
 ---
 
@@ -266,6 +268,7 @@ remain unchanged, and all published tags and hosted assets remain immutable.
 | `post-Phase-0 prerequisites` | Fixed User Execution Context Governance | Define exact ownership, lifecycle, result, cleanup, transition-budget, progression, and evidence authority. | ADR 0018, internal context/result contract and schema, direct governance validator, focused tests, aligned authority documents and task state. | At prerequisite acceptance, hosted gates preserved 67 checks and 41 markers; implementation was authorized later, while version and release remain unauthorized. |
 | `post-Phase-0 implementation` | Fixed User Execution Context Implementation | Wrap the accepted fixed Ring 3 transaction with one supervisor-owned lifecycle and bounded result. | Static context/result storage, direct lifecycle and transition accounting, ELF report evidence, focused unregistered validator/tests, local and hosted gates. | Exactly one context reaches verified `CLEARED`; 67 governed checks, 41 markers, ABI, release version, and Phase 0 evidence levels remain unchanged. |
 | `post-context implementation` | Bounded Repeated User Session | Execute exactly two independent fixed sessions through the accepted static context. | Two explicit calls, fresh identities, result and storage reset, 32-byte coordinator, duplicate-aware marker evidence, focused contract/evidence tests. | Two sessions and four returns complete; 52 ordered occurrences end at `KOZO_RUNTIME_RETURN_OK`; later capabilities run only after final cleanup; hosted gates pass. |
+| `v1.1.0` | Fixed-context and repeated-session feature release | Publish the accepted post-v1.0.1 runtime capabilities as one final feature release. | Version authority, release notes and evidence, exact-commit hosted gates, annotated tag, six validated assets, downloaded ISO proof. | 67 checks pass; Linux QEMU reaches 52 markers; all required host build gates pass; hosted downloads match; prior releases remain immutable. |
 
 ---
 

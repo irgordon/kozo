@@ -1,14 +1,15 @@
 # User Guide
 
-KOZO v1.0.1 runs one fixed governed runtime demonstration. Using KOZO currently
-means booting its ISO in QEMU and observing serial evidence. It does not accept
-keyboard commands and does not provide a shell or graphical interface.
+KOZO v1.1.0 runs a fixed governed runtime demonstration with exactly two
+sequential user sessions. Using KOZO means booting its ISO in QEMU and
+observing serial evidence. It does not accept keyboard commands and does not
+provide a shell or graphical interface.
 
 ## Current Release
 
-KOZO `v1.0.1` is available as the
-[current kernel-foundation release](https://github.com/irgordon/kozo/releases/tag/v1.0.1).
-Download and checksum instructions are in [Getting Started](GETTING_STARTED.md).
+KOZO `v1.1.0` is the authorized release target. Until publication completes,
+`v1.0.1` remains the current downloadable release. Download and checksum
+instructions are in [Getting Started](GETTING_STARTED.md).
 
 ## What Happens When KOZO Starts
 
@@ -17,10 +18,11 @@ stack and memory region, initializes required CPU state, and activates fixed
 page tables.
 
 It then prepares one fixed kernel-to-user path. Odin runs a three-iteration
-loop. KOZO enters fixed user-mode code, handles one fixed runtime-status
-request, returns a fixed response, and checks that response in both user mode
-and kernel mode. It completes two internal kernel operations and reaches its
-final safe stop.
+loop. KOZO executes the fixed user transaction twice through one static
+context. Each session receives a fresh kernel-owned identity, handles one
+fixed runtime-status request, validates the response, clears all authority,
+and checks the cleared state. KOZO then completes two internal kernel
+operations and reaches its final safe stop.
 
 ## What the Runtime Proves
 
@@ -28,8 +30,9 @@ The accepted path proves that:
 
 - the kernel reached its assembly entry;
 - controlled stack, memory, CPU, and paging initialization succeeded;
-- fixed descriptor and interrupt tables supported one user-mode transition;
-- one fixed request and response crossed the privilege boundary;
+- fixed descriptor and interrupt tables supported two bounded user sessions;
+- two fixed requests and responses crossed the privilege boundary;
+- the first session left no authority or transaction state for the second;
 - Odin completed a bounded loop and two governed kernel operations;
 - all successful paths converged on the final halt loop.
 
@@ -55,7 +58,7 @@ A successful summary reports:
 ```text
 Outcome: pass
 Blocker: none
-Observed Markers: 41
+Observed Markers: 52
 Expected Marker: KOZO_RUNTIME_RETURN_OK
 ```
 
@@ -81,9 +84,11 @@ no blocker, and the complete sequence through `KOZO_RUNTIME_RETURN_OK`.
 The current user-mode code is linked into the kernel image at a fixed address.
 It is not loaded from a file and cannot be replaced by a caller.
 
-The program confirms that it is running in user mode, submits one fixed status
-request through software interrupt `int 0x81`, checks every returned field,
-records that it consumed the response, and returns through the same fixed gate.
+In each session, the program confirms that it is running in user mode, submits
+one fixed status request through software interrupt `int 0x81`, checks every
+returned field, records that it consumed the response, and returns through the
+same fixed gate. The kernel permits exactly two returns per session and four
+total returns.
 
 ## What the Runtime-Status Request Returns
 

@@ -804,3 +804,34 @@ The runtime, ABI, contracts, schemas, fixed request geometry, mappings,
 capabilities, marker order, and halt behavior remain unchanged. The
 `v1.0.0` and `v1.0.0-rc.1` release records remain immutable. The v1.0.1 tag,
 notes, and six assets are also immutable after publication.
+
+---
+
+# 20. v1.1.0 Feature Release
+
+`release/version.txt` owns feature version `1.1.0`. v1.0.2 is skipped because
+the accepted Fixed User Execution Context and Bounded Repeated User Session
+add runtime capability rather than a patch-only correction.
+
+Release acceptance requires exactly two fixed sessions, distinct kernel-owned
+identities, four total `int 0x81` returns, complete inter-session reset, and 52
+ordered markers ending at `KOZO_RUNTIME_RETURN_OK`. The governed aggregate
+remains 67 checks. Linux must pass build and runtime; Windows 2025 under Git
+Bash and macOS 15 must pass build; cross-host release-input identity must pass.
+
+The approved output set is:
+
+```text
+kozo-v1.1.0.tar.xz
+kozo.iso
+kozo-kernel.elf
+latest_verify.json
+release_metadata.json
+SHA256SUMS
+```
+
+The exact versioned proof commit must pass fresh hosted CI, lint, and
+portability before tagging. The annotated tag must target that commit. Final
+publication requires independent checksum, metadata, and QEMU validation of a
+fresh GitHub download. Until those gates complete, v1.0.1 remains the current
+published release and all earlier release records remain immutable.

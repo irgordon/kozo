@@ -31,7 +31,7 @@ engineering document.
 | Kernel return-stack settings | Task State Segment (TSS) | Supplies the Ring 0 stack when the fixed user path returns |
 | Kernel return stack | RSP0 | The fixed stack pointer loaded for a user-to-kernel transition |
 | Mode-switch instruction | `iretq` | Enters the fixed Ring 3 code using an explicit return frame |
-| Fixed user-to-kernel call | `int 0x81` | Invokes the only governed request/response gate in v1.0.1 |
+| Fixed user-to-kernel call | `int 0x81` | Invokes the governed request/response gate twice per bounded v1.1.0 session |
 | CPU math state | x87/SSE state | Must be initialized before Odin can safely execute compiler-generated instructions |
 | Kernel binary | ELF | The linked file inspected for symbols, instructions, and geometry |
 | Virtual test computer | QEMU | Boots the released ISO and captures its serial evidence |

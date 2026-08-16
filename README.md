@@ -15,26 +15,28 @@ machine-readable rules.
 
 **Current release:** [v1.0.1](https://github.com/irgordon/kozo/releases/tag/v1.0.1)
 
-**Previous release:** [v1.0.0](https://github.com/irgordon/kozo/releases/tag/v1.0.0)
+**Release target:** [v1.1.0](docs/releases/v1.1.0.md) is qualified locally
+and authorized for exact-commit hosted validation. Publication is pending.
 
-v1.0.1 fixes cross-host Odin object-output normalization. Its kernel runtime,
-ABI, marker sequence, and terminal halt behavior are unchanged from v1.0.0.
+v1.0.2 is intentionally skipped. The new fixed execution context and bounded
+repeated session are feature additions, so v1.1.0 is the next release target.
 
 Start with the [wiki](docs/wiki/README.md), which routes users, maintainers,
 and engineers to the right level of detail. The
-[v1.0.1 release notes](docs/releases/v1.0.1.md) and
-[release evidence](docs/releases/v1.0.1-evidence.md) describe the current
-published product and its immutable artifacts.
+[v1.1.0 release notes](docs/releases/v1.1.0.md) and
+[qualification evidence](docs/releases/v1.1.0-evidence.md) describe the
+authorized release target. v1.0.1 remains the current downloadable release
+until promotion completes.
 
 ## What Works Today
 
 KOZO currently boots on the governed x86-64 QEMU path, prepares a controlled
 stack and memory region, initializes required CPU math state, activates
-KOZO-owned page tables, enters one fixed user-mode probe, completes one fixed
-runtime-status request, executes two internal kernel operations, and stops in
-a deterministic halt loop.
+KOZO-owned page tables, executes two sequential fixed user sessions with fresh
+kernel identities and verified reset between them, completes two internal
+kernel operations, and stops in a deterministic halt loop.
 
-The accepted run contains 41 ordered progress markers and passes 67 verification
+The accepted run contains 52 ordered progress markers and passes 67 verification
 checks. These are narrow proof claims. KOZO does not yet provide general
 userspace, processes, a scheduler, a filesystem, Linux or POSIX compatibility,
 or production readiness.
@@ -77,16 +79,15 @@ under `docs`.
 
 ## Release Status
 
-`v1.0.0` is published as the
-[final kernel-foundation release](https://github.com/irgordon/kozo/releases/tag/v1.0.0).
-Its [release evidence](docs/releases/v1.0.0-evidence.md) records the immutable
-tag, hosted asset hashes, and accepted runtime result.
+`v1.0.1` is published as the current final patch release. Its
+[release evidence](docs/releases/v1.0.1-evidence.md) records the immutable tag,
+hosted asset hashes, and accepted runtime result.
 
 The earlier `v1.0.0-rc.1` prerelease remains immutable. KOZO v1.0.0 is not a
 production desktop operating system.
 
-The [v1.0.1 release evidence](docs/releases/v1.0.1-evidence.md) records the
-bounded Odin build correction and the gates required before publication.
+The [v1.1.0 release evidence](docs/releases/v1.1.0-evidence.md) records the
+two-session runtime boundary and the gates required before publication.
 
 ## Maintaining KOZO
 

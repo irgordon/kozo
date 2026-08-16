@@ -147,8 +147,8 @@ KOZO still does not prove:
 
 # 9. Current Active Blocker
 
-No active runtime blocker is recorded for the published v1.0.1
-kernel-foundation scope.
+No active runtime blocker is recorded for the authorized v1.1.0 feature
+release scope. v1.0.1 remains the published release until promotion completes.
 Force pushes to `main` are blocked. No broader repository policy is required
 by the final-release scope. The immutable `v1.0.0-rc.1` prerelease and
 `v1.0.0` final release are published. The final hosted assets passed checksum,
@@ -203,13 +203,14 @@ The **Fixed User Execution Context** definition, governance prerequisites, and
 implementation are complete and hosted accepted on `main`. CI run
 `31563696881`, lint run `31563696973`, and portability run `31563697127`
 preserved 67 governed checks, all 41 markers, the existing ABI, and the
-accepted host evidence levels. The current published release remains
-`v1.0.1`, which predates this implementation; no published release contains
-the context. The separately authorized **Bounded Repeated User Session** is
+accepted host evidence levels. The published v1.0.1 release predates this
+implementation. The separately authorized **Bounded Repeated User Session** is
 implemented and hosted accepted on `main` through CI run `31899981058`, lint
 run `31899981084`, and portability run `31899981072`. It completes two
 explicit lifecycles and 52 marker occurrences while retaining 67 governed
-checks. v1.0.2 and v1.1.0 remain unauthorized.
+checks. These accepted feature additions authorize v1.1.0 release
+qualification; v1.0.2 is intentionally skipped. Publication remains pending
+the exact-commit hosted and artifact gates.
 
 Future general-userspace releases must preserve a defined minimum usable
 hardware profile. Additional CPU, memory, and storage should increase capacity
@@ -249,11 +250,10 @@ The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
     one canonical object-build boundary with its focused failure coverage.
 21. Preserve the immutable v1.0.1 tag, notes, six assets, checksums, and hosted
     ISO evidence; use a later patch version for any product correction.
-22. Complete v1.1.0 Phase 0 by resolving `KOZO-TRIAGE-003`, proving identical
-    governed release inputs on pinned Linux, Windows, and macOS runners, and
-    retaining Linux as the required guest/runtime gate.
-23. Keep v1.1.0 product capability work blocked until Phase 0 hosted evidence
-    is accepted.
+22. Preserve accepted Phase 0 release-input identity on pinned Linux, Windows,
+    and macOS runners, with Linux as the required guest/runtime gate.
+23. Qualify and publish v1.1.0 only from the exact hosted-accepted versioned
+    commit and independently verify the downloaded six-asset release.
 24. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
 
 ---

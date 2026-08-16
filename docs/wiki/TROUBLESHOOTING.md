@@ -36,7 +36,7 @@ cat artifacts/runtime/qemu_smoke.summary.txt
 jq '{outcome, observed_markers}' artifacts/runtime/qemu_smoke.metadata.json
 ```
 
-**Expected result:** `Outcome: pass`, 41 ordered markers, and final marker
+**Expected result:** `Outcome: pass`, 52 ordered markers, and final marker
 `KOZO_RUNTIME_RETURN_OK`.
 
 **Stop when:** the final marker is missing, the marker order differs, or the
@@ -225,7 +225,7 @@ evidence counts to hide formatting differences.
 **Likely cause:** an incomplete, corrupted, or wrong-version download.
 
 **Safe check:** confirm all files came from the same
-[v1.0.1 release](https://github.com/irgordon/kozo/releases/tag/v1.0.1), then run
+[v1.1.0 release](https://github.com/irgordon/kozo/releases/tag/v1.1.0), then run
 the checksum command again.
 
 **Expected result:** every listed file reports `OK`.
@@ -235,7 +235,7 @@ again, and do not run it until validation succeeds.
 
 ## Wrong Release Version
 
-**Symptom:** asset names or metadata mention an older version instead of `v1.0.1`,
+**Symptom:** asset names or metadata mention an older version instead of `v1.1.0`,
 or the expected final archive is absent.
 
 **Likely cause:** assets were downloaded from the historical prerelease.
@@ -246,8 +246,8 @@ or the expected final archive is absent.
 jq '{version, display_version, commit}' release_metadata.json
 ```
 
-**Expected result:** version `1.0.1`, display version `v1.0.1`, and commit
-`02f1b0113458b988562b7e03362ec9ae716cebd0`.
+**Expected result:** version `1.1.0`, display version `v1.1.0`, and a commit
+matching the annotated `v1.1.0` tag target.
 
 **Stop when:** metadata identifies another release. Do not combine files from
 different release pages.
