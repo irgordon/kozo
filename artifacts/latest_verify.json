@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20260815T181447Z",
+  "run_id": "verify-20260816T023546Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -493,14 +493,31 @@
   ],
   "failed_checks": [],
   "changed_files": [
+    ".github/workflows/ci.yml",
     "CHANGELOG.md",
+    "README.md",
     "artifacts/runtime/qemu_smoke.summary.txt",
     "docs/BOUNDED_REPEATED_USER_SESSION.md",
+    "docs/FIXED_USER_EXECUTION_CONTEXT.md",
     "docs/PHASEMAP.md",
+    "docs/RELEASE_CHECKLIST.md",
+    "docs/RELEASE_EVIDENCE.md",
     "docs/ROADMAP.md",
     "docs/generated/governance_index.md",
+    "docs/releases/v1.1.0-evidence.md",
+    "docs/releases/v1.1.0.md",
+    "docs/wiki/ENGINEERING_OVERVIEW.md",
+    "docs/wiki/GETTING_STARTED.md",
+    "docs/wiki/MAINTAINER_GUIDE.md",
+    "docs/wiki/README.md",
+    "docs/wiki/TERMS.md",
+    "docs/wiki/TROUBLESHOOTING.md",
+    "docs/wiki/USER_GUIDE.md",
+    "release/release_files.v1.json",
+    "release/version.txt",
     "tasks/runtime.json",
-    "tasks/todo.json"
+    "tasks/todo.json",
+    "tests/test_release_candidate_hardening.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -517,5 +534,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-08-15T18:14:47Z"
+  "generated_at": "2026-08-16T02:35:46Z"
 }
