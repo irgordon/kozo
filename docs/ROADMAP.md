@@ -1,8 +1,9 @@
 # KOZO Roadmap
 
-Version: 1
-Status: Planning
-Scope: Product direction and release goals for the path to a scoped KOZO v1.0.0
+Version: 1.1.0
+Status: Published final feature release
+Release commit: a5226635be46c687299028b5244f808da67c0984
+Scope: Product direction and release gates from the published KOZO v1.1.0 baseline
 
 ---
 
@@ -35,21 +36,26 @@ Roadmap entries are planning commitments, not claims that behavior already exist
 
 # 3. Product Thesis
 
-KOZO should become a small, contract-backed operating-system substrate where every claimed boundary is explicit, verified, and supported by reproducible release evidence.
+KOZO is a small, contract-backed operating-system substrate where every
+claimed boundary is explicit, verified, and supported by reproducible release
+evidence.
 
-The current repository is strong at governance and source-level proof. The roadmap focuses on adding runtime evidence and release discipline without broad compatibility claims.
+The v1.1.0 baseline proves bounded user execution through one fixed execution
+context and exactly two sequential fixed sessions. Future work should add one
+concrete capability at a time without broad compatibility, process, or
+production-readiness claims that exceed the evidence.
 
 ---
 
 # 4. Goals
 
-* Define exact v1.0.0 scope.
+* Preserve the immutable v1.1.0 release baseline and its downloadable evidence.
 * Maintain strict contract-backed development.
-* Add runtime execution evidence.
-* Keep compatibility claims narrow.
-* Make release evidence reproducible.
+* Extend usable runtime capability one bounded feature at a time.
+* Keep compatibility claims narrow and evidence-tiered.
+* Make release evidence reproducible from committed inputs and hosted assets.
 * Keep generated reports current and non-authoritative.
-* Preserve validator coverage depth.
+* Preserve validator coverage, cross-host build portability, and release-input identity.
 
 ---
 
@@ -59,12 +65,14 @@ The roadmap does not add or imply:
 
 * Linux compatibility
 * POSIX completeness
-* general userspace execution
-* process model behavior
-* VFS behavior
-* scheduler maturity
-* ELF loading
-* file descriptor behavior
+* general or persistent userspace execution
+* third, arbitrary, or concurrent user sessions
+* process lifecycle or scheduling
+* physical-frame allocation, heap allocation, or general virtual memory
+* VFS, filesystem, or file descriptor behavior
+* executable loading
+* device-driver or networking behavior
+* a stable public ABI
 * production readiness beyond the scoped release definition
 
 ---
@@ -115,8 +123,26 @@ The current repository proves:
   runtime evidence
 * hosted-CI-accepted v0.8.9 documentation and adoption path with 67 checks,
   0 failures, QEMU pass, blocker none, and all 41 markers
+* hosted-CI-accepted Fixed User Execution Context with one 128-byte
+  supervisor-owned context and one separate 32-byte non-authoritative result,
+  both in supervisor RW-NX static storage,
+  lifecycle `UNINITIALIZED -> READY -> ACTIVE -> RETURNED -> CLEARED`, exact
+  two-return phase/count coupling, verified cleanup, CI run `31563696881`, 67
+  governed checks, and the then-authoritative 41-marker sequence
+* hosted-CI-accepted Bounded Repeated User Session with exactly two sequential
+  sessions, distinct nonzero opaque kernel identities, four total `int 0x81`
+  returns, verified reset of result, transaction buffers, scratch storage, and
+  user stack, fail-closed rejection of a third session or fifth return, and a
+  repeated 11-marker transaction block that increased ordered occurrences from
+  41 to 52; CI run `31899981058` passed 1,284 Python tests
+* final v1.1.0 feature release from exact hosted-accepted commit
+  `a5226635be46c687299028b5244f808da67c0984` with six assets, pre-upload
+  SHA-256 values matching fresh GitHub downloads, and a downloaded ISO that
+  booted with two completed sessions through 52 ordered markers ending at
+  `KOZO_RUNTIME_RETURN_OK`
 
-The latest local generated evidence may still report missing local Limine/xorriso tooling, but CI run `27894312430` proves the narrow QEMU serial smoke path.
+The final v1.1.0 release is the current published capability baseline. Detailed
+release evidence is owned by `docs/RELEASE_EVIDENCE.md`.
 
 ---
 
@@ -125,162 +151,105 @@ The latest local generated evidence may still report missing local Limine/xorris
 KOZO still does not prove:
 
 * complete Odin runtime readiness or dynamic initialization
-* general stack readiness beyond the controlled boot stack proof
-* general memory management beyond the governed static region
-* runtime progression beyond the bounded call and governed halt continuation
-* general userspace planning and execution remain unproven beyond the fixed boot-time CPL3 probe
-* AVX, XSAVE, extended-state context switching, and floating-point exception recovery remain unproven
-* syscall dispatch during boot
-* hardware halt instruction semantics
-* interrupt handling
-* hardware trap execution
+* general stack readiness beyond the controlled boot, user, and Ring 0 return stacks
+* general memory management beyond the governed static regions and fixed mappings
+* more than exactly two sequential fixed user sessions
+* arbitrary, concurrent, persistent, or user-selected sessions
+* general-purpose or persistent userspace beyond the fixed request/response transaction
+* process identity, process lifecycle, scheduling, preemption, or concurrency
+* physical-frame allocation, heap allocation, or dynamic virtual memory
+* executable loading
+* a public or general hardware syscall ABI beyond the fixed `int 0x81` path
+* general interrupt handling or exception recovery
+* AVX, XSAVE, extended-state context switching, or floating-point exception recovery
+* filesystem, VFS, or file descriptor behavior
+* device-driver or networking behavior
+* Windows or macOS runtime validation
 * Linux compatibility
 * POSIX compatibility
-* userspace execution
-* process model behavior
-* VFS behavior
-* scheduler maturity
-* file descriptor behavior
-* production readiness
+* production readiness beyond the scoped v1.1.0 release evidence
 
 ---
 
-# 9. Current Active Blocker
+# 9. Release Sequence
 
-No active runtime blocker is recorded for final v1.1.0. The release is
-published and independently download verified.
-Force pushes to `main` are blocked. No broader repository policy is required
-by the final-release scope. The immutable `v1.0.0-rc.1` prerelease and
-`v1.0.0` final release are published. The final hosted assets passed checksum,
-metadata, and downloaded-ISO verification. No reproducible blocker was found
-for the declared release scope.
+KOZO v1.1.0 is the current final release. It is published from exact
+hosted-accepted commit `a5226635be46c687299028b5244f808da67c0984` and was
+independently verified after download.
 
-Post-publication documentation on `main` now routes users, maintainers, and
-engineers through separate paths while preserving the immutable release
-records. This alignment changes no runtime or release artifact.
+v1.0.2 was intentionally skipped. The Fixed User Execution Context and
+Bounded Repeated User Session add runtime capability rather than correct only
+a patch-level defect, so the governed release class is minor rather than
+patch.
 
-The v1.0.0 post-release issue triage reviewed all project-visible GitHub
-issues, Actions runs after publication, repository issue records, the six
-hosted assets, and the downloaded ISO. No user-filed report was present, but
-hosted acceptance exposed `KOZO-TRIAGE-001`: current Odin emits `.o` for a
-suffixless object output, while the accepted helper normalizes only the prior
-path forms. Tagged-source and direct compiler reproductions classify the case
-`BUILD_TOOLING`, `U2`, and `R3`. Current `main` implements the bounded
-normalization correction and focused regression coverage. Local and hosted
-governed verification pass, including the formerly failing release-bundle
-stage. Patch preparation and release gates passed. v1.0.1 is published from
-the exact hosted-accepted commit, and `KOZO-TRIAGE-001` is resolved.
+| Release | Purpose | Required Evidence | Explicit Non-Goals |
+| --- | --- | --- | --- |
+| `v1.0.0-rc.1` | Freeze and publish the first release candidate. | Annotated prerelease tag, six verified assets, checksum and downloaded-ISO validation. | Final-release claim or in-place mutation of tag, notes, or assets. |
+| `v1.0.0` | Publish the governed kernel-foundation baseline. | Hosted CI/lint, 67 checks, QEMU pass, 41 markers, six assets, downloaded checksum and ISO proof. | General userspace, process model, scheduler, filesystem, drivers, or compatibility claims. |
+| `v1.0.1` | Correct `KOZO-TRIAGE-001` at the Odin object-output boundary. | Focused exact/`.o`/`.obj` regressions, hosted release-bundle pass, 67 checks, 41 markers, and six verified assets. | Feature additions, runtime changes, ABI expansion, or in-place repair of v1.0.0. |
+| `v1.1.0` | Publish the Fixed User Execution Context and Bounded Repeated User Session as one final feature release. | Exact commit `a5226635be46c687299028b5244f808da67c0984`; CI `31922319739`; lint `31922319746`; portability `31922319738`; 1,284 Python tests; 67 checks; Linux QEMU pass through 52 ordered markers; two sessions and four `int 0x81` returns; cross-host release-input identity; six assets; pre-upload/download SHA-256 match; downloaded ISO proof. | No process, scheduler, allocator, public ABI expansion, mapping change, interrupt-vector change, third or arbitrary session, Windows/macOS runtime claim, or in-place mutation of prior releases. |
 
-The bounded v1.0.1 post-release observation is complete. It reviewed
-all project-visible issues and post-publication Actions, revalidated the six
-hosted assets, booted the downloaded ISO through all 41 markers, and observed
-the accepted cross-host Odin output boundary against tagged source. No
-qualifying defect was reproduced. v1.0.2 was skipped in favor of the feature
-release v1.1.0.
-
-v1.1.0 Phase 0 established the repository-development gate. Hosted portability
-run `31291100568` passed all three pinned jobs and resolved
-`KOZO-TRIAGE-002`: canonical paths, deterministic textual QEMU evidence, and
-early host diagnostics now work across Linux, Windows, and macOS. Separate CI
-run `31291100579` preserves the Linux runtime result at 67 checks, no failures,
-QEMU pass, and 41 markers.
-
-The historical run left Phase 0 blocked after downloaded host artifacts exposed
-`KOZO-TRIAGE-003`: Windows staged the tracked license files with CRLF bytes,
-so supposedly identical release inputs had different SHA-256 values from
-Linux and macOS even though each host's internal checksum round trip passed.
-No v1.1.0 capability work was authorized while that independently causal
-release-input boundary remained uncorrected.
-
-Portability run `31458972010` validated the bounded correction on all three
-pinned hosts and passed the required aggregate release-input identity gate.
-Linux remains `VALIDATED_RUNTIME`; Windows and macOS are `VALIDATED_BUILD`
-with runtime `NOT_EXECUTED`. Phase 0 is accepted. Phase 0 itself authorized no
-product capability; a later separate task authorized only the Fixed User
-Execution Context implementation.
-
-The **Fixed User Execution Context** definition, governance prerequisites, and
-implementation are complete and hosted accepted on `main`. CI run
-`31563696881`, lint run `31563696973`, and portability run `31563697127`
-preserved 67 governed checks, all 41 markers, the existing ABI, and the
-accepted host evidence levels. The published v1.0.1 release predates this
-implementation. The separately authorized **Bounded Repeated User Session** is
-implemented and hosted accepted on `main` through CI run `31899981058`, lint
-run `31899981084`, and portability run `31899981072`. It completes two
-explicit lifecycles and 52 marker occurrences while retaining 67 governed
-checks. These accepted feature additions are published in v1.1.0; v1.0.2 was
-intentionally skipped. Exact-commit hosted, package, publication, and
-downloaded-artifact gates passed.
-
-Future general-userspace releases must preserve a defined minimum usable
-hardware profile. Additional CPU, memory, and storage should increase capacity
-and performance without making core supported functionality depend on
-high-end development hardware. KOZO does not yet define host or guest resource
-minimums, and this tooling correction introduces none.
+No active release blocker is recorded. Any later capability, patch, or release
+requires a separately scoped and evidenced task.
 
 ---
 
-# 10. Near-Term Runtime Work
+# 10. Current Runtime and Release Gates
 
-The next runtime work must preserve the narrow QEMU serial smoke claim boundary:
+Future work must preserve the accepted v1.1.0 boundary unless a separately
+governed phase changes it:
 
-1. Keep CI evidence summaries and artifact uploads active.
-2. Keep QEMU serial smoke evidence as marker-sequence evidence only.
-3. Keep the v0.6.0 post-smoke terminal halt contract narrow and source-structural.
-4. Use `contracts/runtime_progression_stages.v0.json` as the sole authority for stage order and allowed transitions.
-5. Keep the v0.6.2 runtime progression contract as halt-preservation governance, not a second stage-order definition.
-6. Treat v0.7.4 memory evidence as accepted by the CI validator gate, while preserving the manual-artifact-inspection limitation.
-7. Preserve the accepted v0.7.45 progression/runtime-initialization evidence and the hosted-CI-proven v0.7.5 controlled loop.
-8. Keep the terminal halt path authoritative after the bounded Odin call.
-9. Keep physical memory discovery, general virtual memory management, allocators, heaps, dynamic Odin initialization, and userspace outside the current proof.
-10. Preserve the hosted-accepted v0.8.1 CPU-state boundary before all Odin capability work.
-11. Preserve the hosted-accepted v0.8.3 fixed-mapping boundary, both validators, effective U/S and W^X, and the unchanged runtime suffix.
-12. Preserve the hosted-accepted v0.8.4 fixed `iretq` entry, CPL3 probe, `int 0x81` return, saved-frame validation, fixed continuation, and unchanged runtime suffix.
-13. Preserve hosted-accepted v0.8.5 fixed request geometry, service behavior, and evidence.
-14. Preserve hosted-accepted v0.8.6 response consumption, exact cleanup, and unchanged runtime suffix.
-15. Preserve the hosted-accepted v0.8.7 complete 41-marker transaction and both status-service validators.
-16. Preserve the accepted v0.8.8 package-license correction and v0.8.9 documentation path.
-17. Preserve the accepted v1.0.0-rc.1 tag, hosted artifacts, checksums, runtime
-    evidence, and immutable release record.
-18. Preserve the published v1.0.0 version, documentation, bundle, hosted gate,
-    immutable tag, and hosted asset evidence without in-place mutation.
-19. Preserve the post-publication user, maintainer, and engineering entry paths
-    without making the wiki authoritative over contracts or governance.
-20. Preserve the accepted bounded v1.0.1 correction for `KOZO-TRIAGE-001` at
-    one canonical object-build boundary with its focused failure coverage.
-21. Preserve the immutable v1.0.1 tag, notes, six assets, checksums, and hosted
-    ISO evidence; use a later patch version for any product correction.
-22. Preserve accepted Phase 0 release-input identity on pinned Linux, Windows,
-    and macOS runners, with Linux as the required guest/runtime gate.
-23. Qualify and publish v1.1.0 only from the exact hosted-accepted versioned
-    commit and independently verify the downloaded six-asset release.
-24. Keep arbitrary writes, concurrency, general userspace access, authorization, persistence, AVX/XSAVE context ownership, compatibility, and production readiness outside the current scope.
+1. Preserve exactly one fixed supervisor-owned execution context and its separate non-authoritative result.
+2. Preserve exactly two sequential fixed sessions, distinct opaque identities, four total `int 0x81` returns, and verified inter-session reset.
+3. Preserve fail-closed rejection of a third session, fifth return, stale authority, stale result, or stale transaction storage.
+4. Preserve 67 governed checks and the 52-occurrence runtime sequence ending at `KOZO_RUNTIME_RETURN_OK` unless a separate evidence-governance phase authorizes a change.
+5. Preserve Linux as `VALIDATED_RUNTIME`; preserve Windows 2025 under Git Bash and macOS 15 as `VALIDATED_BUILD` with runtime `NOT_EXECUTED`.
+6. Preserve committed Git blobs as release-input authority and require cross-host release-input identity.
+7. Require exact-commit hosted CI, lint, portability, package, checksum, metadata, and downloaded-artifact validation for every release.
+8. Require the packaged and GitHub-downloaded ISO to reproduce the governed runtime result; a local rebuild is not a substitute for user artifact validation.
+9. Preserve the six-asset release inventory unless a separately governed packaging change explains and validates a different set.
+10. Preserve immutable prior tags, notes, classifications, and hosted assets.
+11. Keep process, scheduler, allocator, loader, filesystem, drivers, networking, general public ABI, and broader runtime-host claims outside scope until separately implemented and proven.
+12. Do not infer a next version or capability merely because v1.1.0 is complete.
 
 ---
 
-# 11. Post-Boot Roadmap
+# 11. Change Justification: v1.1.0 Instead of v1.0.2
 
-After CI QEMU serial smoke evidence is green, resume deferred maturity work:
+v1.0.2 would have represented another patch-only correction to the v1.0.x
+line. The accepted post-v1.0.1 work instead added two bounded runtime
+capabilities:
 
-* accept runtime progression entry evidence through CI
-* accept bounded runtime initialization evidence through CI
-* accept first governed runtime capability evidence through hosted CI
-* split QEMU smoke script policy from metadata rendering
-* split large validator coverage implementation layers
-* define ABI/syscall expansion rules
-* strengthen security boundary implementation evidence
+* a Fixed User Execution Context with explicit identity, lifecycle, result, and cleanup;
+* a Bounded Repeated User Session with exactly two sessions, fresh identity, verified reset, and four total user-to-kernel returns.
+
+Those additions expand what KOZO can execute while preserving the existing
+public and internal fixed transaction geometry. They therefore justify the
+minor release `v1.1.0`, not a patch release `v1.0.2`.
+
+No `v1.0.2` tag or GitHub release was created. This classification does not
+claim a process model, scheduler, allocator, general userspace, or public ABI
+expansion.
 
 ---
 
 # 12. Deferred Work
 
-Deferred until separately scoped runtime or cleanup phases:
+Deferred until separately scoped and proven:
 
-* ABI versioning expansion
-* syscall expansion process changes
-* new runtime subsystems
-* hardware trap execution work
-* broader boot lifecycle claims
+* a third, arbitrary, persistent, or concurrent user session
+* process identity and process lifecycle
+* scheduler, timer, preemption, and context switching
+* physical-frame allocation, heap allocation, and dynamic virtual memory
+* executable loading and general-purpose userspace
+* public or expanded syscall ABI
+* filesystem, VFS, and file descriptor behavior
+* device drivers and networking
+* Windows or macOS runtime validation
+* Linux compatibility and POSIX completeness
+* stable public ABI guarantees
+* evidence-backed minimum CPU, RAM, and storage profiles
+* production readiness beyond the scoped v1.1.0 release evidence
 
 ---
 
@@ -345,28 +314,33 @@ Deferred until separately scoped runtime or cleanup phases:
 | `v0.8.9` | Documentation and Adoption Readiness | Add a user-first wiki, maintainer path, engineering overview, terminology guide, documentation audit, and focused comment cleanup. | Runtime features, documentation frameworks, publication, compatibility, complete release readiness. |
 | `v1.0.0-rc.1` | Published release candidate | Freeze scope and gates, publish the accepted immutable prerelease, and verify the distributed artifacts and user path. | In-place tag, note, or asset changes; new feature scope after RC. |
 | `v1.0.0` | Final kernel-foundation release | Publish the accepted governed kernel foundation with final versioning, evidence, and immutable assets. | Any unimplemented compatibility or runtime subsystem claim; any in-place mutation of the final tag or assets. |
+| `v1.0.1` | Odin object-output compatibility patch | Normalize supported exact, `.o`, and legacy `.obj` object outputs at one fail-closed compiler boundary and publish the verified correction. | Runtime capability additions, ABI changes, platform-specific exceptions, or in-place mutation of v1.0.0. |
 | `post-Phase-0 definition` | Fixed User Execution Context | Define one supervisor-only identity and lifecycle that binds the accepted fixed user execution path without implementing it. | Runtime implementation, repeated sessions, processes, scheduling, dynamic memory, ABI expansion, version authorization, or release. |
 | `post-Phase-0 prerequisites` | Fixed User Execution Context Governance | Adopt exact ownership, lifecycle, result, cleanup, transition-budget, progression, and evidence authority before runtime implementation. | Runtime implementation, marker/check-count changes, repeated sessions, public ABI, version authorization, or release. |
 | `post-Phase-0 implementation` | Fixed User Execution Context Implementation | Add one static supervisor-owned lifecycle around the accepted fixed transaction and prove cleanup without changing markers or ABI. | Repeated sessions, processes, scheduling, dynamic allocation, marker/check-count changes, version authorization, or release. |
 | `post-context implementation` | Bounded Repeated User Session | Reuse the one static context for exactly two independent fixed sessions after verified reset. | Third or arbitrary sessions, processes, scheduling, dynamic allocation, ABI expansion, version authorization, or release. |
+| `v1.1.0` | Fixed-context and bounded-session feature release | Publish exact hosted-accepted commit `a5226635be46c687299028b5244f808da67c0984` with 1,284 tests, 67 governed checks, Linux QEMU through 52 markers, two sessions, four `int 0x81` returns, all pinned host build gates, cross-host release-input identity, six assets, pre-upload/download SHA-256 identity, and downloaded-ISO proof. | No process, scheduler, allocator, public ABI expansion, mapping changes, interrupt-vector changes, third or arbitrary session, Windows/macOS runtime claim, or mutation of prior releases. |
 
 ---
 
 # 14. Release Gates
 
-Required gates:
+Required gates for any release after v1.1.0:
 
-* `scripts/verify.sh` passes.
-* Unit discovery passes.
-* Odin check/build passes.
-* Pinned Rust cargo check passes.
-* Generated reports are current.
-* `artifacts/latest_verify.json` is valid and passing.
-* Branch protection checks are green.
-* Release checklist is complete.
-* Required checks policy is satisfied.
-* Release evidence bundle is present.
-* Compatibility claims are scoped and accurate.
+* `release/version.txt` and all current release metadata agree.
+* `scripts/verify.sh` passes with the governed check count and expected runtime sequence.
+* Unit discovery passes; v1.1.0 established a 1,284-test release baseline.
+* Odin check/build, Cargo check, cargo-deny, and cargo-audit pass.
+* The fixed execution context and exactly two repeated sessions validate, including four total `int 0x81` returns and fail-closed rejection of a third session or fifth return.
+* Linux QEMU passes through 52 ordered marker occurrences ending at `KOZO_RUNTIME_RETURN_OK`, unless a separately governed release changes the evidence contract.
+* The pinned Linux, Windows, and macOS build matrix passes; runtime claims remain evidence-tiered.
+* Cross-host release-input identity passes using committed Git blobs as authority.
+* Generated reports and `artifacts/latest_verify.json` are current, valid, and passing.
+* The governed release bundle contains the expected asset inventory, licenses, metadata, and checksum manifest.
+* Pre-upload and fresh GitHub-download SHA-256 values match for every asset.
+* The GitHub-downloaded ISO reproduces the accepted runtime result on the governed runtime host.
+* Prior release tags, notes, classifications, and assets remain immutable.
+* Compatibility and product claims remain limited to demonstrated behavior.
 
 ---
 
@@ -374,16 +348,20 @@ Required gates:
 
 Release evidence must include:
 
-* verification artifact
-* verification logs
-* generated syscall surface report
-* generated ABI surface report
-* generated governance index
-* checked-in contracts and schemas
-* changelog and release notes
-* phase map and roadmap
-* CI status or run URLs when available
-* known non-goals
+* exact release version, annotated tag object, and target commit
+* hosted CI, lint, and portability run identities
+* full verification artifact and logs
+* generated syscall, ABI, ELF, and governance reports required by the release
+* checked-in contracts, schemas, changelog, phase map, and roadmap
+* Fixed User Execution Context lifecycle, storage, cleanup, and result evidence where applicable
+* Bounded Repeated User Session evidence for exactly two sessions, four returns, reset validation, and marker occurrence counts where applicable
+* Linux runtime evidence and separate Windows/macOS build evidence
+* cross-host release-input identity evidence
+* release bundle inventory, license files, metadata, and `SHA256SUMS`
+* pre-upload artifact digests
+* fresh GitHub-download asset digests and checksum validation
+* downloaded-ISO QEMU evidence
+* known limits and explicit non-goals
 
 Detailed evidence ownership is defined in `docs/RELEASE_EVIDENCE.md`.
 
@@ -393,14 +371,16 @@ Detailed evidence ownership is defined in `docs/RELEASE_EVIDENCE.md`.
 
 Deferred until separately scoped and proven:
 
-* hardware syscall or interrupt transition path
-* general userspace execution
-* process lifecycle
-* scheduler maturity
-* VFS behavior
-* file descriptor behavior
-* ELF loading
-* Linux compatibility
-* POSIX completeness
-* stable public ABI guarantee
+* third, arbitrary, persistent, or concurrent user sessions
+* process lifecycle and scheduling
+* timer, preemption, and general context switching
+* physical-frame allocation, heap allocation, and dynamic virtual memory
+* executable loading and general userspace
+* public syscall or interrupt-interface expansion
+* filesystem, VFS, and file descriptor behavior
+* device drivers and networking
+* Windows and macOS runtime validation
+* Linux compatibility and POSIX completeness
+* stable public ABI guarantees
+* evidence-backed minimum hardware profiles
 * production readiness beyond scoped release evidence
