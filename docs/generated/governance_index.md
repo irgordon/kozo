@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 67
 * Failed checks: 0
-* Run ID: `verify-20260818T004634Z`
-* Generated at: `2026-08-18T00:46:34Z`
+* Run ID: `verify-20261015T190842Z`
+* Generated at: `2026-10-15T19:08:42Z`
 
 ## Registered validators
 
@@ -110,6 +110,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | `contracts/fixed_user_execution_context_contract.v0.json` | `0` | fixed user execution context contract.v0 |
 | `contracts/fixed_user_mapping_foundation.v0.json` | `0` | fixed user mapping foundation.v0 |
 | `contracts/fixed_user_request_boundary_contract.v0.json` | `0` | fixed user request boundary contract.v0 |
+| `contracts/fixed_user_request_boundary_contract.v1.json` | `1` | fixed user request boundary contract.v1 |
 | `contracts/fixed_user_runtime_status_service_contract.v0.json` | `0` | fixed user runtime status service contract.v0 |
 | `contracts/kozo_abi_manifest.json` | `0` | ABI manifest |
 | `contracts/memory_initialization_evidence_contract.v0.json` | `0` | memory initialization evidence contract.v0 |
@@ -139,6 +140,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | `schemas/fixed_user_execution_context_contract.schema.json` | KOZO fixed user execution context governance contract |
 | `schemas/fixed_user_mapping_foundation.schema.json` | KOZO fixed user-mapping foundation contract |
 | `schemas/fixed_user_request_boundary_contract.schema.json` | KOZO fixed user request boundary contract |
+| `schemas/fixed_user_request_boundary_contract.v1.schema.json` | fixed_user_request_boundary_contract.v1.schema.json |
 | `schemas/fixed_user_runtime_status_service_contract.schema.json` | KOZO fixed user runtime status service contract |
 | `schemas/kozo_abi_manifest.schema.json` | kozo_abi_manifest.schema.json |
 | `schemas/latest_verify.schema.json` | latest_verify.schema.json |
