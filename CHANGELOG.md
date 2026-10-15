@@ -11,6 +11,9 @@
   negative QEMU controls without changing the 52-marker success sequence.
 * Preserve historical assembly tests and all immutable published releases.
   No product version is advanced.
+* Correct the Rust adapter ELF evidence to use bounded addresses rather than
+  GNU/LLVM symbol-label selection, retaining exact call-target checks and
+  recording the original failed hosted run `38805988627`.
 
 ## Bounded User Argument Service - 2026-10-15
 

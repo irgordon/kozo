@@ -1032,11 +1032,22 @@ def bounded_privilege_transition_record(
 def rust_user_execution_record(kernel_elf):
     instruction_sets = {name: parse_disassembly_instructions(disassemble_symbol(kernel_elf, name))
                         for name in ENTRYPOINTS}
-    symbols = symbol_addresses(kernel_elf, ENTRYPOINTS)
-    calls = {adapter: _calls_address(
-        parse_disassembly_instructions(disassemble_symbol(kernel_elf, adapter)), symbols.get(entry))
-        for adapter, entry in zip(('user_privilege_probe_start', 'user_response_consumer_start'), ENTRYPOINTS)}
+    symbols = symbol_addresses(kernel_elf, (*ENTRYPOINTS, 'user_privilege_probe_start',
+                               'user_privilege_probe_end', 'user_response_consumer_start',
+                               'user_response_consumer_end'))
+    calls = rust_adapter_call_record(run_text_command(['objdump', '-d', str(kernel_elf)]), symbols)
     return object_record(Path(__file__).resolve().parents[1], kernel_elf, instruction_sets) | {'adapter_calls': calls}
+
+
+def rust_adapter_call_record(disassembly, symbols):
+    adapters = (('user_privilege_probe_start', 'user_privilege_probe_end', ENTRYPOINTS[0]),
+                ('user_response_consumer_start', 'user_response_consumer_end', ENTRYPOINTS[1]))
+    calls = {}
+    for start, end, entry in adapters:
+        bounded = extract_function_disassembly(disassembly, symbols.get(start), symbols.get(end))
+        instructions = [(item.address, item.mnemonic, item.operands) for item in bounded]
+        calls[start] = _calls_address(instructions, symbols.get(entry))
+    return calls
 
 
 def fixed_user_request_boundary_record(

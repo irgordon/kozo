@@ -19,6 +19,28 @@ CONSUMER_SYMBOLS = {
 
 
 class KernelElfReportTests(unittest.TestCase):
+    def test_rust_adapter_calls_ignore_gnu_alias_labels(self):
+        self.assertEqual(kernel_elf_report.rust_adapter_call_record(rust_adapter_fixture('user_probe_code_start'),
+                         rust_adapter_symbols()),
+                         {'user_privilege_probe_start': True, 'user_response_consumer_start': True})
+
+    def test_rust_adapter_calls_accept_llvm_alias_labels(self):
+        fixture = rust_adapter_fixture('user_privilege_probe_start').replace('call ', 'callq ')
+        self.assertTrue(all(kernel_elf_report.rust_adapter_call_record(fixture, rust_adapter_symbols()).values()))
+
+    def test_rust_adapter_must_call_the_exact_entrypoint(self):
+        fixture = rust_adapter_fixture('unrelated_alias').replace('10000100 <rust_request>', '10000200 <different_target>')
+        self.assertFalse(kernel_elf_report.rust_adapter_call_record(fixture, rust_adapter_symbols())['user_privilege_probe_start'])
+
+    def test_rust_call_outside_adapter_cannot_satisfy_evidence(self):
+        fixture = rust_adapter_fixture('unrelated_alias').replace('10000000: e8', '10000010: e8')
+        self.assertFalse(kernel_elf_report.rust_adapter_call_record(fixture, rust_adapter_symbols())['user_privilege_probe_start'])
+
+    def test_missing_rust_adapter_bounds_fail_closed(self):
+        symbols = rust_adapter_symbols()
+        del symbols['user_privilege_probe_end']
+        self.assertFalse(kernel_elf_report.rust_adapter_call_record(rust_adapter_fixture('alias'), symbols)['user_privilege_probe_start'])
+
     def test_symbol_sections_parse_bss_from_gnu_and_llvm_shapes(self):
         output = (
             "ffffffff80216120 g       .bss 0000000000000000 fixed_user_context\n"
@@ -234,6 +256,19 @@ class KernelElfReportTests(unittest.TestCase):
         self.assertEqual(evidence["ring3_response_success_store_count"], 8)
         self.assertTrue(evidence["ring3_response_second_interrupt_present"])
         self.assertTrue(evidence["ring3_response_order_valid"])
+
+
+def rust_adapter_fixture(alias):
+    return (f'0000000010000000 <{alias}>:\n'
+            '    10000000: e8 fb 00 00 00 call 10000100 <rust_request>\n'
+            '0000000020000000 <response_alias>:\n'
+            '    20000000: e8 fb 00 00 00 call 20000100 <rust_response>\n')
+
+
+def rust_adapter_symbols():
+    return {'user_privilege_probe_start': 0x10000000, 'user_privilege_probe_end': 0x10000010,
+            'user_response_consumer_start': 0x20000000, 'user_response_consumer_end': 0x20000010,
+            'kozo_rust_user_request_entry': 0x10000100, 'kozo_rust_user_response_entry': 0x20000100}
 
 
 if __name__ == "__main__":
