@@ -354,4 +354,7 @@ the exact stack on return, restore governed flags and issue the fixed
 interrupt. Kernel frame checks retain exact RIP, RSP, selectors and flags.
 The linker places adapters and closed Rust code in the same existing RX page;
 there is no loader, process, allocator, new mapping or general userspace ABI.
-Main implementation is under validation; immutable v1.1.0 predates it.
+The implementation is hosted accepted on main by CI `38809437466`, lint
+`38809437455`, and portability `38809437557`. Independently downloaded
+Actions artifacts boot through both sessions and four CPL3 returns.
+Immutable v1.1.0 predates this implementation; no release is created here.

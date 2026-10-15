@@ -2,7 +2,7 @@
 
 ## First Bounded Rust Userspace Execution - 2026-10-15
 
-**Status:** Implemented locally; hosted acceptance pending. Not in v1.1.0.
+**Status:** Implemented and hosted accepted on main. Not in published v1.1.0.
 
 * Compile a separate pinned `no_std` Rust object for the fixed CPL3 page.
 * Move request construction and full response consumption into Rust while
@@ -17,6 +17,14 @@
 * Correct relative control-fixture ISO paths at the subprocess boundary after
   run `38807624959` passed runtime packaging but rejected every control for a
   missing ISO. Keep all nine controls required and preserve failure evidence.
+* CI `38809437466`, lint `38809437455`, and portability `38809437557`
+  validate the implementation: 1,326 tests, 67/0 checks, nine guest controls,
+  two sessions, four returns and 52 markers. Independently downloaded checksums,
+  source/object/ELF evidence, ISO kernel contents and a fresh downloaded-ISO
+  boot pass. Windows and macOS remain build-only validation environments.
+* Preserve the failed proof snapshot `d84ecb1` in history; regenerate qualified
+  proof in `e596e55` after an unchanged full verifier run outside the execution
+  sandbox. No runtime rule, timeout, release, tag or hosted asset was changed.
 
 ## Bounded User Argument Service - 2026-10-15
 

@@ -5,8 +5,10 @@ Status: Planning
 Scope: Release phase sequencing for the path to a scoped KOZO v1.0.0
 
 Post-v1.1.0 capability: First Bounded Rust Userspace Execution is implemented
-locally and pending hosted acceptance. The published release remains v1.1.0;
-no new release or subsequent capability is authorized by this phase.
+and hosted accepted on main. CI `38809437466`, lint `38809437455`, and
+portability `38809437557` pass, including downloaded artifact validation.
+The published release remains v1.1.0; no new release or subsequent capability
+is authorized by this phase.
 
 ---
 
