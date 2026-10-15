@@ -22,8 +22,8 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 * Summary code: `OK`
 * Total checks: 67
 * Failed checks: 0
-* Run ID: `verify-20261015T192121Z`
-* Generated at: `2026-10-15T19:21:21Z`
+* Run ID: `verify-20261015T205042Z`
+* Generated at: `2026-10-15T20:50:42Z`
 
 ## Registered validators
 
@@ -107,6 +107,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | `contracts/controlled_runtime_loop_contract.v0.json` | `0` | controlled runtime loop contract.v0 |
 | `contracts/cpu_extended_state_initialization_contract.v0.json` | `0` | cpu extended state initialization contract.v0 |
 | `contracts/first_governed_runtime_capability.v0.json` | `0` | first governed runtime capability.v0 |
+| `contracts/fixed_rust_user_execution_contract.v0.json` | `0` | fixed rust user execution contract.v0 |
 | `contracts/fixed_user_execution_context_contract.v0.json` | `0` | fixed user execution context contract.v0 |
 | `contracts/fixed_user_mapping_foundation.v0.json` | `0` | fixed user mapping foundation.v0 |
 | `contracts/fixed_user_request_boundary_contract.v0.json` | `0` | fixed user request boundary contract.v0 |
@@ -137,6 +138,7 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 | `schemas/controlled_runtime_loop_contract.schema.json` | KOZO controlled runtime loop contract |
 | `schemas/cpu_extended_state_initialization_contract.schema.json` | KOZO CPU extended-state initialization contract |
 | `schemas/first_governed_runtime_capability.schema.json` | KOZO first governed runtime capability |
+| `schemas/fixed_rust_user_execution_contract.schema.json` | fixed_rust_user_execution_contract.schema.json |
 | `schemas/fixed_user_execution_context_contract.schema.json` | KOZO fixed user execution context governance contract |
 | `schemas/fixed_user_mapping_foundation.schema.json` | KOZO fixed user-mapping foundation contract |
 | `schemas/fixed_user_request_boundary_contract.schema.json` | KOZO fixed user request boundary contract |
