@@ -1,12 +1,12 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20261015T210710Z",
-  "status": "pass",
-  "summary_code": "OK",
-  "summary_subsystem": "generic",
+  "run_id": "verify-20261015T212037Z",
+  "status": "fail",
+  "summary_code": "RUNTIME_PROGRESSION_EVIDENCE_INVALID",
+  "summary_subsystem": "runtime_progression_evidence",
   "summary": {
     "total_checks": 67,
-    "failed_check_count": 0
+    "failed_check_count": 13
   },
   "checks": [
     {
@@ -229,9 +229,9 @@
     {
       "name": "runtime_progression_evidence",
       "subsystem": "runtime_progression_evidence",
-      "status": "pass",
-      "code": "OK",
-      "detail": "Runtime progression evidence aligns the bounded assembly-to-Odin call with symbols, markers, stages, and halt"
+      "status": "fail",
+      "code": "RUNTIME_PROGRESSION_EVIDENCE_INVALID",
+      "detail": "Runtime progression requires passing QEMU evidence or an allowed local tooling blocker"
     },
     {
       "name": "runtime_progression_stages",
@@ -250,9 +250,9 @@
     {
       "name": "stack_initialization_evidence",
       "subsystem": "stack_initialization_evidence",
-      "status": "pass",
-      "code": "OK",
-      "detail": "Stack initialization evidence is aligned with the controlled boot stack marker path"
+      "status": "fail",
+      "code": "STACK_INITIALIZATION_EVIDENCE_INVALID",
+      "detail": "Stack initialization evidence requires passing QEMU smoke or a local tooling blocker"
     },
     {
       "name": "memory_initialization_evidence_contract",
@@ -264,9 +264,9 @@
     {
       "name": "memory_initialization_evidence",
       "subsystem": "memory_initialization_evidence",
-      "status": "pass",
-      "code": "OK",
-      "detail": "Memory initialization evidence matches the controlled region, probe, marker, and halt path"
+      "status": "fail",
+      "code": "MEMORY_INITIALIZATION_EVIDENCE_INVALID",
+      "detail": "Memory evidence requires passing QEMU evidence or an allowed local tooling blocker"
     },
     {
       "name": "controlled_runtime_loop_contract",
@@ -278,9 +278,9 @@
     {
       "name": "controlled_runtime_loop_evidence",
       "subsystem": "controlled_runtime_loop_evidence",
-      "status": "pass",
-      "code": "OK",
-      "detail": "Controlled runtime loop evidence aligns bounded Odin state, ELF control flow, ordered markers, status, and terminal halt"
+      "status": "fail",
+      "code": "CONTROLLED_RUNTIME_LOOP_EVIDENCE_INVALID",
+      "detail": "Controlled loop requires passing QEMU evidence or an allowed local tooling blocker"
     },
     {
       "name": "first_governed_runtime_capability",
@@ -292,9 +292,9 @@
     {
       "name": "first_governed_runtime_capability_evidence",
       "subsystem": "first_governed_runtime_capability_evidence",
-      "status": "pass",
-      "code": "OK",
-      "detail": "First governed runtime capability aligns request validation, dispatch, response proof, markers, ELF symbols, stages, and halt"
+      "status": "fail",
+      "code": "FIRST_GOVERNED_RUNTIME_CAPABILITY_EVIDENCE_INVALID",
+      "detail": "First capability requires passing QEMU evidence or an allowed local tooling blocker"
     },
     {
       "name": "cpu_extended_state_initialization_contract",
@@ -306,9 +306,9 @@
     {
       "name": "cpu_extended_state_initialization_evidence",
       "subsystem": "cpu_extended_state_initialization_evidence",
-      "status": "pass",
-      "code": "OK",
-      "detail": "CPU extended-state initialization is aligned across source, ELF, and runtime evidence"
+      "status": "fail",
+      "code": "CPU_EXTENDED_STATE_INITIALIZATION_EVIDENCE_INVALID",
+      "detail": "CPU state evidence requires passing QEMU evidence or an allowed local tooling blocker"
     },
     {
       "name": "fixed_user_mapping_foundation",
@@ -320,9 +320,9 @@
     {
       "name": "fixed_user_mapping_foundation_evidence",
       "subsystem": "fixed_user_mapping_foundation_evidence",
-      "status": "pass",
-      "code": "OK",
-      "detail": "Fixed user mappings align across contract, source, ELF, and QEMU evidence"
+      "status": "fail",
+      "code": "FIXED_USER_MAPPING_FOUNDATION_EVIDENCE_INVALID",
+      "detail": "QEMU metadata must contain the full governed marker sequence"
     },
     {
       "name": "bounded_privilege_transition_probe_contract",
@@ -334,9 +334,9 @@
     {
       "name": "bounded_privilege_transition_probe_evidence",
       "subsystem": "bounded_privilege_transition_probe_evidence",
-      "status": "pass",
-      "code": "OK",
-      "detail": "One fixed CPL3 excursion and TSS-backed Ring0 return align across source, ELF, and QEMU evidence"
+      "status": "fail",
+      "code": "BOUNDED_PRIVILEGE_TRANSITION_PROBE_EVIDENCE_INVALID",
+      "detail": "QEMU must pass the full governed marker sequence"
     },
     {
       "name": "fixed_user_request_boundary_contract",
@@ -348,9 +348,9 @@
     {
       "name": "fixed_user_request_boundary_evidence",
       "subsystem": "fixed_user_request_boundary_evidence",
-      "status": "pass",
-      "code": "OK",
-      "detail": "One exact Ring3 request and Ring0 response transaction aligns across source, ELF, and QEMU evidence"
+      "status": "fail",
+      "code": "FIXED_USER_REQUEST_BOUNDARY_EVIDENCE_INVALID",
+      "detail": "QEMU must pass the complete governed marker sequence"
     },
     {
       "name": "bounded_user_response_consumption_contract",
@@ -362,9 +362,9 @@
     {
       "name": "bounded_user_response_consumption_evidence",
       "subsystem": "bounded_user_response_consumption_evidence",
-      "status": "pass",
-      "code": "OK",
-      "detail": "One fixed Ring3 response consumer and second int 0x81 transaction align across source, ELF, and QEMU"
+      "status": "fail",
+      "code": "BOUNDED_USER_RESPONSE_CONSUMPTION_EVIDENCE_INVALID",
+      "detail": "QEMU must pass the complete governed marker sequence"
     },
     {
       "name": "fixed_user_runtime_status_service_contract",
@@ -376,9 +376,9 @@
     {
       "name": "fixed_user_runtime_status_service_evidence",
       "subsystem": "fixed_user_runtime_status_service_evidence",
-      "status": "pass",
-      "code": "OK",
-      "detail": "Post-loop user status transaction, shared snapshot, internal capability, and QEMU evidence agree"
+      "status": "fail",
+      "code": "FIXED_USER_RUNTIME_STATUS_SERVICE_EVIDENCE_INVALID",
+      "detail": "QEMU status transaction evidence must pass without a blocker"
     },
     {
       "name": "runtime_state_transition_capability",
@@ -390,9 +390,9 @@
     {
       "name": "runtime_state_transition_capability_evidence",
       "subsystem": "runtime_state_transition_capability_evidence",
-      "status": "pass",
-      "code": "OK",
-      "detail": "Runtime state transition evidence aligns bounded volatile mutation, response proof, markers, ELF, first capability, and halt"
+      "status": "fail",
+      "code": "RUNTIME_STATE_TRANSITION_CAPABILITY_EVIDENCE_INVALID",
+      "detail": "State transition requires passing QEMU evidence or an allowed local tooling blocker"
     },
     {
       "name": "boot_blocker_report",
@@ -432,9 +432,9 @@
     {
       "name": "kernel_loadability",
       "subsystem": "kernel_loadability",
-      "status": "pass",
-      "code": "OK",
-      "detail": "Kernel ELF loadability report proves entry, architecture, and PT_LOAD structure without claiming boot"
+      "status": "fail",
+      "code": "KERNEL_LOADABILITY_INVALID",
+      "detail": "Boot blocker report must preserve the external load blocker when the kernel ELF itself is structurally loadable"
     },
     {
       "name": "host_dependency_portability",
@@ -491,11 +491,103 @@
       "detail": "Evidence file references resolve on disk"
     }
   ],
-  "failed_checks": [],
+  "failed_checks": [
+    {
+      "name": "runtime_progression_evidence",
+      "subsystem": "runtime_progression_evidence",
+      "code": "RUNTIME_PROGRESSION_EVIDENCE_INVALID",
+      "detail": "Runtime progression requires passing QEMU evidence or an allowed local tooling blocker",
+      "action": "Keep runtime progression source, ELF symbols, QEMU evidence, stage status, and terminal halt aligned"
+    },
+    {
+      "name": "stack_initialization_evidence",
+      "subsystem": "stack_initialization_evidence",
+      "code": "STACK_INITIALIZATION_EVIDENCE_INVALID",
+      "detail": "Stack initialization evidence requires passing QEMU smoke or a local tooling blocker",
+      "action": "Keep stack initialization evidence aligned with the controlled stack marker path"
+    },
+    {
+      "name": "memory_initialization_evidence",
+      "subsystem": "memory_initialization_evidence",
+      "code": "MEMORY_INITIALIZATION_EVIDENCE_INVALID",
+      "detail": "Memory evidence requires passing QEMU evidence or an allowed local tooling blocker",
+      "action": "Keep memory initialization evidence aligned with the governed static-region runtime path"
+    },
+    {
+      "name": "controlled_runtime_loop_evidence",
+      "subsystem": "controlled_runtime_loop_evidence",
+      "code": "CONTROLLED_RUNTIME_LOOP_EVIDENCE_INVALID",
+      "detail": "Controlled loop requires passing QEMU evidence or an allowed local tooling blocker",
+      "action": "Keep controlled loop contract, Odin state, ELF control flow, QEMU evidence, stage status, and terminal halt aligned"
+    },
+    {
+      "name": "first_governed_runtime_capability_evidence",
+      "subsystem": "first_governed_runtime_capability_evidence",
+      "code": "FIRST_GOVERNED_RUNTIME_CAPABILITY_EVIDENCE_INVALID",
+      "detail": "First capability requires passing QEMU evidence or an allowed local tooling blocker",
+      "action": "Keep first capability contract, source, ELF, QEMU evidence, stages, and halt continuation aligned"
+    },
+    {
+      "name": "cpu_extended_state_initialization_evidence",
+      "subsystem": "cpu_extended_state_initialization_evidence",
+      "code": "CPU_EXTENDED_STATE_INITIALIZATION_EVIDENCE_INVALID",
+      "detail": "CPU state evidence requires passing QEMU evidence or an allowed local tooling blocker",
+      "action": "Keep pre-Odin CPU state source, ELF evidence, QEMU markers, AVX prohibition, and halt convergence aligned"
+    },
+    {
+      "name": "fixed_user_mapping_foundation_evidence",
+      "subsystem": "fixed_user_mapping_foundation_evidence",
+      "code": "FIXED_USER_MAPPING_FOUNDATION_EVIDENCE_INVALID",
+      "detail": "QEMU metadata must contain the full governed marker sequence",
+      "action": "Regenerate fixed user-mapping source, ELF, and QEMU evidence without weakening paging policy"
+    },
+    {
+      "name": "bounded_privilege_transition_probe_evidence",
+      "subsystem": "bounded_privilege_transition_probe_evidence",
+      "code": "BOUNDED_PRIVILEGE_TRANSITION_PROBE_EVIDENCE_INVALID",
+      "detail": "QEMU must pass the full governed marker sequence",
+      "action": "Regenerate bounded privilege-transition source, ELF, and QEMU evidence without broadening the boundary"
+    },
+    {
+      "name": "fixed_user_request_boundary_evidence",
+      "subsystem": "fixed_user_request_boundary_evidence",
+      "code": "FIXED_USER_REQUEST_BOUNDARY_EVIDENCE_INVALID",
+      "detail": "QEMU must pass the complete governed marker sequence",
+      "action": "Regenerate fixed request source, ELF, and QEMU evidence without broadening the boundary"
+    },
+    {
+      "name": "bounded_user_response_consumption_evidence",
+      "subsystem": "bounded_user_response_consumption_evidence",
+      "code": "BOUNDED_USER_RESPONSE_CONSUMPTION_EVIDENCE_INVALID",
+      "detail": "QEMU must pass the complete governed marker sequence",
+      "action": "Regenerate bounded response-consumption source, ELF, and QEMU evidence without broadening the transaction"
+    },
+    {
+      "name": "fixed_user_runtime_status_service_evidence",
+      "subsystem": "fixed_user_runtime_status_service_evidence",
+      "code": "FIXED_USER_RUNTIME_STATUS_SERVICE_EVIDENCE_INVALID",
+      "detail": "QEMU status transaction evidence must pass without a blocker",
+      "action": "Restore post-loop ordering, shared runtime status ownership, fixed response validation, and QEMU evidence"
+    },
+    {
+      "name": "runtime_state_transition_capability_evidence",
+      "subsystem": "runtime_state_transition_capability_evidence",
+      "code": "RUNTIME_STATE_TRANSITION_CAPABILITY_EVIDENCE_INVALID",
+      "detail": "State transition requires passing QEMU evidence or an allowed local tooling blocker",
+      "action": "Keep state transition contract, source, ELF, QEMU, first capability, runtime return, and halt evidence aligned"
+    },
+    {
+      "name": "kernel_loadability",
+      "subsystem": "kernel_loadability",
+      "code": "KERNEL_LOADABILITY_INVALID",
+      "detail": "Boot blocker report must preserve the external load blocker when the kernel ELF itself is structurally loadable",
+      "action": "Run scripts/build_boot_image.sh and keep kernel ELF loadability evidence aligned with the boot blocker report"
+    }
+  ],
   "changed_files": [
-    "scripts/kernel_elf_report.py",
-    "tasks/todo.json",
-    "tests/test_kernel_elf_report.py"
+    "artifacts/runtime/kernel_elf_report.json",
+    "artifacts/runtime/qemu_smoke.summary.txt",
+    "docs/generated/governance_index.md"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -512,5 +604,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-10-15T21:07:10Z"
+  "generated_at": "2026-10-15T21:20:37Z"
 }

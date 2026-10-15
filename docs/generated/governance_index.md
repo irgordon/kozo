@@ -18,12 +18,12 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Verification status
 
-* Status: `pass`
-* Summary code: `OK`
+* Status: `fail`
+* Summary code: `RUNTIME_PROGRESSION_EVIDENCE_INVALID`
 * Total checks: 67
-* Failed checks: 0
-* Run ID: `verify-20261015T210710Z`
-* Generated at: `2026-10-15T21:07:10Z`
+* Failed checks: 13
+* Run ID: `verify-20261015T212037Z`
+* Generated at: `2026-10-15T21:20:37Z`
 
 ## Registered validators
 
@@ -172,9 +172,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 ## Latest proof artifact
 
 * Path: `artifacts/latest_verify.json`
-* Status: `pass`
+* Status: `fail`
 * Check count: 67
-* Failure count: 0
+* Failure count: 13
 
 ## Non-goals
 

@@ -1049,7 +1049,7 @@
     "result_validator_present": true
   },
   "fixed_rust_user_execution": {
-    "source_sha256": "d83b8e9ec706d4d71c493e0ad1c9579ec2545efc3efb4b98ee518f1790f213de",
+    "source_sha256": "ae6d5103f64756e8e0c3bc3c359eec020288a5d36d44a3c037ddd788392c8bc1",
     "object": {
       "architecture": "x86_64",
       "allocated_bytes": 480,
