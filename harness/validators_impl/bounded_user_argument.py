@@ -12,6 +12,10 @@ def argument_evidence_issue(context):
     issue = validate_argument_sources(context.privilege, context.layout, service)
     if issue is not None:
         return issue
+    from harness.fixed_rust_user_evidence import current_execution_issue
+    detail = current_execution_issue(ROOT, context.report)
+    if detail:
+        return ('argument_boundary_invalid', 'argument.rust', detail)
     return validate_argument_elf(context.report.get('bounded_user_argument', {}))
 
 
@@ -32,7 +36,7 @@ def validate_argument_elf(evidence):
 
 
 def argument_source_rules(privilege, layout, service):
-    return (
+    rules = (
         ('layout', layout, ('%define FIXED_USER_RESPONSE_SIZE 96',
                            '%define FIXED_USER_REQUEST_VERSION 2',
                            '%define FIXED_USER_ARGUMENT_MAX 65535')),
@@ -78,6 +82,9 @@ def argument_source_rules(privilege, layout, service):
           'call fixed_user_buffers_are_zero', 'mov rdi, FIXED_USER_DATA_SCRATCH_VA',
           'call fixed_qword_span_is_zero')),
     )
+    if 'call kozo_rust_user_request_entry' in privilege:
+        return tuple(rule for rule in rules if rule[0] not in ('construction', 'consumer'))
+    return rules
 
 
 def ordered_tokens_present(source, tokens):

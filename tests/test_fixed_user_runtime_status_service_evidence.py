@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
+from tests.fixed_user_assembly_fixture import historical_user_assembly, historical_elf_report
 from pathlib import Path
 
 from harness.codes import FIXED_USER_RUNTIME_STATUS_SERVICE_EVIDENCE_INVALID, OK
@@ -422,6 +423,8 @@ class FixedUserRuntimeStatusServiceEvidenceTests(unittest.TestCase):
             }
             for name, source in text_sources.items():
                 text = source.read_text()
+                if name == "privilege":
+                    text = historical_user_assembly(text)
                 mutate = mutations.get(name)
                 paths[name].write_text(mutate(text) if mutate else text)
             self.write_json_fixture(
@@ -457,6 +460,8 @@ class FixedUserRuntimeStatusServiceEvidenceTests(unittest.TestCase):
 
     def write_json_fixture(self, target, source, mutate):
         value = json.loads(source.read_text())
+        if source == validator_module._ELF_REPORT_PATH:
+            value = historical_elf_report(value)
         if source == validator_module._METADATA_PATH:
             value["observed_markers"] = list(get_smoke_marker_order())
             value["outcome"] = "pass"

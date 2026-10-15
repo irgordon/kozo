@@ -77,3 +77,4 @@ build/
 /artifacts/release-candidate/
 /artifacts/release/
 /artifacts/portability/
+/artifacts/rust-user-controls/

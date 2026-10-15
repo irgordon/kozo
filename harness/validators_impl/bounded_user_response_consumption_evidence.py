@@ -207,6 +207,10 @@ def _resume_issue(context):
 
 
 def _ring3_consumer_issue(context):
+    if 'call kozo_rust_user_response_entry' in context.privilege:
+        from harness.fixed_rust_user_evidence import current_execution_issue
+        detail = current_execution_issue(ROOT, context.report, context.privilege)
+        return _issue('ring3_consumer_invalid', 'ring3_response_checks', detail) if detail else None
     source = _source_range(
         context.privilege,
         "user_response_consumer_start:",
@@ -375,6 +379,9 @@ def _elf_issue(context):
         "response_clear_stosq_count": 5,
         "total_iretq_count": 2,
     }
+    if 'call kozo_rust_user_response_entry' in context.privilege:
+        del minimums['consumer_response_compare_count']
+        del minimums['consumer_record_store_count']
     if any(record.get(field, -1) < value for field, value in minimums.items()):
         return _issue("missing_elf_operation", "kernel_elf_report.bounded_user_response_consumption", "ELF must retain exact comparisons, stores, copies, clears, and two iretq sites")
     if record.get("prohibited_instructions") != []:

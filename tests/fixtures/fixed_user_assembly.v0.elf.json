@@ -1,0 +1,429 @@
+{
+  "fixed_user_request_boundary": {
+    "symbols": {
+      "user_privilege_probe_start": {
+        "present": true,
+        "address": "0xffffffff80207000"
+      },
+      "privilege_return_handler": {
+        "present": true,
+        "address": "0xffffffff8020564e"
+      },
+      "handle_fixed_user_request": {
+        "present": true,
+        "address": "0xffffffff80205692"
+      },
+      "handle_fixed_user_response_consumption": {
+        "present": true,
+        "address": "0xffffffff80205725"
+      },
+      "validate_ring3_request_frame": {
+        "present": true,
+        "address": "0xffffffff802057ee"
+      },
+      "validate_fixed_user_buffer_ranges": {
+        "present": true,
+        "address": "0xffffffff80205893"
+      },
+      "copy_fixed_user_request_in": {
+        "present": true,
+        "address": "0xffffffff802059f9"
+      },
+      "validate_fixed_user_request": {
+        "present": true,
+        "address": "0xffffffff80205a50"
+      },
+      "build_fixed_user_runtime_status_response": {
+        "present": true,
+        "address": "0xffffffff80205b0a"
+      },
+      "validate_fixed_user_response": {
+        "present": true,
+        "address": "0xffffffff80205bef"
+      },
+      "copy_fixed_user_response_out": {
+        "present": true,
+        "address": "0xffffffff80205ca6"
+      },
+      "validate_fixed_user_response_readback": {
+        "present": true,
+        "address": "0xffffffff80205d35"
+      },
+      "clear_fixed_user_request_buffers": {
+        "present": true,
+        "address": "0xffffffff802060cd"
+      },
+      "fixed_user_session_storage_is_zero": {
+        "present": true,
+        "address": "0xffffffff8020619d"
+      },
+      "fixed_user_buffers_are_zero": {
+        "present": true,
+        "address": "0xffffffff802061d9"
+      },
+      "privilege_ring0_continuation": {
+        "present": true,
+        "address": "0xffffffff802062ad"
+      },
+      "runtime_serial_write_user_request_copy_in_marker": {
+        "present": true,
+        "address": "0xffffffff8020066c"
+      },
+      "runtime_serial_write_user_runtime_status_service_enter_marker": {
+        "present": true,
+        "address": "0xffffffff8020068b"
+      },
+      "runtime_serial_write_user_runtime_status_service_ok_marker": {
+        "present": true,
+        "address": "0xffffffff802006aa"
+      },
+      "runtime_serial_write_user_response_copy_out_marker": {
+        "present": true,
+        "address": "0xffffffff802006c9"
+      },
+      "runtime_serial_write_fixed_user_request_marker": {
+        "present": true,
+        "address": "0xffffffff80200745"
+      },
+      "runtime_serial_write_ring3_probe_marker": {
+        "present": true,
+        "address": "0xffffffff80200764"
+      },
+      "fixed_user_request_shadow": {
+        "present": true,
+        "address": "0xffffffff80216008"
+      },
+      "fixed_user_request_shadow_end": {
+        "present": true,
+        "address": "0xffffffff80216030"
+      },
+      "fixed_user_response_shadow": {
+        "present": true,
+        "address": "0xffffffff80216030"
+      },
+      "fixed_user_response_shadow_end": {
+        "present": true,
+        "address": "0xffffffff80216090"
+      },
+      "fixed_user_response_verify": {
+        "present": true,
+        "address": "0xffffffff80216090"
+      },
+      "fixed_user_response_verify_end": {
+        "present": true,
+        "address": "0xffffffff802160f0"
+      },
+      "fixed_user_request_success_state": {
+        "present": true,
+        "address": "0xffffffff802161d0"
+      }
+    },
+    "request_shadow": {
+      "start_symbol": "fixed_user_request_shadow",
+      "end_symbol": "fixed_user_request_shadow_end",
+      "start_address": "0xffffffff80216008",
+      "end_address": "0xffffffff80216030",
+      "size_bytes": 40,
+      "required_size_bytes": 40,
+      "required_alignment_bytes": 8,
+      "start_aligned": true
+    },
+    "response_shadow": {
+      "start_symbol": "fixed_user_response_shadow",
+      "end_symbol": "fixed_user_response_shadow_end",
+      "start_address": "0xffffffff80216030",
+      "end_address": "0xffffffff80216090",
+      "size_bytes": 96,
+      "required_size_bytes": 96,
+      "required_alignment_bytes": 8,
+      "start_aligned": true
+    },
+    "response_verify": {
+      "start_symbol": "fixed_user_response_verify",
+      "end_symbol": "fixed_user_response_verify_end",
+      "start_address": "0xffffffff80216090",
+      "end_address": "0xffffffff802160f0",
+      "size_bytes": 96,
+      "required_size_bytes": 96,
+      "required_alignment_bytes": 8,
+      "start_aligned": true
+    },
+    "ring3_request_store_count": 9,
+    "ring3_return_interrupt_present": true,
+    "handler_call_order_valid": true,
+    "copy_in_memory_move_count": 10,
+    "copy_out_memory_move_count": 24,
+    "readback_memory_move_count": 24,
+    "clear_memory_move_count": 2,
+    "clear_stosq_count": 7,
+    "post_clear_zero_validation_present": true,
+    "fixed_continuation_jump_present": true,
+    "prohibited_boundary_instructions": []
+  },
+  "bounded_user_response_consumption": {
+    "symbols": {
+      "user_response_consumer_start": {
+        "present": true,
+        "address": "0xffffffff8020709d"
+      },
+      "user_response_consumer_interrupt_return": {
+        "present": true,
+        "address": "0xffffffff80207266"
+      },
+      "user_response_consumer_end": {
+        "present": true,
+        "address": "0xffffffff80207268"
+      },
+      "privilege_return_handler": {
+        "present": true,
+        "address": "0xffffffff8020564e"
+      },
+      "handle_fixed_user_request": {
+        "present": true,
+        "address": "0xffffffff80205692"
+      },
+      "handle_fixed_user_response_consumption": {
+        "present": true,
+        "address": "0xffffffff80205725"
+      },
+      "validate_ring3_response_frame": {
+        "present": true,
+        "address": "0xffffffff80205804"
+      },
+      "prepare_user_response_resume": {
+        "present": true,
+        "address": "0xffffffff80205ddb"
+      },
+      "resume_fixed_user_response_consumer": {
+        "present": true,
+        "address": "0xffffffff80205f22"
+      },
+      "validate_user_visible_response": {
+        "present": true,
+        "address": "0xffffffff80205f51"
+      },
+      "copy_fixed_user_consumption_record": {
+        "present": true,
+        "address": "0xffffffff80205f63"
+      },
+      "validate_fixed_user_consumption_record": {
+        "present": true,
+        "address": "0xffffffff80205fc2"
+      },
+      "clear_fixed_user_response_transaction": {
+        "present": true,
+        "address": "0xffffffff8020605e"
+      },
+      "fixed_user_session_storage_is_zero": {
+        "present": true,
+        "address": "0xffffffff8020619d"
+      },
+      "fixed_user_response_matches_shadow": {
+        "present": true,
+        "address": "0xffffffff80205ee4"
+      },
+      "fixed_user_transaction_phase": {
+        "present": true,
+        "address": "0xffffffff80216120"
+      },
+      "fixed_user_transaction_phase_end": {
+        "present": true,
+        "address": "0xffffffff80216128"
+      },
+      "fixed_user_consumption_shadow": {
+        "present": true,
+        "address": "0xffffffff802160f0"
+      },
+      "fixed_user_consumption_shadow_end": {
+        "present": true,
+        "address": "0xffffffff80216120"
+      },
+      "runtime_serial_write_ring3_response_resume_marker": {
+        "present": true,
+        "address": "0xffffffff802006e8"
+      },
+      "runtime_serial_write_user_response_consumed_marker": {
+        "present": true,
+        "address": "0xffffffff80200707"
+      },
+      "runtime_serial_write_fixed_user_response_marker": {
+        "present": true,
+        "address": "0xffffffff80200726"
+      },
+      "privilege_ring0_continuation": {
+        "present": true,
+        "address": "0xffffffff802062ad"
+      }
+    },
+    "transaction_phase": {
+      "start_symbol": "fixed_user_transaction_phase",
+      "end_symbol": "fixed_user_transaction_phase_end",
+      "start_address": "0xffffffff80216120",
+      "end_address": "0xffffffff80216128",
+      "size_bytes": 8,
+      "required_size_bytes": 8,
+      "required_alignment_bytes": 8,
+      "start_aligned": true
+    },
+    "consumption_shadow": {
+      "start_symbol": "fixed_user_consumption_shadow",
+      "end_symbol": "fixed_user_consumption_shadow_end",
+      "start_address": "0xffffffff802160f0",
+      "end_address": "0xffffffff80216120",
+      "size_bytes": 48,
+      "required_size_bytes": 48,
+      "required_alignment_bytes": 8,
+      "start_aligned": true
+    },
+    "consumer_inside_user_page": true,
+    "consumer_response_compare_count": 20,
+    "consumer_record_store_count": 8,
+    "consumer_second_interrupt_present": true,
+    "resume_iretq_present": true,
+    "total_iretq_count": 2,
+    "initial_interrupt_present": true,
+    "first_handler_resume_call_order_valid": true,
+    "second_handler_call_order_valid": true,
+    "record_copy_memory_move_count": 13,
+    "response_revalidation_compare_count": 1,
+    "response_clear_stosq_count": 5,
+    "response_clear_zero_validation_present": true,
+    "fixed_continuation_jump_present": true,
+    "prohibited_instructions": []
+  },
+  "fixed_user_runtime_status_service": {
+    "symbols": {
+      "evaluate_bounded_user_argument": {
+        "present": true,
+        "address": "0xffffffff80200930"
+      },
+      "validate_fixed_user_argument_result": {
+        "present": true,
+        "address": "0xffffffff80205c11"
+      },
+      "runtime_progression_entry": {
+        "present": true,
+        "address": "0xffffffff802025f0"
+      },
+      "execute_runtime_status_boundaries": {
+        "present": true,
+        "address": "0xffffffff80202710"
+      },
+      "collect_runtime_status": {
+        "present": true,
+        "address": "0xffffffff80202f40"
+      },
+      "validate_runtime_status_snapshot": {
+        "present": true,
+        "address": "0xffffffff802030a0"
+      },
+      "clear_runtime_status_snapshot": {
+        "present": true,
+        "address": "0xffffffff80203200"
+      },
+      "build_internal_runtime_status_response": {
+        "present": true,
+        "address": "0xffffffff802033d0"
+      },
+      "execute_fixed_user_runtime_status_transaction": {
+        "present": true,
+        "address": "0xffffffff80205516"
+      },
+      "enter_bounded_ring3_probe": {
+        "present": true,
+        "address": "0xffffffff802055b2"
+      },
+      "runtime_status_snapshot": {
+        "present": true,
+        "address": "0xffffffff80210030"
+      },
+      "runtime_status_snapshot_fields_are_valid": {
+        "present": true,
+        "address": "0xffffffff80205aa6"
+      },
+      "build_fixed_user_runtime_status_response": {
+        "present": true,
+        "address": "0xffffffff80205b0a"
+      },
+      "fixed_user_response_fields_are_valid": {
+        "present": true,
+        "address": "0xffffffff80205c2e"
+      },
+      "fixed_user_response_digest": {
+        "present": true,
+        "address": "0xffffffff8020602e"
+      },
+      "runtime_serial_write_user_runtime_status_service_enter_marker": {
+        "present": true,
+        "address": "0xffffffff8020068b"
+      },
+      "runtime_serial_write_user_runtime_status_service_ok_marker": {
+        "present": true,
+        "address": "0xffffffff802006aa"
+      },
+      "runtime_serial_write_ring0_return_marker": {
+        "present": true,
+        "address": "0xffffffff80200783"
+      }
+    },
+    "snapshot": {
+      "present": true,
+      "address": "0xffffffff80210030",
+      "size_bytes": 64,
+      "required_size_bytes": 64,
+      "required_alignment_bytes": 8,
+      "aligned": true
+    },
+    "runtime_entry_calls_status_boundaries": true,
+    "status_boundary_call_order_valid": true,
+    "bridge_calls_fixed_ring3_entry": true,
+    "request_handler_service_order_valid": true,
+    "boot_calls_transaction": false,
+    "response_builder_store_count": 13,
+    "ring3_response_consumer_symbol_found": true,
+    "ring3_response_consumer_instruction_count": 98,
+    "ring3_response_compare_count": 20,
+    "ring3_response_expected_offsets": [
+      "0x00",
+      "0x04",
+      "0x08",
+      "0x0c",
+      "0x10",
+      "0x18",
+      "0x1c",
+      "0x20",
+      "0x28",
+      "0x30",
+      "0x38",
+      "0x40",
+      "0x48",
+      "0x50",
+      "0x58"
+    ],
+    "ring3_response_observed_offsets": [
+      "0x00",
+      "0x04",
+      "0x08",
+      "0x0c",
+      "0x10",
+      "0x18",
+      "0x1c",
+      "0x20",
+      "0x28",
+      "0x30",
+      "0x38",
+      "0x40",
+      "0x48",
+      "0x50",
+      "0x58"
+    ],
+    "ring3_response_missing_offsets": [],
+    "ring3_response_success_store_count": 8,
+    "ring3_response_second_interrupt_present": true,
+    "ring3_response_comparisons_before_success_store": true,
+    "ring3_response_success_store_before_interrupt": true,
+    "ring3_response_fail_closed_guard_present": true,
+    "ring3_response_order_valid": true,
+    "digest_xor_count": 11
+  }
+}

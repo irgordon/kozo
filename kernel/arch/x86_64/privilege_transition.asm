@@ -76,6 +76,7 @@ global fixed_user_context_result_is_initial
 global observed_governed_gdtr
 global observed_governed_idtr
 global observed_task_register
+global write_user_boundary_failure
 
 extern walk_page_mapping
 extern physical_for_kernel_virtual
@@ -96,6 +97,8 @@ extern runtime_serial_write_ring0_return_marker
 extern runtime_status_snapshot
 extern evaluate_bounded_user_argument
 extern boot_terminal_halt
+extern kozo_rust_user_request_entry
+extern kozo_rust_user_response_entry
 
 %define PAGE_QWORDS (KOZO_PAGE_SIZE / 8)
 %define GDT_ENTRY_COUNT 7
@@ -166,10 +169,6 @@ section .user_probe_code progbits alloc exec nowrite align=4096
 align 4096
 user_probe_code_start:
 user_privilege_probe_start:
-    mov ax, cs
-    and eax, 3
-    cmp eax, 3
-    jne user_privilege_probe_failed
     mov rdx, rsp
     mov rax, USER_STACK_SENTINEL
     push rax
@@ -178,21 +177,14 @@ user_privilege_probe_start:
     jne user_privilege_probe_failed
     cmp rsp, rdx
     jne user_privilege_probe_failed
-
-    mov rdi, FIXED_USER_REQUEST_VA
-    mov dword [rdi], FIXED_USER_REQUEST_VERSION
-    mov dword [rdi + 4], FIXED_USER_REQUEST_ID
-    mov dword [rdi + 8], FIXED_USER_REQUEST_SIZE
-    mov dword [rdi + 12], FIXED_USER_RESPONSE_SIZE
-    mov qword [rdi + 16], FIXED_USER_REQUEST_SEQUENCE
-    mov rax, FIXED_USER_ARGUMENT_OPERAND
-    mov [rdi + 24], rax
-    mov rcx, FIXED_USER_DATA_SCRATCH_VA
-    mov [rcx], rax
-    mov dword [rdi + 32], FIXED_USER_REQUEST_FLAGS
-    mov dword [rdi + 36], 0
-    cmp [rdi + 24], rax
+    call kozo_rust_user_request_entry
+    test eax, eax
+    jnz user_privilege_probe_failed
+    mov rax, USER_INITIAL_RSP
+    cmp rsp, rax
     jne user_privilege_probe_failed
+user_rust_request_interrupt:
+    mov rsp, USER_INITIAL_RSP
     push qword USER_RFLAGS
     popfq
     int KOZO_PRIVILEGE_RETURN_VECTOR
@@ -203,119 +195,36 @@ user_privilege_probe_failed:
     mov rdi, FIXED_USER_REQUEST_VA
     mov rax, USER_PROBE_FAILURE_TOKEN
     mov [rdi], rax
-    int KOZO_PRIVILEGE_RETURN_VECTOR
-    ud2
+    jmp user_rust_request_interrupt
 user_privilege_probe_end:
 
 user_response_consumer_start:
-    mov rdi, FIXED_USER_RESPONSE_VA
-    mov ax, cs
-    and eax, 3
-    cmp eax, 3
-    jne .cpl_invalid
     mov rdx, rsp
-    mov rax, USER_INITIAL_RSP
-    cmp rdx, rax
-    jne .stack_invalid
     mov rax, USER_STACK_SENTINEL
     push rax
     pop rcx
     cmp rcx, rax
-    jne .stack_invalid
+    jne user_rust_response_failed
     cmp rsp, rdx
-    jne .stack_invalid
-
-    mov r8d, 1
-    cmp dword [rdi], FIXED_USER_REQUEST_VERSION
-    jne .write_record
-    mov r8d, 2
-    cmp dword [rdi + 4], FIXED_USER_REQUEST_ID
-    jne .write_record
-    mov r8d, 3
-    cmp dword [rdi + 8], PRIVILEGE_TRANSITION_SUCCESS
-    jne .write_record
-    mov r8d, 4
-    cmp dword [rdi + 12], FIXED_USER_RESPONSE_SIZE
-    jne .write_record
-    mov r8d, 5
-    cmp qword [rdi + 16], FIXED_USER_REQUEST_SEQUENCE
-    jne .write_record
-    mov r8d, 6
-    cmp dword [rdi + 24], RUNTIME_STATUS_STAGE
-    jne .write_record
-    mov r8d, 7
-    cmp dword [rdi + 28], 0
-    jne .write_record
-    mov r8d, 8
-    cmp qword [rdi + 32], RUNTIME_STATUS_PROVEN_STAGE_MASK
-    jne .write_record
-    mov r8d, 9
-    cmp qword [rdi + 40], RUNTIME_STATUS_BOOT_MEMORY_SIZE
-    jne .write_record
-    mov r8d, 10
-    cmp qword [rdi + 48], RUNTIME_STATUS_LOOP_LIMIT
-    jne .write_record
-    mov r8d, 11
-    cmp qword [rdi + 56], RUNTIME_STATUS_LOOP_FINAL_COUNT
-    jne .write_record
-    mov r8d, 12
-    cmp qword [rdi + 64], RUNTIME_STATUS_LOOP_FINAL_ACCUMULATOR
-    jne .write_record
-    mov r8d, 13
-    cmp qword [rdi + 72], RUNTIME_STATUS_FEATURE_MASK
-    jne .write_record
-    mov r8d, 14
-    cmp qword [rdi + 80], 0
-    jne .write_record
-    mov r8d, 15
-    mov rcx, FIXED_USER_DATA_SCRATCH_VA
-    mov rax, [rcx]
-    cmp rax, FIXED_USER_ARGUMENT_MAX
-    ja .write_record
-    add rax, FIXED_USER_ARGUMENT_INCREMENT
-    cmp [rdi + 88], rax
-    jne .write_record
-    xor r8d, r8d
-    jmp .write_record
-
-.cpl_invalid:
-    mov r8d, 10
-    jmp .write_record
-.stack_invalid:
-    mov r8d, 11
-
-.write_record:
-    mov rsi, FIXED_USER_CONSUMPTION_RECORD_VA
-    mov dword [rsi], FIXED_USER_CONSUMPTION_RECORD_VERSION
-    mov dword [rsi + 4], FIXED_USER_CONSUMPTION_RECORD_ID
-    mov dword [rsi + 8], FIXED_USER_CONSUMPTION_RECORD_SIZE
-    mov [rsi + 12], r8d
-    mov rax, [rdi + 16]
-    mov [rsi + 16], rax
-    mov rax, [rdi + 32]
-    mov [rsi + 24], rax
-    mov rax, [rdi]
-    xor rax, [rdi + 8]
-    xor rax, [rdi + 16]
-    xor rax, [rdi + 24]
-    xor rax, [rdi + 32]
-    xor rax, [rdi + 40]
-    xor rax, [rdi + 48]
-    xor rax, [rdi + 56]
-    xor rax, [rdi + 64]
-    xor rax, [rdi + 72]
-    xor rax, [rdi + 80]
-    xor rax, [rdi + 88]
-    mov [rsi + 32], rax
-    mov qword [rsi + 40], 0
+    jne user_rust_response_failed
+    call kozo_rust_user_response_entry
+    test eax, eax
+    jnz user_rust_response_failed
+    mov rax, USER_INITIAL_RSP
+    cmp rsp, rax
+    jne user_rust_response_failed
+user_rust_response_interrupt:
+    mov rsp, USER_INITIAL_RSP
     push qword USER_RFLAGS
     popfq
     int KOZO_PRIVILEGE_RETURN_VECTOR
 user_response_consumer_interrupt_return:
     ud2
+user_rust_response_failed:
+    mov rdi, FIXED_USER_RESPONSE_VA
+    mov qword [rdi + 80], USER_RESPONSE_CONTENT_INVALID
+    jmp user_rust_response_interrupt
 user_response_consumer_end:
-    times KOZO_PAGE_SIZE - ($ - user_probe_code_start) db 0x90
-user_probe_code_end:
 
 section .bss
 alignb 16
@@ -1757,6 +1666,10 @@ privilege_return_failure:
     mov rsp, [rel saved_odin_return_stack]
     test rsp, rsp
     jz boot_terminal_halt
+    push rax
+    mov edi, eax
+    call write_user_boundary_failure
+    pop rax
     mov qword [rel saved_odin_return_stack], 0
     ret
 
@@ -2512,7 +2425,49 @@ fixed_user_context_status_from_failure:
     add eax, FIXED_USER_CONTEXT_STATUS_BASE
     ret
 
+write_user_boundary_failure:
+    push rax
+    push rbx
+    push rcx
+    push rdx
+    push rsi
+    mov ebx, edi
+    mov dx, 0x3f8
+    lea rsi, [rel user_boundary_failure_text]
+    mov ecx, user_boundary_failure_text_end - user_boundary_failure_text
+.prefix:
+    lodsb
+    out dx, al
+    loop .prefix
+    lea rsi, [rel user_boundary_hex_digits]
+    mov ecx, 8
+.hex:
+    rol ebx, 4
+    mov eax, ebx
+    and eax, 15
+    mov al, [rsi + rax]
+    out dx, al
+    loop .hex
+    mov al, 13
+    out dx, al
+    mov al, 10
+    out dx, al
+    pop rsi
+    pop rdx
+    pop rcx
+    pop rbx
+    pop rax
+    ret
+
+section .rodata
+user_boundary_failure_text: db 'USER_BOUNDARY_FAILURE='
+user_boundary_failure_text_end:
+user_boundary_hex_digits: db '0123456789abcdef'
+section .text
+
 privilege_fault_sink:
+    mov edi, 0xff
+    call write_user_boundary_failure
     cli
     jmp boot_terminal_halt
 

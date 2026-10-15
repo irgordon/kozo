@@ -9,6 +9,10 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from harness.fixed_rust_user_evidence import object_record
+from harness.fixed_rust_user import ENTRYPOINTS
+
 PT_LOAD = 1
 EM_X86_64 = 62
 ET_EXEC = 2
@@ -421,6 +425,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
             *FIXED_USER_EXECUTION_CONTEXT_SYMBOLS,
             *BOUNDED_REPEATED_USER_SESSION_SYMBOLS,
             *FIXED_USER_CONTEXT_OVERLAP_SYMBOLS,
+            *ENTRYPOINTS,
         ),
     )
     symbol_address = symbols.get("_start")
@@ -456,6 +461,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "bounded_user_response_consumption": bounded_user_response_consumption_record(kernel_elf, symbols),
         "fixed_user_runtime_status_service": fixed_user_runtime_status_service_record(kernel_elf, symbols),
         "bounded_user_argument": bounded_user_argument_record(kernel_elf, symbols),
+        "fixed_rust_user_execution": rust_user_execution_record(kernel_elf),
         "fixed_user_execution_context": fixed_user_execution_context_record(
             kernel_elf,
             symbols,
@@ -1009,7 +1015,9 @@ def bounded_privilege_transition_record(
         "sidt_present": _instruction_present(instruction_sets, "sidt"),
         "iretq_present": _instruction_present(instruction_sets, "iretq"),
         "int_0x81_present": _int_vector_present(
-            instruction_sets.get("user_privilege_probe_start", []),
+            _instructions_for_symbol(
+                parse_disassembly_instructions(run_text_command(['objdump', '-d', str(kernel_elf)])),
+                'user_privilege_probe_start', symbols),
             0x81,
         ),
         "handler_continuation_jump_present": _jumps_address(
@@ -1019,6 +1027,16 @@ def bounded_privilege_transition_record(
         "fault_halt_paths_present": _fault_halt_paths_present(instruction_sets, symbols),
         "prohibited_instructions": _privilege_prohibited_instructions(instruction_sets),
     }
+
+
+def rust_user_execution_record(kernel_elf):
+    instruction_sets = {name: parse_disassembly_instructions(disassemble_symbol(kernel_elf, name))
+                        for name in ENTRYPOINTS}
+    symbols = symbol_addresses(kernel_elf, ENTRYPOINTS)
+    calls = {adapter: _calls_address(
+        parse_disassembly_instructions(disassemble_symbol(kernel_elf, adapter)), symbols.get(entry))
+        for adapter, entry in zip(('user_privilege_probe_start', 'user_response_consumer_start'), ENTRYPOINTS)}
+    return object_record(Path(__file__).resolve().parents[1], kernel_elf, instruction_sets) | {'adapter_calls': calls}
 
 
 def fixed_user_request_boundary_record(
@@ -1043,7 +1061,9 @@ def fixed_user_request_boundary_record(
     }
     handler = instruction_sets.get("handle_fixed_user_request", [])
     response_handler = instruction_sets.get("handle_fixed_user_response_consumption", [])
-    ring3_probe = instruction_sets.get("user_privilege_probe_start", [])
+    ring3_probe = _instructions_for_symbol(
+        parse_disassembly_instructions(run_text_command(['objdump', '-d', str(kernel_elf)])),
+        'user_privilege_probe_start', symbols)
     return {
         "symbols": symbol_record(symbols, FIXED_USER_REQUEST_SYMBOLS),
         "request_shadow": _symbol_range_record(

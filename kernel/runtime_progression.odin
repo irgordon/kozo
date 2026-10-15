@@ -75,6 +75,7 @@ foreign runtime_boot_bridge {
 }
 
 foreign runtime_privilege_bridge {
+	write_user_boundary_failure :: proc "c" (failure_code: u32) ---
 	execute_fixed_user_runtime_status_transaction :: proc "c" () -> u32 ---
 	validate_fixed_user_context_success_result :: proc "c" () -> u32 ---
 	validate_fixed_user_session_cleanup :: proc "c" () -> u32 ---
@@ -435,6 +436,7 @@ session_failure_code :: proc "contextless" (session_ordinal: u32) -> u32 {
 }
 
 fail_repeated_user_sessions :: proc "contextless" (failure_code: u32) -> u32 {
+	write_user_boundary_failure(failure_code)
 	intrinsics.volatile_store(&repeated_user_session_coordinator.active_session_ordinal, 0)
 	intrinsics.volatile_store(&repeated_user_session_coordinator.failure_code, failure_code)
 	invalidate_fixed_user_session_state()

@@ -198,6 +198,10 @@ def _entry_issue(context):
 
 
 def _user_probe_issue(context):
+    if 'call kozo_rust_user_request_entry' in context.privilege:
+        from harness.fixed_rust_user_evidence import current_execution_issue
+        detail = current_execution_issue(ROOT, context.report, context.privilege)
+        return _issue('user_probe_invalid', 'probe', detail) if detail else None
     expected = (
         "user_privilege_probe_start:",
         "mov ax, cs",

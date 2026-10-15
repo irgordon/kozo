@@ -5,6 +5,10 @@ Status: Published final feature release
 Release commit: a5226635be46c687299028b5244f808da67c0984
 Scope: Product direction and release gates from the published KOZO v1.1.0 baseline
 
+Current authorized work: First Bounded Rust Userspace Execution. The local
+implementation preserves two sessions and 52 markers; hosted acceptance is
+pending. This is not a release and selects no automatic follow-on capability.
+
 ---
 
 # 1. Purpose

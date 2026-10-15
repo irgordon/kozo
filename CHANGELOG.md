@@ -1,5 +1,17 @@
 # Changelog
 
+## First Bounded Rust Userspace Execution - 2026-10-15
+
+**Status:** Implemented locally; hosted acceptance pending. Not in v1.1.0.
+
+* Compile a separate pinned `no_std` Rust object for the fixed CPL3 page.
+* Move request construction and full response consumption into Rust while
+  retaining Odin arithmetic, exact frames and two sessions/four returns.
+* Validate object closure, linked bytes, bounded stack use, and isolated
+  negative QEMU controls without changing the 52-marker success sequence.
+* Preserve historical assembly tests and all immutable published releases.
+  No product version is advanced.
+
 ## Bounded User Argument Service - 2026-10-15
 
 **Status:** Implemented and hosted accepted on main; not in published v1.1.0.

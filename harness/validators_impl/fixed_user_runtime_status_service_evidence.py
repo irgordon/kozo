@@ -298,6 +298,10 @@ def _response_issue(context):
         "user_response_consumer_start:",
         "user_response_consumer_end:",
     )
+    if 'call kozo_rust_user_response_entry' in consumer:
+        from harness.fixed_rust_user_evidence import current_execution_issue
+        detail = current_execution_issue(ROOT, context.report, context.privilege)
+        return _issue('partial_ring3_validation', 'ring3_validation', detail) if detail else None
     comparisons = sum("cmp " in line and "[rdi" in line for line in consumer.splitlines())
     if comparisons < 15:
         return _issue("partial_ring3_validation", "ring3_validation", "Ring3 must compare all fifteen fixed response fields")
@@ -352,7 +356,12 @@ def _elf_issue(context):
         return _issue("boot_executes_transaction", "kernel_elf_report.boot_calls_transaction", "ELF must prove boot does not enter the fixed transaction")
     if evidence.get("response_builder_store_count", 0) < 11:
         return _issue("elf_response_stores_missing", "kernel_elf_report.response_builder_store_count", "ELF must retain the complete response stores")
-    consumer_issue = _ring3_consumer_elf_issue(evidence)
+    if 'call kozo_rust_user_response_entry' in context.privilege:
+        from harness.fixed_rust_user_evidence import current_execution_issue
+        detail = current_execution_issue(ROOT, context.report, context.privilege)
+        consumer_issue = _issue('elf_consumer_order_invalid', 'ring3_validation', detail) if detail else None
+    else:
+        consumer_issue = _ring3_consumer_elf_issue(evidence)
     if consumer_issue is not None:
         return consumer_issue
     if evidence.get("digest_xor_count", 0) < 11:

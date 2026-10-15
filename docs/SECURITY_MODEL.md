@@ -296,3 +296,17 @@ revalidates all response bytes against the validated supervisor shadow and
 checks the complete twelve-qword digest and six-qword record. Full cleanup
 removes the argument and appended result before reuse. Service-success evidence
 requires complete response readback; any failure suppresses later continuation.
+
+# 23. Fixed Rust User Program
+
+Rust executes without kernel authority in the existing fixed user mappings.
+Both Rust entrypoints inspect CPL3 before touching transaction data. Only the
+copied supervisor request reaches Odin. Kernel response and consumption
+validation remain independent of Rust's checks.
+
+The object boundary rejects undefined dependencies, writable/TLS storage,
+out-of-page code and external or absolute relocations. Exact saved frames
+remain required. Rust return adapters reject bad completion status and stack
+state; rejection diagnostics are not success markers. Two bounded sessions
+still require full cleanup. This is not hostile-code containment, a stable
+public ABI, or general application execution.

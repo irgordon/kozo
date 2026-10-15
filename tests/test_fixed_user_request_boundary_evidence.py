@@ -12,6 +12,7 @@ from harness.validators_impl.fixed_user_request_boundary_evidence import (
     FixedUserRequestBoundaryEvidenceValidator,
 )
 from scripts import kernel_elf_report
+from tests.fixed_user_assembly_fixture import historical_user_assembly
 
 KOZO_NEGATIVE_COVERAGE = {
     "fixed_user_request_boundary_evidence": {
@@ -289,7 +290,7 @@ def write_fixture(root, mutate_boot, mutate_privilege, mutate_layout, mutate_lin
     }
     paths["contract"].write_text(validator_module._CONTRACT_PATH.read_text())
     write_mutated(paths["boot"], validator_module._BOOT_PATH.read_text(), mutate_boot)
-    write_mutated(paths["privilege"], validator_module._PRIVILEGE_PATH.read_text(), mutate_privilege)
+    write_mutated(paths["privilege"], historical_user_assembly(validator_module._PRIVILEGE_PATH.read_text()), mutate_privilege)
     write_mutated(paths["layout"], validator_module._LAYOUT_PATH.read_text(), mutate_layout)
     write_mutated(paths["linker"], validator_module._LINKER_PATH.read_text(), mutate_linker)
     report = valid_report()

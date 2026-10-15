@@ -341,3 +341,17 @@ govern both sessions; no static authority record or mapping is added.
 The four legacy Odin inline-assembly primitives use typed calls to the existing
 NASM bridge, preserving rdtsc/shl/or, hlt, outb and inb instructions under the
 current compiler. Arithmetic service policy remains in Odin.
+
+# 20. Fixed Rust User Execution
+
+ADR 0021 and `fixed_rust_user_execution_contract.v0.json` compose the existing
+two-session transaction with separately compiled `no_std` Rust. Rust owns
+request construction, complete response validation and consumption-record
+construction at CPL3. Odin still owns arithmetic and session coordination.
+
+Two small assembly adapters establish the System V call alignment, require
+the exact stack on return, restore governed flags and issue the fixed
+interrupt. Kernel frame checks retain exact RIP, RSP, selectors and flags.
+The linker places adapters and closed Rust code in the same existing RX page;
+there is no loader, process, allocator, new mapping or general userspace ABI.
+Main implementation is under validation; immutable v1.1.0 predates it.

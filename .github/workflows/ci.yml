@@ -197,6 +197,23 @@ jobs:
         run: |
           scripts/ci_evidence_summary.sh
 
+      - name: Execute Rust guest controls
+        run: |
+          python3 tests/run_fixed_rust_user_controls.py --output artifacts/rust-user-controls
+
+      - name: Upload Rust guest controls
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: kozo-rust-user-controls
+          path: |
+            artifacts/rust-user-controls/results.json
+            artifacts/rust-user-controls/*/control.json
+            artifacts/rust-user-controls/*/build.log
+            artifacts/rust-user-controls/*/artifacts/runtime/qemu_smoke.*
+            artifacts/rust-user-controls/*/artifacts/runtime/kernel_elf_report.json
+          if-no-files-found: error
+
       - name: Validate generated verification artifact
         run: |
           python3 -m json.tool artifacts/release-candidate/latest_verify.json >/dev/null

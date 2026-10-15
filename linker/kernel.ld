@@ -12,21 +12,29 @@ SECTIONS
   . = ALIGN(4K);
   __kernel_text_start = .;
   .text : AT(ADDR(.text) - KERNEL_VMA + KERNEL_LMA) {
-    *(.text .text.*)
+    *(EXCLUDE_FILE (*fixed_user.o) .text .text.*)
   }
   __kernel_text_end = .;
 
   . = ALIGN(4K);
   __user_probe_code_backing_start = .;
   .user_probe_code : AT(ADDR(.user_probe_code) - KERNEL_VMA + KERNEL_LMA) {
-    *(.user_probe_code)
+    KEEP(*(.user_probe_code))
+    . = ALIGN(16);
+    __rust_user_code_start = .;
+    KEEP(*fixed_user.o(.text .text.* .rodata .rodata.*))
+    __rust_user_code_end = .;
+    ASSERT((__rust_user_code_end - __user_probe_code_backing_start) <= 4K,
+           "Rust user executable exceeds the fixed one-page budget")
+    . = __user_probe_code_backing_start + 4K;
+    user_probe_code_end = .;
   }
   __user_probe_code_backing_end = .;
 
   . = ALIGN(4K);
   __kernel_rodata_start = .;
   .rodata : AT(ADDR(.rodata) - KERNEL_VMA + KERNEL_LMA) {
-    *(.rodata .rodata.*)
+    *(EXCLUDE_FILE (*fixed_user.o) .rodata .rodata.*)
     *(.odinti .odinti.*)
     *(.eh_frame .eh_frame.*)
   }

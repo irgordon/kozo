@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from tests.fixed_user_assembly_fixture import historical_user_assembly
 from pathlib import Path
 
 from harness.bounded_user_argument import load_contract, validate_contract, response_digest
@@ -81,11 +82,11 @@ class BoundedUserArgumentExecutableTests(unittest.TestCase):
 
 class BoundedUserArgumentEvidenceTests(unittest.TestCase):
     def setUp(self):
-        self.privilege = (ROOT / 'kernel/arch/x86_64/privilege_transition.asm').read_text()
+        self.privilege = historical_user_assembly((ROOT / 'kernel/arch/x86_64/privilege_transition.asm').read_text())
         self.layout = (ROOT / 'kernel/arch/x86_64/runtime_layout.inc').read_text()
         self.service = (ROOT / 'kernel/bounded_user_argument.odin').read_text()
 
-    def test_current_sources_validate(self):
+    def test_historical_assembly_sources_validate(self):
         self.assertIsNone(validate_argument_sources(self.privilege, self.layout, self.service))
 
     def test_argument_boundary_mutations_fail(self):

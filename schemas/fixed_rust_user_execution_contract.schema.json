@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "toolchain",
+    "target",
+    "request_entry",
+    "response_entry",
+    "request_adapter",
+    "response_adapter",
+    "code_virtual_address",
+    "code_size_bytes",
+    "data_size_bytes",
+    "stack_size_bytes",
+    "initial_rsp",
+    "pre_call_rsp_modulo_16",
+    "rust_entry_rsp_modulo_16",
+    "stack_budget_bytes",
+    "red_zone",
+    "panic",
+    "allocator",
+    "sessions",
+    "transitions_per_session",
+    "marker_occurrences",
+    "wire_contract",
+    "required_evidence",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 0
+    },
+    "architecture": {
+      "type": "string",
+      "const": "x86_64"
+    },
+    "toolchain": {
+      "type": "string",
+      "const": "1.96.0"
+    },
+    "target": {
+      "type": "string",
+      "const": "x86_64-unknown-none"
+    },
+    "request_entry": {
+      "type": "string",
+      "const": "kozo_rust_user_request_entry"
+    },
+    "response_entry": {
+      "type": "string",
+      "const": "kozo_rust_user_response_entry"
+    },
+    "request_adapter": {
+      "type": "string",
+      "const": "user_privilege_probe_start"
+    },
+    "response_adapter": {
+      "type": "string",
+      "const": "user_response_consumer_start"
+    },
+    "code_virtual_address": {
+      "type": "string",
+      "const": "0x0000400000000000"
+    },
+    "code_size_bytes": {
+      "type": "integer",
+      "const": 4096
+    },
+    "data_size_bytes": {
+      "type": "integer",
+      "const": 4096
+    },
+    "stack_size_bytes": {
+      "type": "integer",
+      "const": 4096
+    },
+    "initial_rsp": {
+      "type": "string",
+      "const": "0x0000400000002ff0"
+    },
+    "pre_call_rsp_modulo_16": {
+      "type": "integer",
+      "const": 0
+    },
+    "rust_entry_rsp_modulo_16": {
+      "type": "integer",
+      "const": 8
+    },
+    "stack_budget_bytes": {
+      "type": "integer",
+      "const": 256
+    },
+    "red_zone": {
+      "type": "boolean",
+      "const": false
+    },
+    "panic": {
+      "type": "string",
+      "const": "abort"
+    },
+    "allocator": {
+      "type": "boolean",
+      "const": false
+    },
+    "sessions": {
+      "type": "integer",
+      "const": 2
+    },
+    "transitions_per_session": {
+      "type": "integer",
+      "const": 2
+    },
+    "marker_occurrences": {
+      "type": "integer",
+      "const": 52
+    },
+    "wire_contract": {
+      "type": "string",
+      "const": "contracts/fixed_user_request_boundary_contract.v1.json"
+    },
+    "required_evidence": {
+      "type": "array",
+      "const": [
+        "independent_pinned_object",
+        "read_only_closed_relocations",
+        "linked_entry_bytes_match_object",
+        "rust_entries_in_user_rx_page",
+        "exact_hardware_frame",
+        "rust_request_and_response_validation",
+        "two_completed_sessions",
+        "hosted_qemu_controls"
+      ],
+      "items": {
+        "type": "string"
+      }
+    },
+    "non_goals": {
+      "type": "array",
+      "const": [
+        "processes",
+        "scheduler",
+        "loader",
+        "dynamic allocation",
+        "new mappings",
+        "new interrupt vectors",
+        "public syscall ABI",
+        "Windows runtime",
+        "macOS runtime"
+      ],
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

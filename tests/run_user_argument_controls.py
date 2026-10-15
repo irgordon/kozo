@@ -11,21 +11,22 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PRIVILEGE = 'kernel/arch/x86_64/privilege_transition.asm'
 LAYOUT = 'kernel/arch/x86_64/runtime_layout.inc'
+RUST = 'userspace/fixed_user_program/user.rs'
 SOURCE_DIRECTORIES = ('kernel', 'bindings', 'contracts', 'schemas', 'harness',
-                      'scripts', 'boot', 'linker')
+                      'scripts', 'boot', 'linker', 'userspace/fixed_user_program')
 CONTROLS = (
-    ('zero', LAYOUT, 'FIXED_USER_ARGUMENT_OPERAND 7', 'FIXED_USER_ARGUMENT_OPERAND 0', True),
-    ('maximum', LAYOUT, 'FIXED_USER_ARGUMENT_OPERAND 7', 'FIXED_USER_ARGUMENT_OPERAND 65535', True),
-    ('out_of_range', LAYOUT, 'FIXED_USER_ARGUMENT_OPERAND 7', 'FIXED_USER_ARGUMENT_OPERAND 65536', False),
+    ('zero', RUST, 'const ARGUMENT: u64 = 7;', 'const ARGUMENT: u64 = 0;', True),
+    ('maximum', RUST, 'const ARGUMENT: u64 = 7;', 'const ARGUMENT: u64 = 65535;', True),
+    ('out_of_range', RUST, 'const ARGUMENT: u64 = 7;', 'const ARGUMENT: u64 = 65536;', False),
     ('corrupted_result', PRIVILEGE,
      '    call prepare_user_response_resume\n',
      '    inc qword [rel fixed_user_response_shadow + 88]\n    call prepare_user_response_resume\n', False),
     ('consumer_corruption', PRIVILEGE,
      'user_response_consumer_start:\n',
      'user_response_consumer_start:\n    mov rax, FIXED_USER_RESPONSE_VA\n    inc qword [rax + 88]\n', False),
-    ('short_digest', PRIVILEGE,
-     '    xor rax, [rdi + 88]\n    mov [rsi + 32], rax',
-     '    mov [rsi + 32], rax', False),
+    ('short_digest', RUST,
+     'response.iter().fold(0, |digest, word| digest ^ word)',
+     'response[..11].iter().fold(0, |digest, word| digest ^ word)', False),
     ('short_cleanup', PRIVILEGE,
      'clear_fixed_user_response_transaction:\n    cld\n    xor eax, eax\n    mov rdi, FIXED_USER_RESPONSE_VA\n    mov ecx, FIXED_USER_RESPONSE_QWORDS',
      'clear_fixed_user_response_transaction:\n    cld\n    xor eax, eax\n    mov rdi, FIXED_USER_RESPONSE_VA\n    mov ecx, 11', False),
@@ -70,6 +71,7 @@ def prepare_fixture(destination, path, before, after):
     destination.mkdir(parents=True, exist_ok=False)
     for directory in SOURCE_DIRECTORIES:
         shutil.copytree(ROOT / directory, destination / directory, ignore=shutil.ignore_patterns('__pycache__'))
+    shutil.copyfile(ROOT / 'rust-toolchain.toml', destination / 'rust-toolchain.toml')
     source = destination / path
     text = source.read_text()
     assert before in text, (path, before)

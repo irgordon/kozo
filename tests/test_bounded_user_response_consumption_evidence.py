@@ -4,6 +4,7 @@ import copy
 import json
 import tempfile
 import unittest
+from tests.fixed_user_assembly_fixture import historical_user_assembly, historical_elf_report
 from pathlib import Path
 
 from harness.codes import BOUNDED_USER_RESPONSE_CONSUMPTION_EVIDENCE_INVALID, OK
@@ -284,6 +285,8 @@ class BoundedUserResponseConsumptionEvidenceTests(unittest.TestCase):
                     target = root / f"fixture-{index}"
                     if is_json:
                         value = json.loads(source_path.read_text())
+                        if attribute == "_ELF_REPORT_PATH":
+                            value = historical_elf_report(value)
                         if attribute == "_METADATA_PATH":
                             value["observed_markers"] = list(get_smoke_marker_order())
                             value["outcome"] = "pass"
@@ -291,6 +294,8 @@ class BoundedUserResponseConsumptionEvidenceTests(unittest.TestCase):
                         target.write_text(json.dumps(mutation(copy.deepcopy(value)) if mutation else value))
                     else:
                         value = source_path.read_text()
+                        if attribute == "_PRIVILEGE_PATH":
+                            value = historical_user_assembly(value)
                         target.write_text(mutation(value) if mutation else value)
                     originals[attribute] = getattr(validator_module, attribute)
                     setattr(validator_module, attribute, target)

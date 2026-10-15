@@ -8,6 +8,15 @@ Scope: Harness, validator, verification, evidence, and proof-state rules
 
 # 1. Purpose
 
+Fixed Rust user execution composes into the existing 67-check gate. It must
+prove the independently compiled pinned object, closed references, linked
+entry-byte identity, RX placement, CPL inspection and bounded leaf stack use.
+Historical assembly evidence tests retain explicit pre-Rust fixtures; current
+Rust checks must not infer field coverage from obsolete assembly counts.
+The hosted Linux CI lane must also execute the valid program and eight
+isolated negative guest controls, requiring explicit kernel rejection and
+suppression of later success. Windows and macOS validate builds only.
+
 This document defines how KOZO verifies repository state.
 
 Validation proves that source files, contracts, generated artifacts, task state, schemas, and evidence agree for the current development state.

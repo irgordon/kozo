@@ -170,6 +170,10 @@ def _layout_issue(context):
 
 
 def _ring3_request_issue(context):
+    if 'call kozo_rust_user_request_entry' in context.privilege:
+        from harness.fixed_rust_user_evidence import current_execution_issue
+        detail = current_execution_issue(ROOT, context.report, context.privilege)
+        return _issue('ring3_request_invalid', 'request.fields', detail) if detail else None
     expected = (
         "mov rdi, FIXED_USER_REQUEST_VA",
         "mov dword [rdi], FIXED_USER_REQUEST_VERSION",
@@ -318,7 +322,7 @@ def _elf_issue(context):
     issue = _elf_range_issue(record)
     if issue is not None:
         return issue
-    return _elf_behavior_issue(record)
+    return _elf_behavior_issue(record, 'call kozo_rust_user_request_entry' in context.privilege)
 
 
 def _elf_symbol_issue(record):
@@ -340,7 +344,7 @@ def _elf_range_issue(record):
     return None
 
 
-def _elf_behavior_issue(record):
+def _elf_behavior_issue(record, rust_request=False):
     required_true = (
         "ring3_return_interrupt_present",
         "handler_call_order_valid",
@@ -354,6 +358,8 @@ def _elf_behavior_issue(record):
         "copy_out_memory_move_count": 24,
         "readback_memory_move_count": 24,
     }
+    if rust_request:
+        del minimum_counts['ring3_request_store_count']
     if any(record.get(field, -1) < count for field, count in minimum_counts.items()):
         return _issue("missing_elf_copy_evidence", "kernel_elf_report.fixed_user_request_boundary", "ELF must retain exact request, copy, and readback operations")
     if record.get("clear_stosq_count", 0) < 5 or record.get("post_clear_zero_validation_present") is not True:

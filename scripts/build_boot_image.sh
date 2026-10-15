@@ -81,6 +81,7 @@ prepare_directories() {
 }
 
 build_kernel_objects() {
+  python3 "$ROOT/scripts/build_fixed_rust_user.py" "$WORK_DIR/fixed_user.o"
   "$ROOT/scripts/build_odin_object.sh" "$WORK_DIR/kernel.o" "$ROOT/kernel" \
     "-target:$BRIDGE_TARGET" \
     -disable-red-zone

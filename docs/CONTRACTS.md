@@ -8,6 +8,13 @@ Scope: Contract purpose, contract source paths, and contract authority
 
 # 1. Purpose
 
+The post-v1.1.0 fixed Rust user implementation is additionally governed by
+`contracts/fixed_rust_user_execution_contract.v0.json` and its strict schema.
+ADR 0021 changes user-program ownership only. Historical assembly transport
+contracts and their fixture-based negative tests remain intact; current
+evidence composes those kernel boundaries with compiled Rust placement,
+complete wire validation, bounded stack use and exact return adapters.
+
 This document defines what KOZO means by a contract and which files own system boundary truth.
 
 Contracts make implicit boundaries explicit. A boundary is not governed until it is backed by a checked-in contract and validation.

@@ -1,8 +1,8 @@
 {
-  "task_title": "KOZO Bounded User Argument Service Implementation",
+  "task_title": "KOZO First Bounded Rust Userspace Execution",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
-  "plan_status": "complete",
+  "plan_status": "approved",
   "replan_number": 0,
   "approval": {
     "status": "approved"
@@ -3611,6 +3611,62 @@
         "verification.tests_run[169]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 103,
+      "title": "Execute fixed Rust user program through two sessions",
+      "status": "pending",
+      "kind": "edit",
+      "files_expected": [
+        ".gitignore",
+        ".github/workflows/ci.yml",
+        "kernel/arch/x86_64/privilege_transition.asm",
+        "kernel/runtime_progression.odin",
+        "linker/kernel.ld",
+        "userspace/fixed_user_program/user.rs",
+        "contracts/fixed_rust_user_execution_contract.v0.json",
+        "schemas/fixed_rust_user_execution_contract.schema.json",
+        "harness/fixed_rust_user.py",
+        "harness/fixed_rust_user_evidence.py",
+        "scripts/build_fixed_rust_user.py",
+        "scripts/build_boot_image.sh",
+        "scripts/host_portability_contract.py",
+        "scripts/kernel_elf_report.py",
+        "harness/validators_impl/bounded_privilege_transition_probe_evidence.py",
+        "harness/validators_impl/bounded_user_argument.py",
+        "harness/validators_impl/bounded_user_response_consumption_evidence.py",
+        "harness/validators_impl/fixed_user_request_boundary_evidence.py",
+        "harness/validators_impl/fixed_user_runtime_status_service_evidence.py",
+        "harness/validators_impl/schema.py",
+        "tests/fixed_user_assembly_fixture.py",
+        "tests/fixtures/fixed_user_assembly.v0.asm",
+        "tests/fixtures/fixed_user_assembly.v0.elf.json",
+        "tests/run_fixed_rust_user_controls.py",
+        "tests/run_user_argument_controls.py",
+        "tests/test_fixed_rust_user.py",
+        "tests/test_bounded_privilege_transition_probe_evidence.py",
+        "tests/test_bounded_user_argument.py",
+        "tests/test_bounded_user_response_consumption_evidence.py",
+        "tests/test_fixed_user_request_boundary_evidence.py",
+        "tests/test_fixed_user_runtime_status_service_evidence.py",
+        "docs/ARCHITECTURE.md",
+        "docs/GENERATED_ARTIFACTS.md",
+        "docs/CONTRACTS.md",
+        "docs/SECURITY_MODEL.md",
+        "docs/VALIDATION.md",
+        "docs/ROADMAP.md",
+        "docs/PHASEMAP.md",
+        "docs/adr/0021-fixed-rust-user-execution.md",
+        "docs/generated/governance_index.md",
+        "CHANGELOG.md",
+        "tasks/todo.json",
+        "tasks/runtime.json",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/runtime/qemu_smoke.summary.txt"
+      ],
+      "verification_refs": ["verification.tests_run[170]"],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -4546,6 +4602,11 @@
         "tool": "bounded user argument service",
         "command": "actual Odin executable boundary and mutation tests; historical v0 contract tests; source and ELF successor validation; isolated QEMU argument controls; full Python and governed verification; hosted CI, lint and portability",
         "status": "implemented_hosted_accepted_c8614e8_ci_38791570613_lint_38791570563_portability_38791570560_1300_tests_67_checks_52_markers_2_sessions_4_returns_8_qemu_controls_pass_downloaded_iso_verified_v1.1.0_unchanged"
+      },
+      {
+        "tool": "fixed Rust user execution",
+        "command": "pinned Rust object build; native wire-policy tests; object and linked ELF checks; isolated QEMU controls; full Python and governed verification; hosted CI, lint and portability",
+        "status": "implemented_locally_1320_tests_67_checks_52_markers_2_sessions_4_returns_9_qemu_controls_pass_hosted_acceptance_pending"
       }
     ],
     "logs": [

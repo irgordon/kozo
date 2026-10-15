@@ -19,6 +19,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from harness.text_evidence import write_canonical_text
+from harness.fixed_rust_user import build_user_object
 
 
 EXPECTED_FOCUSED_TESTS = 34
@@ -111,6 +112,8 @@ def execute_build_contract(
     checksums = validate_checksum_round_trip(root, work_directory)
     state.enter("odin_object")
     object_result = build_real_odin_object(root, work_directory)
+    state.enter("rust_user_object")
+    rust_user_object = build_user_object(root, work_directory / 'Rust user object/fixed_user.o')
     state.finish()
     return build_evidence(
         state,
@@ -120,6 +123,7 @@ def execute_build_contract(
         release_inputs,
         checksums,
         object_result,
+        rust_user_object,
     )
 
 
@@ -528,6 +532,7 @@ def build_evidence(
     release_inputs: dict,
     checksums: dict,
     object_result: dict,
+    rust_user_object: dict,
 ) -> dict:
     return build_environment_evidence(
         state,
@@ -535,6 +540,7 @@ def build_evidence(
     ) | {
         "tests": {"odin_object_build": focused_count, "full_python": full_count},
         "odin_object": object_result,
+        "rust_user_object": rust_user_object,
         "release_inventory": {**inventory, "result": "PASS"},
         "release_inputs": release_inputs,
         "checksums": {"algorithm": "SHA-256", "result": "PASS", "files": checksums},
