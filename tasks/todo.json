@@ -3663,7 +3663,9 @@
         "tasks/runtime.json",
         "artifacts/latest_verify.json",
         "artifacts/runtime/kernel_elf_report.json",
-        "artifacts/runtime/qemu_smoke.summary.txt"
+        "artifacts/runtime/qemu_smoke.summary.txt",
+        "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/boot_blocker_report.json"
       ],
       "verification_refs": ["verification.tests_run[170]"],
       "failure_count": 0
