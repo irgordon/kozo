@@ -120,6 +120,7 @@ def build_fixture(fixture):
 
 
 def boot_fixture(fixture):
+    fixture = fixture.resolve()
     environment = os.environ | {'KOZO_BOOT_ISO': str(fixture / 'artifacts/runtime/boot_image/kozo.iso')}
     with (fixture / 'qemu.log').open('w') as log:
         execution = subprocess.run(['bash', 'scripts/qemu_smoke.sh'], cwd=fixture, env=environment,

@@ -14,6 +14,9 @@
 * Correct the Rust adapter ELF evidence to use bounded addresses rather than
   GNU/LLVM symbol-label selection, retaining exact call-target checks and
   recording the original failed hosted run `38805988627`.
+* Correct relative control-fixture ISO paths at the subprocess boundary after
+  run `38807624959` passed runtime packaging but rejected every control for a
+  missing ISO. Keep all nine controls required and preserve failure evidence.
 
 ## Bounded User Argument Service - 2026-10-15
 

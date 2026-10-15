@@ -3669,7 +3669,7 @@
         "artifacts/runtime/boot_blocker_report.json"
       ],
       "verification_refs": ["verification.tests_run[170]"],
-      "failure_count": 0
+      "failure_count": 2
     }
   ],
   "expected_outputs": [
@@ -4609,7 +4609,7 @@
       {
         "tool": "fixed Rust user execution",
         "command": "pinned Rust object build; native wire-policy tests; object and linked ELF checks; isolated QEMU controls; full Python and governed verification; hosted CI, lint and portability",
-        "status": "implemented_locally_1325_tests_67_checks_52_markers_2_sessions_4_returns_9_qemu_controls_pass_ci_38805988627_GNU_alias_evidence_failure_corrected_locally_hosted_acceptance_pending"
+        "status": "implemented_locally_1326_tests_67_checks_52_markers_2_sessions_4_returns_9_qemu_controls_pass_ci_38805988627_alias_failure_and_38807624959_fixture_path_failure_corrected_locally_hosted_acceptance_pending"
       }
     ],
     "logs": [

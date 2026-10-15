@@ -8,6 +8,8 @@ import json
 import struct
 import shutil
 import copy
+from unittest.mock import patch
+from types import SimpleNamespace
 from pathlib import Path
 
 from harness.fixed_rust_user import (
@@ -55,6 +57,23 @@ class FixedRustUserEvidenceTests(unittest.TestCase):
 
     def test_current_rust_sources_are_valid(self):
         self.assertIsNone(source_issue(self.rust, self.assembly))
+
+    def test_control_iso_path_survives_relative_fixture_working_directory(self):
+        from tests.run_fixed_rust_user_controls import boot_fixture
+        # Relative-path fixtures must share the checkout volume on Windows.
+        with tempfile.TemporaryDirectory(prefix='kozo control path ', dir=ROOT) as directory:
+            fixture = Path(directory).resolve()
+            runtime = fixture / 'artifacts/runtime'
+            runtime.mkdir(parents=True)
+            (runtime / 'qemu_smoke.metadata.json').write_text('{"outcome": "unit_fixture"}')
+            (runtime / 'qemu_smoke.log').write_text('unit fixture, not guest evidence')
+            relative = Path(os.path.relpath(fixture, Path.cwd()))
+            with patch('tests.run_fixed_rust_user_controls.subprocess.run',
+                       return_value=SimpleNamespace(returncode=0)) as execute:
+                boot_fixture(relative)
+            environment = execute.call_args.kwargs['env']
+            self.assertEqual(Path(environment['KOZO_BOOT_ISO']), fixture / 'artifacts/runtime/boot_image/kozo.iso')
+            self.assertEqual(execute.call_args.kwargs['cwd'], fixture)
 
     def test_every_governed_wire_field_is_required(self):
         for rule in SOURCE_RULES:
