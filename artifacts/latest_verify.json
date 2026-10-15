@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20261015T190842Z",
+  "run_id": "verify-20261015T192121Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -493,7 +493,8 @@
   ],
   "failed_checks": [],
   "changed_files": [
-    "artifacts/runtime/kernel_elf_report.json",
+    "artifacts/runtime/boot_blocker_report.json",
+    "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt",
     "docs/generated/governance_index.md"
   ],
@@ -512,5 +513,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-10-15T19:08:42Z"
+  "generated_at": "2026-10-15T19:21:21Z"
 }
