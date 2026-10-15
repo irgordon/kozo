@@ -360,6 +360,17 @@ response-consumption contracts own their fixed transport. This contract owns
 only the status service placed inside that transport; documentation and
 generated reports do not redefine it.
 
+ADR 0020 preserves this v0 contract as the immutable historical v1.1.0
+protocol. `contracts/fixed_user_request_boundary_contract.v1.json` owns its
+bounded argument successor: contract version 1, wire version 2, request ID 2,
+40-byte request, 96-byte response, appended u64 at offset 88, and twelve-qword
+digest. It inherits status meanings and fixed transport policy while replacing
+only zero payload, wire version, response length, result validation, and
+corresponding copy/cleanup lengths. The 48-byte consumption record and context
+geometry are unchanged. Historical v0 validators remain enabled; current
+runtime evidence additionally enforces the successor contract and real Odin
+service. The published v1.1.0 assets remain immutable.
+
 # 28. Fixed User Execution Context Governance
 
 `contracts/fixed_user_execution_context_contract.v0.json` owns the internal

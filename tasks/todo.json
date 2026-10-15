@@ -1,8 +1,8 @@
 {
-  "task_title": "KOZO v1.1.0 Release Qualification and Promotion",
+  "task_title": "KOZO Bounded User Argument Service Implementation",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
-  "plan_status": "complete",
+  "plan_status": "approved",
   "replan_number": 0,
   "approval": {
     "status": "approved"
@@ -3562,6 +3562,55 @@
         "verification.tests_run[168]"
       ],
       "failure_count": 0
+    },
+    {
+      "id": 102,
+      "title": "Implement bounded user argument service",
+      "status": "pending",
+      "kind": "edit",
+      "files_expected": [
+        "CHANGELOG.md",
+        "artifacts/latest_verify.json",
+        "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/runtime/qemu_smoke.summary.txt",
+        "contracts/fixed_user_request_boundary_contract.v1.json",
+        "docs/ARCHITECTURE.md",
+        "docs/CONTRACTS.md",
+        "docs/INVARIANTS.md",
+        "docs/PHASEMAP.md",
+        "docs/ROADMAP.md",
+        "docs/SECURITY_MODEL.md",
+        "docs/VALIDATION.md",
+        "docs/adr/0020-fixed-user-argument-protocol-evolution.md",
+        "docs/generated/governance_index.md",
+        "harness/bounded_user_argument.py",
+        "harness/validators_impl/bounded_privilege_transition_probe_evidence.py",
+        "harness/validators_impl/bounded_user_argument.py",
+        "harness/validators_impl/bounded_user_response_consumption_evidence.py",
+        "harness/validators_impl/fixed_user_request_boundary_evidence.py",
+        "harness/validators_impl/fixed_user_runtime_status_service_evidence.py",
+        "harness/validators_impl/schema.py",
+        "kernel/arch/x86_64/arch.odin",
+        "kernel/arch/x86_64/privilege_transition.asm",
+        "kernel/arch/x86_64/runtime_layout.inc",
+        "kernel/arch/x86_64/serial.odin",
+        "kernel/arch/x86_64/syscall.asm",
+        "kernel/bounded_user_argument.odin",
+        "linker/kernel.ld",
+        "schemas/fixed_user_request_boundary_contract.v1.schema.json",
+        "scripts/kernel_elf_report.py",
+        "tasks/runtime.json",
+        "tasks/todo.json",
+        "tests/run_user_argument_controls.py",
+        "tests/test_bounded_user_argument.py",
+        "tests/test_fixed_user_request_boundary_evidence.py",
+        "tests/test_fixed_user_runtime_status_service_evidence.py",
+        "tests/test_kernel_elf_report.py"
+      ],
+      "verification_refs": [
+        "verification.tests_run[169]"
+      ],
+      "failure_count": 0
     }
   ],
   "expected_outputs": [
@@ -4492,6 +4541,11 @@
         "tool": "v1.1.0 release qualification and promotion",
         "command": "release integrity review; 337 focused tests; 1,284-test discovery; Odin, Rust, cargo-deny, cargo-audit, portability actionlint, governed 67-check QEMU verification; hosted CI 31922319739; lint 31922319746; portability 31922319738; annotated tag; final six-asset publication; fresh hosted download, checksum, JSON, byte-identity, and ISO QEMU validation",
         "status": "complete_v1.0.2_skipped_v1.1.0_published_final_tag_object_db81ce98280cc795ceb2cbd42ac561cfba556f39_target_a5226635be46c687299028b5244f808da67c0984_six_assets_download_verified_1284_tests_67_checks_0_failures_qemu_pass_blocker_none_52_markers_2_sessions_4_transitions"
+      },
+      {
+        "tool": "bounded user argument service",
+        "command": "actual Odin executable boundary and mutation tests; historical v0 contract tests; source and ELF successor validation; isolated QEMU argument controls; full Python and governed verification; hosted CI, lint and portability",
+        "status": "locally_validated_candidate_1300_tests_67_checks_52_markers_2_sessions_4_returns_8_qemu_controls_pass_hosted_pending"
       }
     ],
     "logs": [

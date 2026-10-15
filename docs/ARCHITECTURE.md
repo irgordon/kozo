@@ -320,3 +320,24 @@ reserved state. Later internal capabilities are reachable only after two
 completed sessions, four total returns, zero active ordinal, and zero failure.
 There is no loop, third-session path, process, scheduler, allocator, or ABI
 change.
+
+# 19. Bounded User Argument Service
+
+ADR 0020 and fixed request contract v1 extend each existing session with one
+copied u64 argument. Wire format version 2 retains request ID 2 and the fixed
+40-byte request, appending the result to a 96-byte response at offset 88.
+The offset-80 reserved field remains zero. Ring 0 validates the frame and
+spans, copies the request, validates the shadow, and passes its operand to
+`evaluate_bounded_user_argument` in Odin. That function checks 0..65535 before
+adding one into the fixed supervisor response slot and returning status.
+
+Ring 3 retains its submitted operand in the existing user-data scratch area
+and compares the returned result against that operand plus one. Ring 0 checks
+the initial result against the request shadow, then retains the validated
+response shadow through consumption. Full readback and a twelve-qword digest
+protect the response. Existing scratch, stack, buffer and context cleanup
+govern both sessions; no static authority record or mapping is added.
+
+The four legacy Odin inline-assembly primitives use typed calls to the existing
+NASM bridge, preserving rdtsc/shl/or, hlt, outb and inb instructions under the
+current compiler. Arithmetic service policy remains in Odin.

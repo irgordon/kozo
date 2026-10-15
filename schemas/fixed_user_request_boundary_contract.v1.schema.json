@@ -1,0 +1,413 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "architecture",
+    "wire_format_version",
+    "historical_contract",
+    "request",
+    "response",
+    "consumption",
+    "operation",
+    "validation",
+    "runtime",
+    "non_goals"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "architecture": {
+      "type": "string",
+      "const": "x86_64"
+    },
+    "wire_format_version": {
+      "type": "integer",
+      "const": 2
+    },
+    "historical_contract": {
+      "type": "string",
+      "const": "contracts/fixed_user_runtime_status_service_contract.v0.json"
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identifier",
+        "virtual_address",
+        "size_bytes",
+        "alignment_bytes",
+        "payload_offset",
+        "argument_min",
+        "argument_max",
+        "sequence",
+        "flags",
+        "reserved"
+      ],
+      "properties": {
+        "identifier": {
+          "type": "integer",
+          "const": 2
+        },
+        "virtual_address": {
+          "type": "string",
+          "const": "0x0000400000001000"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "const": 40
+        },
+        "alignment_bytes": {
+          "type": "integer",
+          "const": 8
+        },
+        "payload_offset": {
+          "type": "integer",
+          "const": 24
+        },
+        "argument_min": {
+          "type": "integer",
+          "const": 0
+        },
+        "argument_max": {
+          "type": "integer",
+          "const": 65535
+        },
+        "sequence": {
+          "type": "integer",
+          "const": 1
+        },
+        "flags": {
+          "type": "integer",
+          "const": 0
+        },
+        "reserved": {
+          "type": "integer",
+          "const": 0
+        }
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "virtual_address",
+        "size_bytes",
+        "alignment_bytes",
+        "result_offset",
+        "reserved_zero_offsets",
+        "fields"
+      ],
+      "properties": {
+        "virtual_address": {
+          "type": "string",
+          "const": "0x0000400000001080"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "const": 96
+        },
+        "alignment_bytes": {
+          "type": "integer",
+          "const": 8
+        },
+        "result_offset": {
+          "type": "integer",
+          "const": 88
+        },
+        "reserved_zero_offsets": {
+          "type": "array",
+          "const": [
+            28,
+            80
+          ],
+          "items": {
+            "type": "integer"
+          }
+        },
+        "fields": {
+          "type": "array",
+          "const": [
+            {
+              "name": "version",
+              "offset": 0,
+              "size": 4
+            },
+            {
+              "name": "request_id",
+              "offset": 4,
+              "size": 4
+            },
+            {
+              "name": "status",
+              "offset": 8,
+              "size": 4
+            },
+            {
+              "name": "response_size",
+              "offset": 12,
+              "size": 4
+            },
+            {
+              "name": "sequence",
+              "offset": 16,
+              "size": 8
+            },
+            {
+              "name": "current_runtime_stage",
+              "offset": 24,
+              "size": 4
+            },
+            {
+              "name": "reserved_0",
+              "offset": 28,
+              "size": 4
+            },
+            {
+              "name": "proven_stage_mask",
+              "offset": 32,
+              "size": 8
+            },
+            {
+              "name": "boot_memory_region_size",
+              "offset": 40,
+              "size": 8
+            },
+            {
+              "name": "controlled_loop_iteration_limit",
+              "offset": 48,
+              "size": 8
+            },
+            {
+              "name": "controlled_loop_final_count",
+              "offset": 56,
+              "size": 8
+            },
+            {
+              "name": "controlled_loop_final_accumulator",
+              "offset": 64,
+              "size": 8
+            },
+            {
+              "name": "feature_mask",
+              "offset": 72,
+              "size": 8
+            },
+            {
+              "name": "reserved_1",
+              "offset": 80,
+              "size": 8
+            },
+            {
+              "name": "argument_result",
+              "offset": 88,
+              "size": 8
+            }
+          ],
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "offset",
+              "size"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "offset": {
+                "type": "integer"
+              },
+              "size": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "consumption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "virtual_address",
+        "size_bytes",
+        "qword_count",
+        "response_digest_qwords"
+      ],
+      "properties": {
+        "virtual_address": {
+          "type": "string",
+          "const": "0x0000400000001100"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "const": 48
+        },
+        "qword_count": {
+          "type": "integer",
+          "const": 6
+        },
+        "response_digest_qwords": {
+          "type": "integer",
+          "const": 12
+        }
+      }
+    },
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "symbol",
+        "kind",
+        "increment",
+        "success_status",
+        "invalid_status",
+        "result_destination",
+        "input_source",
+        "ring3_operand",
+        "ring3_operand_storage"
+      ],
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "const": "evaluate_bounded_user_argument"
+        },
+        "kind": {
+          "type": "string",
+          "const": "increment"
+        },
+        "increment": {
+          "type": "integer",
+          "const": 1
+        },
+        "success_status": {
+          "type": "integer",
+          "const": 0
+        },
+        "invalid_status": {
+          "type": "integer",
+          "const": 1
+        },
+        "result_destination": {
+          "type": "string",
+          "const": "fixed_user_response_shadow + 88"
+        },
+        "input_source": {
+          "type": "string",
+          "const": "fixed_user_request_shadow + 24"
+        },
+        "ring3_operand": {
+          "type": "integer",
+          "const": 7
+        },
+        "ring3_operand_storage": {
+          "type": "string",
+          "const": "FIXED_USER_DATA_SCRATCH_VA"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "range_before_arithmetic",
+        "complete_shadow_validation",
+        "complete_copy_readback",
+        "reserved_fields_zero",
+        "ring3_result_check",
+        "ring0_result_check",
+        "complete_digest",
+        "complete_cleanup_readback"
+      ],
+      "properties": {
+        "range_before_arithmetic": {
+          "type": "boolean",
+          "const": true
+        },
+        "complete_shadow_validation": {
+          "type": "boolean",
+          "const": true
+        },
+        "complete_copy_readback": {
+          "type": "boolean",
+          "const": true
+        },
+        "reserved_fields_zero": {
+          "type": "boolean",
+          "const": true
+        },
+        "ring3_result_check": {
+          "type": "boolean",
+          "const": true
+        },
+        "ring0_result_check": {
+          "type": "boolean",
+          "const": true
+        },
+        "complete_digest": {
+          "type": "boolean",
+          "const": true
+        },
+        "complete_cleanup_readback": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessions",
+        "transitions_per_session",
+        "total_transitions",
+        "marker_occurrences",
+        "final_marker"
+      ],
+      "properties": {
+        "sessions": {
+          "type": "integer",
+          "const": 2
+        },
+        "transitions_per_session": {
+          "type": "integer",
+          "const": 2
+        },
+        "total_transitions": {
+          "type": "integer",
+          "const": 4
+        },
+        "marker_occurrences": {
+          "type": "integer",
+          "const": 52
+        },
+        "final_marker": {
+          "type": "string",
+          "const": "KOZO_RUNTIME_RETURN_OK"
+        }
+      }
+    },
+    "non_goals": {
+      "type": "array",
+      "const": [
+        "public syscall ABI",
+        "arbitrary pointers",
+        "variable lengths",
+        "user-selected operations",
+        "dynamic allocation",
+        "new mappings",
+        "third session",
+        "processes",
+        "scheduler"
+      ],
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

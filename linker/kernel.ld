@@ -94,10 +94,10 @@ SECTIONS
          "double-fault stack must be exactly one page")
   ASSERT((fixed_user_request_shadow_end - fixed_user_request_shadow) == 40,
          "fixed user request shadow must be exactly 40 bytes")
-  ASSERT((fixed_user_response_shadow_end - fixed_user_response_shadow) == 88,
-         "fixed user response shadow must be exactly 88 bytes")
-  ASSERT((fixed_user_response_verify_end - fixed_user_response_verify) == 88,
-         "fixed user response verify buffer must be exactly 88 bytes")
+  ASSERT((fixed_user_response_shadow_end - fixed_user_response_shadow) == 96,
+         "fixed user response shadow must be exactly 96 bytes")
+  ASSERT((fixed_user_response_verify_end - fixed_user_response_verify) == 96,
+         "fixed user response verify buffer must be exactly 96 bytes")
   ASSERT((fixed_user_consumption_shadow_end - fixed_user_consumption_shadow) == 48,
          "fixed user consumption shadow must be exactly 48 bytes")
   ASSERT((fixed_user_transaction_phase_end - fixed_user_transaction_phase) == 8,

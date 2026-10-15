@@ -180,6 +180,12 @@ Historical runtime blockers such as `kernel_not_loaded`, `limine_lower_half_phdr
 
 ## Next Phase
 
+The current implementation candidate is the Bounded User Argument Service:
+one u64 in 0..65535, Odin increment, a versioned 96-byte response, and complete
+result consumption in both fixed sessions. ADR 0020 accompanies the narrow
+invariant amendment. Local validation passes; hosted acceptance is
+pending. ADR 0019 remains reserved; no third session or release is selected.
+
 The `v1.0.0-rc.1`, `v1.0.0`, post-publication documentation, v1.0.1 patch, and
 v1.0.1 observation phases are complete. `KOZO-TRIAGE-002` and
 `KOZO-TRIAGE-003` are resolved on `main`, and v1.1.0 Phase 0 is accepted.

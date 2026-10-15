@@ -24,10 +24,7 @@ boot_smoke_marker :: "KOZO_BOOT_SMOKE_OK"
 
 outb :: proc "contextless" (port: u16, value: u8) {
 	when ODIN_ARCH == .amd64 {
-		asm(u32, u8) #side_effects #intel {
-			"mov edx, $0; mov al, $1; out dx, al",
-			"r,r",
-		}(u32(port), value)
+		x86_outb(port, value)
 	} else {
 		_ = port
 		_ = value
@@ -36,10 +33,7 @@ outb :: proc "contextless" (port: u16, value: u8) {
 
 inb :: proc "contextless" (port: u16) -> u8 {
 	when ODIN_ARCH == .amd64 {
-		return asm(u32) -> u8 #side_effects #intel {
-			"mov edx, $1; in al, dx; mov $0, al",
-			"=r,r",
-		}(u32(port))
+		return x86_inb(port)
 	} else {
 		_ = port
 		return transmit_ready

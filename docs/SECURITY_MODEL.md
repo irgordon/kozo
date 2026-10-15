@@ -283,3 +283,16 @@ first identity is invalid after clear.
 The coordinator has no identity or address authority. Any stale byte, identity
 reuse, count mismatch, cleanup failure, third session, or fifth transition
 prevents later capabilities and converges on the existing terminal halt path.
+
+# 22. Bounded User Argument Boundary
+
+Wire version 2 treats the argument as untrusted data, never authority. Only
+the copied supervisor request supplies the Odin operand; both the assembly
+boundary and Odin reject values above 65535 before computation. The result
+destination is a fixed supervisor slot, never a caller-selected pointer.
+Ring 3 independently checks the returned result using its retained operand.
+Ring 0 trusts neither that scratch value nor the consumption record: it
+revalidates all response bytes against the validated supervisor shadow and
+checks the complete twelve-qword digest and six-qword record. Full cleanup
+removes the argument and appended result before reuse. Service-success evidence
+requires complete response readback; any failure suppresses later continuation.

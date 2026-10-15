@@ -10,6 +10,7 @@ from harness.runtime_evidence_taxonomy import get_smoke_marker_order
 from harness.runtime_marker_occurrences import exact_marker_line_count
 from harness.validator import BaseValidator, ValidationResult
 from harness.validators_impl.fixed_user_runtime_status_service_contract import _contract_issue
+from harness.validators_impl.bounded_user_argument import argument_evidence_issue
 
 _CONTRACT_PATH = ROOT / "contracts" / "fixed_user_runtime_status_service_contract.v0.json"
 _BOOT_PATH = ROOT / "kernel" / "arch" / "x86_64" / "boot.asm"
@@ -108,6 +109,9 @@ def _evidence_issue() -> RuntimeStatusEvidenceIssue | None:
         issue = check(context)
         if issue is not None:
             return issue
+    argument_issue = argument_evidence_issue(context)
+    if argument_issue is not None:
+        return _issue(*argument_issue)
     return None
 
 
@@ -260,7 +264,7 @@ def _bridge_issue(context):
 def _response_issue(context):
     layout_tokens = (
         "%define FIXED_USER_REQUEST_ID 2",
-        "%define FIXED_USER_RESPONSE_SIZE 88",
+        "%define FIXED_USER_RESPONSE_SIZE 96",
         "%define RUNTIME_STATUS_SNAPSHOT_SIZE 64",
         "%define RUNTIME_STATUS_FEATURE_MASK 0x7f",
     )
@@ -280,8 +284,9 @@ def _response_issue(context):
             "call runtime_serial_write_user_runtime_status_service_enter_marker",
             "call build_fixed_user_runtime_status_response",
             "call validate_fixed_user_response",
-            "call runtime_serial_write_user_runtime_status_service_ok_marker",
             "call copy_fixed_user_response_out",
+            "call validate_fixed_user_response_readback",
+            "call runtime_serial_write_user_runtime_status_service_ok_marker",
         ),
         "service_order_invalid",
         "marker_order",
@@ -294,10 +299,10 @@ def _response_issue(context):
         "user_response_consumer_end:",
     )
     comparisons = sum("cmp " in line and "[rdi" in line for line in consumer.splitlines())
-    if comparisons < 14:
-        return _issue("partial_ring3_validation", "ring3_validation", "Ring3 must compare all fourteen fixed response fields")
-    if "xor rax, [rdi + 80]" not in consumer:
-        return _issue("response_digest_invalid", "ring3_validation.digest_operation", "Ring3 must digest all eleven response qwords")
+    if comparisons < 15:
+        return _issue("partial_ring3_validation", "ring3_validation", "Ring3 must compare all fifteen fixed response fields")
+    if any(f"xor rax, [rdi + {offset}]" not in consumer for offset in range(8, 96, 8)):
+        return _issue("response_digest_invalid", "ring3_validation.digest_operation", "Ring3 must digest all twelve response qwords")
     return None
 
 
@@ -350,8 +355,8 @@ def _elf_issue(context):
     consumer_issue = _ring3_consumer_elf_issue(evidence)
     if consumer_issue is not None:
         return consumer_issue
-    if evidence.get("digest_xor_count", 0) < 10:
-        return _issue("elf_digest_incomplete", "kernel_elf_report.digest_xor_count", "ELF must retain all ten digest XOR operations")
+    if evidence.get("digest_xor_count", 0) < 11:
+        return _issue("elf_digest_incomplete", "kernel_elf_report.digest_xor_count", "ELF must retain all eleven digest XOR operations")
     return None
 
 
@@ -415,7 +420,7 @@ def _expected_response_offsets():
         offsets = [field["offset"] for field in contract["response"]["fields"]]
     except (OSError, json.JSONDecodeError, KeyError, TypeError):
         return []
-    return [f"0x{offset:02x}" for offset in offsets]
+    return [f"0x{offset:02x}" for offset in (*offsets, 88)]
 
 
 def _runtime_evidence_issue(context):

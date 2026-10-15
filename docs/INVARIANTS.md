@@ -598,18 +598,30 @@ interrupt handling.
 
 # 18. Fixed User Request Invariants
 
-The bounded CPL3 probe may construct only the fixed version-1 request at
+Historically, v0.8.5 constructed only the fixed version-1 request at
 `0x0000400000001000`. Ring0 must validate the saved CPL3 frame and each complete
 fixed span before shared-page access, copy exactly 40 request bytes into
 supervisor storage, validate every field, execute only the named deterministic
-service, and copy exactly 48 response bytes to `0x0000400000001080`.
+service, and copied exactly 48 response bytes to `0x0000400000001080`.
+The accepted v0.8.7 status protocol expanded that response to 88 bytes.
+
+The bounded argument successor uses wire format version 2, fixed request ID 2,
+exactly 40 request bytes at the same address, and one u64 argument at offset
+24 in the inclusive range 0 through 65535. Its response is exactly 96 bytes
+at the same fixed address, retains reserved-zero offset 80, and appends one
+u64 result at offset 88. Ring 0 validates complete spans, copies into a
+supervisor shadow, validates all copied fields before service, and verifies
+complete response copy-out by readback. All buffers require full clearing
+and zero readback. Arbitrary pointers, lengths, addresses, dispatch identifiers,
+and user-selected operations remain forbidden. This is an internal fixed
+transaction protocol, not a public syscall ABI.
 
 Success requires response readback, every-field validation, clearing of both
 shared spans and all supervisor shadows, zero readback, and the fixed Ring0
-continuation. No failure may emit later success evidence. This invariant does
-not authorize arbitrary pointers, lengths, request identifiers, general copy
-helpers, a public syscall ABI, return to Ring3, persistent userspace, or
-process isolation.
+continuation. No failure may emit later success evidence. Arbitrary pointers,
+lengths, request identifiers, general copy helpers, a public syscall ABI,
+persistent userspace, and process isolation remain unauthorized. Return to
+the fixed Ring 3 response consumer is governed solely by section 19.
 
 # 19. Bounded User Response Invariants
 
@@ -617,11 +629,15 @@ The supervisor-owned phase follows exactly
 `REQUEST_PENDING -> RESPONSE_READY -> CONSUMED -> REQUEST_PENDING`.
 The response-consumer RIP and RSP are fixed and its resume RFLAGS are
 sanitized. Ring 3 validates all response fields and writes only the fixed
-48-byte record. The second Ring 0 handler validates the frame, revalidates all
-six response qwords, copies and validates all six record qwords, and clears
-every remaining transaction span before success.
+48-byte record. Historical responses contained six qwords (v0.8.5) and eleven
+qwords (v0.8.7). The successor contains twelve response qwords: all twelve
+participate in copy-out readback, Ring 3 validation, the response digest, and
+Ring 0 revalidation. The record remains six qwords, all copied and validated.
+Every remaining transaction span is cleared before success. Each of the two
+fixed sessions retains exactly two int 0x81 returns; no additional entry or
+interrupt vector is authorized.
 
-No third Ring 3 entry, arbitrary pointer, variable length, persistent user
+No third Ring 3 entry within one session, arbitrary pointer, variable length, persistent user
 loop, or success marker after a failed boundary is permitted.
 
 # 20. Runtime-Ordered User Status Invariants
@@ -632,10 +648,17 @@ the same validated snapshot. Request validation precedes snapshot use,
 response validation precedes copy-out, and Ring 0 revalidation follows Ring 3
 consumption.
 
-The 88-byte response has fixed identity and geometry, reports no planned stage
+The historical 88-byte response has fixed identity and geometry, reports no planned stage
 as proven, sets only seven documented feature bits, and keeps every reserved
 field zero. All transaction buffers and the snapshot must be cleared before
 later runtime success. Failure suppresses later markers and converges on halt.
+
+Its versioned 96-byte successor preserves all status fields and seven feature
+bits, keeps reserved fields zero, and appends a u64 result at offset 88. The
+actual Odin service validates the copied argument before computing argument
+plus one. It consumes only supervisor-owned copied data, never live user
+memory. Response validation precedes copy-out, complete revalidation follows
+Ring 3 consumption, and all new storage is cleared before later success.
 
 # 21. Fixed User Execution Context Governance Invariants
 

@@ -1,5 +1,19 @@
 # Changelog
 
+## Bounded User Argument Service - 2026-10-15
+
+**Status:** Locally validated implementation candidate; hosted acceptance pending.
+
+* Added ADR 0020 and a versioned fixed argument protocol while preserving
+  historical v0 contracts and published v1.1.0 assets.
+* Added the Odin 0..65535 increment service, complete 96-byte response,
+  independent Ring 3 result check, twelve-qword digest and full cleanup.
+* Preserved two sessions, four returns and 52 ordered runtime occurrences.
+* Migrated four incompatible Odin inline-assembly primitives into the existing
+  NASM bridge with their original hardware operations and typed Odin wrappers.
+* Added actual Odin executable mutation tests and isolated QEMU controls.
+  No release version is advanced or future capability selected.
+
 ## v1.1.0 - 2026-08-16
 
 **Status:** Final feature release published and independently verified.

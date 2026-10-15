@@ -359,6 +359,18 @@ The same script accepts canonical `X.Y.Z-rc.N` candidate versions and canonical
 
 # 22. Host Portability Validation
 
+The bounded argument successor is validated within the existing registered
+fixed-user status evidence check, preserving 67 aggregate checks. Historical
+v0 contract tests remain intact. `tests.test_bounded_user_argument` validates
+the successor schema, bridge, result validation, digest and cleanup mutations,
+and compiles the actual Odin service into isolated host executables for
+0, 1, 7, 65535, 65536 and UINT64_MAX. Constant-result and missing-range-guard
+mutations must compile and then fail their executable assertions.
+`tests/run_user_argument_controls.py --output <new-directory>` runs isolated
+QEMU fixtures for alternate operands and corrupted protocol paths. Production
+sources are never modified by these controls. The normal governed runtime
+remains two sessions, four returns, and 52 ordered marker occurrences.
+
 Host portability and guest runtime are separate validation contracts.
 
 ## 22.1 Build Contract

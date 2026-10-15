@@ -36,6 +36,12 @@ Roadmap entries are planning commitments, not claims that behavior already exist
 
 # 3. Product Thesis
 
+Post-v1.1.0 implementation candidate: Bounded User Argument Service. The fixed
+two-session transaction now carries one bounded u64 and computes argument plus
+one through Odin under ADR 0020. Local validation passes; hosted
+acceptance is pending. No future release is assigned, and published v1.1.0
+does not contain this candidate.
+
 KOZO is a small, contract-backed operating-system substrate where every
 claimed boundary is explicit, verified, and supported by reproducible release
 evidence.

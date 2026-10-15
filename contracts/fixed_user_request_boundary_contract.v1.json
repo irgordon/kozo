@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "architecture": "x86_64",
+  "wire_format_version": 2,
+  "historical_contract": "contracts/fixed_user_runtime_status_service_contract.v0.json",
+  "request": {
+    "identifier": 2,
+    "virtual_address": "0x0000400000001000",
+    "size_bytes": 40,
+    "alignment_bytes": 8,
+    "payload_offset": 24,
+    "argument_min": 0,
+    "argument_max": 65535,
+    "sequence": 1,
+    "flags": 0,
+    "reserved": 0
+  },
+  "response": {
+    "virtual_address": "0x0000400000001080",
+    "size_bytes": 96,
+    "alignment_bytes": 8,
+    "result_offset": 88,
+    "reserved_zero_offsets": [
+      28,
+      80
+    ],
+    "fields": [
+      {
+        "name": "version",
+        "offset": 0,
+        "size": 4
+      },
+      {
+        "name": "request_id",
+        "offset": 4,
+        "size": 4
+      },
+      {
+        "name": "status",
+        "offset": 8,
+        "size": 4
+      },
+      {
+        "name": "response_size",
+        "offset": 12,
+        "size": 4
+      },
+      {
+        "name": "sequence",
+        "offset": 16,
+        "size": 8
+      },
+      {
+        "name": "current_runtime_stage",
+        "offset": 24,
+        "size": 4
+      },
+      {
+        "name": "reserved_0",
+        "offset": 28,
+        "size": 4
+      },
+      {
+        "name": "proven_stage_mask",
+        "offset": 32,
+        "size": 8
+      },
+      {
+        "name": "boot_memory_region_size",
+        "offset": 40,
+        "size": 8
+      },
+      {
+        "name": "controlled_loop_iteration_limit",
+        "offset": 48,
+        "size": 8
+      },
+      {
+        "name": "controlled_loop_final_count",
+        "offset": 56,
+        "size": 8
+      },
+      {
+        "name": "controlled_loop_final_accumulator",
+        "offset": 64,
+        "size": 8
+      },
+      {
+        "name": "feature_mask",
+        "offset": 72,
+        "size": 8
+      },
+      {
+        "name": "reserved_1",
+        "offset": 80,
+        "size": 8
+      },
+      {
+        "name": "argument_result",
+        "offset": 88,
+        "size": 8
+      }
+    ]
+  },
+  "consumption": {
+    "virtual_address": "0x0000400000001100",
+    "size_bytes": 48,
+    "qword_count": 6,
+    "response_digest_qwords": 12
+  },
+  "operation": {
+    "symbol": "evaluate_bounded_user_argument",
+    "kind": "increment",
+    "increment": 1,
+    "success_status": 0,
+    "invalid_status": 1,
+    "result_destination": "fixed_user_response_shadow + 88",
+    "input_source": "fixed_user_request_shadow + 24",
+    "ring3_operand": 7,
+    "ring3_operand_storage": "FIXED_USER_DATA_SCRATCH_VA"
+  },
+  "validation": {
+    "range_before_arithmetic": true,
+    "complete_shadow_validation": true,
+    "complete_copy_readback": true,
+    "reserved_fields_zero": true,
+    "ring3_result_check": true,
+    "ring0_result_check": true,
+    "complete_digest": true,
+    "complete_cleanup_readback": true
+  },
+  "runtime": {
+    "sessions": 2,
+    "transitions_per_session": 2,
+    "total_transitions": 4,
+    "marker_occurrences": 52,
+    "final_marker": "KOZO_RUNTIME_RETURN_OK"
+  },
+  "non_goals": [
+    "public syscall ABI",
+    "arbitrary pointers",
+    "variable lengths",
+    "user-selected operations",
+    "dynamic allocation",
+    "new mappings",
+    "third session",
+    "processes",
+    "scheduler"
+  ]
+}

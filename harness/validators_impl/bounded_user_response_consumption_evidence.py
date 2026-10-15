@@ -176,9 +176,9 @@ def _first_handler_issue(context):
         "call copy_fixed_user_request_in",
         "call runtime_serial_write_user_runtime_status_service_enter_marker",
         "call build_fixed_user_runtime_status_response",
-        "call runtime_serial_write_user_runtime_status_service_ok_marker",
         "call copy_fixed_user_response_out",
         "call validate_fixed_user_response_readback",
+        "call runtime_serial_write_user_runtime_status_service_ok_marker",
         "call runtime_serial_write_user_response_copy_out_marker",
         "call prepare_user_response_resume",
         "call runtime_serial_write_ring3_response_resume_marker",
@@ -231,10 +231,10 @@ def _ring3_consumer_issue(context):
     if issue is not None:
         return issue
     response_comparisons = sum("[rdi" in line and "cmp " in line for line in source.splitlines())
-    if response_comparisons < 14:
+    if response_comparisons < 15:
         return _issue("partial_ring3_response_validation", "ring3_response_checks", "Ring3 must compare every fixed response field")
     status_write = source.find("mov [rsi + 12], r8d")
-    final_comparison = source.rfind("cmp qword [rdi + 80], 0")
+    final_comparison = source.rfind("cmp [rdi + 88], rax")
     if status_write < final_comparison:
         return _issue("success_record_before_validation", "consumption_record", "Record construction must follow every response comparison")
     return None

@@ -94,6 +94,7 @@ extern runtime_serial_write_fixed_user_request_marker
 extern runtime_serial_write_ring3_probe_marker
 extern runtime_serial_write_ring0_return_marker
 extern runtime_status_snapshot
+extern evaluate_bounded_user_argument
 extern boot_terminal_halt
 
 %define PAGE_QWORDS (KOZO_PAGE_SIZE / 8)
@@ -184,10 +185,13 @@ user_privilege_probe_start:
     mov dword [rdi + 8], FIXED_USER_REQUEST_SIZE
     mov dword [rdi + 12], FIXED_USER_RESPONSE_SIZE
     mov qword [rdi + 16], FIXED_USER_REQUEST_SEQUENCE
-    mov qword [rdi + 24], 0
+    mov rax, FIXED_USER_ARGUMENT_OPERAND
+    mov [rdi + 24], rax
+    mov rcx, FIXED_USER_DATA_SCRATCH_VA
+    mov [rcx], rax
     mov dword [rdi + 32], FIXED_USER_REQUEST_FLAGS
     mov dword [rdi + 36], 0
-    cmp qword [rdi + 24], 0
+    cmp [rdi + 24], rax
     jne user_privilege_probe_failed
     push qword USER_RFLAGS
     popfq
@@ -263,6 +267,14 @@ user_response_consumer_start:
     mov r8d, 14
     cmp qword [rdi + 80], 0
     jne .write_record
+    mov r8d, 15
+    mov rcx, FIXED_USER_DATA_SCRATCH_VA
+    mov rax, [rcx]
+    cmp rax, FIXED_USER_ARGUMENT_MAX
+    ja .write_record
+    add rax, FIXED_USER_ARGUMENT_INCREMENT
+    cmp [rdi + 88], rax
+    jne .write_record
     xor r8d, r8d
     jmp .write_record
 
@@ -293,6 +305,7 @@ user_response_consumer_start:
     xor rax, [rdi + 64]
     xor rax, [rdi + 72]
     xor rax, [rdi + 80]
+    xor rax, [rdi + 88]
     mov [rsi + 32], rax
     mov qword [rsi + 40], 0
     push qword USER_RFLAGS
@@ -919,14 +932,13 @@ handle_fixed_user_request:
     call validate_fixed_user_response
     test eax, eax
     jnz privilege_return_failure
-    call runtime_serial_write_user_runtime_status_service_ok_marker
-
     call copy_fixed_user_response_out
     test eax, eax
     jnz privilege_return_failure
     call validate_fixed_user_response_readback
     test eax, eax
     jnz privilege_return_failure
+    call runtime_serial_write_user_runtime_status_service_ok_marker
     call runtime_serial_write_user_response_copy_out_marker
 
     call prepare_user_response_resume
@@ -1173,8 +1185,8 @@ validate_fixed_user_request:
     jne .invalid
     cmp qword [rel fixed_user_request_shadow + 16], FIXED_USER_REQUEST_SEQUENCE
     jne .invalid
-    cmp qword [rel fixed_user_request_shadow + 24], 0
-    jne .invalid
+    cmp qword [rel fixed_user_request_shadow + 24], FIXED_USER_ARGUMENT_MAX
+    ja .invalid
     cmp dword [rel fixed_user_request_shadow + 32], FIXED_USER_REQUEST_FLAGS
     jne .invalid
     cmp dword [rel fixed_user_request_shadow + 36], 0
@@ -1241,6 +1253,11 @@ build_fixed_user_runtime_status_response:
     mov [rel fixed_user_response_shadow + 72], rax
     mov rax, [rel runtime_status_snapshot + 56]
     mov [rel fixed_user_response_shadow + 80], rax
+    mov rdi, [rel fixed_user_request_shadow + 24]
+    lea rsi, [rel fixed_user_response_shadow + 88]
+    call evaluate_bounded_user_argument
+    test eax, eax
+    jnz .failed
     xor eax, eax
     ret
 .failed:
@@ -1252,6 +1269,20 @@ validate_fixed_user_response:
     call fixed_user_response_fields_are_valid
     test eax, eax
     jnz .invalid
+    call validate_fixed_user_argument_result
+    test eax, eax
+    jnz .invalid
+    xor eax, eax
+    ret
+.invalid:
+    mov eax, FIXED_USER_RESPONSE_INVALID
+    ret
+
+validate_fixed_user_argument_result:
+    mov rax, [rel fixed_user_response_shadow + 88]
+    sub rax, FIXED_USER_ARGUMENT_INCREMENT
+    cmp rax, [rel fixed_user_request_shadow + 24]
+    jne .invalid
     xor eax, eax
     ret
 .invalid:
@@ -1287,13 +1318,17 @@ fixed_user_response_fields_are_valid:
     jne .invalid
     cmp qword [rdi + 80], 0
     jne .invalid
+    cmp qword [rdi + 88], FIXED_USER_ARGUMENT_INCREMENT
+    jb .invalid
+    cmp qword [rdi + 88], (FIXED_USER_ARGUMENT_MAX + FIXED_USER_ARGUMENT_INCREMENT)
+    ja .invalid
     xor eax, eax
     ret
 .invalid:
     mov eax, 1
     ret
 
-; Copies exactly eleven qwords to the fixed response span and verifies each store.
+; Copies exactly twelve qwords to the fixed response span and verifies each store.
 copy_fixed_user_response_out:
     lea rsi, [rel fixed_user_response_shadow]
     mov rdi, FIXED_USER_RESPONSE_VA
@@ -1319,6 +1354,8 @@ copy_fixed_user_response_out:
     mov [rdi + 72], rax
     mov rax, [rsi + 80]
     mov [rdi + 80], rax
+    mov rax, [rsi + 88]
+    mov [rdi + 88], rax
     mov ecx, FIXED_USER_RESPONSE_QWORDS
 .verify:
     mov rax, [rsi]
@@ -1359,6 +1396,8 @@ validate_fixed_user_response_readback:
     mov [rdi + 72], rax
     mov rax, [rsi + 80]
     mov [rdi + 80], rax
+    mov rax, [rsi + 88]
+    mov [rdi + 88], rax
     lea rsi, [rel fixed_user_response_shadow]
     mov ecx, FIXED_USER_RESPONSE_QWORDS
 .compare:
@@ -1548,7 +1587,7 @@ validate_fixed_user_consumption_record:
     mov eax, USER_RESPONSE_RECORD_INVALID
     ret
 
-; Returns the XOR digest of all eleven fixed response qwords.
+; Returns the XOR digest of all twelve fixed response qwords.
 fixed_user_response_digest:
     mov rax, [rdi]
     xor rax, [rdi + 8]
@@ -1561,6 +1600,7 @@ fixed_user_response_digest:
     xor rax, [rdi + 64]
     xor rax, [rdi + 72]
     xor rax, [rdi + 80]
+    xor rax, [rdi + 88]
     ret
 
 ; Clears only the remaining response-stage spans and supervisor shadows.

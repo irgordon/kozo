@@ -29,8 +29,8 @@ _BOUNDARY_MARKERS = (
 )
 _ELF_RANGES = {
     "request_shadow": (40, 8),
-    "response_shadow": (88, 8),
-    "response_verify": (88, 8),
+    "response_shadow": (96, 8),
+    "response_verify": (96, 8),
 }
 _ELF_SYMBOLS = (
     "user_privilege_probe_start",
@@ -162,8 +162,8 @@ def _layout_issue(context):
         "%define FIXED_USER_REQUEST_VA (USER_PROBE_DATA_VA + 0x000)",
         "%define FIXED_USER_RESPONSE_VA (USER_PROBE_DATA_VA + 0x080)",
         "%define FIXED_USER_REQUEST_SIZE 40",
-        "%define FIXED_USER_RESPONSE_SIZE 88",
-        "%define FIXED_USER_REQUEST_VERSION 1",
+        "%define FIXED_USER_RESPONSE_SIZE 96",
+        "%define FIXED_USER_REQUEST_VERSION 2",
         "%define FIXED_USER_REQUEST_ID 2",
     )
     return _source_tokens_issue(context.layout, required, "layout_geometry_invalid", "request.response")
@@ -177,10 +177,10 @@ def _ring3_request_issue(context):
         "mov dword [rdi + 8], FIXED_USER_REQUEST_SIZE",
         "mov dword [rdi + 12], FIXED_USER_RESPONSE_SIZE",
         "mov qword [rdi + 16], FIXED_USER_REQUEST_SEQUENCE",
-        "mov qword [rdi + 24], 0",
+        "mov [rdi + 24], rax",
         "mov dword [rdi + 32], FIXED_USER_REQUEST_FLAGS",
         "mov dword [rdi + 36], 0",
-        "cmp qword [rdi + 24], 0",
+        "cmp [rdi + 24], rax",
         "int KOZO_PRIVILEGE_RETURN_VECTOR",
     )
     return _ordered_source_issue(context.privilege, expected, "ring3_request_invalid", "request.fields")
@@ -197,9 +197,9 @@ def _handler_order_issue(context):
         "call runtime_serial_write_user_runtime_status_service_enter_marker",
         "call build_fixed_user_runtime_status_response",
         "call validate_fixed_user_response",
-        "call runtime_serial_write_user_runtime_status_service_ok_marker",
         "call copy_fixed_user_response_out",
         "call validate_fixed_user_response_readback",
+        "call runtime_serial_write_user_runtime_status_service_ok_marker",
         "call runtime_serial_write_user_response_copy_out_marker",
         "call prepare_user_response_resume",
         "call runtime_serial_write_ring3_response_resume_marker",
@@ -237,10 +237,10 @@ def _copy_issue(context):
     readback = _source_range(context.privilege, "validate_fixed_user_response_readback:", "prepare_user_response_resume:")
     if _fixed_move_count(copy_in, 5) is False:
         return _issue("copy_in_invalid", "copy_boundary.copy_in_size_bytes", "Copy-in must move exactly five fixed qwords")
-    if _fixed_move_count(copy_out, 11) is False:
-        return _issue("copy_out_invalid", "copy_boundary.copy_out_size_bytes", "Copy-out must move exactly eleven fixed qwords")
-    if _fixed_move_count(readback, 11) is False or "call fixed_user_response_fields_are_valid" not in readback:
-        return _issue("response_readback_invalid", "copy_boundary.copy_out_readback_required", "Response readback must copy and validate eleven qwords")
+    if _fixed_move_count(copy_out, 12) is False:
+        return _issue("copy_out_invalid", "copy_boundary.copy_out_size_bytes", "Copy-out must move exactly twelve fixed qwords")
+    if _fixed_move_count(readback, 12) is False or "call fixed_user_response_fields_are_valid" not in readback:
+        return _issue("response_readback_invalid", "copy_boundary.copy_out_readback_required", "Response readback must copy and validate twelve qwords")
     return None
 
 
@@ -299,8 +299,8 @@ def _failure_issue(context):
 def _linker_issue(context):
     required = (
         "fixed user request shadow must be exactly 40 bytes",
-        "fixed user response shadow must be exactly 88 bytes",
-        "fixed user response verify buffer must be exactly 88 bytes",
+        "fixed user response shadow must be exactly 96 bytes",
+        "fixed user response verify buffer must be exactly 96 bytes",
         "fixed user request shadow must be 8-byte aligned",
         "fixed user response shadow must be 8-byte aligned",
         "fixed user response verify buffer must be 8-byte aligned",
@@ -351,8 +351,8 @@ def _elf_behavior_issue(record):
     minimum_counts = {
         "ring3_request_store_count": 8,
         "copy_in_memory_move_count": 10,
-        "copy_out_memory_move_count": 22,
-        "readback_memory_move_count": 22,
+        "copy_out_memory_move_count": 24,
+        "readback_memory_move_count": 24,
     }
     if any(record.get(field, -1) < count for field, count in minimum_counts.items()):
         return _issue("missing_elf_copy_evidence", "kernel_elf_report.fixed_user_request_boundary", "ELF must retain exact request, copy, and readback operations")

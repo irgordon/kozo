@@ -142,8 +142,8 @@ class FixedUserRuntimeStatusServiceEvidenceTests(unittest.TestCase):
     def test_fails_when_response_size_changes(self):
         result = self.validate_fixture(
             layout=lambda text: text.replace(
-                "%define FIXED_USER_RESPONSE_SIZE 88",
                 "%define FIXED_USER_RESPONSE_SIZE 96",
+                "%define FIXED_USER_RESPONSE_SIZE 88",
                 1,
             )
         )
@@ -378,8 +378,8 @@ class FixedUserRuntimeStatusServiceEvidenceTests(unittest.TestCase):
     def test_failure_diagnostic_names_field(self):
         result = self.validate_fixture(
             layout=lambda text: text.replace(
-                "%define FIXED_USER_RESPONSE_SIZE 88",
                 "%define FIXED_USER_RESPONSE_SIZE 96",
+                "%define FIXED_USER_RESPONSE_SIZE 88",
                 1,
             )
         )

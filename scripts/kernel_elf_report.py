@@ -163,6 +163,8 @@ FIXED_USER_REQUEST_SYMBOLS = (
     "fixed_user_request_success_state",
 )
 FIXED_USER_RUNTIME_STATUS_SYMBOLS = (
+    "evaluate_bounded_user_argument",
+    "validate_fixed_user_argument_result",
     "runtime_progression_entry",
     "execute_runtime_status_boundaries",
     "collect_runtime_status",
@@ -306,7 +308,7 @@ RING3_RESPONSE_REQUIRED_SUCCESS_STORES = 8
 RUNTIME_STATUS_CONTRACT_PATH = (
     Path(__file__).resolve().parents[1]
     / "contracts"
-    / "fixed_user_runtime_status_service_contract.v0.json"
+    / "fixed_user_request_boundary_contract.v1.json"
 )
 
 ARCHITECTURES = {
@@ -453,6 +455,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "fixed_user_request_boundary": fixed_user_request_boundary_record(kernel_elf, symbols),
         "bounded_user_response_consumption": bounded_user_response_consumption_record(kernel_elf, symbols),
         "fixed_user_runtime_status_service": fixed_user_runtime_status_service_record(kernel_elf, symbols),
+        "bounded_user_argument": bounded_user_argument_record(kernel_elf, symbols),
         "fixed_user_execution_context": fixed_user_execution_context_record(
             kernel_elf,
             symbols,
@@ -1054,14 +1057,14 @@ def fixed_user_request_boundary_record(
             symbols,
             "fixed_user_response_shadow",
             "fixed_user_response_shadow_end",
-            88,
+            96,
             8,
         ),
         "response_verify": _symbol_range_record(
             symbols,
             "fixed_user_response_verify",
             "fixed_user_response_verify_end",
-            88,
+            96,
             8,
         ),
         "ring3_request_store_count": _memory_store_count(ring3_probe),
@@ -1079,9 +1082,9 @@ def fixed_user_request_boundary_record(
                     "runtime_serial_write_user_runtime_status_service_enter_marker",
                     "build_fixed_user_runtime_status_response",
                     "validate_fixed_user_response",
-                    "runtime_serial_write_user_runtime_status_service_ok_marker",
                     "copy_fixed_user_response_out",
                     "validate_fixed_user_response_readback",
+                    "runtime_serial_write_user_runtime_status_service_ok_marker",
                     "runtime_serial_write_user_response_copy_out_marker",
                     "prepare_user_response_resume",
                     "runtime_serial_write_ring3_response_resume_marker",
@@ -1114,6 +1117,17 @@ def fixed_user_request_boundary_record(
         "prohibited_boundary_instructions": _fixed_user_request_prohibited_instructions(
             instruction_sets
         ),
+    }
+
+
+def bounded_user_argument_record(kernel_elf, symbols):
+    instructions = parse_disassembly_instructions(
+        disassemble_symbol(kernel_elf, 'build_fixed_user_runtime_status_response')
+    )
+    return {
+        'service_present': 'evaluate_bounded_user_argument' in symbols,
+        'builder_calls_service': _calls_address(instructions, symbols.get('evaluate_bounded_user_argument')),
+        'result_validator_present': 'validate_fixed_user_argument_result' in symbols,
     }
 
 
@@ -1181,8 +1195,9 @@ def fixed_user_runtime_status_service_record(
                     "runtime_serial_write_user_runtime_status_service_enter_marker",
                     "build_fixed_user_runtime_status_response",
                     "validate_fixed_user_response",
-                    "runtime_serial_write_user_runtime_status_service_ok_marker",
                     "copy_fixed_user_response_out",
+                    "validate_fixed_user_response_readback",
+                    "runtime_serial_write_user_runtime_status_service_ok_marker",
                 )
             ),
         ),

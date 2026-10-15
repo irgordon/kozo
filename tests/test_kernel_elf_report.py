@@ -189,8 +189,17 @@ class KernelElfReportTests(unittest.TestCase):
         return kernel_elf_report.build_ring3_response_consumer_evidence(
             text,
             symbols,
-            kernel_elf_report.runtime_status_response_offsets(),
+            kernel_elf_report.runtime_status_response_offsets(
+                ROOT / 'contracts/fixed_user_runtime_status_service_contract.v0.json'
+            ),
         )
+
+    def test_historical_consumer_does_not_prove_successor_result(self):
+        evidence = kernel_elf_report.build_ring3_response_consumer_evidence(
+            GNU_FIXTURE.read_text(), CONSUMER_SYMBOLS,
+        )
+        self.assertIn('0x58', evidence['ring3_response_missing_offsets'])
+        self.assertFalse(evidence['ring3_response_order_valid'])
 
     def remove_lines(self, text, prefixes):
         return "\n".join(
