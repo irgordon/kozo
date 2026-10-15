@@ -2,7 +2,7 @@
 
 ## Bounded User Argument Service - 2026-10-15
 
-**Status:** Locally validated implementation candidate; hosted acceptance pending.
+**Status:** Implemented and hosted accepted on main; not in published v1.1.0.
 
 * Added ADR 0020 and a versioned fixed argument protocol while preserving
   historical v0 contracts and published v1.1.0 assets.
@@ -13,6 +13,10 @@
   NASM bridge with their original hardware operations and typed Odin wrappers.
 * Added actual Odin executable mutation tests and isolated QEMU controls.
   No release version is advanced or future capability selected.
+* CI `38791570613`, lint `38791570563`, and portability `38791570560`
+  accepted implementation proof `c8614e8`. All 1,300 tests and 67 checks
+  passed. Downloaded package checksums, ISO/runtime identity, JSON, ELF, and
+  a fresh boot of the hosted ISO passed with two sessions and 52 markers.
 
 ## v1.1.0 - 2026-08-16
 

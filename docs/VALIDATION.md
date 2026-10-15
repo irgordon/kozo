@@ -371,6 +371,14 @@ QEMU fixtures for alternate operands and corrupted protocol paths. Production
 sources are never modified by these controls. The normal governed runtime
 remains two sessions, four returns, and 52 ordered marker occurrences.
 
+Hosted acceptance: CI `38791570613`, lint `38791570563`, portability
+`38791570560`, proof commit `c8614e8`. All 1,300 Python tests passed on each
+required host. Local isolated QEMU controls accepted operands 0 and 65535,
+rejected 65536, result corruption, incomplete digest and incomplete cleanup,
+and proved that a post-copy user-memory mutation cannot change the copied
+operand. The downloaded CI ISO matched the runtime-lane ISO and booted through
+both sessions. These are development artifacts; v1.1.0 remains immutable.
+
 Host portability and guest runtime are separate validation contracts.
 
 ## 22.1 Build Contract
