@@ -24,7 +24,7 @@ SOURCE_RULES = (
     '[WIRE_VERSION | (REQUEST_ID << 32), REQUEST_BYTES | (RESPONSE_BYTES << 32),',
     'SEQUENCE, argument, 0]', 'for index in 0..12',
     'words[index] = read_volatile((RESPONSE as *const u64).add(index));',
-    'let argument = read_volatile(ARGUMENT_SCRATCH as *const u64);',
+    'read_volatile(ARGUMENT_SCRATCH as *const u64)',
     'if argument > 65535',
     'words[0] == WIRE_VERSION | (REQUEST_ID << 32)',
     'words[1] == (RESPONSE_BYTES << 32) | u64::from(abi::K_OK)',
@@ -54,6 +54,7 @@ def rust_entry_rules():
     return (
         (ENTRYPOINTS[0], ('if !at_cpl3()', 'return INVALID;', 'construct_request();', 'abi::K_OK')),
         (ENTRYPOINTS[1], ('if !at_cpl3()', 'return INVALID;', 'let response = read_response();',
+                         'let argument = read_argument_scratch();',
                          'if !response_is_valid(&response, argument)', 'return INVALID;',
                          'write_consumption(consumption_words(&response));', 'abi::K_OK')),
     )

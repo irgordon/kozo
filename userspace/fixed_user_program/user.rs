@@ -36,7 +36,7 @@ pub unsafe extern "C" fn kozo_rust_user_response_entry() -> u32 {
         return INVALID;
     }
     let response = read_response();
-    let argument = read_volatile(ARGUMENT_SCRATCH as *const u64);
+    let argument = read_argument_scratch();
     if !response_is_valid(&response, argument) {
         return INVALID;
     }
@@ -66,6 +66,11 @@ unsafe fn read_response() -> [u64; 12] {
         words[index] = read_volatile((RESPONSE as *const u64).add(index));
     }
     words
+}
+
+#[inline(always)]
+unsafe fn read_argument_scratch() -> u64 {
+    read_volatile(ARGUMENT_SCRATCH as *const u64)
 }
 
 #[inline(always)]
