@@ -136,6 +136,8 @@ governed_page_tables_end:
 
 section .data
 align 8
+global executable_physical_base
+global executable_virtual_base
 executable_physical_base:
     dq 0
 executable_virtual_base:

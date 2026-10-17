@@ -33,7 +33,7 @@ def derive_stack(content, response=False, control=0):
     extra_stack = 8 if control == 8 else 0
     if extra_stack:
         prefix += bytes.fromhex('6a00')
-    prefix += bytes.fromhex('6a029d')
+    prefix += bytes.fromhex('6a129d' if control == 33 else '6a029d')
     if control in (6, 19, 20, 21):
         prefix += bytes.fromhex('eb02')
     opcode = bytes.fromhex('0fb9c0' if control == 7 else '0f0b')

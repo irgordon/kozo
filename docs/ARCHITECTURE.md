@@ -367,5 +367,7 @@ control after an exact fixture-only Rust fault, never resumes Rust, and uses
 the existing transaction failure wrapper for one authoritative commit and
 clear. One separate 64-byte evidence record advances through validated stages
 before Odin may report completed recovery. Rejections use stack-independent
-direct context clearing where safe, otherwise a demonstrated emergency halt.
+direct context and fixed user-session storage clearing where safe, otherwise a
+demonstrated emergency halt. The fixture accepts only the two contract-owned
+saved-frame RFLAGS forms; QMP evidence must match the registered emulator form.
 Implementation is under validation; hosted acceptance is not yet claimed.

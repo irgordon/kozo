@@ -1,11 +1,17 @@
-%define USER_EXCEPTION_RFLAGS 0x10002
+%define USER_EXCEPTION_RFLAGS_LEGACY 0x2
+%define USER_EXCEPTION_RFLAGS_ARCHITECTURAL 0x10002
 %define USER_EXCEPTION_RECORD_SIZE 64
 %define USER_EXCEPTION_SELECTOR (FIXED_USER_DATA_SCRATCH_VA + 8)
 
 extern __kozo_authorized_ud2_rip
 extern runtime_bootstrap_context
 extern governed_kernel_pt
+extern governed_user_pt
 extern governed_page_table_root_physical
+extern executable_virtual_base
+extern executable_physical_base
+extern user_probe_data_start
+extern user_probe_stack
 global bounded_user_exception_handler
 global bounded_user_exception_record
 global bounded_user_exception_record_end
@@ -53,8 +59,11 @@ bounded_user_exception_handler:
     cmp qword [r15 + 32], USER_DATA_SELECTOR
     jne reject_user_exception
     mov ebx, 5
-    cmp qword [r15 + 16], USER_EXCEPTION_RFLAGS
+    cmp qword [r15 + 16], USER_EXCEPTION_RFLAGS_LEGACY
+    je .flags_valid
+    cmp qword [r15 + 16], USER_EXCEPTION_RFLAGS_ARCHITECTURAL
     jne reject_user_exception
+.flags_valid:
     mov rax, __kozo_authorized_ud2_rip
     test rax, rax
     jz .site_disabled
@@ -171,6 +180,15 @@ finish_authorized_user_exception:
     call fail_and_clear_fixed_user_execution_context
     test eax, eax
     jnz .failed
+%ifdef KOZO_FAULT_SESSION
+%if KOZO_FAULT_MODE == 36
+    mov dword [rel fixed_user_context_result + FIXED_USER_CONTEXT_RESULT_FAILURE_CODE_OFFSET], 0
+    mov edi, FIXED_USER_CONTEXT_FAILURE_INVALID_RETURN_STATE
+    call validate_fixed_user_context_failure_result_survives
+    test eax, eax
+    jnz .failed
+%endif
+%endif
 %ifdef KOZO_FAULT_SESSION
 %if KOZO_FAULT_MODE == 26
     mov edi, FIXED_USER_CONTEXT_FAILURE_INVALID_RETURN_STATE
@@ -352,7 +370,10 @@ advance_user_exception_stage:
     mov [rel bounded_user_exception_record + 8], edi
 %ifdef KOZO_FAULT_SESSION
 %if KOZO_FAULT_MODE == 28
+    cmp edi, 2
+    jne .readback
     inc dword [rel bounded_user_exception_record + 8]
+.readback:
 %endif
 %endif
     cmp [rel bounded_user_exception_record + 8], edi
@@ -379,7 +400,14 @@ mutate_user_exception_fixture_state:
 %elif KOZO_FAULT_MODE == 4
     mov qword [r15 + 32], 0x13
 %elif KOZO_FAULT_MODE == 5
-    xor qword [r15 + 16], 1
+    mov qword [r15 + 16], 0
+%elif KOZO_FAULT_MODE == 32
+    mov qword [r15 + 16], 0x10000
+%elif KOZO_FAULT_MODE == 34
+    mov qword [r15 + 16], 0x202
+%elif KOZO_FAULT_MODE == 35
+    and qword [r15 + 8], ~3
+    mov qword [r15 + 16], 0
 %elif KOZO_FAULT_MODE == 10
     mov dword [rel fixed_user_context + FIXED_USER_CONTEXT_LIFECYCLE_OFFSET], FIXED_USER_CONTEXT_READY
 %elif KOZO_FAULT_MODE == 11
@@ -486,6 +514,45 @@ reject_user_exception:
     and rdx, ~PTE_USER
     cmp rax, rdx
     jne user_exception_emergency_halt
+    mov rdx, 0x000ffffffffff000
+    lea rax, [rel fixed_user_context]
+    sub rax, [rel executable_virtual_base]
+    add rax, [rel executable_physical_base]
+    and rax, rdx
+    lea r8, [rel fixed_user_context]
+    shr r8, 12
+    and r8d, 511
+    lea rdi, [rel governed_kernel_pt]
+    mov rdi, [rdi + r8 * 8]
+    and rdi, rdx
+    cmp rax, rdi
+    jne user_exception_emergency_halt
+    mov rax, [rel governed_user_pt + 8]
+    mov rdx, PTE_NX | PTE_PRESENT | PTE_WRITABLE | PTE_USER
+    and rax, rdx
+    cmp rax, rdx
+    jne user_exception_emergency_halt
+    mov rax, [rel governed_user_pt + 16]
+    and rax, rdx
+    cmp rax, rdx
+    jne user_exception_emergency_halt
+    mov rdx, 0x000ffffffffff000
+    lea rax, [rel user_probe_data_start]
+    sub rax, [rel executable_virtual_base]
+    add rax, [rel executable_physical_base]
+    and rax, rdx
+    mov rdi, [rel governed_user_pt + 8]
+    and rdi, rdx
+    cmp rax, rdi
+    jne user_exception_emergency_halt
+    lea rax, [rel user_probe_stack]
+    sub rax, [rel executable_virtual_base]
+    add rax, [rel executable_physical_base]
+    and rax, rdx
+    mov rdi, [rel governed_user_pt + 16]
+    and rdi, rdx
+    cmp rax, rdi
+    jne user_exception_emergency_halt
     lea rdi, [rel fixed_user_context]
     xor eax, eax
     mov ecx, FIXED_USER_CONTEXT_SIZE / 8
@@ -510,6 +577,47 @@ reject_user_exception:
     jne user_exception_emergency_halt
     add rdi, 8
     loop .readback
+    xor eax, eax
+    mov rdi, USER_PROBE_DATA_VA
+    mov ecx, KOZO_PAGE_SIZE / 8
+    rep stosq
+    mov rdi, USER_PROBE_STACK_VA
+    mov ecx, KOZO_PAGE_SIZE / 8
+    rep stosq
+    lea rdi, [rel privilege_probe_state]
+    mov ecx, (fixed_user_context - privilege_probe_state) / 8
+    rep stosq
+    lea rdi, [rel fixed_user_context_result]
+    mov ecx, (saved_odin_return_stack + 8 - fixed_user_context_result) / 8
+    rep stosq
+    lea rdi, [rel fixed_user_context_result]
+    mov ecx, (saved_odin_return_stack + 8 - fixed_user_context_result) / 8
+.verify_result:
+    cmp qword [rdi], 0
+    jne user_exception_emergency_halt
+    add rdi, 8
+    loop .verify_result
+    mov rdi, USER_PROBE_DATA_VA
+    mov ecx, KOZO_PAGE_SIZE / 8
+.verify_data:
+    cmp qword [rdi], 0
+    jne user_exception_emergency_halt
+    add rdi, 8
+    loop .verify_data
+    mov rdi, USER_PROBE_STACK_VA
+    mov ecx, KOZO_PAGE_SIZE / 8
+.verify_stack:
+    cmp qword [rdi], 0
+    jne user_exception_emergency_halt
+    add rdi, 8
+    loop .verify_stack
+    lea rdi, [rel privilege_probe_state]
+    mov ecx, (fixed_user_context - privilege_probe_state) / 8
+.verify_supervisor:
+    cmp qword [rdi], 0
+    jne user_exception_emergency_halt
+    add rdi, 8
+    loop .verify_supervisor
     test ebx, ebx
     jz boot_terminal_halt
     lea rsi, [rel user_exception_reject_text]

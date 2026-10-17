@@ -16,9 +16,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from harness.fixed_rust_user import read_sections, read_symbols
 from harness.runtime_evidence_taxonomy import get_smoke_marker_order
+from harness.user_exception_evidence import classify_qemu_rflags
+
+CONTRACT = json.loads((ROOT / 'contracts/bounded_user_exception_recovery_contract.v0.json').read_text())
 
 CONTROLS = {
-    'session_1': (1, 0, 'recovery'), 'session_2': (2, 0, 'recovery'),
+    'session_1': (1, 0, 'real'), 'session_2': (2, 0, 'real'),
     'bad_frame': (1, 1, 'synthetic'), 'bad_cs_rpl': (1, 2, 'synthetic'),
     'bad_cs_selector': (1, 3, 'synthetic'), 'bad_ss': (1, 4, 'synthetic'),
     'bad_rflags': (1, 5, 'synthetic'), 'unauthorized_rip': (1, 6, 'real'),
@@ -35,11 +38,18 @@ CONTROLS = {
     'skipped_stage': (1, 27, 'synthetic'), 'stage_readback_failure': (1, 28, 'synthetic'),
     'early_diagnostic': (1, 30, 'synthetic'),
     'backward_stage': (1, 31, 'synthetic'),
+    'bad_rflags_rf_only': (1, 32, 'synthetic'),
+    'bad_rflags_bit4': (1, 33, 'real'),
+    'bad_rflags_if': (1, 34, 'synthetic'),
+    'bad_cs_rpl_and_bad_rflags': (1, 35, 'synthetic'),
+    'corrupted_failure_result': (1, 36, 'synthetic'),
 }
 
 
 def main():
     options = parse_options()
+    if set(CONTROLS) != set(CONTRACT['control_expectations']):
+        raise ValueError('Control inventory differs from the authoritative contract')
     options.output.mkdir(parents=True, exist_ok=False)
     if options.replay:
         replay_hosted_fixture(options.replay, options.output, options.expected_control)
@@ -48,6 +58,16 @@ def main():
         compare_production_page(options.baseline_kernel, options.output)
     results = [execute_control(options.output, name) for name in options.control or CONTROLS]
     (options.output / 'results.json').write_text(json.dumps(results, indent=2) + '\n')
+    first_qmp = next((item['qmp'] for item in results if 'qmp' in item), {})
+    qemu_binary = os.environ.get('KOZO_QEMU_BIN') or shutil.which('qemu-system-x86_64')
+    provenance = subprocess.run([qemu_binary, '--version'], capture_output=True, text=True,
+                                check=True).stdout.splitlines()[0]
+    environment = dict(evidence_scope='hosted_ci' if os.environ.get('GITHUB_ACTIONS') else 'local_nonhosted',
+                       qmp_version=first_qmp, qemu_binary_version=provenance,
+                       declared_control_count=len(options.control or CONTROLS),
+                       passed_control_count=sum(item['result'] == 'PASS' for item in results))
+    (options.output / 'environment.json').write_text(json.dumps(environment, indent=2) + '\n')
+    write_fixture_checksums(options.output)
     raise SystemExit(any(item['result'] != 'PASS' for item in results))
 
 
@@ -73,6 +93,16 @@ def execute_control(output, name):
         build_image(directory, environment)
         evidence = boot_image(directory)
         issue = control_issue(evidence, session, mode)
+        expected_mechanism, expected_code, expected_outcome = CONTRACT['control_expectations'][name]
+        observed_outcome = observed_primary_outcome(evidence, mode)
+        observed_codes = {outcome: code for _, code, outcome in CONTRACT['control_expectations'].values()}
+        evidence.update(expected_primary_outcome=expected_outcome,
+                        expected_primary_code=expected_code,
+                        observed_primary_outcome=observed_outcome,
+                        observed_primary_code=observed_codes.get(observed_outcome))
+        if (mechanism != expected_mechanism or evidence['observed_primary_outcome'] != expected_outcome or
+                evidence['observed_primary_code'] != expected_code):
+            issue = issue or 'Primary outcome differs from the contract'
         evidence.update(control=name, mechanism=mechanism, result='FAIL' if issue else 'PASS', issue=issue)
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         evidence = dict(control=name, mechanism=mechanism, result='FAIL', issue=str(error))
@@ -130,7 +160,7 @@ def boot_image(directory, capture=None):
                '-machine', 'q35', '-accel', 'tcg', '-m', '256M', '-cpu', 'qemu64',
                '-display', 'none', '-monitor', 'none', '-qmp', 'stdio',
                '-serial', 'file:' + str(capture / 'serial.log'), '-no-reboot', '-no-shutdown',
-               '-d', 'int,cpu_reset', '-D', str(capture / 'cpu.log'), '-cdrom', str(iso)]
+               '-d', 'int,cpu_reset', '-D', str(capture / 'qemu-int.log'), '-cdrom', str(iso)]
     with (capture / 'stderr.log').open('w') as error:
         process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                    stderr=error, text=True)
@@ -148,11 +178,20 @@ def boot_image(directory, capture=None):
                 process.kill()
                 process.wait()
     serial = (capture / 'serial.log').read_text(errors='replace')
-    trace = (capture / 'cpu.log').read_text(errors='replace')
-    return dict(qemu_exit=status, qmp=greeting['QMP']['version'],
+    trace = (capture / 'qemu-int.log').read_text(errors='replace')
+    qmp_version = greeting['QMP']['version']
+    frame_flags = memory['hardware_frame'][4] | (memory['hardware_frame'][5] << 32) if len(memory['hardware_frame']) >= 6 else 0
+    fault_events = trace_event_lines(trace)
+    profile = classify_qemu_rflags(CONTRACT, qmp_version, frame_flags,
+                                   hosted_ubuntu=bool(os.environ.get('KOZO_HOSTED_UBUNTU_24_04')))
+    if not any('v=06' in event and 'i=0 cpl=3' in event for event in fault_events):
+        profile.update(rflags_form='not_applicable', profile_match=None,
+                       evidence_blocker=profile['evidence_blocker'] if profile['evidence_blocker'] in
+                       ('QMP_VERSION_UNAVAILABLE', 'HOSTED_QEMU_VERSION_DRIFT') else None)
+    return dict(qemu_exit=status, qmp=qmp_version, **profile,
                 iso_sha256=hashlib.sha256(iso.read_bytes()).hexdigest(),
                 authorized_rip=symbols['__kozo_authorized_ud2_rip'],
-                serial=serial, trace_events=trace_event_lines(trace),
+                serial=serial, trace_events=fault_events,
                 post_exception_reset='CPU Reset' in trace[trace.find('v=06'):],
                 stack=json.loads((directory / 'boot_image/work/fixed_user.stack.json').read_text()),
                 elf=json.loads((directory / 'kernel_elf_report.json').read_text()).get('bounded_user_exception_recovery'),
@@ -180,6 +219,10 @@ def capture_supervisor_memory(process, symbols):
              'response_shadow': ('fixed_user_response_shadow', 24),
              'response_verify': ('fixed_user_response_verify', 24),
              'consumption_shadow': ('fixed_user_consumption_shadow', 12)}
+    spans.update(transaction_phase=('fixed_user_transaction_phase', 2),
+                 request_success=('fixed_user_request_success_state', 2),
+                 privilege_probe=('privilege_probe_state', 2),
+                 saved_continuation=('saved_odin_return_stack', 2))
     memory = {}
     for name, (symbol, count) in spans.items():
         text = qmp_command(process, 'human-monitor-command',
@@ -237,6 +280,10 @@ def fixture_instruction_issue(text):
 def control_issue(evidence, session, mode):
     if not evidence['terminal_halted']:
         return 'Guest did not reach a terminal halt within the unchanged 20-second bound'
+    if evidence.get('evidence_blocker') in ('QMP_VERSION_UNAVAILABLE', 'HOSTED_QEMU_VERSION_DRIFT'):
+        return evidence['evidence_blocker']
+    if mode not in (5, 32, 33, 34, 35) and evidence.get('evidence_blocker'):
+        return evidence['evidence_blocker']
     serial, memory = evidence['serial'], evidence['memory']
     markers = re.findall(r'^KOZO_[A-Z0-9_]+\r?$', serial, re.MULTILINE)
     markers = [marker.rstrip('\r') for marker in markers]
@@ -247,8 +294,8 @@ def control_issue(evidence, session, mode):
         return recovery_issue(evidence, session)
     if 'USER_EXCEPTION_RECOVERED=06' in serial:
         return 'Rejected fault was reported as recovered'
-    if mode in range(1, 16) or mode == 18:
-        reason = 2 if mode == 18 else mode
+    if mode in range(1, 16) or mode in (18, 32, 33, 34, 35):
+        reason = 2 if mode in (18, 35) else 5 if mode in (32, 33, 34) else mode
         if f'USER_EXCEPTION_REJECT={reason:02d}' not in serial:
             return 'Missing exact rejection classification'
         if memory['context'] != [1, 128, 0, 0, 4] + [0] * 27:
@@ -266,12 +313,21 @@ def control_issue(evidence, session, mode):
         return 'Emergency control did not demonstrate inaccessible context memory'
     if mode == 22 and memory['record'][2] != 3:
         return 'Failed cleanup advanced beyond its verified stage'
-    if mode in (22, 26, 27, 28, 30, 31):
-        expected_stage = {22: 3, 26: 2, 27: 1, 28: 2, 30: 2, 31: 2}[mode]
+    if mode in (22, 26, 27, 28, 30, 31, 36):
+        expected_stage = {22: 3, 26: 2, 27: 1, 28: 3, 30: 2, 31: 2, 36: 2}[mode]
         if memory['record'][2] != expected_stage or memory['context'] != [1, 128, 0, 0, 4] + [0] * 27:
             return 'Failed recovery stage advanced or retained context authority'
-        if mode == 26 and memory['result'] != [1, 32, 2, 9, 0, 2, 0, 0]:
-            return 'Duplicate-commit control did not preserve the single original result'
+    safe_rejection = set(range(1, 16)) | {18, 22, 26, 27, 28, 30, 31, 32, 33, 34, 35, 36}
+    if mode in safe_rejection:
+        if memory['context'] != [1, 128, 0, 0, 4] + [0] * 27 or any(memory['result']):
+            return 'Safe rejection left context authority or a trusted result'
+        for name, length in (('user_data', 1024), ('user_stack', 1024),
+                             ('request_shadow', 10), ('response_shadow', 24),
+                             ('response_verify', 24), ('consumption_shadow', 12),
+                             ('transaction_phase', 2), ('request_success', 2),
+                             ('privilege_probe', 2), ('saved_continuation', 2)):
+            if memory[name] != [0] * length:
+                return 'Safe rejection retained reusable state: ' + name
     if mode in (24, 25) and markers.count('KOZO_RING3_ENTER'):
         return 'Invalid selector permitted Ring3 entry'
     if mode in (19, 20, 21):
@@ -298,6 +354,11 @@ def rejected_hardware_issue(evidence, mode):
         return 'Rejected Rust fault did not originate at CPL3'
     actual_rip = int(re.search(r'IP=0023:([0-9a-f]+)', event)[1], 16)
     actual_rsp = int(re.search(r'SP=001b:([0-9a-f]+)', event)[1], 16)
+    frame = evidence['memory']['hardware_frame']
+    if (frame[0] | (frame[1] << 32)) != actual_rip:
+        return 'QMP hardware-frame RIP differs from the processor exception trace'
+    if (frame[6] | (frame[7] << 32)) != actual_rsp:
+        return 'QMP hardware-frame RSP differs from the processor exception trace'
     approved = evidence['authorized_rip']
     if mode == 6 and actual_rip == approved:
         return 'BAD_RIP control did not execute its second real UD2'
@@ -334,8 +395,8 @@ def recovery_issue(evidence, session):
     expected_record = [1, 64, 5, 0x106, 6, session, 0, 0, 1, 0, 0x7fff] + [0] * 5
     if memory['record'] != expected_record:
         return 'QEMU memory does not match the completed recovery record'
-    if memory['hardware_frame'][4:6] != [0x10002, 0]:
-        return 'Actual saved exception flags differ from exact 0x10002'
+    if evidence['saved_exception_rflags'] not in CONTRACT['fault_site']['saved_exception_rflags']:
+        return 'Actual saved exception flags differ from the exact enumeration'
     frame = memory['hardware_frame']
     if frame[0] | (frame[1] << 32) != evidence['authorized_rip']:
         return 'Hardware-saved fault RIP differs from linker authority'
@@ -346,6 +407,37 @@ def recovery_issue(evidence, session):
         return 'No real CPL3 #UD at the linker-authorized instruction'
     if any('v=08' in line for line in events) or evidence['post_exception_reset']:
         return 'Recovery was followed by a double fault or reset'
+    return None
+
+
+def observed_primary_outcome(evidence, mode):
+    serial = evidence.get('serial', '')
+    rejection = re.search(r'USER_EXCEPTION_REJECT=(\d\d)', serial)
+    if rejection:
+        code = int(rejection[1])
+        return CONTRACT['rejections'][code - 1] if 1 <= code <= 15 else None
+    if 'USER_EXCEPTION_RECOVERED=06' in serial:
+        return 'RECOVERY_COMPLETE'
+    events = evidence.get('trace_events', [])
+    for vector, outcome in (('v=08', 'DOUBLE_FAULT_TERMINAL'),
+                            ('v=0d', 'USER_INT6_GP_TERMINAL'),
+                            ('v=0e', 'USER_PAGE_FAULT_TERMINAL')):
+        if any(vector in event for event in events):
+            return outcome
+    if mode == 16 and 'Cannot access memory' in evidence.get('memory', {}).get('context_raw', ''):
+        return 'UNSAFE_SUPERVISOR_EMERGENCY_HALT'
+    stage = evidence.get('memory', {}).get('record', [0, 0, 0])[2]
+    staged = {22: (3, 'CLEANUP_VERIFICATION_FAILED'),
+              26: (2, 'DUPLICATE_FAILURE_COMMIT_BLOCKED'),
+              27: (1, 'SKIPPED_RECOVERY_STAGE_BLOCKED'),
+              28: (3, 'STAGE_READBACK_FAILED'),
+              30: (2, 'EARLY_RECOVERY_DIAGNOSTIC_BLOCKED'),
+              31: (2, 'BACKWARD_RECOVERY_STAGE_BLOCKED'),
+              36: (2, 'CORRUPTED_FAILURE_RESULT_BLOCKED')}
+    if mode in staged and stage == staged[mode][0]:
+        return staged[mode][1]
+    if mode in (24, 25) and 'USER_BOUNDARY_FAILURE=' in serial:
+        return 'FIXTURE_SELECTOR_INVALID' if mode == 24 else 'FIXTURE_SELECTOR_STALE'
     return None
 
 

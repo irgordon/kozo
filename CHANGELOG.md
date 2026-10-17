@@ -13,9 +13,17 @@
 * Preserve the first failed local fixture: a higher-half backing-symbol read
   caused supervisor #PF. Validate physical backing and use the existing fixed
   RX alias instead; no mapping is added or permission weakened.
-* Local preflight proves 1,344 Python tests, 67 governed checks, the normal
-  52-marker QEMU path, and 30 isolated exception controls. Hosted CI and
-  downloaded-artifact acceptance remain pending.
+* Hosted CI `39069425953` rejected QEMU 8.2.2's saved `0x2` fault frame under
+  the original `0x10002`-only contract. Preserve that failure and amend ADR
+  0022 and contract v0 revision 1 to enumerate both values without masking.
+  QMP version and hardware-frame evidence must agree with the registered
+  emulator profile; ordinary `int 0x81` frames remain exactly `0x2`.
+* Safe rejections now clear and read back both complete user pages and all
+  reusable supervisor session storage, including the fixture selector.
+  The intentionally unsafe mapping still halts without a cleanup claim.
+* Local preflight proves 1,346 Python tests, 67 governed checks, the normal
+  52-marker QEMU path, and all 35 declared exception controls on QEMU 11.1.2.
+  Hosted CI and downloaded-artifact acceptance remain pending.
 
 ## First Bounded Rust Userspace Execution - 2026-10-15
 

@@ -100,7 +100,8 @@ by the existing boot builder and `tests/run_user_exception_controls.py` under
 an isolated caller-selected output directory. They are review evidence, not
 authoritative source and must not be edited manually. The new contract owns
 their meaning. `harness/user_exception_build.py` derives stack input from the
-pinned compiled object; linked disassembly and hardware frame must agree.
+pinned compiled object; linked disassembly, QMP version, hardware frame and
+complete fixed-storage readback must agree.
 
 `artifacts/latest_verify.json` records generated verification state.
 

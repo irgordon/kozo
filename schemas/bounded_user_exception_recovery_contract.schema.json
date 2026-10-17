@@ -2,9 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "architecture", "decision", "fault_site", "required_state", "fixture", "record", "rejections", "rejection_policy", "diagnostics", "evidence", "non_goals"],
+  "required": ["version", "revision", "amendment", "architecture", "decision", "fault_site", "required_state", "fixture", "record", "rejections", "rejection_policy", "diagnostics", "qemu_profiles", "control_expectations", "evidence", "non_goals"],
   "properties": {
     "version": {"const": 0},
+    "revision": {"const": 1},
+    "amendment": {"const": {"date": "2026-10-17", "trigger": "GitHub Actions run 39069425953", "reason": "registered QEMU saved-RFLAGS divergence", "previous_policy": "0x10002 only", "revised_policy": "exact enumerated fixture forms with QEMU evidence matrix"}},
     "architecture": {"const": "x86_64"},
     "decision": {"const": "docs/adr/0022-bounded-user-exception-recovery.md"},
     "fault_site": {
@@ -17,21 +19,64 @@
         "rsp_derivation": {"const": "pinned_object_disassembly_then_independent_linked_disassembly"},
         "production_authorized_rip": {"const": 0},
         "live_rflags": {"const": "0x2"},
-        "saved_exception_rflags": {"const": "0x10002"},
+        "saved_exception_rflags": {"const": ["0x2", "0x10002"]},
         "existing_int_0x81_rflags": {"const": "0x2"},
-        "flags_comparison": {"const": "exact_no_mask"}
+        "flags_comparison": {"const": "exact_enumeration_no_mask"}
       }
     },
-    "required_state": {"const": {"vector": 6, "cs_rpl": 3, "cs": "USER_CODE_SELECTOR", "ss": "USER_DATA_SELECTOR", "rip": "exact_linker_derived_fault_site", "instruction": "exact_supervisor_backing_bytes_0f0b", "rsp": "exact_compiled_fixture_rsp", "rflags": "0x10002", "lifecycle": "ACTIVE", "session": "fixture_selected_1_or_2", "phase": "REQUEST_PENDING", "transition_count": 0, "continuation": "nonzero_validated_kernel_stack_and_exact_wrapper_return", "record": "structurally_valid_EMPTY", "occurrence": "first_authorized_fault"}},
+    "required_state": {"const": {"vector": 6, "cs_rpl": 3, "cs": "USER_CODE_SELECTOR", "ss": "USER_DATA_SELECTOR", "rip": "exact_linker_derived_fault_site", "instruction": "exact_supervisor_backing_bytes_0f0b", "rsp": "exact_compiled_fixture_rsp", "rflags": ["0x2", "0x10002"], "lifecycle": "ACTIVE", "session": "fixture_selected_1_or_2", "phase": "REQUEST_PENDING", "transition_count": 0, "continuation": "nonzero_validated_kernel_stack_and_exact_wrapper_return", "record": "structurally_valid_EMPTY", "occurrence": "first_authorized_fault"}},
     "fixture": {"const": {"rust_cfg": "kozo_fault_fixture", "selector": "FIXED_USER_DATA_SCRATCH_VA + 8", "selector_owner": "supervisor_only_fixture_writer", "selected_sessions": [1, 2], "production_hooks": "absent", "production_user_page": "byte_identical_to_pinned_starting_baseline"}},
     "record": {"const": {"symbol": "bounded_user_exception_record", "size_bytes": 64, "alignment_bytes": 8, "storage": "supervisor_rw_nx", "owner": "ring0_recovery_component", "u32_fields": ["format_version", "structure_size", "recovery_stage", "recovery_status", "exception_vector", "session_ordinal", "observed_transition_count", "observed_transaction_phase", "fault_site_id", "failure_code", "validation_flags", "reserved_0"], "u64_fields": ["reserved_1", "reserved_2"], "reserved": "always_zero", "stages": ["EMPTY", "AUTHORIZED_FAULT", "SUPERVISOR_RETURNED", "FAILURE_RESULT_AND_CONTEXT_CLEARED", "CLEANUP_VERIFIED", "ODIN_OBSERVED"], "transition": "exact_previous_then_volatile_readback", "lifecycle_failure_commits": 1}},
     "rejections": {"const": ["BAD_FRAME_LOCATION", "BAD_CS_RPL", "BAD_CS_SELECTOR", "BAD_SS", "BAD_RFLAGS", "BAD_RIP", "BAD_UD2_BYTES", "BAD_RSP", "BAD_PHASE", "CONTEXT_NOT_ACTIVE", "BAD_SESSION", "BAD_TRANSITION_COUNT", "NO_CONTINUATION", "RECOVERY_RECORD_INVALID", "FAULT_SITE_DISABLED"]},
-    "rejection_policy": {"const": {"precedence": "listed_order_among_applicable_checks_disabled_site_skips_address_checks", "safe_supervisor": "direct_fixed_context_clear_verify_diagnostic_terminal_halt", "unsafe_supervisor": "demonstrated_emergency_halt_without_cleanup_claim", "context_cleared_fields": {"format_version": 1, "structure_size": 128, "lifecycle": 4}, "authority_fields": "zero", "use_saved_continuation": false, "commit_lifecycle_result": false, "return_to_odin": false}},
+    "rejection_policy": {"const": {"precedence": "frame_cs_rpl_cs_ss_rflags_site_rip_bytes_rsp_phase_context_session_count_continuation_record", "safe_supervisor": "direct_fixed_context_and_user_session_storage_clear_readback_diagnostic_terminal_halt", "unsafe_supervisor": "demonstrated_emergency_halt_without_cleanup_claim", "context_cleared_fields": {"format_version": 1, "structure_size": 128, "lifecycle": 4}, "authority_fields": "zero", "use_saved_continuation": false, "commit_lifecycle_result": false, "return_to_odin": false}},
+    "qemu_profiles": {"const": {"8.2.2": "0x2", "11.1.2": "0x10002", "hosted_ubuntu_24_04": "8.2.2", "unregistered_architectural_form": "observed_not_runtime_validated", "unregistered_legacy_form": "blocked"}},
+    "control_expectations": {
+      "type": "object",
+      "required": ["session_1", "session_2", "bad_frame", "bad_cs_rpl", "bad_cs_selector", "bad_ss", "bad_rflags", "unauthorized_rip", "bad_ud2_bytes", "altered_rsp", "wrong_phase", "context_inactive", "bad_session", "transition_count", "no_continuation", "invalid_record", "site_disabled", "unsafe_supervisor", "kernel_ud", "user_int6", "user_pf", "double_fault", "cleanup_failure", "invalid_selector", "stale_selector", "duplicate_failure_commit", "skipped_stage", "stage_readback_failure", "early_diagnostic", "backward_stage", "bad_rflags_rf_only", "bad_rflags_bit4", "bad_rflags_if", "bad_cs_rpl_and_bad_rflags", "corrupted_failure_result"],
+      "properties": {
+        "session_1": {"const": ["real", 100, "RECOVERY_COMPLETE"]},
+        "session_2": {"const": ["real", 100, "RECOVERY_COMPLETE"]},
+        "bad_frame": {"const": ["synthetic", 1, "BAD_FRAME_LOCATION"]},
+        "bad_cs_rpl": {"const": ["synthetic", 2, "BAD_CS_RPL"]},
+        "bad_cs_selector": {"const": ["synthetic", 3, "BAD_CS_SELECTOR"]},
+        "bad_ss": {"const": ["synthetic", 4, "BAD_SS"]},
+        "bad_rflags": {"const": ["synthetic", 5, "BAD_RFLAGS"]},
+        "unauthorized_rip": {"const": ["real", 6, "BAD_RIP"]},
+        "bad_ud2_bytes": {"const": ["real", 7, "BAD_UD2_BYTES"]},
+        "altered_rsp": {"const": ["real", 8, "BAD_RSP"]},
+        "wrong_phase": {"const": ["real", 9, "BAD_PHASE"]},
+        "context_inactive": {"const": ["synthetic", 10, "CONTEXT_NOT_ACTIVE"]},
+        "bad_session": {"const": ["synthetic", 11, "BAD_SESSION"]},
+        "transition_count": {"const": ["synthetic", 12, "BAD_TRANSITION_COUNT"]},
+        "no_continuation": {"const": ["synthetic", 13, "NO_CONTINUATION"]},
+        "invalid_record": {"const": ["synthetic", 14, "RECOVERY_RECORD_INVALID"]},
+        "site_disabled": {"const": ["synthetic", 15, "FAULT_SITE_DISABLED"]},
+        "unsafe_supervisor": {"const": ["synthetic", 101, "UNSAFE_SUPERVISOR_EMERGENCY_HALT"]},
+        "kernel_ud": {"const": ["real", 2, "BAD_CS_RPL"]},
+        "user_int6": {"const": ["real", 102, "USER_INT6_GP_TERMINAL"]},
+        "user_pf": {"const": ["real", 103, "USER_PAGE_FAULT_TERMINAL"]},
+        "double_fault": {"const": ["real", 104, "DOUBLE_FAULT_TERMINAL"]},
+        "cleanup_failure": {"const": ["synthetic", 105, "CLEANUP_VERIFICATION_FAILED"]},
+        "invalid_selector": {"const": ["synthetic", 106, "FIXTURE_SELECTOR_INVALID"]},
+        "stale_selector": {"const": ["synthetic", 107, "FIXTURE_SELECTOR_STALE"]},
+        "duplicate_failure_commit": {"const": ["synthetic", 108, "DUPLICATE_FAILURE_COMMIT_BLOCKED"]},
+        "skipped_stage": {"const": ["synthetic", 109, "SKIPPED_RECOVERY_STAGE_BLOCKED"]},
+        "stage_readback_failure": {"const": ["synthetic", 110, "STAGE_READBACK_FAILED"]},
+        "early_diagnostic": {"const": ["synthetic", 111, "EARLY_RECOVERY_DIAGNOSTIC_BLOCKED"]},
+        "backward_stage": {"const": ["synthetic", 112, "BACKWARD_RECOVERY_STAGE_BLOCKED"]},
+        "bad_rflags_rf_only": {"const": ["synthetic", 5, "BAD_RFLAGS"]},
+        "bad_rflags_bit4": {"const": ["real", 5, "BAD_RFLAGS"]},
+        "bad_rflags_if": {"const": ["synthetic", 5, "BAD_RFLAGS"]},
+        "bad_cs_rpl_and_bad_rflags": {"const": ["synthetic", 2, "BAD_CS_RPL"]},
+        "corrupted_failure_result": {"const": ["synthetic", 113, "CORRUPTED_FAILURE_RESULT_BLOCKED"]}
+      },
+      "additionalProperties": false
+    },
     "diagnostics": {"const": {"reject": "USER_EXCEPTION_REJECT=<two_decimal_digits>", "recovered": "USER_EXCEPTION_RECOVERED=06", "recovered_stage": "ODIN_OBSERVED", "success_catalog_member": false}},
     "evidence": {"type": "object", "additionalProperties": false, "required": ["normal_marker_occurrences", "governed_checks", "qemu_trace", "real_controls", "synthetic_controls"], "properties": {
       "normal_marker_occurrences": {"const": 52}, "governed_checks": {"const": 67}, "qemu_trace": {"const": "int,cpu_reset"},
-      "real_controls": {"const": ["session_1", "session_2", "unauthorized_rip", "bad_ud2_bytes", "altered_rsp", "wrong_phase", "kernel_ud", "user_int6", "user_pf", "double_fault"]},
-      "synthetic_controls": {"const": ["bad_frame", "bad_cs_rpl", "bad_cs_selector", "bad_ss", "bad_rflags", "context_inactive", "bad_session", "transition_count", "no_continuation", "invalid_record", "site_disabled", "unsafe_supervisor", "cleanup_failure", "invalid_selector", "stale_selector", "duplicate_failure_commit", "skipped_stage", "stage_readback_failure", "early_diagnostic", "backward_stage"]}
+      "real_controls": {"const": ["session_1", "session_2", "unauthorized_rip", "bad_ud2_bytes", "altered_rsp", "wrong_phase", "kernel_ud", "user_int6", "user_pf", "double_fault", "bad_rflags_bit4"]},
+      "synthetic_controls": {"const": ["bad_frame", "bad_cs_rpl", "bad_cs_selector", "bad_ss", "bad_rflags", "context_inactive", "bad_session", "transition_count", "no_continuation", "invalid_record", "site_disabled", "unsafe_supervisor", "cleanup_failure", "invalid_selector", "stale_selector", "duplicate_failure_commit", "skipped_stage", "stage_readback_failure", "early_diagnostic", "backward_stage", "bad_rflags_rf_only", "bad_rflags_if", "bad_cs_rpl_and_bad_rflags", "corrupted_failure_result"]}
     }},
     "non_goals": {"const": ["resumed_faulting_rust", "general_exception_framework", "public_abi", "processes", "scheduler", "new_mappings", "simd_state_switching", "release"]}
   }

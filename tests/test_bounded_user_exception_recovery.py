@@ -7,7 +7,8 @@ import unittest
 from harness.fixed_rust_user import build_user_object
 from harness.user_exception_build import derive_stack
 from harness.user_exception_evidence import (
-    FRAME_GUARDS, production_image_issue, recovery_source_issue, validate_stack_evidence,
+    FRAME_GUARDS, classify_qemu_rflags, image_record, production_image_issue,
+    recovery_source_issue, validate_stack_evidence,
 )
 from harness.validators_impl.schema import validate_named_document
 from tests.run_user_exception_controls import CONTROLS, fixture_instruction_issue, control_issue, recovery_issue
@@ -20,8 +21,10 @@ class BoundedUserExceptionSourceTests(unittest.TestCase):
         assembly = (ROOT / 'kernel/arch/x86_64/privilege_transition.asm').read_text()
         recovery = (ROOT / 'kernel/arch/x86_64/exception_recovery.inc').read_text()
         self.assertIn('%define USER_RFLAGS 0x2', assembly)
-        self.assertIn('%define USER_EXCEPTION_RFLAGS 0x10002', recovery)
-        self.assertIn('cmp qword [r15 + 16], USER_EXCEPTION_RFLAGS', recovery)
+        self.assertIn('%define USER_EXCEPTION_RFLAGS_LEGACY 0x2', recovery)
+        self.assertIn('%define USER_EXCEPTION_RFLAGS_ARCHITECTURAL 0x10002', recovery)
+        self.assertIn('cmp qword [r15 + 16], USER_EXCEPTION_RFLAGS_LEGACY', recovery)
+        self.assertIn('cmp qword [r15 + 16], USER_EXCEPTION_RFLAGS_ARCHITECTURAL', recovery)
         self.assertNotIn('and qword [r15 + 16]', recovery)
 
     def test_record_mapping_is_checked_before_user_entry(self):
@@ -40,7 +43,7 @@ class BoundedUserExceptionSourceTests(unittest.TestCase):
 
     def test_rust_normalizes_flags_at_exact_anchor(self):
         rust = (ROOT / 'userspace/fixed_user_program/user.rs').read_text()
-        self.assertIn('"push 2", "popfq",', rust)
+        self.assertIn('"push 0x12", ".else", "push 2", ".endif", "popfq",', rust)
         self.assertIn('".set kozo_rust_user_fault_site, 2f"', rust)
         self.assertIn('"2:",', rust)
         self.assertIn('".else", "ud2", ".endif"', rust)
@@ -49,12 +52,18 @@ class BoundedUserExceptionSourceTests(unittest.TestCase):
     def test_rejection_does_not_use_continuation_or_failure_commit(self):
         recovery = (ROOT / 'kernel/arch/x86_64/exception_recovery.inc').read_text()
         rejection = recovery.split('reject_user_exception:', 1)[1].split('section .rodata', 1)[0]
-        self.assertNotIn('saved_odin_return_stack', rejection)
+        self.assertNotIn('mov rsp, [rel saved_odin_return_stack]', rejection)
+        self.assertIn('saved_odin_return_stack', rejection)
         self.assertNotIn('commit_fixed_user_context', rejection)
         self.assertNotIn('call ', rejection)
         self.assertIn('FIXED_USER_CONTEXT_CLEARED', rejection)
         self.assertIn('cmp qword [rdi], 0', rejection)
         self.assertIn('jmp boot_terminal_halt', rejection)
+        self.assertIn('mov rdi, USER_PROBE_DATA_VA', rejection)
+        self.assertIn('mov rdi, USER_PROBE_STACK_VA', rejection)
+        self.assertIn('cmp rax, rdi\n    jne user_exception_emergency_halt', rejection)
+        linker = (ROOT / 'linker/kernel.ld').read_text()
+        self.assertIn('fixed rejection cleanup storage must share one supervisor page', linker)
 
     def test_each_frame_guard_is_required_in_order(self):
         source = (ROOT / 'kernel/arch/x86_64/exception_recovery.inc').read_text()
@@ -62,6 +71,9 @@ class BoundedUserExceptionSourceTests(unittest.TestCase):
         for guard in FRAME_GUARDS:
             with self.subTest(guard=guard):
                 self.assertIsNotNone(recovery_source_issue(source.replace(guard, '', 1)))
+        self.assertIsNotNone(recovery_source_issue(source.replace(
+            'cmp qword [r15 + 16], USER_EXCEPTION_RFLAGS_LEGACY',
+            'and qword [r15 + 16], USER_EXCEPTION_RFLAGS_LEGACY', 1)))
 
     def test_rejection_cannot_use_saved_continuation_or_commit_result(self):
         source = (ROOT / 'kernel/arch/x86_64/exception_recovery.inc').read_text()
@@ -115,6 +127,17 @@ class BoundedExceptionContractTests(unittest.TestCase):
         synthetic = [name for name, (_, _, mechanism) in CONTROLS.items() if mechanism == 'synthetic']
         self.assertEqual(evidence['real_controls'], real)
         self.assertEqual(evidence['synthetic_controls'], synthetic)
+        self.assertEqual(set(self.contract['control_expectations']), set(CONTROLS))
+        for name, (_, _, mechanism) in CONTROLS.items():
+            self.assertEqual(self.contract['control_expectations'][name][0], mechanism)
+        changed = copy.deepcopy(self.contract)
+        changed['control_expectations']['unknown_control'] = ['synthetic', 5, 'BAD_RFLAGS']
+        with self.assertRaises(ValueError):
+            validate_named_document('bounded_user_exception_recovery_contract', changed)
+        changed = copy.deepcopy(self.contract)
+        changed['control_expectations']['bad_cs_rpl_and_bad_rflags'][1] = 5
+        with self.assertRaises(ValueError):
+            validate_named_document('bounded_user_exception_recovery_contract', changed)
         for code in range(15):
             changed = copy.deepcopy(self.contract)
             changed['rejections'][code] = 'IGNORED_FAILURE'
@@ -165,16 +188,32 @@ class CompiledExceptionFixtureTests(unittest.TestCase):
 
 
 class ExceptionEvidencePolicyTests(unittest.TestCase):
+    def test_linked_flag_enumeration_rejects_machine_code_mutations(self):
+        kernel = ROOT / 'artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf'
+        original = kernel.read_bytes()
+        sequence = bytes.fromhex('49837f1002740e49817f10020001000f85')
+        self.assertEqual(original.count(sequence), 1)
+        self.assertTrue(image_record(kernel)['handler_enumerated_rflags_check'])
+        for offset, replacement in ((4, 3), (5, 0xeb), (12, 3)):
+            with self.subTest(offset=offset), tempfile.TemporaryDirectory() as directory:
+                altered = bytearray(original)
+                altered[original.index(sequence) + offset] = replacement
+                path = Path(directory) / 'kozo-kernel.elf'
+                path.write_bytes(altered)
+                self.assertFalse(image_record(path).get('handler_enumerated_rflags_check'))
+
     def test_production_fixture_symbols_or_enabled_site_fail(self):
         record = dict(authorized_rip=0, fixture_symbols=[], record_size=64,
                       record_aligned=True, record_rw_nx=True, record_disjoint=True,
-                      handler_exact_rip_check=True, handler_exact_rflags_check=True)
+                      handler_exact_rip_check=True, handler_enumerated_rflags_check=True,
+                      int_0x81_exact_rflags_check=True)
         self.assertIsNone(production_image_issue(record))
         for key, value in (('authorized_rip', 1), ('fixture_symbols', ['select_user_exception_fixture']),
                            ('record_size', 32), ('record_aligned', False),
                            ('record_rw_nx', False), ('record_disjoint', False),
                            ('handler_exact_rip_check', False),
-                           ('handler_exact_rflags_check', False)):
+                           ('handler_enumerated_rflags_check', False),
+                           ('int_0x81_exact_rflags_check', False)):
             with self.subTest(key=key):
                 self.assertIsNotNone(production_image_issue(record | {key: value}))
 
@@ -190,6 +229,31 @@ class ExceptionEvidencePolicyTests(unittest.TestCase):
             changed = copy.deepcopy(valid)
             changed['memory']['result'][2] = 2
             self.assertIsNotNone(control_issue(changed, 1, mode))
+            for span in ('user_data', 'user_stack', 'request_shadow', 'response_shadow',
+                         'response_verify', 'consumption_shadow', 'transaction_phase',
+                         'request_success', 'privilege_probe', 'saved_continuation'):
+                changed = copy.deepcopy(valid)
+                changed['memory'][span][-1] = 1
+                self.assertIsNotNone(control_issue(changed, 1, mode))
+
+    def test_qmp_saved_flags_profiles(self):
+        contract = json.loads((ROOT / 'contracts/bounded_user_exception_recovery_contract.v0.json').read_text())
+        cases = ((8, 2, 2, 2, None), (8, 2, 2, 0x10002, 'QEMU_RFLAGS_PROFILE_MISMATCH'),
+                 (11, 1, 2, 0x10002, None), (11, 1, 2, 2, 'QEMU_RFLAGS_PROFILE_MISMATCH'),
+                 (12, 0, 0, 0x10002, None), (12, 0, 0, 2, 'QEMU_RFLAGS_UNREGISTERED_LEGACY_FORM'),
+                 (8, 2, 2, 0, 'QEMU_RFLAGS_PROFILE_MISMATCH'),
+                 (8, 2, 2, 0x10000, 'QEMU_RFLAGS_PROFILE_MISMATCH'),
+                 (11, 1, 2, 0x12, 'QEMU_RFLAGS_PROFILE_MISMATCH'),
+                 (11, 1, 2, 0x202, 'QEMU_RFLAGS_PROFILE_MISMATCH'))
+        for major, minor, micro, flags, blocker in cases:
+            with self.subTest(version=(major, minor, micro), flags=flags):
+                observed = classify_qemu_rflags(contract, {'qemu': {'major': major, 'minor': minor, 'micro': micro}}, flags)
+                self.assertEqual(observed['evidence_blocker'], blocker)
+        missing = classify_qemu_rflags(contract, {'qemu': {'major': 8, 'minor': 2}}, 2)
+        self.assertEqual(missing['evidence_blocker'], 'QMP_VERSION_UNAVAILABLE')
+        drift = classify_qemu_rflags(contract, {'qemu': {'major': 11, 'minor': 1, 'micro': 2}},
+                                     0x10002, hosted_ubuntu=True)
+        self.assertEqual(drift['evidence_blocker'], 'HOSTED_QEMU_VERSION_DRIFT')
 
     def test_emergency_halt_cannot_claim_verified_rejection_or_recovery(self):
         evidence = rejection_fixture(16)
@@ -209,10 +273,17 @@ def rejection_fixture(mode):
     if mode == 9:
         events.append('0: v=81 e=0000 i=1 cpl=3 IP=0023:000040000000003e')
     events.append(f'1: v=06 e=0000 i=0 cpl=3 IP=0023:{observed_rip:016x} SP=001b:{observed_stack:016x}')
-    return dict(terminal_halted=True, serial='', trace_events=events,
+    return dict(terminal_halted=True, serial='', trace_events=events, evidence_blocker=None,
                 authorized_rip=rip, stack={'expected_fault_rsp': stack},
                 memory={'context_raw': '',
-        'context': [1, 128, 0, 0, 4] + [0] * 27, 'result': [0] * 8})
+        'context': [1, 128, 0, 0, 4] + [0] * 27, 'result': [0] * 8,
+        'hardware_frame': [observed_rip & 0xffffffff, observed_rip >> 32, 0x23, 0,
+                           0x10002, 0, observed_stack & 0xffffffff, observed_stack >> 32, 0x1b, 0],
+        'user_data': [0] * 1024, 'user_stack': [0] * 1024,
+        'request_shadow': [0] * 10, 'response_shadow': [0] * 24,
+        'response_verify': [0] * 24, 'consumption_shadow': [0] * 12,
+        'transaction_phase': [0] * 2, 'request_success': [0] * 2,
+        'privilege_probe': [0] * 2, 'saved_continuation': [0] * 2})
 
 
 if __name__ == '__main__':

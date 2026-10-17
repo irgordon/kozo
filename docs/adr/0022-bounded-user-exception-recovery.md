@@ -60,3 +60,25 @@ evidence must agree. Missing evidence fails closed; the aggregate remains 67.
 
 Only unconditional terminal handling of the precisely authorized vector-6
 fixture fault changes. ADRs 0017, 0018, 0020 and 0021 otherwise remain in force.
+
+## Amendment — 2026-10-17: QEMU Saved-RFLAGS Compatibility
+
+Hosted run 39069425953 failed under the original exact-0x10002 rule. The
+identical Rust object and fault RIP produced a saved #UD frame of 0x10002 on
+local QEMU 11.1.2, but 0x2 on hosted QEMU 8.2.2. This is a saved-frame
+emulator difference, not a different user instruction or an int 0x81 change.
+
+The fixture handler now accepts exactly 0x2 or 0x10002 by equality, with no
+RF mask or normalization. Its faulting Rust is never resumed, so this saved
+RF difference grants no continuing authority. Ordinary int 0x81 frames
+remain exactly 0x2. QMP upstream triples, not package strings, select the
+evidence profile: 8.2.2 requires 0x2; 11.1.2 requires 0x10002. A registered
+profile mismatch blocks acceptance. An unregistered emulator's 0x10002 form
+may be reported as architectural observation, but its 0x2 form blocks. The
+required Ubuntu 24.04 hosted profile remains exactly 8.2.2 until separately
+authorized. Missing QMP version evidence blocks acceptance.
+
+Safe rejection also clears and reads back both complete fixed user pages and
+all fixed supervisor transaction storage, in addition to the 128-byte context.
+The supervisor hardware frame remains on its return stack for inspection.
+An unsafe mapping takes the emergency terminal path without a cleanup claim.

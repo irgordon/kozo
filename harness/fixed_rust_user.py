@@ -19,7 +19,8 @@ def build_user_object(root: Path, output: Path, fault_fixture=False, response_fa
     if fault_fixture:
         command += ['--cfg', 'kozo_fault_fixture']
         controls = {6: 'kozo_fault_bad_rip', 7: 'kozo_fault_bad_bytes', 8: 'kozo_fault_bad_rsp',
-                    19: 'kozo_fault_int6', 20: 'kozo_fault_pf', 21: 'kozo_fault_int6'}
+                    19: 'kozo_fault_int6', 20: 'kozo_fault_pf', 21: 'kozo_fault_int6',
+                    33: 'kozo_fault_rflags_bit4'}
         if control in controls:
             command += ['--cfg', controls[control]]
     subprocess.run(command, check=True, capture_output=True, text=True)

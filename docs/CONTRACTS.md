@@ -9,7 +9,8 @@ Scope: Contract purpose, contract source paths, and contract authority
 # 1. Purpose
 
 `contracts/bounded_user_exception_recovery_contract.v0.json` owns the bounded
-fixture #UD predicate, exact flags, linker/compiled-stack derivation, 64-byte
+fixture #UD predicate, exact enumerated saved flags and QMP profile,
+linker/compiled-stack derivation, 64-byte
 record, monotonic stages, rejection taxonomy and classified controls. ADR 0022
 and INVARIANTS section 21 govern safe direct rejection clearing versus unsafe
 emergency halt. No exception result becomes reusable execution authority.

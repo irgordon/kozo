@@ -314,14 +314,16 @@ public ABI, or general application execution.
 # 24. Bounded User Exception Recovery
 
 ADR 0022 adds an exact fixture-only CPL3 UD2 authorization predicate, not
-arbitrary exception recovery. Fault-frame flags are exactly 0x10002; ordinary
-int 0x81 frames remain exactly 0x2. The handler checks trusted frame location
+arbitrary exception recovery. The fixture handler enumerates saved fault-frame
+flags 0x2 and 0x10002 without masking; QMP evidence requires the registered
+form for each emulator. Ordinary int 0x81 frames remain exactly 0x2. The handler checks trusted frame location
 and saved CS RPL before using saved user SS/RSP as evidence. Instruction bytes
 are read only after validating the fixed RX alias's physical backing; the
 higher-half backing symbol is deliberately unmapped and is never dereferenced.
 
-Rejected faults never use user addresses or the saved Odin continuation to
-clear authority. A fixed-address stack-independent clear/readback retains
+Rejected faults never use saved user addresses or the saved Odin continuation to
+clear authority. A fixed-address stack-independent clear/readback of context,
+both fixed user pages and supervisor transaction storage retains
 version 1, size 128 and CLEARED, without committing a trusted lifecycle result.
 An inaccessible context page is an explicit emergency limitation, not cleanup
 success. Existing generic #PF/#GP sinks retain their pre-existing terminal-only

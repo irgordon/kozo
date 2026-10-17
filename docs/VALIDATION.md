@@ -10,11 +10,15 @@ Scope: Harness, validator, verification, evidence, and proof-state rules
 
 The bounded exception successor composes source and ELF proof into the existing
 Rust execution evidence without adding an aggregate check. Linux fixture
-controls correlate the actual hardware frame (including exact saved 0x10002),
+controls correlate the actual hardware frame with the contract's exact
+0x2/0x10002 fixture enumeration and QMP upstream version. Registered QEMU
+8.2.2 requires 0x2; 11.1.2 requires 0x10002. The required hosted Ubuntu
+24.04 version is 8.2.2; missing or drifted version evidence blocks acceptance.
 QEMU int/cpu_reset trace, serial stages, context/result readback and final
 recovery record. Real faults and synthetic supervisor mutations are classified
 separately. A rejection halt alone is insufficient: safe rejections must prove
-direct CLEARED readback and no trusted failure-result commitment. The production
+direct CLEARED readback, zero readback of both complete user pages and reusable
+supervisor session storage, and no trusted failure-result commitment. The production
 page must match a pinned rebuild of the starting baseline byte-for-byte.
 Windows/macOS remain build-only; hosted acceptance is pending.
 

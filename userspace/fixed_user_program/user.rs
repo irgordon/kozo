@@ -142,8 +142,8 @@ unsafe extern "C" fn kozo_rust_user_fault_probe() -> ! {
     #[cfg(kozo_fault_bad_rsp)]
     core::arch::asm!("push 0");
     core::arch::asm!(
-        "push 2", "popfq",
-        ".if {control} != 0 && {control} != 7", "jmp 3f", ".endif",
+        ".if {control} == 33", "push 0x12", ".else", "push 2", ".endif", "popfq",
+        ".if {control} != 0 && {control} != 7 && {control} != 33", "jmp 3f", ".endif",
         ".global kozo_rust_user_fault_site",
         ".set kozo_rust_user_fault_site, 2f",
         "2:",
@@ -166,7 +166,9 @@ const FAULT_CONTROL_INSTRUCTION: usize = 19;
 const FAULT_CONTROL_INSTRUCTION: usize = 20;
 #[cfg(all(kozo_fault_fixture, kozo_fault_bad_bytes))]
 const FAULT_CONTROL_INSTRUCTION: usize = 7;
-#[cfg(all(kozo_fault_fixture, not(any(kozo_fault_bad_rip, kozo_fault_int6, kozo_fault_pf, kozo_fault_bad_bytes))))]
+#[cfg(all(kozo_fault_fixture, kozo_fault_rflags_bit4))]
+const FAULT_CONTROL_INSTRUCTION: usize = 33;
+#[cfg(all(kozo_fault_fixture, not(any(kozo_fault_bad_rip, kozo_fault_int6, kozo_fault_pf, kozo_fault_bad_bytes, kozo_fault_rflags_bit4))))]
 const FAULT_CONTROL_INSTRUCTION: usize = 0;
 
 // Native non-x86 tests exercise pure wire policy, never guest privilege evidence.

@@ -49,7 +49,7 @@ _VERIFY_RUST_ANCHORS = (
 )
 
 _CI_TOOLING_ANCHORS = (
-    "runs-on: ubuntu-latest",
+    "runs-on: ubuntu-24.04",
     "xorriso",
     "qemu-system-x86",
     "nasm",

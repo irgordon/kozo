@@ -364,7 +364,7 @@ def write_fixture_files(root: Path) -> dict[str, object]:
 def valid_ci_text() -> str:
     return "\n".join(
         (
-            "runs-on: ubuntu-latest",
+            "runs-on: ubuntu-24.04",
             "xorriso",
             "qemu-system-x86",
             "nasm",

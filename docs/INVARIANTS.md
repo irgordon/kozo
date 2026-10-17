@@ -675,8 +675,9 @@ it.
 The only successful lifecycle is `UNINITIALIZED -> READY -> ACTIVE ->
 RETURNED -> CLEARED`. Ordinary failures from any live state must converge on
 verified `CLEARED`; failure before `READY` must establish no authority.
-Rejected exceptions with usable supervisor execution and fixed context memory
-must directly clear authority and verify `CLEARED` before terminal halt,
+Rejected exceptions with usable supervisor execution and fixed mappings
+must directly clear authority, both fixed user pages, and reusable supervisor
+session storage, then verify `CLEARED` and zero readback before terminal halt,
 without using a saved user address or Odin continuation, committing a trusted
 lifecycle result, or reporting recovery. A specifically demonstrated unsafe
 supervisor condition permits emergency halt without unsafe memory operations;

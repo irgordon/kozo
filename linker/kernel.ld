@@ -111,6 +111,8 @@ SECTIONS
          "fixed user consumption shadow must be exactly 48 bytes")
   ASSERT((fixed_user_transaction_phase_end - fixed_user_transaction_phase) == 8,
          "fixed user transaction phase must be exactly 8 bytes")
+  ASSERT((privilege_probe_state / 4K) == (saved_odin_return_stack / 4K),
+         "fixed rejection cleanup storage must share one supervisor page")
   ASSERT((fixed_user_context_end - fixed_user_context) == 128,
          "fixed user execution context must be exactly 128 bytes")
   ASSERT((fixed_user_context % 16) == 0,

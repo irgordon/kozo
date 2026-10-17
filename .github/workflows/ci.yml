@@ -22,7 +22,7 @@ concurrency:
 jobs:
   verify:
     name: full verification
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     steps:
@@ -213,6 +213,8 @@ jobs:
           )
 
       - name: Execute bounded user exception controls
+        env:
+          KOZO_HOSTED_UBUNTU_24_04: "1"
         run: |
           python3 tests/run_user_exception_controls.py \
             --output artifacts/user-exception-controls \

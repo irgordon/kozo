@@ -4,6 +4,8 @@ Bounded Ring 3 Exception Recovery: implementation and executable controls are
 under validation; hosted acceptance is pending. Normal runtime remains two
 Rust sessions, four int 0x81 transitions and 52 success occurrences. Current
 published v1.1.0 is immutable and predates this work.
+The QEMU saved-frame compatibility amendment is locally validated but has not
+yet passed the required fresh hosted matrix.
 
 Version: 1
 Status: Planning
