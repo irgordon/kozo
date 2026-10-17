@@ -156,11 +156,12 @@ class CompiledExceptionFixtureTests(unittest.TestCase):
                     derive_stack(original.replace(before, after, 1))
 
     def test_extended_state_instructions_cannot_be_silently_accepted(self):
-        self.assertIsNone(fixture_instruction_issue('0: pushq %rbp\n1: movq %rsp, %rbp\n4: ud2'))
+        self.assertIsNone(fixture_instruction_issue('0: 55 pushq %rbp\n1: 48 89 e5 movq %rsp, %rbp\n4: 0f 0b ud2'))
+        self.assertIsNone(fixture_instruction_issue('/project/verified/fixed_user.o: file format elf64-x86-64\n0: 55 pushq %rbp'))
         for instruction in ('movaps %xmm0, %xmm1', 'vzeroupper', 'fldl (%rax)',
                             'fxsave (%rax)', 'xrstor (%rax)', 'ldmxcsr (%rax)'):
             with self.subTest(instruction=instruction):
-                self.assertIsNotNone(fixture_instruction_issue(instruction))
+                self.assertIsNotNone(fixture_instruction_issue('0: 90 ' + instruction))
 
 
 class ExceptionEvidencePolicyTests(unittest.TestCase):

@@ -225,7 +225,13 @@ def terminal_registers_match(text, address):
 
 
 def fixture_instruction_issue(text):
-    return re.search(r'%(?:xmm|ymm|zmm|mm[0-7]|st\b)|\b(?:v[a-z0-9]+|xsave[a-z]*|xrstor[a-z]*|fxsave[a-z]*|fxrstor[a-z]*|fninit|fadd[a-z]*|fsub[a-z]*|fmul[a-z]*|fdiv[a-z]*|fld[a-z]*|fst[a-z]*|ldmxcsr|stmxcsr|emms)\b', text)
+    from scripts.kernel_elf_report import parse_disassembly_instructions
+    registers = re.compile(r'%(?:xmm\d+|ymm\d+|zmm\d+|mm[0-7]|st\b)')
+    extended = re.compile(r'^(?:v[a-z0-9]+|xsave[a-z]*|xrstor[a-z]*|fxsave[a-z]*|fxrstor[a-z]*|f[a-z]+|ldmxcsr|stmxcsr|emms)$')
+    for _, mnemonic, operands in parse_disassembly_instructions(text):
+        if registers.search(operands) or extended.fullmatch(mnemonic):
+            return mnemonic
+    return None
 
 
 def control_issue(evidence, session, mode):
