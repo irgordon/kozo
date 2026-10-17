@@ -14,13 +14,14 @@ controls correlate the actual hardware frame with the contract's exact
 0x2/0x10002 fixture enumeration and QMP upstream version. Registered QEMU
 8.2.2 requires 0x2; 11.1.2 requires 0x10002. The required hosted Ubuntu
 24.04 version is 8.2.2; missing or drifted version evidence blocks acceptance.
-QEMU int/cpu_reset trace, serial stages, context/result readback and final
+The QEMU int/cpu_reset trace, serial stages, context/result readback and final
 recovery record. Real faults and synthetic supervisor mutations are classified
 separately. A rejection halt alone is insufficient: safe rejections must prove
 direct CLEARED readback, zero readback of both complete user pages and reusable
 supervisor session storage, and no trusted failure-result commitment. The production
 page must match a pinned rebuild of the starting baseline byte-for-byte.
-Windows/macOS remain build-only; hosted acceptance is pending.
+Windows/macOS remain build-only. Hosted CI `39076469379` and downloaded
+evidence accept this bounded fixture without changing the 67-check aggregate.
 
 Fixed Rust user execution composes into the existing 67-check gate. It must
 prove the independently compiled pinned object, closed references, linked

@@ -1,11 +1,12 @@
 # KOZO Phase Map
 
-Bounded Ring 3 Exception Recovery: implementation and executable controls are
-under validation; hosted acceptance is pending. Normal runtime remains two
+Bounded Ring 3 Exception Recovery: implemented and hosted accepted through
+CI `39076469379`, lint `39076469371`, and portability `39076469433`.
+Downloaded QEMU 8.2.2 controls and checksums validate. Normal runtime remains two
 Rust sessions, four int 0x81 transitions and 52 success occurrences. Current
 published v1.1.0 is immutable and predates this work.
-The QEMU saved-frame compatibility amendment is locally validated but has not
-yet passed the required fresh hosted matrix.
+The QEMU saved-frame compatibility amendment passes local 11.1.2 and hosted
+8.2.2 evidence; neither result changes the immutable release.
 
 Version: 1
 Status: Planning

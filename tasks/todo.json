@@ -2,7 +2,7 @@
   "task_title": "KOZO Bounded Ring 3 Exception Recovery",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
-  "plan_status": "approved",
+  "plan_status": "complete",
   "replan_number": 0,
   "approval": {
     "status": "approved"
@@ -3674,7 +3674,7 @@
     {
       "id": 104,
       "title": "Recover supervisor authority after exact fixture CPL3 UD2",
-      "status": "pending",
+      "status": "done",
       "kind": "edit",
       "files_expected": [
         ".gitignore", ".github/workflows/ci.yml",
@@ -4647,7 +4647,7 @@
       {
         "tool": "bounded user exception recovery",
         "command": "python3 -m unittest tests.test_bounded_user_exception_recovery; python3 -m unittest discover -s tests; scripts/verify.sh; python3 tests/run_user_exception_controls.py with the accepted baseline rebuild and isolated output",
-        "status": "local_pass_1344_tests_67_checks_0_failures_52_normal_markers_30_fault_controls_pass_hosted_pending_v1.1.0_unchanged"
+        "status": "hosted_accepted_ci_39076469379_lint_39076469371_portability_39076469433_1346_tests_67_checks_0_failures_52_normal_markers_35_fault_controls_pass_qemu_8_2_2_and_11_1_2_downloaded_checksums_and_iso_identity_verified_v1.1.0_unchanged"
       }
     ],
     "logs": [

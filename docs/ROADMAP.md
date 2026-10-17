@@ -1,10 +1,11 @@
 # KOZO Roadmap
 
-Current development: bounded fixture CPL3 #UD supervisor recovery is under
-validation under ADR 0022. Hosted acceptance remains pending. Published
-v1.1.0 is unchanged and does not include this post-release implementation.
-The local 11.1.2 controls pass under contract v0 revision 1; hosted 8.2.2
-compatibility and downloaded evidence remain required.
+Current development: bounded fixture CPL3 #UD supervisor recovery is
+implemented and hosted accepted under ADR 0022. CI `39076469379`, lint
+`39076469371`, and portability `39076469433` pass. Local QEMU 11.1.2 and
+hosted QEMU 8.2.2 each pass all 35 declared controls; downloaded evidence
+and ISO identity validate. Published v1.1.0 is unchanged and does not include
+this post-release implementation.
 No release or additional capability is selected by this task.
 
 Version: 1.1.0

@@ -2,7 +2,7 @@
 
 ## Bounded Ring 3 Exception Recovery - 2026-10-17
 
-**Status:** Implementation in progress; hosted acceptance pending. Not released.
+**Status:** Implemented and hosted accepted on main. Not released.
 
 * Adopt ADR 0022 and reconcile exact fault-frame flags with hardware RF while
   preserving all int 0x81 checks. Distinguish verified rejection clearing from
@@ -23,7 +23,12 @@
   The intentionally unsafe mapping still halts without a cleanup claim.
 * Local preflight proves 1,346 Python tests, 67 governed checks, the normal
   52-marker QEMU path, and all 35 declared exception controls on QEMU 11.1.2.
-  Hosted CI and downloaded-artifact acceptance remain pending.
+* CI `39076469379`, lint `39076469371`, and portability `39076469433` pass.
+  Fresh hosted QEMU 8.2.2 evidence proves all 35 controls, its registered
+  saved `0x2` form, and complete safe-rejection cleanup. Downloaded checksums,
+  primary outcomes, ELF, and packaged/runtime ISO identity validate. The
+  failed runs `39069425953`, `39075279664`, and `39076027584` remain recorded
+  as historical qualification evidence.
 
 ## First Bounded Rust Userspace Execution - 2026-10-15
 

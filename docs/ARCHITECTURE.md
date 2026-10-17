@@ -370,4 +370,4 @@ before Odin may report completed recovery. Rejections use stack-independent
 direct context and fixed user-session storage clearing where safe, otherwise a
 demonstrated emergency halt. The fixture accepts only the two contract-owned
 saved-frame RFLAGS forms; QMP evidence must match the registered emulator form.
-Implementation is under validation; hosted acceptance is not yet claimed.
+The fixture is hosted accepted on main. Immutable v1.1.0 predates it.
