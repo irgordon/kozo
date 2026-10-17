@@ -1049,7 +1049,7 @@
     "result_validator_present": true
   },
   "fixed_rust_user_execution": {
-    "source_sha256": "bb775e5faaea0cf39bb68b9268edb66d75e8ec7bd4f481b5ef8d4c03a8d1d088",
+    "source_sha256": "bd53b0c107fb5f244a25b24aa4e9bbd53b6d5057bcd97a1c554f2266c7a07a75",
     "object": {
       "architecture": "x86_64",
       "allocated_bytes": 480,
@@ -1141,7 +1141,8 @@
     "fixture_symbols": [],
     "user_page_sha256": "687c74c3aa81950cc0309d39bc9033a3ed6306a87daa67aaaa46ac51f5bc7613",
     "handler_exact_rip_check": true,
-    "handler_exact_rflags_check": true
+    "handler_enumerated_rflags_check": true,
+    "int_0x81_exact_rflags_check": true
   },
   "fixed_user_execution_context": {
     "symbols": {
@@ -1446,8 +1447,8 @@
       "offset": "0x1000",
       "virtual_address": "0xffffffff80200000",
       "physical_address": "0x200000",
-      "file_size": "0x73a9",
-      "memory_size": "0x73a9",
+      "file_size": "0x7549",
+      "memory_size": "0x7549",
       "alignment": "0x1000"
     },
     {
