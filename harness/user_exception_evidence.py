@@ -192,18 +192,12 @@ def linked_handler_checks(kernel, sections, symbols):
     location = handler.find(load)
     saved_rip_compare = handler.find(b'\x49\x39\x07', location + len(load))
     values = json.loads(CONTRACT_PATH.read_text())['fault_site']['saved_exception_rflags']
-    flags = (bytes.fromhex('49837f10') + bytes([int(values[0], 16)]) + bytes.fromhex('740e49817f10') +
-             struct.pack('<I', int(values[1], 16)) + bytes.fromhex('0f85'))
     disassembly = subprocess.run(['objdump', '-d', str(kernel)], capture_output=True, text=True,
                                  check=True).stdout
     from scripts.kernel_elf_report import extract_function_disassembly
     instructions = extract_function_disassembly(disassembly,
         symbols['bounded_user_exception_handler']['value'],
         symbols['finish_authorized_user_exception']['value'])
-    frame_compares = [line for line in instructions if '0x10(%r15)' in line.operands and
-                      line.mnemonic.startswith('cmp')]
-    disassembly_matches = (len(frame_compares) == 2 and
-                           all(value in line.operands for value, line in zip(values, frame_compares)))
     transaction = sections[symbols['validate_fixed_ring3_frame']['section']]
     transaction_start = symbols['validate_fixed_ring3_frame']['value'] - transaction['address']
     transaction_code = transaction['data'][transaction_start:transaction_start + 128]
@@ -211,10 +205,20 @@ def linked_handler_checks(kernel, sections, symbols):
     int_comparison = bytes.fromhex('49837f10') + bytes([int_flags])
     return dict(handler_exact_rip_check=(location >= 0 and handler.count(load) == 1
                                          and 0 <= saved_rip_compare - location <= 48),
-                handler_enumerated_rflags_check=(handler.count(flags) == 1 and
-                                                  handler.find(flags) < location and
-                                                  disassembly_matches),
+                handler_enumerated_rflags_check=enumerated_rflags_machine_check(
+                    handler, instructions, values, location),
                 int_0x81_exact_rflags_check=transaction_code.count(int_comparison) == 1)
+
+
+def enumerated_rflags_machine_check(handler, instructions, values, rip_load_offset):
+    flags = (bytes.fromhex('49837f10') + bytes([int(values[0], 16)]) +
+             bytes.fromhex('740e49817f10') + struct.pack('<I', int(values[1], 16)) +
+             bytes.fromhex('0f85'))
+    comparisons = [line for line in instructions if '0x10(%r15)' in line.operands and
+                   line.mnemonic.startswith('cmp')]
+    return (handler.count(flags) == 1 and 0 <= handler.find(flags) < rip_load_offset and
+            len(comparisons) == 2 and
+            all(value in line.operands for value, line in zip(values, comparisons)))
 
 
 def linked_handler_stack_check(sections, symbols, rsp):

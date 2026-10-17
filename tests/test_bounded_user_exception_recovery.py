@@ -3,11 +3,12 @@ import copy
 import json
 import tempfile
 import unittest
+from types import SimpleNamespace
 
 from harness.fixed_rust_user import build_user_object
 from harness.user_exception_build import derive_stack
 from harness.user_exception_evidence import (
-    FRAME_GUARDS, classify_qemu_rflags, image_record, production_image_issue,
+    FRAME_GUARDS, classify_qemu_rflags, enumerated_rflags_machine_check, production_image_issue,
     recovery_source_issue, validate_stack_evidence,
 )
 from harness.validators_impl.schema import validate_named_document
@@ -189,18 +190,20 @@ class CompiledExceptionFixtureTests(unittest.TestCase):
 
 class ExceptionEvidencePolicyTests(unittest.TestCase):
     def test_linked_flag_enumeration_rejects_machine_code_mutations(self):
-        kernel = ROOT / 'artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf'
-        original = kernel.read_bytes()
+        contract = json.loads((ROOT / 'contracts/bounded_user_exception_recovery_contract.v0.json').read_text())
+        values = contract['fault_site']['saved_exception_rflags']
         sequence = bytes.fromhex('49837f1002740e49817f10020001000f85')
-        self.assertEqual(original.count(sequence), 1)
-        self.assertTrue(image_record(kernel)['handler_enumerated_rflags_check'])
+        instructions = [SimpleNamespace(mnemonic='cmpq', operands=f'${value}, 0x10(%r15)')
+                        for value in values]
+        handler = sequence + bytes.fromhex('48b80000000000000000')
+        self.assertTrue(enumerated_rflags_machine_check(handler, instructions, values, len(sequence)))
         for offset, replacement in ((4, 3), (5, 0xeb), (12, 3)):
-            with self.subTest(offset=offset), tempfile.TemporaryDirectory() as directory:
-                altered = bytearray(original)
-                altered[original.index(sequence) + offset] = replacement
-                path = Path(directory) / 'kozo-kernel.elf'
-                path.write_bytes(altered)
-                self.assertFalse(image_record(path).get('handler_enumerated_rflags_check'))
+            with self.subTest(offset=offset):
+                altered = bytearray(handler)
+                altered[offset] = replacement
+                self.assertFalse(enumerated_rflags_machine_check(altered, instructions, values, len(sequence)))
+        extra = instructions + [SimpleNamespace(mnemonic='cmpq', operands='$0x202, 0x10(%r15)')]
+        self.assertFalse(enumerated_rflags_machine_check(handler, extra, values, len(sequence)))
 
     def test_production_fixture_symbols_or_enabled_site_fail(self):
         record = dict(authorized_rip=0, fixture_symbols=[], record_size=64,
