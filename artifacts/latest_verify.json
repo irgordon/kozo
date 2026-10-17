@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20261017T223924Z",
+  "run_id": "verify-20261017T230115Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -493,11 +493,13 @@
   ],
   "failed_checks": [],
   "changed_files": [
-    "artifacts/runtime/qemu_smoke.metadata.json",
-    "artifacts/runtime/qemu_smoke.summary.txt",
-    "docs/generated/governance_index.md",
-    "harness/user_exception_evidence.py",
-    "tests/test_bounded_user_exception_recovery.py"
+    "CHANGELOG.md",
+    "docs/ARCHITECTURE.md",
+    "docs/PHASEMAP.md",
+    "docs/ROADMAP.md",
+    "docs/VALIDATION.md",
+    "tasks/runtime.json",
+    "tasks/todo.json"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -514,5 +516,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-10-17T22:39:24Z"
+  "generated_at": "2026-10-17T23:01:15Z"
 }
