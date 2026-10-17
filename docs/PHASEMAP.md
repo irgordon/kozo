@@ -1,5 +1,10 @@
 # KOZO Phase Map
 
+Bounded Ring 3 Exception Recovery: implementation and executable controls are
+under validation; hosted acceptance is pending. Normal runtime remains two
+Rust sessions, four int 0x81 transitions and 52 success occurrences. Current
+published v1.1.0 is immutable and predates this work.
+
 Version: 1
 Status: Planning
 Scope: Release phase sequencing for the path to a scoped KOZO v1.0.0

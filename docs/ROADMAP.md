@@ -1,5 +1,10 @@
 # KOZO Roadmap
 
+Current development: bounded fixture CPL3 #UD supervisor recovery is under
+validation under ADR 0022. Hosted acceptance remains pending. Published
+v1.1.0 is unchanged and does not include this post-release implementation.
+No release or additional capability is selected by this task.
+
 Version: 1.1.0
 Status: Published final feature release
 Release commit: a5226635be46c687299028b5244f808da67c0984

@@ -1,0 +1,84 @@
+{
+  "version": 0,
+  "architecture": "x86_64",
+  "decision": "docs/adr/0022-bounded-user-exception-recovery.md",
+  "fault_site": {
+    "symbol": "kozo_rust_user_fault_site",
+    "instruction_bytes": "0f0b",
+    "rip_derivation": "USER_PROBE_CODE_VA + (kozo_rust_user_fault_site - user_probe_code_start)",
+    "rsp_derivation": "pinned_object_disassembly_then_independent_linked_disassembly",
+    "production_authorized_rip": 0,
+    "live_rflags": "0x2",
+    "saved_exception_rflags": "0x10002",
+    "existing_int_0x81_rflags": "0x2",
+    "flags_comparison": "exact_no_mask"
+  },
+  "required_state": {
+    "vector": 6,
+    "cs_rpl": 3,
+    "cs": "USER_CODE_SELECTOR",
+    "ss": "USER_DATA_SELECTOR",
+    "rip": "exact_linker_derived_fault_site",
+    "instruction": "exact_supervisor_backing_bytes_0f0b",
+    "rsp": "exact_compiled_fixture_rsp",
+    "rflags": "0x10002",
+    "lifecycle": "ACTIVE",
+    "session": "fixture_selected_1_or_2",
+    "phase": "REQUEST_PENDING",
+    "transition_count": 0,
+    "continuation": "nonzero_validated_kernel_stack_and_exact_wrapper_return",
+    "record": "structurally_valid_EMPTY",
+    "occurrence": "first_authorized_fault"
+  },
+  "fixture": {
+    "rust_cfg": "kozo_fault_fixture",
+    "selector": "FIXED_USER_DATA_SCRATCH_VA + 8",
+    "selector_owner": "supervisor_only_fixture_writer",
+    "selected_sessions": [1, 2],
+    "production_hooks": "absent",
+    "production_user_page": "byte_identical_to_pinned_starting_baseline"
+  },
+  "record": {
+    "symbol": "bounded_user_exception_record",
+    "size_bytes": 64,
+    "alignment_bytes": 8,
+    "storage": "supervisor_rw_nx",
+    "owner": "ring0_recovery_component",
+    "u32_fields": ["format_version", "structure_size", "recovery_stage", "recovery_status", "exception_vector", "session_ordinal", "observed_transition_count", "observed_transaction_phase", "fault_site_id", "failure_code", "validation_flags", "reserved_0"],
+    "u64_fields": ["reserved_1", "reserved_2"],
+    "reserved": "always_zero",
+    "stages": ["EMPTY", "AUTHORIZED_FAULT", "SUPERVISOR_RETURNED", "FAILURE_RESULT_AND_CONTEXT_CLEARED", "CLEANUP_VERIFIED", "ODIN_OBSERVED"],
+    "transition": "exact_previous_then_volatile_readback",
+    "lifecycle_failure_commits": 1
+  },
+  "rejections": [
+    "BAD_FRAME_LOCATION", "BAD_CS_RPL", "BAD_CS_SELECTOR", "BAD_SS",
+    "BAD_RFLAGS", "BAD_RIP", "BAD_UD2_BYTES", "BAD_RSP", "BAD_PHASE",
+    "CONTEXT_NOT_ACTIVE", "BAD_SESSION", "BAD_TRANSITION_COUNT",
+    "NO_CONTINUATION", "RECOVERY_RECORD_INVALID", "FAULT_SITE_DISABLED"
+  ],
+  "rejection_policy": {
+    "precedence": "listed_order_among_applicable_checks_disabled_site_skips_address_checks",
+    "safe_supervisor": "direct_fixed_context_clear_verify_diagnostic_terminal_halt",
+    "unsafe_supervisor": "demonstrated_emergency_halt_without_cleanup_claim",
+    "context_cleared_fields": {"format_version": 1, "structure_size": 128, "lifecycle": 4},
+    "authority_fields": "zero",
+    "use_saved_continuation": false,
+    "commit_lifecycle_result": false,
+    "return_to_odin": false
+  },
+  "diagnostics": {
+    "reject": "USER_EXCEPTION_REJECT=<two_decimal_digits>",
+    "recovered": "USER_EXCEPTION_RECOVERED=06",
+    "recovered_stage": "ODIN_OBSERVED",
+    "success_catalog_member": false
+  },
+  "evidence": {
+    "normal_marker_occurrences": 52,
+    "governed_checks": 67,
+    "qemu_trace": "int,cpu_reset",
+    "real_controls": ["session_1", "session_2", "unauthorized_rip", "bad_ud2_bytes", "altered_rsp", "wrong_phase", "kernel_ud", "user_int6", "user_pf", "double_fault"],
+    "synthetic_controls": ["bad_frame", "bad_cs_rpl", "bad_cs_selector", "bad_ss", "bad_rflags", "context_inactive", "bad_session", "transition_count", "no_continuation", "invalid_record", "site_disabled", "unsafe_supervisor", "cleanup_failure", "invalid_selector", "stale_selector", "duplicate_failure_commit", "skipped_stage", "stage_readback_failure", "early_diagnostic", "backward_stage"]
+  },
+  "non_goals": ["resumed_faulting_rust", "general_exception_framework", "public_abi", "processes", "scheduler", "new_mappings", "simd_state_switching", "release"]
+}

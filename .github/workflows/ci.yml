@@ -201,6 +201,31 @@ jobs:
         run: |
           python3 tests/run_fixed_rust_user_controls.py --output artifacts/rust-user-controls
 
+      - name: Rebuild accepted pre-exception user page
+        run: |
+          mkdir -p artifacts/user-exception-baseline/source
+          git fetch --no-tags --depth=1 origin 99d3912a63fbb614f853b83992ec5387b92c7e54
+          git archive 99d3912a63fbb614f853b83992ec5387b92c7e54 \
+            | tar -x -C artifacts/user-exception-baseline/source
+          (
+            cd artifacts/user-exception-baseline/source
+            scripts/build_boot_image.sh
+          )
+
+      - name: Execute bounded user exception controls
+        run: |
+          python3 tests/run_user_exception_controls.py \
+            --output artifacts/user-exception-controls \
+            --baseline-kernel artifacts/user-exception-baseline/source/artifacts/runtime/boot_image/image-root/boot/kozo/kozo-kernel.elf
+
+      - name: Upload bounded exception evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: kozo-user-exception-controls
+          path: artifacts/user-exception-controls/
+          if-no-files-found: warn
+
       - name: Upload Rust guest controls
         if: always()
         uses: actions/upload-artifact@v7

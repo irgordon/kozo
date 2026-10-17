@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-RUNTIME_DIR="$ROOT/artifacts/runtime"
+RUNTIME_DIR="${KOZO_RUNTIME_OUTPUT:-$ROOT/artifacts/runtime}"
 BOOT_IMAGE_DIR="$RUNTIME_DIR/boot_image"
 WORK_DIR="$BOOT_IMAGE_DIR/work"
 IMAGE_ROOT="$BOOT_IMAGE_DIR/image-root"
@@ -66,13 +66,10 @@ find_limine_artifact() {
       return
     fi
   fi
-  for candidate in \
-    "$ROOT/boot/limine/$name"; do
-    if [[ -f "$candidate" ]]; then
-      printf "%s\n" "$candidate"
-      return
-    fi
-  done
+  candidate="$ROOT/boot/limine/$name"
+  if [[ -f "$candidate" ]]; then
+    printf "%s\n" "$candidate"
+  fi
 }
 
 prepare_directories() {
@@ -81,21 +78,41 @@ prepare_directories() {
 }
 
 build_kernel_objects() {
-  python3 "$ROOT/scripts/build_fixed_rust_user.py" "$WORK_DIR/fixed_user.o"
+  local rust_options=() assembly_options=()
+  if [[ -n "${KOZO_FAULT_SESSION:-}" ]]; then
+    [[ "$KOZO_FAULT_SESSION" == 1 || "$KOZO_FAULT_SESSION" == 2 ]] || fail "Invalid fixture session"
+    [[ -n "${KOZO_RUNTIME_OUTPUT:-}" ]] || fail "Fault fixtures require an isolated output"
+    rust_options=(--fault-fixture)
+    if [[ "${KOZO_FAULT_MODE:-0}" == 9 ]]; then
+      rust_options=(--response-fault-fixture)
+    fi
+    rust_options+=(--control "${KOZO_FAULT_MODE:-0}")
+    assembly_options=("-DKOZO_FAULT_SESSION=$KOZO_FAULT_SESSION" "-DKOZO_FAULT_MODE=${KOZO_FAULT_MODE:-0}" -p "$WORK_DIR/fixed_user.stack.inc")
+  fi
+  python3 "$ROOT/scripts/build_fixed_rust_user.py" "$WORK_DIR/fixed_user.o" "${rust_options[@]}"
   "$ROOT/scripts/build_odin_object.sh" "$WORK_DIR/kernel.o" "$ROOT/kernel" \
     "-target:$BRIDGE_TARGET" \
     -disable-red-zone
   nasm -I "$ROOT/" -f elf64 "$ROOT/kernel/arch/x86_64/boot.asm" -o "$WORK_DIR/boot.o"
   nasm -I "$ROOT/" -f elf64 "$ROOT/kernel/arch/x86_64/paging.asm" -o "$WORK_DIR/paging.o"
-  nasm -I "$ROOT/" -f elf64 "$ROOT/kernel/arch/x86_64/privilege_transition.asm" -o "$WORK_DIR/privilege_transition.o"
+  nasm -I "$ROOT/" "${assembly_options[@]}" -f elf64 "$ROOT/kernel/arch/x86_64/privilege_transition.asm" -o "$WORK_DIR/privilege_transition.o"
   nasm -f elf64 "$ROOT/kernel/arch/x86_64/syscall.asm" -o "$WORK_DIR/syscall.o"
   nasm -f elf64 "$ROOT/kernel/arch/x86_64/memory.asm" -o "$WORK_DIR/memory.o"
 }
 
 link_kernel_elf() {
+  local fixture_link_options=()
+  if [[ -n "${KOZO_FAULT_SESSION:-}" ]]; then
+    if [[ "${KOZO_FAULT_MODE:-0}" == 15 ]]; then
+      fixture_link_options=(-T "$ROOT/linker/exception_fixture_disabled.ld")
+    else
+      fixture_link_options=(-T "$ROOT/linker/exception_fixture.ld")
+    fi
+  fi
   lld -flavor gnu \
     -nostdlib \
     -T "$ROOT/linker/kernel.ld" \
+    "${fixture_link_options[@]}" \
     -o "$KERNEL_ELF" \
     "$WORK_DIR"/*.o
 }

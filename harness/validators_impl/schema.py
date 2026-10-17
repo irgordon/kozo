@@ -11,6 +11,7 @@ from harness.validator import BaseValidator, ValidationResult
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _SCHEMA_DIR = _REPO_ROOT / "schemas"
 _SCHEMA_PATHS = {
+    "bounded_user_exception_recovery_contract": _SCHEMA_DIR / "bounded_user_exception_recovery_contract.schema.json",
     "fixed_rust_user_execution_contract": _SCHEMA_DIR / "fixed_rust_user_execution_contract.schema.json",
     "fixed_user_request_boundary_contract_v1": _SCHEMA_DIR / "fixed_user_request_boundary_contract.v1.schema.json",
     "todo": _SCHEMA_DIR / "todo.schema.json",

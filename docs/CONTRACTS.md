@@ -8,6 +8,12 @@ Scope: Contract purpose, contract source paths, and contract authority
 
 # 1. Purpose
 
+`contracts/bounded_user_exception_recovery_contract.v0.json` owns the bounded
+fixture #UD predicate, exact flags, linker/compiled-stack derivation, 64-byte
+record, monotonic stages, rejection taxonomy and classified controls. ADR 0022
+and INVARIANTS section 21 govern safe direct rejection clearing versus unsafe
+emergency halt. No exception result becomes reusable execution authority.
+
 The post-v1.1.0 fixed Rust user implementation is additionally governed by
 `contracts/fixed_rust_user_execution_contract.v0.json` and its strict schema.
 ADR 0021 changes user-program ownership only. Historical assembly transport

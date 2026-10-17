@@ -94,6 +94,14 @@ If a generated binding is wrong, fix the contract or generator path.
 
 # 8. Proof Artifacts
 
+Bounded exception fixture objects, stack includes/JSON, ELF records, ISOs,
+checksums, QEMU traces, serial output and monitor memory snapshots are generated
+by the existing boot builder and `tests/run_user_exception_controls.py` under
+an isolated caller-selected output directory. They are review evidence, not
+authoritative source and must not be edited manually. The new contract owns
+their meaning. `harness/user_exception_build.py` derives stack input from the
+pinned compiled object; linked disassembly and hardware frame must agree.
+
 `artifacts/latest_verify.json` records generated verification state.
 
 It should be refreshed only after source and focused tests pass.

@@ -128,6 +128,7 @@ extern kozo_rust_user_response_entry
 
 %define USER_INITIAL_RSP (USER_PROBE_STACK_TOP_VA - 16)
 %define USER_RFLAGS 0x2
+%define USER_EXCEPTION_STATUS 0x106
 %define USER_STACK_SENTINEL 0x4b4f5a4f55534552
 %define USER_PROBE_FAILURE_TOKEN 0x4641494c50524956
 %define PRIVILEGE_PROBE_SUCCESS_STATE 0x4b4f5a4f52335230
@@ -350,6 +351,7 @@ clear_privilege_transition_storage:
     mov qword [rel privilege_probe_state], 0
     mov qword [rel saved_odin_return_stack], 0
     mov word [rel observed_task_register], 0
+    call initialize_bounded_user_exception_record
     ret
 
 ; Populates only RSP0, IST1, and the disabled I/O bitmap offset.
@@ -436,7 +438,7 @@ initialize_governed_idt:
     call set_idt_gate
 
     mov edi, 6
-    lea rsi, [rel privilege_fault_sink]
+    lea rsi, [rel bounded_user_exception_handler]
     mov edx, INTERRUPT_GATE_DPL0
     xor ecx, ecx
     call set_idt_gate
@@ -637,6 +639,10 @@ validate_user_probe_entry:
     call require_supervisor_rw_nx
     test eax, eax
     jnz .entry_invalid
+    lea rdi, [rel bounded_user_exception_record]
+    call require_supervisor_rw_nx
+    test eax, eax
+    jnz .entry_invalid
 
     lea rdi, [rel user_probe_code_start]
     call walk_page_mapping
@@ -686,6 +692,12 @@ require_mapping_flags:
 
 ; Preserve SysV stack alignment and return the architecture status in eax.
 execute_fixed_user_runtime_status_transaction:
+    push rbx
+    push rbp
+    push r12
+    push r13
+    push r14
+    push r15
     sub rsp, 8
     call initialize_fixed_user_execution_context
     test eax, eax
@@ -697,11 +709,23 @@ execute_fixed_user_runtime_status_transaction:
     test eax, eax
     jnz .live_context_failure
     call enter_bounded_ring3_probe
+.exception_wrapper_return:
+    cmp eax, USER_EXCEPTION_STATUS
+    jne .ordinary_return
+    call finish_authorized_user_exception
+    jmp .done
+.ordinary_return:
     test eax, eax
     jz .done
     call finish_fixed_user_context_transaction_failure
 .done:
     add rsp, 8
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop rbp
+    pop rbx
     ret
 .pre_ready_failure:
     call finish_fixed_user_context_pre_ready_failure
@@ -777,6 +801,11 @@ enter_bounded_ring3_probe:
     jnz .done
     cmp qword [rel fixed_user_transaction_phase], FIXED_USER_PHASE_REQUEST_PENDING
     jne .phase_invalid
+%ifdef KOZO_FAULT_SESSION
+    call select_user_exception_fixture
+    test eax, eax
+    jnz .done
+%endif
     call runtime_serial_write_ring3_enter_marker
     mov ax, USER_DATA_SELECTOR
     mov ds, ax
@@ -2474,3 +2503,5 @@ privilege_fault_sink:
 privilege_double_fault_sink:
     cli
     jmp boot_terminal_halt
+
+%include "kernel/arch/x86_64/exception_recovery.inc"

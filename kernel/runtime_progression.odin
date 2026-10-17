@@ -36,6 +36,7 @@ SECOND_SESSION_ORDINAL :: u32(2)
 PER_SESSION_TRANSITION_COUNT :: u32(2)
 REQUIRED_TOTAL_TRANSITION_COUNT :: u32(4)
 RUNTIME_REPEATED_SESSION_FAILURE :: u32(20)
+RUNTIME_USER_EXCEPTION_STATUS :: u32(0x106)
 
 REPEATED_SESSION_FAILURE_NONE :: u32(0)
 REPEATED_SESSION_FAILURE_INVALID_COORDINATOR_FORMAT :: u32(1)
@@ -75,6 +76,8 @@ foreign runtime_boot_bridge {
 }
 
 foreign runtime_privilege_bridge {
+	observe_bounded_user_exception :: proc "c" () -> u32 ---
+	bounded_user_exception_is_complete :: proc "c" () -> u32 ---
 	write_user_boundary_failure :: proc "c" (failure_code: u32) ---
 	execute_fixed_user_runtime_status_transaction :: proc "c" () -> u32 ---
 	validate_fixed_user_context_success_result :: proc "c" () -> u32 ---
@@ -207,6 +210,9 @@ execute_fixed_user_session :: proc "contextless" (session_ordinal: u32) -> u32 {
 		return fail_repeated_user_sessions(begin_failure_code)
 	}
 	if !fixed_user_session_succeeds() {
+		if bounded_user_exception_is_complete() == RUNTIME_PROGRESSION_OK {
+			return RUNTIME_REPEATED_SESSION_FAILURE
+		}
 		return fail_repeated_user_sessions(session_failure_code(session_ordinal))
 	}
 	return complete_fixed_user_session(session_ordinal)
@@ -224,7 +230,12 @@ begin_fixed_user_session :: proc "contextless" (session_ordinal: u32) -> u32 {
 
 @(export)
 fixed_user_session_succeeds :: proc "contextless" () -> bool {
-	if execute_fixed_user_runtime_status_transaction() != RUNTIME_PROGRESSION_OK {
+	transaction_status := execute_fixed_user_runtime_status_transaction()
+	if transaction_status == RUNTIME_USER_EXCEPTION_STATUS {
+		observe_bounded_user_exception()
+		return false
+	}
+	if transaction_status != RUNTIME_PROGRESSION_OK {
 		return false
 	}
 	return validate_fixed_user_context_success_result() == RUNTIME_PROGRESSION_OK

@@ -358,3 +358,14 @@ The implementation is hosted accepted on main by CI `38809437466`, lint
 `38809437455`, and portability `38809437557`. Independently downloaded
 Actions artifacts boot through both sessions and four CPL3 returns.
 Immutable v1.1.0 predates this implementation; no release is created here.
+
+# 21. Bounded User Exception Recovery
+
+The bounded vector-6 successor is governed by ADR 0022 and
+`bounded_user_exception_recovery_contract.v0.json`. It restores supervisor
+control after an exact fixture-only Rust fault, never resumes Rust, and uses
+the existing transaction failure wrapper for one authoritative commit and
+clear. One separate 64-byte evidence record advances through validated stages
+before Odin may report completed recovery. Rejections use stack-independent
+direct context clearing where safe, otherwise a demonstrated emergency halt.
+Implementation is under validation; hosted acceptance is not yet claimed.

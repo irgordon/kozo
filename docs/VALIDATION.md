@@ -8,6 +8,16 @@ Scope: Harness, validator, verification, evidence, and proof-state rules
 
 # 1. Purpose
 
+The bounded exception successor composes source and ELF proof into the existing
+Rust execution evidence without adding an aggregate check. Linux fixture
+controls correlate the actual hardware frame (including exact saved 0x10002),
+QEMU int/cpu_reset trace, serial stages, context/result readback and final
+recovery record. Real faults and synthetic supervisor mutations are classified
+separately. A rejection halt alone is insufficient: safe rejections must prove
+direct CLEARED readback and no trusted failure-result commitment. The production
+page must match a pinned rebuild of the starting baseline byte-for-byte.
+Windows/macOS remain build-only; hosted acceptance is pending.
+
 Fixed Rust user execution composes into the existing 67-check gate. It must
 prove the independently compiled pinned object, closed references, linked
 entry-byte identity, RX placement, CPL inspection and bounded leaf stack use.

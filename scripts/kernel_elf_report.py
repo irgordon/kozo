@@ -462,6 +462,7 @@ def build_report(kernel_elf: Path, linker_script: Path) -> dict[str, object]:
         "fixed_user_runtime_status_service": fixed_user_runtime_status_service_record(kernel_elf, symbols),
         "bounded_user_argument": bounded_user_argument_record(kernel_elf, symbols),
         "fixed_rust_user_execution": rust_user_execution_record(kernel_elf),
+        "bounded_user_exception_recovery": user_exception_record(kernel_elf),
         "fixed_user_execution_context": fixed_user_execution_context_record(
             kernel_elf,
             symbols,
@@ -1027,6 +1028,11 @@ def bounded_privilege_transition_record(
         "fault_halt_paths_present": _fault_halt_paths_present(instruction_sets, symbols),
         "prohibited_instructions": _privilege_prohibited_instructions(instruction_sets),
     }
+
+
+def user_exception_record(kernel_elf):
+    from harness.user_exception_evidence import image_record
+    return image_record(kernel_elf)
 
 
 def rust_user_execution_record(kernel_elf):

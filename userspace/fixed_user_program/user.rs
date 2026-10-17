@@ -26,6 +26,8 @@ pub unsafe extern "C" fn kozo_rust_user_request_entry() -> u32 {
     if !at_cpl3() {
         return INVALID;
     }
+    #[cfg(kozo_fault_fixture)]
+    fault_fixture_request();
     construct_request();
     abi::K_OK
 }
@@ -35,6 +37,8 @@ pub unsafe extern "C" fn kozo_rust_user_response_entry() -> u32 {
     if !at_cpl3() {
         return INVALID;
     }
+    #[cfg(kozo_fault_fixture)]
+    fault_fixture_response();
     let response = read_response();
     let argument = read_argument_scratch();
     if !response_is_valid(&response, argument) {
@@ -113,6 +117,57 @@ unsafe fn at_cpl3() -> bool {
                      options(nomem, nostack, preserves_flags));
     selector & 3 == 3
 }
+
+#[cfg(kozo_fault_fixture)]
+#[inline(always)]
+unsafe fn fault_fixture_request() {
+    let selector = read_volatile((ARGUMENT_SCRATCH + 8) as *const u8);
+    if selector == 1 {
+        kozo_rust_user_fault_probe();
+    }
+}
+
+#[cfg(kozo_fault_fixture)]
+#[inline(always)]
+unsafe fn fault_fixture_response() {
+    let selector = read_volatile((ARGUMENT_SCRATCH + 8) as *const u8);
+    if selector == 2 {
+        kozo_rust_user_fault_probe();
+    }
+}
+
+#[cfg(kozo_fault_fixture)]
+#[inline(never)]
+unsafe extern "C" fn kozo_rust_user_fault_probe() -> ! {
+    #[cfg(kozo_fault_bad_rsp)]
+    core::arch::asm!("push 0");
+    core::arch::asm!(
+        "push 2", "popfq",
+        ".if {control} != 0 && {control} != 7", "jmp 3f", ".endif",
+        ".global kozo_rust_user_fault_site",
+        ".set kozo_rust_user_fault_site, 2f",
+        "2:",
+        ".if {control} == 7", ".byte 0x0f, 0xb9, 0xc0",
+        ".else", "ud2", ".endif",
+        "3:",
+        ".if {control} == 19", "int 6",
+        ".elseif {control} == 20", "xor eax, eax", "mov rax, [rax]",
+        ".else", "ud2", ".endif",
+        control = const FAULT_CONTROL_INSTRUCTION,
+        options(noreturn)
+    );
+}
+
+#[cfg(all(kozo_fault_fixture, kozo_fault_bad_rip))]
+const FAULT_CONTROL_INSTRUCTION: usize = 6;
+#[cfg(all(kozo_fault_fixture, kozo_fault_int6))]
+const FAULT_CONTROL_INSTRUCTION: usize = 19;
+#[cfg(all(kozo_fault_fixture, kozo_fault_pf))]
+const FAULT_CONTROL_INSTRUCTION: usize = 20;
+#[cfg(all(kozo_fault_fixture, kozo_fault_bad_bytes))]
+const FAULT_CONTROL_INSTRUCTION: usize = 7;
+#[cfg(all(kozo_fault_fixture, not(any(kozo_fault_bad_rip, kozo_fault_int6, kozo_fault_pf, kozo_fault_bad_bytes))))]
+const FAULT_CONTROL_INSTRUCTION: usize = 0;
 
 // Native non-x86 tests exercise pure wire policy, never guest privilege evidence.
 #[cfg(all(test, not(target_arch = "x86_64")))]

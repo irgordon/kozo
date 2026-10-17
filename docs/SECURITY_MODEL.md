@@ -310,3 +310,19 @@ remain required. Rust return adapters reject bad completion status and stack
 state; rejection diagnostics are not success markers. Two bounded sessions
 still require full cleanup. This is not hostile-code containment, a stable
 public ABI, or general application execution.
+
+# 24. Bounded User Exception Recovery
+
+ADR 0022 adds an exact fixture-only CPL3 UD2 authorization predicate, not
+arbitrary exception recovery. Fault-frame flags are exactly 0x10002; ordinary
+int 0x81 frames remain exactly 0x2. The handler checks trusted frame location
+and saved CS RPL before using saved user SS/RSP as evidence. Instruction bytes
+are read only after validating the fixed RX alias's physical backing; the
+higher-half backing symbol is deliberately unmapped and is never dereferenced.
+
+Rejected faults never use user addresses or the saved Odin continuation to
+clear authority. A fixed-address stack-independent clear/readback retains
+version 1, size 128 and CLEARED, without committing a trusted lifecycle result.
+An inaccessible context page is an explicit emergency limitation, not cleanup
+success. Existing generic #PF/#GP sinks retain their pre-existing terminal-only
+behavior and cleanup discrepancy; no hostile-code containment is claimed.

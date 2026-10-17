@@ -12,10 +12,16 @@ TARGET = 'x86_64-unknown-none'
 PAGE_SIZE = 4096
 
 
-def build_user_object(root: Path, output: Path):
+def build_user_object(root: Path, output: Path, fault_fixture=False, response_fault=False, control=0):
     compiler = pinned_rustc(root)
     output.parent.mkdir(parents=True, exist_ok=True)
     command = object_command(compiler, root, output)
+    if fault_fixture:
+        command += ['--cfg', 'kozo_fault_fixture']
+        controls = {6: 'kozo_fault_bad_rip', 7: 'kozo_fault_bad_bytes', 8: 'kozo_fault_bad_rsp',
+                    19: 'kozo_fault_int6', 20: 'kozo_fault_pf', 21: 'kozo_fault_int6'}
+        if control in controls:
+            command += ['--cfg', controls[control]]
     subprocess.run(command, check=True, capture_output=True, text=True)
     content = output.read_bytes()
     result = inspect_object(content)
@@ -24,6 +30,9 @@ def build_user_object(root: Path, output: Path):
                          'object_size_bytes': len(content),
                          'compiler': run_output([compiler, '--version'])}
     output.with_suffix('.json').write_text(json.dumps(evidence, indent=2) + '\n')
+    if fault_fixture:
+        from harness.user_exception_build import write_stack_input
+        write_stack_input(output, evidence['compiler'], command, response_fault, control)
     return evidence
 
 

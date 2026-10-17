@@ -1,8 +1,8 @@
 {
-  "task_title": "KOZO First Bounded Rust Userspace Execution",
+  "task_title": "KOZO Bounded Ring 3 Exception Recovery",
   "task_kind": "non_trivial",
   "created_at": "2026-03-15T09:00:00Z",
-  "plan_status": "complete",
+  "plan_status": "approved",
   "replan_number": 0,
   "approval": {
     "status": "approved"
@@ -3670,6 +3670,36 @@
       ],
       "verification_refs": ["verification.tests_run[170]"],
       "failure_count": 3
+    },
+    {
+      "id": 104,
+      "title": "Recover supervisor authority after exact fixture CPL3 UD2",
+      "status": "pending",
+      "kind": "edit",
+      "files_expected": [
+        ".gitignore", ".github/workflows/ci.yml",
+        "docs/adr/0022-bounded-user-exception-recovery.md",
+        "docs/INVARIANTS.md", "docs/ARCHITECTURE.md", "docs/CONTRACTS.md",
+        "docs/SECURITY_MODEL.md", "docs/VALIDATION.md", "docs/GENERATED_ARTIFACTS.md",
+        "docs/ROADMAP.md", "docs/PHASEMAP.md", "CHANGELOG.md",
+        "contracts/bounded_user_exception_recovery_contract.v0.json",
+        "schemas/bounded_user_exception_recovery_contract.schema.json",
+        "kernel/arch/x86_64/exception_recovery.inc",
+        "kernel/arch/x86_64/privilege_transition.asm", "kernel/runtime_progression.odin",
+        "linker/kernel.ld", "linker/exception_fixture.ld",
+        "linker/exception_fixture_disabled.ld", "userspace/fixed_user_program/user.rs",
+        "harness/fixed_rust_user.py", "harness/fixed_rust_user_evidence.py",
+        "harness/user_exception_build.py", "harness/user_exception_evidence.py",
+        "harness/validators_impl/schema.py", "scripts/build_boot_image.sh",
+        "scripts/build_fixed_rust_user.py", "scripts/kernel_elf_report.py",
+        "tests/test_bounded_user_exception_recovery.py", "tests/run_user_exception_controls.py",
+        "tasks/todo.json", "tasks/runtime.json", "artifacts/latest_verify.json",
+        "docs/generated/governance_index.md", "artifacts/runtime/kernel_elf_report.json",
+        "artifacts/runtime/qemu_smoke.summary.txt", "artifacts/runtime/qemu_smoke.metadata.json",
+        "artifacts/runtime/boot_blocker_report.json"
+      ],
+      "verification_refs": ["verification.tests_run[171]"],
+      "failure_count": 1
     }
   ],
   "expected_outputs": [
@@ -4610,6 +4640,11 @@
         "tool": "fixed Rust user execution",
         "command": "pinned Rust object build; native wire-policy tests; object and linked ELF checks; isolated QEMU controls; full Python and governed verification; hosted CI, lint and portability",
         "status": "implemented_hosted_accepted_ci_38809437466_lint_38809437455_portability_38809437557_1326_tests_67_checks_52_markers_2_sessions_4_returns_9_guest_controls_pass_downloaded_ISO_and_ELF_verified_v1.1.0_unchanged"
+      },
+      {
+        "tool": "bounded user exception recovery",
+        "command": "python3 -m unittest tests.test_bounded_user_exception_recovery; python3 -m unittest discover -s tests; scripts/verify.sh; python3 tests/run_user_exception_controls.py with the accepted baseline rebuild and isolated output",
+        "status": "local_pass_1344_tests_67_checks_0_failures_52_normal_markers_30_fault_controls_pass_hosted_pending_v1.1.0_unchanged"
       }
     ],
     "logs": [

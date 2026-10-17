@@ -1,5 +1,22 @@
 # Changelog
 
+## Bounded Ring 3 Exception Recovery - 2026-10-17
+
+**Status:** Implementation in progress; hosted acceptance pending. Not released.
+
+* Adopt ADR 0022 and reconcile exact fault-frame flags with hardware RF while
+  preserving all int 0x81 checks. Distinguish verified rejection clearing from
+  unsafe emergency halt; record the pre-existing generic #PF/#GP cleanup gap.
+* Add one fixture-selected Rust UD2 boundary, linker-derived RIP, compiled
+  stack input and staged supervisor recovery record. Normal runtime and
+  published release version 1.1.0 remain unchanged.
+* Preserve the first failed local fixture: a higher-half backing-symbol read
+  caused supervisor #PF. Validate physical backing and use the existing fixed
+  RX alias instead; no mapping is added or permission weakened.
+* Local preflight proves 1,344 Python tests, 67 governed checks, the normal
+  52-marker QEMU path, and 30 isolated exception controls. Hosted CI and
+  downloaded-artifact acceptance remain pending.
+
 ## First Bounded Rust Userspace Execution - 2026-10-15
 
 **Status:** Implemented and hosted accepted on main. Not in published v1.1.0.

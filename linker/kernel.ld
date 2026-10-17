@@ -30,6 +30,7 @@ SECTIONS
     user_probe_code_end = .;
   }
   __user_probe_code_backing_end = .;
+  PROVIDE(__kozo_authorized_ud2_rip = 0);
 
   . = ALIGN(4K);
   __kernel_rodata_start = .;
@@ -114,6 +115,12 @@ SECTIONS
          "fixed user execution context must be exactly 128 bytes")
   ASSERT((fixed_user_context % 16) == 0,
          "fixed user execution context must be 16-byte aligned")
+  ASSERT((fixed_user_context / 4K) == ((fixed_user_context_end - 1) / 4K),
+         "stack-independent rejection clearing requires one context page")
+  ASSERT((bounded_user_exception_record_end - bounded_user_exception_record) == 64,
+         "bounded user exception record must be exactly 64 bytes")
+  ASSERT((bounded_user_exception_record % 8) == 0,
+         "bounded user exception record must be 8-byte aligned")
   ASSERT((fixed_user_context_result_end - fixed_user_context_result) == 32,
          "fixed user execution context result must be exactly 32 bytes")
   ASSERT((fixed_user_context_result % 8) == 0,

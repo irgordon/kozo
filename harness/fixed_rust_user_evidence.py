@@ -119,6 +119,10 @@ def machine_record(instructions):
 
 def current_execution_issue(root, report, assembly=None):
     try:
+        from harness.user_exception_evidence import current_recovery_issue
+        recovery_issue = current_recovery_issue(root, report)
+        if recovery_issue:
+            return recovery_issue
         rust = (root / RUST_PATH).read_text()
         if assembly is None:
             assembly = (root / 'kernel/arch/x86_64/privilege_transition.asm').read_text()

@@ -584,8 +584,11 @@ bypass the terminal halt path.
 
 The bounded privilege probe may enter only the fixed linked CPL3 target with
 fixed selectors, a fixed user stack, sanitized RFLAGS, and validated user
-mapping permissions. The return may arrive only through vector `0x81`, switch
-through the fixed TSS.RSP0 stack, and resume only the fixed CPL0 continuation.
+mapping permissions. Successful transaction returns may arrive only through
+vector `0x81`, switch through the fixed TSS.RSP0 stack, and resume only the
+fixed CPL0 continuation. ADR 0022 separately permits failure-only supervisor
+return after one precisely authorized fixture CPL3 #UD. It never resumes the
+faulting instruction or authorizes a successful transaction return.
 
 Ring 3 success requires direct privilege evidence from the hardware-saved
 frame plus the fixed stack/token probe. Descriptor, stack, entry, frame, token,
@@ -670,8 +673,17 @@ identity is neither a pointer nor a PID, and user mode cannot select or mutate
 it.
 
 The only successful lifecycle is `UNINITIALIZED -> READY -> ACTIVE ->
-RETURNED -> CLEARED`. Failures from any live state must converge on `CLEARED`;
-failure before `READY` must establish no authority. The clear representation
+RETURNED -> CLEARED`. Ordinary failures from any live state must converge on
+verified `CLEARED`; failure before `READY` must establish no authority.
+Rejected exceptions with usable supervisor execution and fixed context memory
+must directly clear authority and verify `CLEARED` before terminal halt,
+without using a saved user address or Odin continuation, committing a trusted
+lifecycle result, or reporting recovery. A specifically demonstrated unsafe
+supervisor condition permits emergency halt without unsafe memory operations;
+it must not claim `CLEARED` or successful recovery. Existing generic #PF/#GP
+sinks historically halt without clearing; this pre-existing discrepancy is
+not evidence of verified cleanup. The emergency exception is not a default
+rejection policy. The clear representation
 retains only context format version `1`, structure size `128`, and lifecycle
 `CLEARED`; identity, bindings, transition state, and reserved fields must read
 back as zero before normal continuation.

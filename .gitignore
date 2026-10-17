@@ -78,3 +78,5 @@ build/
 /artifacts/release/
 /artifacts/portability/
 /artifacts/rust-user-controls/
+/artifacts/user-exception-controls/
+/artifacts/user-exception-baseline/
