@@ -1,6 +1,6 @@
 {
   "artifact_version": "1",
-  "run_id": "verify-20261017T222820Z",
+  "run_id": "verify-20261017T223924Z",
   "status": "pass",
   "summary_code": "OK",
   "summary_subsystem": "generic",
@@ -63,14 +63,14 @@
       "subsystem": "rust",
       "status": "pass",
       "code": "OK",
-      "detail": "Rust changes are backed by declared cargo check evidence"
+      "detail": "No Rust changes require validation in this bootstrap loop"
     },
     {
       "name": "odin",
       "subsystem": "odin",
       "status": "pass",
       "code": "OK",
-      "detail": "Odin changes are backed by declared odin check evidence"
+      "detail": "No Odin kernel changes require validation in this bootstrap loop"
     },
     {
       "name": "abi",
@@ -493,34 +493,11 @@
   ],
   "failed_checks": [],
   "changed_files": [
-    ".github/workflows/ci.yml",
-    "CHANGELOG.md",
-    "artifacts/runtime/kernel_elf_report.json",
+    "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt",
-    "contracts/bounded_user_exception_recovery_contract.v0.json",
-    "docs/ARCHITECTURE.md",
-    "docs/CONTRACTS.md",
-    "docs/GENERATED_ARTIFACTS.md",
-    "docs/INVARIANTS.md",
-    "docs/PHASEMAP.md",
-    "docs/ROADMAP.md",
-    "docs/SECURITY_MODEL.md",
-    "docs/VALIDATION.md",
-    "docs/adr/0022-bounded-user-exception-recovery.md",
     "docs/generated/governance_index.md",
-    "harness/fixed_rust_user.py",
-    "harness/user_exception_build.py",
     "harness/user_exception_evidence.py",
-    "harness/validators_impl/host_dependency_portability.py",
-    "kernel/arch/x86_64/exception_recovery.inc",
-    "kernel/arch/x86_64/paging.asm",
-    "linker/kernel.ld",
-    "schemas/bounded_user_exception_recovery_contract.schema.json",
-    "tasks/todo.json",
-    "tests/run_user_exception_controls.py",
-    "tests/test_bounded_user_exception_recovery.py",
-    "tests/test_host_dependency_portability.py",
-    "userspace/fixed_user_program/user.rs"
+    "tests/test_bounded_user_exception_recovery.py"
   ],
   "evidence_files": [
     "artifacts/logs/odin-check.log",
@@ -537,5 +514,5 @@
     "artifacts/runtime/qemu_smoke.metadata.json",
     "artifacts/runtime/qemu_smoke.summary.txt"
   ],
-  "generated_at": "2026-10-17T22:28:20Z"
+  "generated_at": "2026-10-17T22:39:24Z"
 }

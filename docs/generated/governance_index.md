@@ -18,12 +18,12 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 
 ## Verification status
 
-* Status: `pass`
-* Summary code: `OK`
+* Status: `fail`
+* Summary code: `STEP_SCOPE_UNPLANNED_FILE`
 * Total checks: 67
-* Failed checks: 0
-* Run ID: `verify-20261017T222732Z`
-* Generated at: `2026-10-17T22:27:32Z`
+* Failed checks: 1
+* Run ID: `verify-20261017T223839Z`
+* Generated at: `2026-10-17T22:38:39Z`
 
 ## Registered validators
 
@@ -174,9 +174,9 @@ This index is not authoritative. Checked-in contracts, schemas, validators, gene
 ## Latest proof artifact
 
 * Path: `artifacts/latest_verify.json`
-* Status: `pass`
+* Status: `fail`
 * Check count: 67
-* Failure count: 0
+* Failure count: 1
 
 ## Non-goals
 
